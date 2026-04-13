@@ -230,7 +230,7 @@ export const PERSOENLICH = {
   kurzvorstellung: "15 Jahre Systemverständnis aus der Elektronik, moderne Software-Architektur und offensive Security Research – ich verbinde praktische Tiefe mit analytischem Denken und baue Lösungen, die echte Probleme lösen.",
   email: "f.michi84.989@gmail.com",
   telefon: "0172 572 5081",
-  adresse: "Geranienweg 3, 94447 Plattling",
+  adresse: "Plattling, Niederbayern",
   github: "https://github.com/NEO849",
   hackerone: "https://hackerone.com/luicypher_neo",
   intigriti: "https://app.intigriti.com/researcher/profile/cypherneo",
