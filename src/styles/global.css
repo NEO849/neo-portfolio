@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════ Globale Basis ═══════════════ */
+html { scroll-behavior: smooth; }
+
+body {
+  background: #06080f;
+  background-image:
+    radial-gradient(ellipse 1200px 600px at 15% 5%, rgba(99,102,241,0.12), transparent 60%),
+    radial-gradient(ellipse 800px 800px at 85% 80%, rgba(6,182,212,0.08), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* ═══════════════ Glassmorphism ═══════════════ */
+@layer components {
+  .glass {
+    @apply border border-white/10 bg-white/[0.04] backdrop-blur-xl rounded-2xl;
+  }
+  .glass-stark {
+    @apply border border-white/15 bg-white/[0.08] backdrop-blur-2xl rounded-2xl shadow-2xl;
+  }
+}
+
+/* ═══════════════ Akzent-Linie (animiert) ═══════════════ */
+.akzent-linie {
+  background: linear-gradient(90deg, transparent, #6366f1, #06b6d4, transparent);
+  height: 1px;
+}
+
+/* ═══════════════ Skill-Balken ═══════════════ */
+.skill-balken {
+  background: linear-gradient(90deg, #6366f1, #06b6d4);
+  border-radius: 4px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ═══════════════ Terminal-Effekt ═══════════════ */
+.terminal-text::after {
+  content: "▋";
+  animation: blinken 1s step-end infinite;
+}
+@keyframes blinken {
+  50% { opacity: 0; }
+}
+
+/* ═══════════════ Scrollbar ═══════════════ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #ffffff15; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #ffffff25; }
+
+/* ═══════════════ Selection ═══════════════ */
+::selection {
+  background: rgba(99,102,241,0.3);
+  color: white;
+}
