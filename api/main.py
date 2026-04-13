@@ -41,14 +41,16 @@ ERLAUBTE_ORIGINS = [
     "http://localhost:5173",                    # Vite Dev Server
     "http://localhost:3000",                    # Fallback
     "https://michael-fleps.duckdns.org",        # API-Domain selbst (für /docs)
-    "https://neo-portfolio.vercel.app",         # Vercel Production
+    "https://michael-fleps.vercel.app",         # Vercel Production
+    "https://neo-portfolio.vercel.app",         # Vercel Alt
     "https://neo-portfolio-neo849.vercel.app",  # Vercel Alias
 ]
 
 # Alle Vercel-Preview-URLs dynamisch erlauben
 # (FastAPI CORS unterstützt keine Wildcards — wir prüfen manuell im Middleware)
 ERLAUBTE_ORIGIN_PRAEFIXE = [
-    "https://neo-portfolio-",  # Vercel Preview Deployments
+    "https://neo-portfolio-",   # Vercel Preview Deployments (alt)
+    "https://michael-fleps-",  # Vercel Preview Deployments (neu)
 ]
 
 from starlette.middleware.base import BaseHTTPMiddleware

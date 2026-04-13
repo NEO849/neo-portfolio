@@ -4,7 +4,7 @@
 // Typsichere Fetch-Funktionen für alle OSINT-Werkzeuge.
 // ═══════════════════════════════════════════════════════════════════
 
-const API_BASIS = import.meta.env.VITE_OSINT_API_URL ?? "http://localhost:8000";
+const API_BASIS = import.meta.env.VITE_OSINT_API_URL ?? "https://michael-fleps.duckdns.org";
 const API_PFAD = `${API_BASIS}/api/v1/osint`;
 
 // ─── Typen: Domain-Analyse ────────────────────────────────────────
