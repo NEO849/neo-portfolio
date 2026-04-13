@@ -40,7 +40,7 @@ app.add_middleware(SlowAPIMiddleware)
 ERLAUBTE_ORIGINS = [
     "http://localhost:5173",                    # Vite Dev Server
     "http://localhost:3000",                    # Fallback
-    "https://fleps-michael.duckdns.org",        # API-Domain selbst (für /docs)
+    "https://michael-fleps.duckdns.org",        # API-Domain selbst (für /docs)
     "https://neo-portfolio.vercel.app",         # Vercel Production
     "https://neo-portfolio-neo849.vercel.app",  # Vercel Alias
 ]

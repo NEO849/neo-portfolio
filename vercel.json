@@ -14,11 +14,11 @@
     }
   ],
   "env": {
-    "VITE_OSINT_API_URL": "https://fleps-michael.duckdns.org"
+    "VITE_OSINT_API_URL": "https://michael-fleps.duckdns.org"
   },
   "build": {
     "env": {
-      "VITE_OSINT_API_URL": "https://fleps-michael.duckdns.org"
+      "VITE_OSINT_API_URL": "https://michael-fleps.duckdns.org"
     }
   }
 }
