@@ -6,3 +6,7 @@ dist/
 *.DS_Store
 .env*
 !.env.example
+__pycache__/
+api/__pycache__/
+api/**/__pycache__/
+.env
