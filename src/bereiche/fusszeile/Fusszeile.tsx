@@ -30,7 +30,7 @@ export function Fusszeile() {
           {/* Marke */}
           <div>
             <p className="font-mono text-sm text-white/25 mb-1">
-              neo<span className="text-akzent-400">@</span>portfolio
+              FREE DATA <span className="text-akzent-400">solution's</span>
             </p>
             <p className="text-xs text-white/25 leading-relaxed max-w-xs">
               Fullstack Security Engineer. iOS Development,<br />

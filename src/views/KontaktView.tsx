@@ -2,8 +2,6 @@ import { motion } from "framer-motion";
 import { PERSOENLICH } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
-import { KnopfPrimaer } from "../bausteine/KnopfPrimaer";
-import { KnopfSekundaer } from "../bausteine/KnopfSekundaer";
 
 const KONTAKT_EINTRAEGE = [
   {
@@ -109,30 +107,14 @@ export default function KontaktView() {
         ))}
       </motion.div>
 
-      {/* Downloads */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="mt-8 flex flex-wrap gap-3"
-      >
-        <KnopfPrimaer zuUrl="/Michael_Fleps_Lebenslauf.pdf">
-          Lebenslauf (PDF)
-        </KnopfPrimaer>
-        <KnopfSekundaer zuUrl="/Michael_Fleps_Anschreiben.pdf">
-          Anschreiben (PDF)
-        </KnopfSekundaer>
-      </motion.div>
-
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.5 }}
-        className="mt-8 text-center"
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="mt-10 text-center"
       >
-        <p className="text-xs text-white/20 font-mono">{PERSOENLICH.adresse} • {PERSOENLICH.standort}</p>
+        <p className="text-xs text-white/20 font-mono">{PERSOENLICH.standort}</p>
       </motion.div>
     </section>
   );

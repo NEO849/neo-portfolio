@@ -5,7 +5,7 @@
 // Lazy Loading: Seiten werden erst geladen wenn sie gebraucht werden.
 // ═══════════════════════════════════════════════════════════════════
 
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { KartenSkeleton } from "../bausteine/LadeanzeigePuls";
@@ -48,10 +48,20 @@ function NichtGefundenSeite() {
   );
 }
 
+function ScrollZuTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [pathname]);
+  return null;
+}
+
 export function Routen() {
   const ort = useLocation();
 
   return (
+    <>
+      <ScrollZuTop />
     <AnimatePresence mode="wait" initial={false}>
       <Suspense fallback={<SeitenLadeindikator />}>
         <Routes location={ort} key={ort.pathname}>
@@ -66,5 +76,6 @@ export function Routen() {
         </Routes>
       </Suspense>
     </AnimatePresence>
+    </>
   );
 }

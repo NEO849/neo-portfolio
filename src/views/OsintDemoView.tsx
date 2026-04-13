@@ -565,7 +565,7 @@ export default function OsintDemoView() {
 
         {/* Terminal-Körper */}
         <div ref={terminalRef}
-          className="bg-[#08080f] p-5 md:p-6 font-mono text-[13px] leading-relaxed min-h-[420px] max-h-[540px] overflow-y-auto">
+          className="bg-[#08080f] p-5 md:p-6 font-mono text-[13px] leading-relaxed min-h-[420px] max-h-[540px] overflow-y-auto overflow-x-hidden">
           <AnimatePresence mode="wait">
 
             {/* Menü */}
@@ -646,7 +646,7 @@ export default function OsintDemoView() {
             {phase === "ausgabe" && (
               <motion.div key="ausgabe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
                 {ausgabeZeilen.slice(0, zeilenIndex + 1).map((zeile, index) => (
-                  <div key={index} className={`whitespace-pre ${zeileFarbe(zeile)}`}>
+                  <div key={index} className={`whitespace-pre-wrap break-words ${zeileFarbe(zeile)}`}>
                     {zeile || "\u00A0"}
                   </div>
                 ))}
