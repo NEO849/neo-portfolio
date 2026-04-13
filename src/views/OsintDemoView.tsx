@@ -528,7 +528,7 @@ export default function OsintDemoView() {
   };
 
   return (
-    <section className="py-16 px-6 max-w-5xl mx-auto">
+    <section id="osint" className="py-16 px-6 max-w-5xl mx-auto">
       <DatenschutzModal
         offen={modalOffen}
         modulName={wartendesModul?.name ?? ""}

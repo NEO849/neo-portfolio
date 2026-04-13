@@ -80,9 +80,7 @@ export default function HeroView() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
-      // pt-20 = Platz für fixe NavBar (80px), pb-12 = Luft unten
-      style={{ paddingTop: "96px", paddingBottom: "48px", paddingLeft: "24px", paddingRight: "24px" }}
+      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-24 pb-12 px-6"
     >
       <CodeRainCanvas />
 

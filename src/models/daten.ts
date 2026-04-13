@@ -9,7 +9,8 @@ export const NAVIGATION: NavigationModel[] = [
   { pfad: "#ueber",      label: "Über mich",  abschnitt: "ueber" },
   { pfad: "#projekte",   label: "Projekte",   abschnitt: "projekte" },
   { pfad: "#security",   label: "Security",   abschnitt: "security" },
-  { pfad: "#zeugnisse",  label: "Zeugnisse",  abschnitt: "zeugnisse" },
+  { pfad: "#osint",      label: "OSINT Lab",  abschnitt: "osint" },
+  { pfad: "#zeugnisse",  label: "Dokumente",  abschnitt: "zeugnisse" },
   { pfad: "#skills",     label: "Skills",     abschnitt: "skills" },
   { pfad: "#kontakt",    label: "Kontakt",    abschnitt: "kontakt" },
 ];
@@ -139,7 +140,7 @@ export const ASSET_TIERS = [
 
 export const SECURITY_STATS: SecurityStatModel[] = [
   { label: "Plattformen",         wert: "2",       icon: "🎯" },
-  { label: "Reports eingereicht", wert: "8+",      icon: "📝" },
+  { label: "Reports eingereicht", wert: "5+",      icon: "📝" },
   { label: "Aktive Targets",      wert: "4",       icon: "🔍" },
   { label: "Pipeline-Skripte",    wert: "30+",     icon: "⚙️" },
   { label: "Custom Tools",        wert: "13",      icon: "🛠️" },
@@ -225,7 +226,7 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
 export const PERSOENLICH = {
   name: "Michael Fleps",
   standort: "Plattling, Niederbayern",
-  titel: "Fullstack Security Engineer",
+  titel: "Security Researcher & iOS Developer",
   untertitel: "iOS Development • Security Research • Bug Bounty",
   kurzvorstellung: "15 Jahre Systemverständnis aus der Elektronik, moderne Software-Architektur und offensive Security Research – ich verbinde praktische Tiefe mit analytischem Denken und baue Lösungen, die echte Probleme lösen.",
   email: "f.michi84.989@gmail.com",

@@ -57,7 +57,7 @@ export default function UeberMichView() {
       >
         <InfoKarte lichtfarbe="34, 211, 238" mitHoverAnimation={false} klassen="p-5">
           <p className="text-white/50 leading-relaxed text-sm">
-            Auch privat spielen Natur und Ausdauer eine große Rolle. In den Bergen bin ich zuhause – beim Wandern, Klettern und auf Klettersteigen. Touren in der Natur geben mir Kraft, Fokus und Motivation. Ich mag Herausforderungen, aber ich gehe sie bewusst und mit Respekt an.
+            Auch abseits der Technik ist mir Ausdauer wichtig. In den Bergen bin ich zuhause – beim Wandern, Klettern und auf Klettersteigen. Diese Erfahrungen schärfen meinen Fokus, meine Geduld und meine Fähigkeit, in anspruchsvollen Situationen ruhig und strukturiert zu handeln.
           </p>
         </InfoKarte>
       </motion.div>

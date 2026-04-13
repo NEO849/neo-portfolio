@@ -20,6 +20,7 @@ export default function App() {
         <ProjekteView />
         <div className="akzent-linie mx-6" />
         <SecurityView />
+        <div className="akzent-linie mx-6" />
         <OsintDemoView />
         <div className="akzent-linie mx-6" />
         <ZeugnisseView />

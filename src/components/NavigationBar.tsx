@@ -43,18 +43,18 @@ export default function NavigationBar() {
     }`}>
       <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
 
-        {/* Brand */}
+        {/* Brand — klare persönliche Identität */}
         <a
           href="#hero"
           onClick={(e) => scrollZu("hero", e)}
-          className="font-mono text-sm font-semibold tracking-wide transition-opacity duration-200 hover:opacity-80"
+          className="font-display text-sm font-bold tracking-wide transition-opacity duration-200 hover:opacity-75 select-none"
           style={{
             background: "linear-gradient(135deg, #818cf8, #22d3ee)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
         >
-          FREE DATA solution's
+          Michael Fleps
         </a>
 
         {/* Desktop Nav */}

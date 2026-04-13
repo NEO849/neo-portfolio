@@ -311,12 +311,27 @@ export default function ZeugnisseView() {
                   <h3 className="font-display text-base font-bold text-white">{aktuell.titel}</h3>
                   <p className="font-mono text-xs text-white/30 mt-0.5">{aktuell.aussteller}</p>
                 </div>
-                <button
-                  onClick={() => setLightboxOffen(false)}
-                  className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition text-lg font-light"
-                >
-                  ×
-                </button>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={aktuell.pdfPfad}
+                    download
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all hover:scale-[1.03]"
+                    style={{
+                      background: `${aktuell.akzentFarbe}15`,
+                      color: aktuell.akzentFarbe,
+                      border: `1px solid ${aktuell.akzentFarbe}30`,
+                    }}
+                  >
+                    ↓ Download
+                  </a>
+                  <button
+                    onClick={() => setLightboxOffen(false)}
+                    className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition text-lg font-light"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
 
               {/* Bild */}

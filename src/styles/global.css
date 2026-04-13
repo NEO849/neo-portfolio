@@ -59,3 +59,19 @@ body {
   background: rgba(99,102,241,0.3);
   color: white;
 }
+
+/* ═══════════════ Accessibility: Fokus-Ring ═══════════════ */
+:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.75);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+/* Nur für Tastaturnavigation sichtbar — nicht bei Mausklick */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ═══════════════ Kein horizontales Scrollen ═══════════════ */
+body {
+  overflow-x: hidden;
+}
