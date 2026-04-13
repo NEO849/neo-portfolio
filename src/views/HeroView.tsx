@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { PERSOENLICH } from "../models/daten";
 
 // ═══════════════════════════════════════════════════════
-// VIEW: Hero mit Code-Rain-Animation
+// VIEW: Hero — Erster Eindruck
 // ═══════════════════════════════════════════════════════
 
 function CodeRainCanvas() {
@@ -12,87 +12,77 @@ function CodeRainCanvas() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const kontext = canvas.getContext("2d");
-    if (!kontext) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    let breite = window.innerWidth;
-    let hoehe = window.innerHeight;
-    canvas.width = breite;
-    canvas.height = hoehe;
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
 
-    const zeichen = "01{}[]();:=></>#!/usr/bin function return const async await import export class if else for while try catch query mutation schema resolve auth token session redirect callback graphql api";
-    const zeichenArray = zeichen.split("");
-    const spaltenBreite = 14;
-    let spaltenAnzahl = Math.floor(breite / spaltenBreite);
-    let tropfen: number[] = Array(spaltenAnzahl).fill(0).map(() => Math.random() * -100);
+    const zeichen = "01{}[]();=></>#!/usr/bin function const async await import graphql auth token";
+    const zeichenArr = zeichen.split("");
+    const spaltenBreite = 16;
+    let spalten = Math.floor(w / spaltenBreite);
+    let tropfen: number[] = Array(spalten).fill(0).map(() => Math.random() * -80);
 
-    const zeichneBild = () => {
-      kontext.fillStyle = "rgba(6, 8, 15, 0.06)";
-      kontext.fillRect(0, 0, breite, hoehe);
-      kontext.font = `11px 'JetBrains Mono', monospace`;
+    const zeichnen = () => {
+      ctx.fillStyle = "rgba(6, 8, 15, 0.055)";
+      ctx.fillRect(0, 0, w, h);
+      ctx.font = `12px 'JetBrains Mono', monospace`;
 
-      for (let spalte = 0; spalte < spaltenAnzahl; spalte++) {
-        const zufallsZeichen = zeichenArray[Math.floor(Math.random() * zeichenArray.length)];
-        const xPosition = spalte * spaltenBreite;
-        const yPosition = tropfen[spalte] * spaltenBreite;
+      for (let s = 0; s < spalten; s++) {
+        const z = zeichenArr[Math.floor(Math.random() * zeichenArr.length)];
+        const x = s * spaltenBreite;
+        const y = tropfen[s] * spaltenBreite;
 
-        // Kopf des Tropfens heller
-        if (Math.random() > 0.97) {
-          kontext.fillStyle = "rgba(99, 102, 241, 0.4)";
-        } else if (Math.random() > 0.95) {
-          kontext.fillStyle = "rgba(6, 182, 212, 0.3)";
+        const r = Math.random();
+        if (r > 0.98) {
+          ctx.fillStyle = "rgba(99, 102, 241, 0.55)"; // heller Kopf
+        } else if (r > 0.94) {
+          ctx.fillStyle = "rgba(6, 182, 212, 0.25)";
         } else {
-          kontext.fillStyle = "rgba(99, 102, 241, 0.08)";
+          ctx.fillStyle = "rgba(99, 102, 241, 0.07)";
         }
 
-        kontext.fillText(zufallsZeichen, xPosition, yPosition);
+        ctx.fillText(z, x, y);
 
-        if (yPosition > hoehe && Math.random() > 0.985) {
-          tropfen[spalte] = 0;
-        }
-        tropfen[spalte] += 0.5;
+        if (y > h && Math.random() > 0.983) tropfen[s] = 0;
+        tropfen[s] += 0.45;
       }
     };
 
-    const intervall = setInterval(zeichneBild, 50);
+    const intervall = setInterval(zeichnen, 50);
 
-    const groesseAnpassen = () => {
-      breite = window.innerWidth;
-      hoehe = window.innerHeight;
-      canvas.width = breite;
-      canvas.height = hoehe;
-      spaltenAnzahl = Math.floor(breite / spaltenBreite);
-      tropfen = Array(spaltenAnzahl).fill(0).map(() => Math.random() * -100);
+    const resize = () => {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w;
+      canvas.height = h;
+      spalten = Math.floor(w / spaltenBreite);
+      tropfen = Array(spalten).fill(0).map(() => Math.random() * -80);
     };
 
-    window.addEventListener("resize", groesseAnpassen);
-    return () => {
-      clearInterval(intervall);
-      window.removeEventListener("resize", groesseAnpassen);
-    };
+    window.addEventListener("resize", resize);
+    return () => { clearInterval(intervall); window.removeEventListener("resize", resize); };
   }, []);
 
-  return (
-    <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" style={{ opacity: 0.6 }} />
-  );
+  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" style={{ opacity: 0.55 }} />;
 }
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 const buchstabenVariante = {
-  versteckt: { opacity: 0, y: 40 },
-  sichtbar: (index: number) => ({
+  versteckt: { opacity: 0, y: 36 },
+  sichtbar: (i: number) => ({
     opacity: 1, y: 0,
-    transition: { duration: 0.5, delay: 0.04 * index, ease: EASE }
+    transition: { duration: 0.5, delay: 0.035 * i, ease: EASE },
   }),
 };
 
-const einblend = (verzoegerung: number) => ({
-  versteckt: { opacity: 0, y: 20 },
-  sichtbar: {
-    opacity: 1, y: 0,
-    transition: { duration: 0.7, delay: verzoegerung, ease: EASE }
-  },
+const einblend = (delay: number, y = 20) => ({
+  versteckt: { opacity: 0, y },
+  sichtbar: { opacity: 1, y: 0, transition: { duration: 0.65, delay, ease: EASE } },
 });
 
 export default function HeroView() {
@@ -100,54 +90,90 @@ export default function HeroView() {
   const nachname = PERSOENLICH.name.split(" ")[1];
 
   return (
-    <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
+    <section
+      id="hero"
+      className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden"
+    >
       {/* Code Rain */}
       <CodeRainCanvas />
 
-      {/* Ambient Glow */}
+      {/* Ambient Glow — tiefer, ruhiger */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-akzent-500/6 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-cyber-500/4 rounded-full blur-[120px]" />
+        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-akzent-500/5 rounded-full blur-[180px]" />
+        <div className="absolute bottom-1/3 right-1/4 w-[500px] h-[500px] bg-cyber-500/4 rounded-full blur-[160px]" />
+        <div className="absolute top-2/3 left-1/2 w-[300px] h-[300px] bg-akzent-500/3 rounded-full blur-[120px]" />
       </div>
 
-      <div className="relative z-10 text-center max-w-4xl">
+      <div className="relative z-10 text-center max-w-4xl w-full">
+
         {/* Status Pill */}
-        <motion.div variants={einblend(0)} initial="versteckt" animate="sichtbar"
-          className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-signal-gruen/20 bg-signal-gruen/5 mb-10 backdrop-blur-sm">
+        <motion.div
+          variants={einblend(0)}
+          initial="versteckt"
+          animate="sichtbar"
+          className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-signal-gruen/25 bg-signal-gruen/6 mb-10 backdrop-blur-sm"
+        >
           <span className="w-2 h-2 rounded-full bg-signal-gruen animate-pulse" />
-          <span className="text-sm font-mono text-signal-gruen/80">Verfügbar für neue Herausforderungen</span>
+          <span className="text-sm font-mono text-signal-gruen/90 tracking-wide">
+            Verfügbar für neue Herausforderungen
+          </span>
         </motion.div>
 
         {/* Profilbild */}
-        <motion.div variants={einblend(0.1)} initial="versteckt" animate="sichtbar" className="mb-8">
-          <div className="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden"
+        <motion.div
+          variants={einblend(0.1)}
+          initial="versteckt"
+          animate="sichtbar"
+          className="mb-10"
+        >
+          <div
+            className="w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full overflow-hidden relative"
             style={{
-              border: "2px solid rgba(99,102,241,0.2)",
-              boxShadow: "0 0 40px rgba(99,102,241,0.1), 0 0 80px rgba(6,182,212,0.05)",
-            }}>
-            <img src="/profilbild.jpg" alt="Michael Fleps" className="w-full h-full object-cover"
-              onError={(event) => {
-                const bild = event.target as HTMLImageElement;
-                bild.style.display = "none";
-              }}
+              border: "1.5px solid rgba(99,102,241,0.25)",
+              boxShadow: "0 0 0 6px rgba(99,102,241,0.05), 0 0 60px rgba(99,102,241,0.12), 0 20px 60px rgba(0,0,0,0.5)",
+            }}
+          >
+            <img
+              src="/profilbild.jpg"
+              alt="Michael Fleps"
+              className="w-full h-full object-cover"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
           </div>
         </motion.div>
 
-        {/* Name */}
-        <div className="mb-3">
+        {/* Name — Buchstaben-Animation */}
+        <div className="mb-4">
           <h1 className="font-display text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight inline-flex flex-wrap justify-center gap-x-4">
             <span className="flex">
-              {vorname.split("").map((buchstabe, index) => (
-                <motion.span key={`v-${index}`} custom={index} variants={buchstabenVariante} initial="versteckt" animate="sichtbar" className="text-white">
-                  {buchstabe}
+              {vorname.split("").map((b, i) => (
+                <motion.span
+                  key={`v-${i}`}
+                  custom={i}
+                  variants={buchstabenVariante}
+                  initial="versteckt"
+                  animate="sichtbar"
+                  className="text-white"
+                >
+                  {b}
                 </motion.span>
               ))}
             </span>
             <span className="flex">
-              {nachname.split("").map((buchstabe, index) => (
-                <motion.span key={`n-${index}`} custom={index + vorname.length + 2} variants={buchstabenVariante} initial="versteckt" animate="sichtbar" className="text-akzent-400">
-                  {buchstabe}
+              {nachname.split("").map((b, i) => (
+                <motion.span
+                  key={`n-${i}`}
+                  custom={i + vorname.length + 2}
+                  variants={buchstabenVariante}
+                  initial="versteckt"
+                  animate="sichtbar"
+                  style={{
+                    background: "linear-gradient(135deg, #818cf8, #22d3ee)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  {b}
                 </motion.span>
               ))}
             </span>
@@ -155,30 +181,70 @@ export default function HeroView() {
         </div>
 
         {/* Titel */}
-        <motion.div variants={einblend(0.5)} initial="versteckt" animate="sichtbar"
-          className="font-mono text-base md:text-lg text-white/40 mb-5 tracking-widest">
-          {PERSOENLICH.titel}
+        <motion.div
+          variants={einblend(0.5)}
+          initial="versteckt"
+          animate="sichtbar"
+          className="font-mono text-sm md:text-base text-white/45 mb-6 tracking-[0.2em] uppercase"
+        >
+          {PERSOENLICH.untertitel}
         </motion.div>
 
-        {/* Kurzvorstellung */}
-        <motion.p variants={einblend(0.65)} initial="versteckt" animate="sichtbar"
-          className="text-base text-white/30 max-w-lg mx-auto leading-relaxed">
+        {/* Kurzvorstellung — besser lesbar */}
+        <motion.p
+          variants={einblend(0.65)}
+          initial="versteckt"
+          animate="sichtbar"
+          className="text-base md:text-lg text-white/55 max-w-2xl mx-auto leading-relaxed mb-12"
+        >
           {PERSOENLICH.kurzvorstellung}
         </motion.p>
 
-        {/* Scroll Indicator */}
+        {/* CTA-Buttons */}
+        <motion.div
+          variants={einblend(0.85)}
+          initial="versteckt"
+          animate="sichtbar"
+          className="flex flex-wrap gap-4 justify-center"
+        >
+          <a
+            href="#kontakt"
+            className="px-7 py-3 rounded-xl font-medium text-sm text-white transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
+            style={{
+              background: "linear-gradient(135deg, rgba(99,102,241,0.25), rgba(6,182,212,0.15))",
+              border: "1px solid rgba(99,102,241,0.35)",
+              boxShadow: "0 0 30px rgba(99,102,241,0.1)",
+            }}
+          >
+            Kontakt aufnehmen
+          </a>
+          <a
+            href={PERSOENLICH.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-7 py-3 rounded-xl font-medium text-sm text-white/65 hover:text-white transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
+            style={{
+              border: "1px solid rgba(255,255,255,0.1)",
+              background: "rgba(255,255,255,0.03)",
+            }}
+          >
+            GitHub →
+          </a>
+        </motion.div>
+
+        {/* Scroll Indikator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="mt-16"
+          transition={{ delay: 2.2 }}
+          className="mt-20"
         >
           <motion.div
             animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="w-5 h-8 mx-auto rounded-full border border-white/15 flex justify-center pt-1.5"
+            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+            className="w-5 h-8 mx-auto rounded-full border border-white/12 flex justify-center pt-1.5"
           >
-            <div className="w-1 h-1.5 rounded-full bg-white/30" />
+            <div className="w-1 h-2 rounded-full bg-white/20" />
           </motion.div>
         </motion.div>
       </div>

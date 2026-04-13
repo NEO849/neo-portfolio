@@ -59,20 +59,81 @@ export default function ZeugnisseView() {
 
   const aktuell = ZEUGNISSE[aktuellerIndex];
 
-  // Vorschau-Komponente: Bild wenn vorhanden, sonst PDF-iframe
+  // Vorschau-Komponente: Bild wenn vorhanden, sonst elegante PDF-Placeholder-Karte
   const VorschauElement = () => {
     if (aktuell.vorschauBild) {
       return (
-        <img src={aktuell.vorschauBild} alt={aktuell.titel}
-          className="w-full h-full object-contain" />
+        <img
+          src={aktuell.vorschauBild}
+          alt={aktuell.titel}
+          className="w-full h-full object-contain"
+        />
       );
     }
+    // Kein Bild → elegante Darstellung statt iframe (iframe funktioniert auf Mobile nicht)
     return (
-      <iframe
-        src={`${aktuell.pdfPfad}#toolbar=0&navpanes=0&scrollbar=0`}
-        className="w-full h-full border-0 pointer-events-none"
-        title={aktuell.titel}
-      />
+      <div
+        className="w-full flex flex-col items-center justify-center gap-6 py-16 px-8"
+        style={{ minHeight: "280px" }}
+      >
+        {/* PDF-Icon */}
+        <div
+          className="w-20 h-20 rounded-2xl flex items-center justify-center"
+          style={{
+            background: `${aktuell.akzentFarbe}12`,
+            border: `1px solid ${aktuell.akzentFarbe}25`,
+          }}
+        >
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              stroke={aktuell.akzentFarbe}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fillOpacity="0"
+            />
+            <polyline
+              points="14 2 14 8 20 8"
+              stroke={aktuell.akzentFarbe}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <text
+              x="12"
+              y="17"
+              textAnchor="middle"
+              fontSize="5.5"
+              fontFamily="monospace"
+              fontWeight="700"
+              fill={aktuell.akzentFarbe}
+            >
+              PDF
+            </text>
+          </svg>
+        </div>
+
+        <div className="text-center">
+          <p className="font-mono text-xs text-white/30 mb-1">Dokument verfügbar</p>
+          <p className="font-display text-sm font-semibold text-white/70">{aktuell.titel}</p>
+        </div>
+
+        <a
+          href={aktuell.pdfPfad}
+          target="_blank"
+          rel="noreferrer"
+          className="font-mono text-xs px-5 py-2.5 rounded-lg transition-all hover:scale-[1.03]"
+          style={{
+            background: `${aktuell.akzentFarbe}15`,
+            color: aktuell.akzentFarbe,
+            border: `1px solid ${aktuell.akzentFarbe}30`,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          PDF öffnen →
+        </a>
+      </div>
     );
   };
 

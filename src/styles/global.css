@@ -3,7 +3,10 @@
 @tailwind utilities;
 
 /* ═══════════════ Globale Basis ═══════════════ */
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Offset für fixe NavBar */
+}
 
 body {
   background: #06080f;
