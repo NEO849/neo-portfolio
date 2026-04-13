@@ -38,24 +38,61 @@ app.add_middleware(SlowAPIMiddleware)
 # ─── CORS ─────────────────────────────────────────────────────────────
 # Erlaubte Origins: lokale Entwicklung + Vercel-Deployments
 ERLAUBTE_ORIGINS = [
-    "http://localhost:5173",           # Vite Dev Server
-    "http://localhost:3000",           # Fallback
-    "http://62.171.158.166:5173",      # VPS Dev Server
-    "http://62.171.158.166:3000",      # VPS Dev Server Fallback
-    "https://neo-portfolio-*.vercel.app",  # Vercel Preview
-    "https://neo-portfolio.vercel.app",    # Vercel Production (anpassen!)
-    "https://michaelfleps.de",         # Eigene Domain (falls vorhanden)
-    "https://www.michaelfleps.de",
+    "http://localhost:5173",                    # Vite Dev Server
+    "http://localhost:3000",                    # Fallback
+    "https://fleps-michael.duckdns.org",        # API-Domain selbst (für /docs)
+    "https://neo-portfolio.vercel.app",         # Vercel Production
+    "https://neo-portfolio-neo849.vercel.app",  # Vercel Alias
 ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=ERLAUBTE_ORIGINS,
-    allow_credentials=False,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Accept"],
-    max_age=600,
-)
+# Alle Vercel-Preview-URLs dynamisch erlauben
+# (FastAPI CORS unterstützt keine Wildcards — wir prüfen manuell im Middleware)
+ERLAUBTE_ORIGIN_PRAEFIXE = [
+    "https://neo-portfolio-",  # Vercel Preview Deployments
+]
+
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
+from starlette.responses import Response
+
+
+class FlexibleCORSMiddleware(BaseHTTPMiddleware):
+    """CORS-Middleware die auch Vercel-Preview-URLs (Wildcard-Prefix) erlaubt."""
+
+    async def dispatch(self, request: StarletteRequest, call_next):
+        origin = request.headers.get("origin", "")
+
+        # Origin prüfen: exakte Liste oder Prefix-Match
+        erlaubt = (
+            origin in ERLAUBTE_ORIGINS
+            or any(origin.startswith(p) for p in ERLAUBTE_ORIGIN_PRAEFIXE)
+        )
+
+        if request.method == "OPTIONS" and erlaubt:
+            # Preflight-Antwort
+            return Response(
+                status_code=204,
+                headers={
+                    "Access-Control-Allow-Origin": origin,
+                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type, Accept",
+                    "Access-Control-Max-Age": "600",
+                    "Vary": "Origin",
+                },
+            )
+
+        antwort = await call_next(request)
+
+        if erlaubt:
+            antwort.headers["Access-Control-Allow-Origin"] = origin
+            antwort.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+            antwort.headers["Access-Control-Allow-Headers"] = "Content-Type, Accept"
+            antwort.headers["Vary"] = "Origin"
+
+        return antwort
+
+
+app.add_middleware(FlexibleCORSMiddleware)
 
 # ─── Routen ──────────────────────────────────────────────────────────
 app.include_router(osint_router, prefix="/api/v1")
