@@ -17,7 +17,7 @@ const KATEGORIE_KONFIGURATION: Record<string, {
 
 export default function UeberMichView() {
   return (
-    <section id="ueber" className="py-24 px-6 max-w-5xl mx-auto">
+    <section id="ueber" className="py-16 px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
         prefix="> ueber_mich"
         titel="Über mich"

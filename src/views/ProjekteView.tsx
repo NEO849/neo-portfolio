@@ -91,7 +91,7 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
 
 export default function ProjekteView() {
   return (
-    <section id="projekte" className="py-24 px-6 max-w-5xl mx-auto">
+    <section id="projekte" className="py-16 px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
         prefix="> projekte"
         titel="Projekte"

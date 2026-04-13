@@ -28,7 +28,7 @@ export default function SkillsView() {
   const gefiltert = filter === "alle" ? SKILLS : SKILLS.filter(skill => skill.kategorie === filter);
 
   return (
-    <section id="skills" className="py-24 px-6 max-w-5xl mx-auto">
+    <section id="skills" className="py-16 px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
         prefix="> skills"
         titel="Fähigkeiten"

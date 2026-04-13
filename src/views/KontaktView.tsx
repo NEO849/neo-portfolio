@@ -55,7 +55,7 @@ const KONTAKT_EINTRAEGE = [
 
 export default function KontaktView() {
   return (
-    <section id="kontakt" className="py-24 px-6 max-w-3xl mx-auto">
+    <section id="kontakt" className="py-16 px-6 max-w-3xl mx-auto">
       <AbschnittsTitel
         prefix="> kontakt"
         titel="Kontakt"

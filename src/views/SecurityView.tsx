@@ -18,7 +18,7 @@ export default function SecurityView() {
   const [aktiverSchritt, setAktiverSchritt] = useState<number | null>(null);
 
   return (
-    <section id="security" className="py-24 px-6 max-w-6xl mx-auto">
+    <section id="security" className="py-16 px-6 max-w-6xl mx-auto">
       <AbschnittsTitel
         prefix="> security_research"
         titel="Security Research & Tooling"

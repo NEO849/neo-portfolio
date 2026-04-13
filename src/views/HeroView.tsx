@@ -170,6 +170,7 @@ export default function HeroView() {
           className="flex flex-wrap gap-3 justify-center">
           <a
             href="#kontakt"
+            onClick={(e) => { e.preventDefault(); document.getElementById("kontakt")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
             className="px-6 py-3 rounded-xl font-medium text-sm text-white transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
             style={{
               background: "linear-gradient(135deg, rgba(99,102,241,0.22), rgba(6,182,212,0.12))",
