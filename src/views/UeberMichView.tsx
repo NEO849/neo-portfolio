@@ -57,7 +57,7 @@ export default function UeberMichView() {
       >
         <InfoKarte lichtfarbe="34, 211, 238" mitHoverAnimation={false} klassen="p-5">
           <p className="text-white/50 leading-relaxed text-sm">
-            Auch privat spielen Verantwortung, Natur und Ausdauer eine große Rolle. Die freiwillige Feuerwehr bedeutet für mich Gemeinschaft, Verlässlichkeit und Einsatz für andere. In den Bergen bin ich zuhause – beim Wandern, Klettern und auf Klettersteigen. Touren in der Natur geben mir Kraft, Fokus und Motivation. Ich mag Herausforderungen, aber ich gehe sie bewusst und mit Respekt an.
+            Auch privat spielen Natur und Ausdauer eine große Rolle. In den Bergen bin ich zuhause – beim Wandern, Klettern und auf Klettersteigen. Touren in der Natur geben mir Kraft, Fokus und Motivation. Ich mag Herausforderungen, aber ich gehe sie bewusst und mit Respekt an.
           </p>
         </InfoKarte>
       </motion.div>
