@@ -33,7 +33,7 @@ const ZEUGNISSE: ZeugnisEintrag[] = [
     jahr: "2024",
     beschreibung: "2.300 Unterrichtseinheiten im Remote Learning. Module: Mobile UX/UI Design, Grundlagen Programmierung, Android App Development (Kotlin, MVVM, Room, Retrofit), iOS App Development (SwiftUI, Core Data, Firebase). Abschluss: 07. November 2024.",
     pdfPfad: "/Zertifikat_IT_Fachkraft.pdf",
-    vorschauBild: "",
+    vorschauBild: "/zertifikat_vorschau.jpg",
     kategorie: "zertifikat",
     akzentFarbe: "#22d3ee",
   },

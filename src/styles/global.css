@@ -5,7 +5,7 @@
 /* ═══════════════ Globale Basis ═══════════════ */
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 80px; /* Offset für fixe NavBar */
+  scroll-padding-top: 88px; /* Offset für fixe NavBar (72px) + Luft */
 }
 
 body {

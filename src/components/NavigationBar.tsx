@@ -46,14 +46,15 @@ export default function NavigationBar() {
     }`}>
       <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
 
-        {/* Logo */}
+        {/* Logo — scrollt immer ganz nach oben */}
         <a
           href="#hero"
+          onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
           className="font-mono text-sm tracking-wider transition-colors duration-200 group"
         >
-          <span className="text-white/50 group-hover:text-white/80 transition-colors">neo</span>
+          <span className="text-white/60 group-hover:text-white transition-colors">neo</span>
           <span className="text-akzent-400">@</span>
-          <span className="text-white/50 group-hover:text-white/80 transition-colors">portfolio</span>
+          <span className="text-white/60 group-hover:text-white transition-colors">portfolio</span>
         </a>
 
         {/* Desktop Nav */}
@@ -62,10 +63,14 @@ export default function NavigationBar() {
             <a
               key={nav.pfad}
               href={nav.pfad}
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById(nav.abschnitt)?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
               className={`relative px-3.5 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                 istAktiv(nav.abschnitt)
                   ? "text-white bg-white/8"
-                  : "text-white/55 hover:text-white/90 hover:bg-white/5"
+                  : "text-white/70 hover:text-white hover:bg-white/5"
               }`}
             >
               {nav.label}
@@ -114,11 +119,17 @@ export default function NavigationBar() {
               <a
                 key={nav.pfad}
                 href={nav.pfad}
-                onClick={() => setMenuOffen(false)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setMenuOffen(false);
+                  setTimeout(() => {
+                    document.getElementById(nav.abschnitt)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }, 150);
+                }}
                 className={`flex items-center gap-3 px-4 py-3 text-sm rounded-xl transition-all duration-200 ${
                   istAktiv(nav.abschnitt)
                     ? "text-white bg-white/8 font-medium"
-                    : "text-white/65 hover:text-white hover:bg-white/5"
+                    : "text-white/70 hover:text-white hover:bg-white/5"
                 }`}
               >
                 {istAktiv(nav.abschnitt) && (

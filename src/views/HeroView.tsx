@@ -30,39 +30,27 @@ function CodeRainCanvas() {
       ctx.fillStyle = "rgba(6, 8, 15, 0.055)";
       ctx.fillRect(0, 0, w, h);
       ctx.font = `12px 'JetBrains Mono', monospace`;
-
       for (let s = 0; s < spalten; s++) {
         const z = zeichenArr[Math.floor(Math.random() * zeichenArr.length)];
         const x = s * spaltenBreite;
         const y = tropfen[s] * spaltenBreite;
-
         const r = Math.random();
-        if (r > 0.98) {
-          ctx.fillStyle = "rgba(99, 102, 241, 0.55)"; // heller Kopf
-        } else if (r > 0.94) {
-          ctx.fillStyle = "rgba(6, 182, 212, 0.25)";
-        } else {
-          ctx.fillStyle = "rgba(99, 102, 241, 0.07)";
-        }
-
+        if (r > 0.98) ctx.fillStyle = "rgba(99, 102, 241, 0.55)";
+        else if (r > 0.94) ctx.fillStyle = "rgba(6, 182, 212, 0.25)";
+        else ctx.fillStyle = "rgba(99, 102, 241, 0.07)";
         ctx.fillText(z, x, y);
-
         if (y > h && Math.random() > 0.983) tropfen[s] = 0;
         tropfen[s] += 0.45;
       }
     };
 
     const intervall = setInterval(zeichnen, 50);
-
     const resize = () => {
-      w = window.innerWidth;
-      h = window.innerHeight;
-      canvas.width = w;
-      canvas.height = h;
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = w; canvas.height = h;
       spalten = Math.floor(w / spaltenBreite);
       tropfen = Array(spalten).fill(0).map(() => Math.random() * -80);
     };
-
     window.addEventListener("resize", resize);
     return () => { clearInterval(intervall); window.removeEventListener("resize", resize); };
   }, []);
@@ -80,8 +68,8 @@ const buchstabenVariante = {
   }),
 };
 
-const einblend = (delay: number, y = 20) => ({
-  versteckt: { opacity: 0, y },
+const einblend = (delay: number) => ({
+  versteckt: { opacity: 0, y: 18 },
   sichtbar: { opacity: 1, y: 0, transition: { duration: 0.65, delay, ease: EASE } },
 });
 
@@ -92,45 +80,32 @@ export default function HeroView() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden"
+      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
+      // pt-20 = Platz für fixe NavBar (80px), pb-12 = Luft unten
+      style={{ paddingTop: "96px", paddingBottom: "48px", paddingLeft: "24px", paddingRight: "24px" }}
     >
-      {/* Code Rain */}
       <CodeRainCanvas />
 
-      {/* Ambient Glow — tiefer, ruhiger */}
+      {/* Ambient Glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-akzent-500/5 rounded-full blur-[180px]" />
         <div className="absolute bottom-1/3 right-1/4 w-[500px] h-[500px] bg-cyber-500/4 rounded-full blur-[160px]" />
-        <div className="absolute top-2/3 left-1/2 w-[300px] h-[300px] bg-akzent-500/3 rounded-full blur-[120px]" />
       </div>
 
-      <div className="relative z-10 text-center max-w-4xl w-full">
-
-        {/* Status Pill */}
-        <motion.div
-          variants={einblend(0)}
-          initial="versteckt"
-          animate="sichtbar"
-          className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-signal-gruen/25 bg-signal-gruen/6 mb-10 backdrop-blur-sm"
-        >
-          <span className="w-2 h-2 rounded-full bg-signal-gruen animate-pulse" />
-          <span className="text-sm font-mono text-signal-gruen/90 tracking-wide">
-            Verfügbar für neue Herausforderungen
-          </span>
-        </motion.div>
+      <div className="relative z-10 text-center max-w-3xl w-full">
 
         {/* Profilbild */}
         <motion.div
-          variants={einblend(0.1)}
+          variants={einblend(0.05)}
           initial="versteckt"
           animate="sichtbar"
-          className="mb-10"
+          className="mb-8"
         >
           <div
-            className="w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full overflow-hidden relative"
+            className="w-28 h-28 md:w-32 md:h-32 mx-auto rounded-full overflow-hidden"
             style={{
-              border: "1.5px solid rgba(99,102,241,0.25)",
-              boxShadow: "0 0 0 6px rgba(99,102,241,0.05), 0 0 60px rgba(99,102,241,0.12), 0 20px 60px rgba(0,0,0,0.5)",
+              border: "1.5px solid rgba(99,102,241,0.3)",
+              boxShadow: "0 0 0 6px rgba(99,102,241,0.06), 0 0 60px rgba(99,102,241,0.15), 0 20px 60px rgba(0,0,0,0.5)",
             }}
           >
             <img
@@ -142,19 +117,12 @@ export default function HeroView() {
           </div>
         </motion.div>
 
-        {/* Name — Buchstaben-Animation */}
-        <div className="mb-4">
+        {/* Name */}
+        <div className="mb-3">
           <h1 className="font-display text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight inline-flex flex-wrap justify-center gap-x-4">
             <span className="flex">
               {vorname.split("").map((b, i) => (
-                <motion.span
-                  key={`v-${i}`}
-                  custom={i}
-                  variants={buchstabenVariante}
-                  initial="versteckt"
-                  animate="sichtbar"
-                  className="text-white"
-                >
+                <motion.span key={`v-${i}`} custom={i} variants={buchstabenVariante} initial="versteckt" animate="sichtbar" className="text-white">
                   {b}
                 </motion.span>
               ))}
@@ -167,11 +135,7 @@ export default function HeroView() {
                   variants={buchstabenVariante}
                   initial="versteckt"
                   animate="sichtbar"
-                  style={{
-                    background: "linear-gradient(135deg, #818cf8, #22d3ee)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
+                  style={{ background: "linear-gradient(135deg, #818cf8, #22d3ee)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
                 >
                   {b}
                 </motion.span>
@@ -180,40 +144,37 @@ export default function HeroView() {
           </h1>
         </div>
 
-        {/* Titel */}
-        <motion.div
-          variants={einblend(0.5)}
-          initial="versteckt"
-          animate="sichtbar"
-          className="font-mono text-sm md:text-base text-white/45 mb-6 tracking-[0.2em] uppercase"
-        >
+        {/* Untertitel */}
+        <motion.div variants={einblend(0.45)} initial="versteckt" animate="sichtbar"
+          className="font-mono text-xs md:text-sm text-white/45 mb-5 tracking-[0.22em] uppercase">
           {PERSOENLICH.untertitel}
         </motion.div>
 
-        {/* Kurzvorstellung — besser lesbar */}
-        <motion.p
-          variants={einblend(0.65)}
-          initial="versteckt"
-          animate="sichtbar"
-          className="text-base md:text-lg text-white/55 max-w-2xl mx-auto leading-relaxed mb-12"
-        >
+        {/* Status Pill — jetzt UNTER dem Titel, nicht über Profilbild */}
+        <motion.div variants={einblend(0.6)} initial="versteckt" animate="sichtbar"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-signal-gruen/25 bg-signal-gruen/6 mb-6 backdrop-blur-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-signal-gruen animate-pulse flex-shrink-0" />
+          <span className="text-xs font-mono text-signal-gruen/85 tracking-wide">
+            Verfügbar für neue Herausforderungen
+          </span>
+        </motion.div>
+
+        {/* Kurzvorstellung */}
+        <motion.p variants={einblend(0.75)} initial="versteckt" animate="sichtbar"
+          className="text-base md:text-lg text-white/60 max-w-xl mx-auto leading-relaxed mb-10">
           {PERSOENLICH.kurzvorstellung}
         </motion.p>
 
         {/* CTA-Buttons */}
-        <motion.div
-          variants={einblend(0.85)}
-          initial="versteckt"
-          animate="sichtbar"
-          className="flex flex-wrap gap-4 justify-center"
-        >
+        <motion.div variants={einblend(0.9)} initial="versteckt" animate="sichtbar"
+          className="flex flex-wrap gap-3 justify-center">
           <a
             href="#kontakt"
-            className="px-7 py-3 rounded-xl font-medium text-sm text-white transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
+            className="px-6 py-3 rounded-xl font-medium text-sm text-white transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
             style={{
-              background: "linear-gradient(135deg, rgba(99,102,241,0.25), rgba(6,182,212,0.15))",
+              background: "linear-gradient(135deg, rgba(99,102,241,0.22), rgba(6,182,212,0.12))",
               border: "1px solid rgba(99,102,241,0.35)",
-              boxShadow: "0 0 30px rgba(99,102,241,0.1)",
+              boxShadow: "0 0 30px rgba(99,102,241,0.08)",
             }}
           >
             Kontakt aufnehmen
@@ -222,25 +183,17 @@ export default function HeroView() {
             href={PERSOENLICH.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-7 py-3 rounded-xl font-medium text-sm text-white/65 hover:text-white transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
-            style={{
-              border: "1px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.03)",
-            }}
+            className="px-6 py-3 rounded-xl font-medium text-sm text-white/65 hover:text-white/90 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
+            style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)" }}
           >
             GitHub →
           </a>
         </motion.div>
 
         {/* Scroll Indikator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2.2 }}
-          className="mt-20"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5 }} className="mt-16">
           <motion.div
-            animate={{ y: [0, 8, 0] }}
+            animate={{ y: [0, 7, 0] }}
             transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
             className="w-5 h-8 mx-auto rounded-full border border-white/12 flex justify-center pt-1.5"
           >
