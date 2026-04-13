@@ -236,8 +236,33 @@ export default function OsintDemoView() {
   const [zeilenIndex, setZeilenIndex] = useState(0);
   const [fertig, setFertig] = useState(false);
   const [apiFehler, setApiFehler] = useState<string | null>(null);
+  const [rohdaten, setRohdaten] = useState<object | null>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
   const eingabeRef = useRef<HTMLInputElement>(null);
+
+  // ─── Download-Funktionen ──────────────────────────────────────
+  const alsTextHerunterladen = useCallback(() => {
+    if (!ausgabeZeilen.length || !aktivesModul) return;
+    const inhalt = ausgabeZeilen.join("\n");
+    const zeitstempel = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
+    const dateiname = `osint-${aktivesModul.name.toLowerCase().replace(/\s+/g, "-")}-${zeitstempel}.txt`;
+    const blob = new Blob([inhalt], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = dateiname; a.click();
+    URL.revokeObjectURL(url);
+  }, [ausgabeZeilen, aktivesModul]);
+
+  const alsJsonHerunterladen = useCallback(() => {
+    if (!rohdaten || !aktivesModul) return;
+    const zeitstempel = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
+    const dateiname = `osint-${aktivesModul.name.toLowerCase().replace(/\s+/g, "-")}-${zeitstempel}.json`;
+    const blob = new Blob([JSON.stringify(rohdaten, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = dateiname; a.click();
+    URL.revokeObjectURL(url);
+  }, [rohdaten, aktivesModul]);
 
   useEffect(() => {
     if (phase !== "ausgabe" || ausgabeZeilen.length === 0) return;
@@ -297,12 +322,15 @@ export default function OsintDemoView() {
       if (aktivesModul.nummer === "5") {
         const ergebnis = await domainAnalysieren(wert);
         zeilen = domainZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
       } else if (aktivesModul.nummer === "2") {
         const ergebnis = await emailAnalysieren(wert);
         zeilen = emailZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
       } else if (aktivesModul.nummer === "3") {
         const ergebnis = await benutzernameSuchen(wert);
         zeilen = benutzerZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
       } else {
         zeilen = erstelleDemoAusgabe(aktivesModul.nummer, wert);
       }
@@ -326,6 +354,7 @@ export default function OsintDemoView() {
     setZeilenIndex(0);
     setFertig(false);
     setApiFehler(null);
+    setRohdaten(null);
   }, []);
 
   const zeileFarbe = (zeile: string): string => {
@@ -459,11 +488,29 @@ export default function OsintDemoView() {
                 ))}
                 {!fertig && <span className="text-signal-gruen/60 animate-pulse">█</span>}
                 {fertig && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-4">
-                    <button onClick={zurueckSetzen}
-                      className="text-xs text-akzent-400/60 hover:text-akzent-400 transition font-mono">
-                      [Neues Modul waehlen]
-                    </button>
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-5 border-t border-white/5 pt-4">
+                    <div className="flex flex-wrap items-center gap-3">
+                      {/* Download TXT */}
+                      <button
+                        onClick={alsTextHerunterladen}
+                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-signal-gruen/10 border border-signal-gruen/25 text-signal-gruen/80 hover:bg-signal-gruen/20 hover:text-signal-gruen transition font-mono"
+                      >
+                        ↓ TXT
+                      </button>
+                      {/* Download JSON — nur bei Live-Modulen */}
+                      {rohdaten && (
+                        <button
+                          onClick={alsJsonHerunterladen}
+                          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-akzent-500/10 border border-akzent-400/25 text-akzent-400/80 hover:bg-akzent-500/20 hover:text-akzent-400 transition font-mono"
+                        >
+                          ↓ JSON
+                        </button>
+                      )}
+                      <button onClick={zurueckSetzen}
+                        className="text-xs text-white/25 hover:text-white/60 transition font-mono ml-auto">
+                        [Neues Modul]
+                      </button>
+                    </div>
                   </motion.div>
                 )}
               </motion.div>
