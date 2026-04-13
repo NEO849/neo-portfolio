@@ -14,6 +14,8 @@ import re
 from werkzeuge.domain_analyse import domain_analysieren
 from werkzeuge.email_analyse import email_analysieren
 from werkzeuge.benutzername_suche import benutzername_suchen
+from werkzeuge.telefon_analyse import telefon_analysieren
+from werkzeuge.bild_analyse import bild_analysieren
 
 router = APIRouter(prefix="/osint", tags=["OSINT-Werkzeuge"])
 limiter = Limiter(key_func=get_remote_address)
@@ -139,7 +141,73 @@ async def benutzername_analyse(anfrage: BenutzerAnfrage, request: Request):
         raise HTTPException(status_code=500, detail=f"Suche fehlgeschlagen: {str(e)}")
 
 
+class TelefonAnfrage(BaseModel):
+    nummer: str
+
+    @field_validator("nummer")
+    @classmethod
+    def nummer_pruefen(cls, v: str) -> str:
+        v = v.strip()
+        # Erlaubt: +, Zahlen, Leerzeichen, -, (, )
+        bereinigt = re.sub(r'[\s\-\(\)]', '', v)
+        if not re.match(r'^\+?[0-9]{6,15}$', bereinigt):
+            raise ValueError("Ungültiges Telefonnummer-Format. Beispiel: +491701234567")
+        return v
+
+
+class BildAnfrage(BaseModel):
+    url: str
+
+    @field_validator("url")
+    @classmethod
+    def url_pruefen(cls, v: str) -> str:
+        v = v.strip()
+        if not re.match(r'^https?://', v):
+            raise ValueError("Bitte eine vollständige URL angeben (https://...)")
+        if len(v) > 2048:
+            raise ValueError("URL zu lang")
+        # Nur Bild-Endungen erlauben
+        erlaubte_endungen = ('.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff', '.tif')
+        url_ohne_params = v.split('?')[0].lower()
+        if not any(url_ohne_params.endswith(e) for e in erlaubte_endungen):
+            # Kein harter Fehler — manche URLs haben keine Endung (CDNs etc.)
+            pass
+        return v
+
+
+@router.post("/telefon", summary="Telefonnummer analysieren")
+@limiter.limit("5/minute")
+async def telefon_analyse(anfrage: TelefonAnfrage, request: Request):
+    """
+    Analysiert eine Telefonnummer: Format, Land, Carrier, Typ, Suchlinks.
+
+    **Rate-Limit:** 5 Anfragen pro Minute pro IP.
+    **Datenschutzhinweis:** Nur passive Analyse — keine aktiven Abfragen bei Drittdiensten.
+    """
+    try:
+        ergebnis = await telefon_analysieren(anfrage.nummer)
+        return JSONResponse(content=ergebnis)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Analyse fehlgeschlagen: {str(e)}")
+
+
+@router.post("/bild", summary="Bild analysieren (EXIF + Reverse Search)")
+@limiter.limit("3/minute")
+async def bild_analyse(anfrage: BildAnfrage, request: Request):
+    """
+    Analysiert ein Bild von einer URL: EXIF-Metadaten, Hashes, Reverse-Image-Links.
+
+    **Rate-Limit:** 3 Anfragen pro Minute pro IP.
+    **Datenschutzhinweis:** Das Bild wird temporär heruntergeladen, nicht gespeichert.
+    """
+    try:
+        ergebnis = await bild_analysieren(anfrage.url)
+        return JSONResponse(content=ergebnis)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Analyse fehlgeschlagen: {str(e)}")
+
+
 @router.get("/gesundheit", summary="API-Status prüfen")
 async def gesundheitscheck():
     """Einfacher Liveness-Check für Monitoring."""
-    return {"status": "ok", "werkzeuge": ["domain", "email", "benutzername"]}
+    return {"status": "ok", "werkzeuge": ["domain", "email", "benutzername", "telefon", "bild"]}

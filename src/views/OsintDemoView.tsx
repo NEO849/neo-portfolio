@@ -2,9 +2,12 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   domainAnalysieren, emailAnalysieren, benutzernameSuchen,
+  telefonAnalysieren, bildAnalysieren,
   Apifehler,
   type DomainErgebnis, type EmailErgebnis, type BenutzerErgebnis,
+  type TelefonErgebnis, type BildErgebnis,
 } from "../dienste/osintApi";
+import { DatenschutzModal } from "../bausteine/DatenschutzModal";
 
 // ═══════════════════════════════════════════════════════
 // OSINT TOOLKIT – LIVE TERMINAL MIT ECHTEM BACKEND
@@ -24,10 +27,129 @@ const DEMO_MODULE: DemoModul[] = [
   { nummer: "1", name: "Status pruefen",        farbe: "#9ca3af", eingabeLabel: "",                    beispielEingabe: "",              eingabeTyp: "none" },
   { nummer: "2", name: "E-Mail Analyse",        farbe: "#818cf8", eingabeLabel: "E-Mail eingeben",    beispielEingabe: "demo@gmail.com", eingabeTyp: "text" },
   { nummer: "3", name: "Username Suche",        farbe: "#c084fc", eingabeLabel: "Username eingeben",  beispielEingabe: "cypherneo",      eingabeTyp: "text" },
-  { nummer: "4", name: "Telefon Analyse",       farbe: "#eab308", eingabeLabel: "Telefonnummer",      beispielEingabe: "+491701234567",  eingabeTyp: "demo" },
-  { nummer: "5", name: "Domain / DNS / WHOIS",  farbe: "#22d3ee", eingabeLabel: "Domain eingeben",   beispielEingabe: "example.com",    eingabeTyp: "text" },
-  { nummer: "6", name: "Reverse Image",         farbe: "#22c55e", eingabeLabel: "Bildpfad",          beispielEingabe: "/foto.jpg",      eingabeTyp: "demo" },
+  { nummer: "4", name: "Telefon Analyse",       farbe: "#eab308", eingabeLabel: "Telefonnummer",   beispielEingabe: "+4915112345678",        eingabeTyp: "text" },
+  { nummer: "5", name: "Domain / DNS / WHOIS",  farbe: "#22d3ee", eingabeLabel: "Domain eingeben", beispielEingabe: "example.com",            eingabeTyp: "text" },
+  { nummer: "6", name: "Reverse Image",         farbe: "#22c55e", eingabeLabel: "Bild-URL",        beispielEingabe: "https://example.com/foto.jpg", eingabeTyp: "text" },
 ];
+
+// ─── Datenschutz-Konfiguration für sensitive Module ──────────────
+
+const DATENSCHUTZ_HINWEISE: Record<string, string[]> = {
+  "4": [
+    "Die Telefonnummer wird zur Analyse einmalig an den Server übertragen.",
+    "Es werden ausschließlich öffentliche Metadaten ausgewertet (Format, Land, Carrier-Typ).",
+    "Suchlinks werden generiert aber nicht automatisch aufgerufen — du entscheidest, welche du öffnest.",
+    "Keine Datenspeicherung — die Nummer wird nach der Analyse nicht aufbewahrt.",
+    "Nutze dieses Tool nur für Nummern, für deren Analyse du berechtigt bist.",
+  ],
+  "6": [
+    "Die Bild-URL wird einmalig an den Server übertragen, um das Bild herunterzuladen.",
+    "Das Bild wird zur EXIF-Analyse und Hash-Berechnung temporär im Arbeitsspeicher verarbeitet.",
+    "GPS-Koordinaten im Bild können den Aufnahmeort preisgeben — überprüfe sensible Bilder mit Bedacht.",
+    "Keine Speicherung — weder URL noch Bilddaten werden dauerhaft aufbewahrt.",
+    "Reverse-Image-Links werden generiert aber nicht automatisch aufgerufen.",
+    "Nutze dieses Tool nur für Bilder, für deren Analyse du berechtigt bist.",
+  ],
+};
+
+// ─── Terminal-Formatter für Telefon ──────────────────────────────
+
+function telefonZuTerminal(t: TelefonErgebnis): string[] {
+  if (!t.gueltig || t.fehler) {
+    return [
+      `+----------------------------------------------+`,
+      `|  TELEFON ANALYSE -- Fehler                   |`,
+      `+----------------------------------------------+`,
+      "", `  ${t.fehler ?? "Ungültige Nummer"}`,
+    ];
+  }
+  const zeilen: string[] = [
+    `+----------------------------------------------+`,
+    `|  TELEFON ANALYSE -- ${(t.format?.e164 ?? t.nummer).substring(0, 25).padEnd(25)}|`,
+    `+----------------------------------------------+`,
+    "", "--- FORMAT ------------------------------------",
+    `  International : ${t.format?.international}`,
+    `  National      : ${t.format?.national}`,
+    `  E.164         : ${t.format?.e164}`,
+    "", "--- METADATEN ---------------------------------",
+    `  Land          : ${t.metadaten?.land_code} — ${t.metadaten?.region}`,
+    `  Leitungstyp   : ${t.metadaten?.leitungstyp}`,
+    `  Carrier       : ${t.metadaten?.carrier}`,
+    `  Zeitzone      : ${t.metadaten?.zeitzonen.join(", ")}`,
+  ];
+  if (t.suchlinks?.nach_kategorie) {
+    zeilen.push("", "--- SUCHLINKS (nicht automatisch aufgerufen) --");
+    for (const [kat, links] of Object.entries(t.suchlinks.nach_kategorie)) {
+      zeilen.push(`  ${kat}`);
+      for (const link of links) {
+        zeilen.push(`    [+]  ${link.name}`);
+      }
+    }
+    zeilen.push(``, `  ${t.suchlinks.gesamt} Suchlinks generiert`);
+  }
+  if (t.risiko?.details.length) {
+    zeilen.push("", "--- HINWEISE ----------------------------------");
+    for (const d of t.risiko.details) zeilen.push(`  [!]  ${d}`);
+  }
+  zeilen.push("", `  Analysiert: ${t.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
+  return zeilen;
+}
+
+// ─── Terminal-Formatter für Bild ─────────────────────────────────
+
+function bildZuTerminal(b: BildErgebnis): string[] {
+  if (b.fehler) {
+    return [
+      `+----------------------------------------------+`,
+      `|  BILD ANALYSE -- Fehler                      |`,
+      `+----------------------------------------------+`,
+      "", `  ${b.fehler}`,
+    ];
+  }
+  const dateiname = b.url.split("/").pop()?.split("?")[0] ?? "bild";
+  const zeilen: string[] = [
+    `+----------------------------------------------+`,
+    `|  BILD ANALYSE -- ${dateiname.substring(0, 28).padEnd(28)}|`,
+    `+----------------------------------------------+`,
+    "", "--- BILD-INFO ---------------------------------",
+    `  Format        : ${b.bild?.format}`,
+    `  Auflösung     : ${b.bild?.breite} x ${b.bild?.hoehe} px`,
+    `  Größe         : ${b.bild?.groesse_kb} KB (${b.bild?.groesse_mb} MB)`,
+    "", "--- HASHES ------------------------------------",
+    `  MD5    : ${b.hashes?.md5}`,
+    `  SHA256 : ${b.hashes?.sha256}`,
+    `  pHash  : ${b.hashes?.phash}`,
+  ];
+  if (b.exif?.verfuegbar) {
+    zeilen.push("", "--- EXIF-METADATEN ----------------------------");
+    if (b.exif.kamera)        zeilen.push(`  Kamera         : ${b.exif.kamera}`);
+    if (b.exif.aufnahmedatum) zeilen.push(`  Aufnahmedatum  : ${b.exif.aufnahmedatum}`);
+    if (b.exif.software)      zeilen.push(`  Software       : ${b.exif.software}`);
+    if (b.exif.iso)           zeilen.push(`  ISO            : ${b.exif.iso}`);
+    if (b.exif.blende)        zeilen.push(`  Blende         : f/${b.exif.blende}`);
+    if (b.exif.gps) {
+      zeilen.push(`  GPS            : ${b.exif.gps.lat}, ${b.exif.gps.lon}`);
+      zeilen.push(`  Maps-Link      : ${b.exif.gps.maps_link}`);
+    }
+  } else {
+    zeilen.push("", "  EXIF: Keine Metadaten gefunden / nicht verfügbar");
+  }
+  if (b.sicherheits_hinweise?.length) {
+    zeilen.push("", "--- SICHERHEITSANALYSE ------------------------");
+    for (const h of b.sicherheits_hinweise) {
+      const prefix = h.stufe === "hoch" ? "[!]" : "[i]";
+      zeilen.push(`  ${prefix}  ${h.meldung}`);
+    }
+  }
+  if (b.suchlinks?.length) {
+    zeilen.push("", "--- REVERSE IMAGE SUCHLINKS -------------------");
+    for (const link of b.suchlinks) {
+      zeilen.push(`  [+]  ${link.name}`);
+    }
+  }
+  zeilen.push("", `  Analysiert: ${b.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
+  return zeilen;
+}
 
 // ─── Demo-Ausgaben für Module ohne Backend ────────────────────────
 
@@ -237,6 +359,8 @@ export default function OsintDemoView() {
   const [fertig, setFertig] = useState(false);
   const [apiFehler, setApiFehler] = useState<string | null>(null);
   const [rohdaten, setRohdaten] = useState<object | null>(null);
+  const [modalOffen, setModalOffen] = useState(false);
+  const [wartendesModul, setWartendesModul] = useState<DemoModul | null>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
   const eingabeRef = useRef<HTMLInputElement>(null);
 
@@ -291,8 +415,14 @@ export default function OsintDemoView() {
   }, [phase]);
 
   const modulStarten = useCallback((modul: DemoModul) => {
-    setAktivesModul(modul);
     setApiFehler(null);
+    // Module 4 und 6 brauchen Datenschutz-Bestätigung
+    if (modul.nummer === "4" || modul.nummer === "6") {
+      setWartendesModul(modul);
+      setModalOffen(true);
+      return;
+    }
+    setAktivesModul(modul);
     if (modul.eingabeTyp === "none") {
       setAusgabeZeilen(erstelleDemoAusgabe(modul.nummer, ""));
       setPhase("ausgabe");
@@ -300,6 +430,20 @@ export default function OsintDemoView() {
       setEingabeWert(modul.beispielEingabe);
       setPhase("eingabe");
     }
+  }, []);
+
+  const modalBestaetigt = useCallback(() => {
+    setModalOffen(false);
+    if (!wartendesModul) return;
+    setAktivesModul(wartendesModul);
+    setEingabeWert(wartendesModul.beispielEingabe);
+    setPhase("eingabe");
+    setWartendesModul(null);
+  }, [wartendesModul]);
+
+  const modalAbgebrochen = useCallback(() => {
+    setModalOffen(false);
+    setWartendesModul(null);
   }, []);
 
   const eingabeAbsenden = useCallback(async () => {
@@ -331,6 +475,14 @@ export default function OsintDemoView() {
         const ergebnis = await benutzernameSuchen(wert);
         zeilen = benutzerZuTerminal(ergebnis);
         setRohdaten(ergebnis);
+      } else if (aktivesModul.nummer === "4") {
+        const ergebnis = await telefonAnalysieren(wert);
+        zeilen = telefonZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
+      } else if (aktivesModul.nummer === "6") {
+        const ergebnis = await bildAnalysieren(wert);
+        zeilen = bildZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
       } else {
         zeilen = erstelleDemoAusgabe(aktivesModul.nummer, wert);
       }
@@ -355,6 +507,8 @@ export default function OsintDemoView() {
     setFertig(false);
     setApiFehler(null);
     setRohdaten(null);
+    setModalOffen(false);
+    setWartendesModul(null);
   }, []);
 
   const zeileFarbe = (zeile: string): string => {
@@ -375,6 +529,13 @@ export default function OsintDemoView() {
 
   return (
     <section className="py-16 px-6 max-w-5xl mx-auto">
+      <DatenschutzModal
+        offen={modalOffen}
+        modulName={wartendesModul?.name ?? ""}
+        hinweise={DATENSCHUTZ_HINWEISE[wartendesModul?.nummer ?? ""] ?? []}
+        onBestaetigen={modalBestaetigt}
+        onAbbrechen={modalAbgebrochen}
+      />
       <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }} transition={{ duration: 0.5 }}>
         <p className="font-mono text-sm text-signal-gruen mb-2">&gt; osint_toolkit.live()</p>
@@ -418,8 +579,11 @@ export default function OsintDemoView() {
                     <span style={{ color: modul.farbe }} className="font-bold">{modul.nummer}</span>
                     <span className="text-white/30">]  </span>
                     <span className="text-white/60 group-hover:text-white transition">{modul.name}</span>
-                    {modul.eingabeTyp !== "demo" && modul.eingabeTyp !== "none" && (
+                    {modul.eingabeTyp === "text" && modul.nummer !== "4" && modul.nummer !== "6" && (
                       <span className="ml-2 text-[10px] text-signal-gruen/50">LIVE</span>
+                    )}
+                    {(modul.nummer === "4" || modul.nummer === "6") && (
+                      <span className="ml-2 text-[10px] text-signal-gelb/60">LIVE ⚠</span>
                     )}
                   </button>
                 ))}

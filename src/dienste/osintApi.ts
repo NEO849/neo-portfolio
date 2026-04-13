@@ -121,6 +121,76 @@ export interface BenutzerErgebnis {
   nach_kategorie?: Record<string, PlattformErgebnis[]>;
 }
 
+// ─── Typen: Telefon-Analyse ───────────────────────────────────────
+
+export interface TelefonErgebnis {
+  nummer: string;
+  analysiert_am: string;
+  gueltig: boolean;
+  moeglich?: boolean;
+  fehler?: string;
+  format?: {
+    international: string;
+    national: string;
+    e164: string;
+    rfc3966: string;
+  };
+  metadaten?: {
+    land_code: string;
+    leitungstyp: string;
+    region: string;
+    carrier: string;
+    zeitzonen: string[];
+  };
+  suchlinks?: {
+    gesamt: number;
+    nach_kategorie: Record<string, Array<{ name: string; url: string; kategorie: string }>>;
+  };
+  risiko?: {
+    stufe: string;
+    details: string[];
+  };
+}
+
+// ─── Typen: Bild-Analyse ──────────────────────────────────────────
+
+export interface BildErgebnis {
+  url: string;
+  analysiert_am: string;
+  fehler?: string;
+  bild?: {
+    format: string;
+    breite: number;
+    hoehe: number;
+    modus: string;
+    groesse_kb: number;
+    groesse_mb: number;
+  };
+  hashes?: {
+    md5: string;
+    sha256: string;
+    phash: string;
+    ahash: string;
+    dhash: string;
+  };
+  exif?: {
+    verfuegbar: boolean;
+    kamera?: string | null;
+    aufnahmedatum?: string | null;
+    software?: string | null;
+    blende?: string | null;
+    iso?: number | null;
+    gps?: {
+      lat: number;
+      lon: number;
+      maps_link: string;
+      hinweis: string;
+    } | null;
+  };
+  suchlinks?: Array<{ name: string; url: string }>;
+  sicherheits_hinweise?: Array<{ stufe: string; meldung: string }>;
+}
+
 // ─── API-Fehler-Klasse ────────────────────────────────────────────
 
 export class Apifehler extends Error {
@@ -194,6 +264,20 @@ export async function emailAnalysieren(email: string): Promise<EmailErgebnis> {
  */
 export async function benutzernameSuchen(benutzername: string): Promise<BenutzerErgebnis> {
   return apiFetch<BenutzerErgebnis>("/benutzername", { benutzername });
+}
+
+/**
+ * Analysiert eine Telefonnummer auf Format, Land, Carrier und Suchlinks.
+ */
+export async function telefonAnalysieren(nummer: string): Promise<TelefonErgebnis> {
+  return apiFetch<TelefonErgebnis>("/telefon", { nummer });
+}
+
+/**
+ * Analysiert ein Bild von einer URL: EXIF, Hashes, Reverse-Image-Links.
+ */
+export async function bildAnalysieren(url: string): Promise<BildErgebnis> {
+  return apiFetch<BildErgebnis>("/bild", { url });
 }
 
 /**
