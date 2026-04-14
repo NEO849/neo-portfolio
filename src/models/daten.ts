@@ -211,7 +211,7 @@ export const SKILLS: SkillModel[] = [
 // ═══════════════════════════════════════════════════════
 
 export const ZEITSTRAHL: ZeitstrahlModel[] = [
-  { jahr: "1999–2014", titel: "Elektroniker",                     beschreibung: "15 Jahre Berufserfahrung – Schaltkreise, Hardware-Debugging, systematisches Denken in Zuständen", kategorie: "beruf" },
+  { jahr: "1999–2014", titel: "Elektroniker",                     beschreibung: "15 Jahre Berufserfahrung – Aufbau von Serverfarmen, Netzwerkinfrastruktur, Telefon- & Videoanalagenanlagen, Schaltkreise, Hardware-Debugging und systematisches Denken in Zuständen.", kategorie: "beruf" },
   { jahr: "2023–2025", titel: "Syntax Institut Berlin",           beschreibung: "Softwareentwicklung: Swift, SwiftUI, MVVM, Clean Architecture, iOS/macOS", kategorie: "bildung" },
   { jahr: "2024",      titel: "Erste iOS-Apps",                   beschreibung: "ONE (Multi-Agent AI), SwiftScout, NeoVimExplorer, Sports Almanach", kategorie: "meilenstein" },
   { jahr: "2025",      titel: "Bug Bounty Einstieg",              beschreibung: "Intigriti + HackerOne. Reports: Superdrug, Yahoo, Whatnot, Axel Springer", kategorie: "security" },

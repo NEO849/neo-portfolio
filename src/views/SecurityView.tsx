@@ -43,13 +43,13 @@ export default function SecurityView() {
         klassen="mb-10"
       />
 
-      {/* Tab-Leiste */}
-      <div className="flex flex-wrap gap-1.5 mb-8 p-1.5 rounded-2xl bg-white/3 border border-white/6 w-fit">
+      {/* Tab-Leiste — immer eine Zeile, auf kleinen Screens scrollbar */}
+      <div className="flex gap-1.5 mb-8 p-1.5 rounded-2xl bg-white/3 border border-white/6 overflow-x-auto scrollbar-none">
         {TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => { setAktiverTab(tab.id); setAktiverSchritt(null); }}
-            className={`relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+            className={`relative flex-1 min-w-[80px] px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 ${
               aktiverTab === tab.id
                 ? "text-white"
                 : "text-white/45 hover:text-white/75"

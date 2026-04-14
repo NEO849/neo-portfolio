@@ -11,7 +11,7 @@ const KATEGORIE_KONFIGURATION: Record<string, {
 }> = {
   beruf:       { variante: "akzent",     lichtfarbe: "99, 102, 241",  akzentFarbe: "#6366f1" },
   bildung:     { variante: "cyber",      lichtfarbe: "34, 211, 238",  akzentFarbe: "#22d3ee" },
-  security:    { variante: "aktiv",      lichtfarbe: "239, 68, 68",   akzentFarbe: "#ef4444" },
+  security:    { variante: "aktiv",      lichtfarbe: "249, 115, 22",  akzentFarbe: "#f97316" },
   meilenstein: { variante: "entwicklung",lichtfarbe: "34, 197, 94",   akzentFarbe: "#22c55e" },
 };
 

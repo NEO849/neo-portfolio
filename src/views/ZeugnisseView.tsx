@@ -134,16 +134,16 @@ export default function ZeugnisseView() {
         </p>
       </motion.div>
 
-      {/* Kategorie-Auswahl */}
-      <div className="flex flex-wrap gap-2 mb-8">
+      {/* Kategorie-Auswahl — alle 4 Tabs in einer Zeile */}
+      <div className="flex gap-1.5 mb-8 p-1.5 rounded-2xl bg-white/3 border border-white/6">
         {DOKUMENTE.map((dok, index) => (
           <button
             key={index}
             onClick={() => navigiere(index)}
-            className={`px-4 py-2 rounded-xl text-xs font-mono font-semibold transition-all duration-200 ${
+            className={`relative flex-1 px-3 py-2 rounded-xl text-xs font-mono font-semibold whitespace-nowrap transition-all duration-200 ${
               index === aktuellerIndex
                 ? "text-white"
-                : "text-white/40 hover:text-white/70 bg-white/3 hover:bg-white/6 border border-white/8"
+                : "text-white/40 hover:text-white/70"
             }`}
             style={index === aktuellerIndex ? {
               background: `${dok.akzentFarbe}18`,
