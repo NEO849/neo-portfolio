@@ -135,12 +135,12 @@ export default function ZeugnisseView() {
       </motion.div>
 
       {/* Kategorie-Auswahl — alle 4 Tabs in einer Zeile */}
-      <div className="flex gap-1.5 mb-8 p-1.5 rounded-2xl bg-white/3 border border-white/6">
+      <div className="flex gap-1.5 mb-8 p-1.5 rounded-2xl bg-white/[0.025] border border-white/[0.05] overflow-x-auto scrollbar-none">
         {DOKUMENTE.map((dok, index) => (
           <button
             key={index}
             onClick={() => navigiere(index)}
-            className={`relative flex-1 px-3 py-2 rounded-xl text-xs font-mono font-semibold whitespace-nowrap transition-all duration-200 ${
+            className={`relative flex-1 min-w-0 px-3 py-2 rounded-xl text-xs font-mono font-semibold whitespace-nowrap transition-all duration-200 ${
               index === aktuellerIndex
                 ? "text-white"
                 : "text-white/40 hover:text-white/70"

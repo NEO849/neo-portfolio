@@ -44,7 +44,7 @@ export default function SecurityView() {
       />
 
       {/* Tab-Leiste — immer eine Zeile, auf kleinen Screens scrollbar */}
-      <div className="flex gap-1.5 mb-8 p-1.5 rounded-2xl bg-white/3 border border-white/6 overflow-x-auto scrollbar-none">
+      <div className="flex gap-1.5 mb-8 p-1.5 rounded-2xl bg-white/[0.025] border border-white/[0.05] overflow-x-auto scrollbar-none">
         {TABS.map(tab => (
           <button
             key={tab.id}
