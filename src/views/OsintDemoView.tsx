@@ -160,9 +160,9 @@ function erstelleDemoAusgabe(modulNummer: string, eingabe: string): string[] {
     "  [ok]  Domain / DNS / WHOIS",
     "  [ok]  E-Mail Analyse",
     "  [ok]  Username Suche",
-    "  [--]  Telefon  (Demo-Modus)",
-    "  [--]  Rev. Image (Demo-Modus)",
-    "", "  3 von 5 Werkzeugen live aktiv",
+    "  [ok]  Telefon Analyse",
+    "  [ok]  Reverse Image",
+    "", "  5 von 5 Werkzeugen live aktiv",
   ];
 
   if (modulNummer === "4") {
