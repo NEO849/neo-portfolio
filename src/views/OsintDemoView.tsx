@@ -52,100 +52,93 @@ const DATENSCHUTZ_HINWEISE: Record<string, string[]> = {
   ],
 };
 
-// ─── Terminal-Formatter für Telefon ──────────────────────────────
+// ─── Terminal-Hilfsfunktionen ─────────────────────────────────────
+// Box: 36 Zeichen breit — passt auf Mobile ohne horizontalen Scroll.
+
+const R  = "+----------------------------------+";
+const K  = (t: string) => `|  ${t.substring(0, 32).padEnd(32)}|`;
+const S  = (n: string) => { const p = `--- ${n} `; return p + "-".repeat(Math.max(2, 34 - p.length)); };
+const WW = (key: string, val: string, kw = 11) => `  ${key.padEnd(kw)}: ${val}`;
+const trunc = (s: string, n: number) => s.length > n ? s.substring(0, n - 1) + "…" : s;
+
+// ─── Telefon ─────────────────────────────────────────────────────
 
 function telefonZuTerminal(t: TelefonErgebnis): string[] {
   if (!t.gueltig || t.fehler) {
-    return [
-      `+----------------------------------------------+`,
-      `|  TELEFON ANALYSE -- Fehler                   |`,
-      `+----------------------------------------------+`,
-      "", `  ${t.fehler ?? "Ungültige Nummer"}`,
-    ];
+    return [R, K("TELEFON ANALYSE -- Fehler"), R, "", `  ${t.fehler ?? "Ungültige Nummer"}`];
   }
   const zeilen: string[] = [
-    `+----------------------------------------------+`,
-    `|  TELEFON ANALYSE -- ${(t.format?.e164 ?? t.nummer).substring(0, 25).padEnd(25)}|`,
-    `+----------------------------------------------+`,
-    "", "--- FORMAT ------------------------------------",
-    `  International : ${t.format?.international}`,
-    `  National      : ${t.format?.national}`,
-    `  E.164         : ${t.format?.e164}`,
-    "", "--- METADATEN ---------------------------------",
-    `  Land          : ${t.metadaten?.land_code} — ${t.metadaten?.region}`,
-    `  Leitungstyp   : ${t.metadaten?.leitungstyp}`,
-    `  Carrier       : ${t.metadaten?.carrier}`,
-    `  Zeitzone      : ${t.metadaten?.zeitzonen.join(", ")}`,
+    R, K(`TELEFON ANALYSE -- ${(t.format?.e164 ?? t.nummer).substring(0, 17)}`), R,
+    "", S("FORMAT"),
+    WW("Internat.", t.format?.international ?? ""),
+    WW("National",  t.format?.national ?? ""),
+    WW("E.164",     t.format?.e164 ?? ""),
+    "", S("METADATEN"),
+    WW("Land",    `${t.metadaten?.land_code} — ${trunc(t.metadaten?.region ?? "", 18)}`),
+    WW("Typ",     t.metadaten?.leitungstyp ?? ""),
+    WW("Carrier", trunc(t.metadaten?.carrier ?? "", 20)),
+    WW("Zeitzone",trunc((t.metadaten?.zeitzonen ?? []).join(", "), 20)),
   ];
   if (t.suchlinks?.nach_kategorie) {
-    zeilen.push("", "--- SUCHLINKS (nicht automatisch aufgerufen) --");
+    zeilen.push("", S("SUCHLINKS"));
     for (const [kat, links] of Object.entries(t.suchlinks.nach_kategorie)) {
       zeilen.push(`  ${kat}`);
-      for (const link of links) {
-        zeilen.push(`    [+]  ${link.name}`);
+      for (const link of links as Array<{ name: string }>) {
+        zeilen.push(`    [+]  ${trunc(link.name, 22)}`);
       }
     }
-    zeilen.push(``, `  ${t.suchlinks.gesamt} Suchlinks generiert`);
+    zeilen.push("", `  ${t.suchlinks.gesamt} Links generiert`);
   }
   if (t.risiko?.details.length) {
-    zeilen.push("", "--- HINWEISE ----------------------------------");
-    for (const d of t.risiko.details) zeilen.push(`  [!]  ${d}`);
+    zeilen.push("", S("HINWEISE"));
+    for (const d of t.risiko.details) zeilen.push(`  [!]  ${trunc(d, 26)}`);
   }
   zeilen.push("", `  Analysiert: ${t.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
   return zeilen;
 }
 
-// ─── Terminal-Formatter für Bild ─────────────────────────────────
+// ─── Bild ────────────────────────────────────────────────────────
 
 function bildZuTerminal(b: BildErgebnis): string[] {
   if (b.fehler) {
-    return [
-      `+----------------------------------------------+`,
-      `|  BILD ANALYSE -- Fehler                      |`,
-      `+----------------------------------------------+`,
-      "", `  ${b.fehler}`,
-    ];
+    return [R, K("BILD ANALYSE -- Fehler"), R, "", `  ${trunc(b.fehler, 30)}`];
   }
-  const dateiname = b.url.split("/").pop()?.split("?")[0] ?? "bild";
+  const dateiname = trunc(b.url.split("/").pop()?.split("?")[0] ?? "bild", 18);
   const zeilen: string[] = [
-    `+----------------------------------------------+`,
-    `|  BILD ANALYSE -- ${dateiname.substring(0, 28).padEnd(28)}|`,
-    `+----------------------------------------------+`,
-    "", "--- BILD-INFO ---------------------------------",
-    `  Format        : ${b.bild?.format}`,
-    `  Auflösung     : ${b.bild?.breite} x ${b.bild?.hoehe} px`,
-    `  Größe         : ${b.bild?.groesse_kb} KB (${b.bild?.groesse_mb} MB)`,
-    "", "--- HASHES ------------------------------------",
-    `  MD5    : ${b.hashes?.md5}`,
-    `  SHA256 : ${b.hashes?.sha256}`,
-    `  pHash  : ${b.hashes?.phash}`,
+    R, K(`BILD ANALYSE -- ${dateiname}`), R,
+    "", S("BILD-INFO"),
+    WW("Format",    b.bild?.format ?? ""),
+    WW("Auflösung", `${b.bild?.breite} x ${b.bild?.hoehe} px`),
+    WW("Größe",     `${b.bild?.groesse_kb} KB`),
+    "", S("HASHES"),
+    WW("MD5",    trunc(b.hashes?.md5 ?? "", 22)),
+    WW("SHA256", trunc(b.hashes?.sha256 ?? "", 22)),
+    WW("pHash",  trunc(b.hashes?.phash ?? "", 22)),
   ];
   if (b.exif?.verfuegbar) {
-    zeilen.push("", "--- EXIF-METADATEN ----------------------------");
-    if (b.exif.kamera)        zeilen.push(`  Kamera         : ${b.exif.kamera}`);
-    if (b.exif.aufnahmedatum) zeilen.push(`  Aufnahmedatum  : ${b.exif.aufnahmedatum}`);
-    if (b.exif.software)      zeilen.push(`  Software       : ${b.exif.software}`);
-    if (b.exif.iso)           zeilen.push(`  ISO            : ${b.exif.iso}`);
-    if (b.exif.blende)        zeilen.push(`  Blende         : f/${b.exif.blende}`);
+    zeilen.push("", S("EXIF-METADATEN"));
+    if (b.exif.kamera)        zeilen.push(WW("Kamera",   trunc(b.exif.kamera, 20)));
+    if (b.exif.aufnahmedatum) zeilen.push(WW("Datum",    trunc(b.exif.aufnahmedatum, 20)));
+    if (b.exif.software)      zeilen.push(WW("Software", trunc(b.exif.software, 20)));
+    if (b.exif.iso)           zeilen.push(WW("ISO",      String(b.exif.iso)));
+    if (b.exif.blende)        zeilen.push(WW("Blende",   `f/${b.exif.blende}`));
     if (b.exif.gps) {
-      zeilen.push(`  GPS            : ${b.exif.gps.lat}, ${b.exif.gps.lon}`);
-      zeilen.push(`  Maps-Link      : ${b.exif.gps.maps_link}`);
+      zeilen.push(WW("GPS", `${b.exif.gps.lat}, ${b.exif.gps.lon}`));
+      zeilen.push(`  Maps-Link  : (generiert)`);
     }
   } else {
-    zeilen.push("", "  EXIF: Keine Metadaten gefunden / nicht verfügbar");
+    zeilen.push("", "  EXIF: Keine Metadaten vorhanden");
   }
   if (b.sicherheits_hinweise?.length) {
-    zeilen.push("", "--- SICHERHEITSANALYSE ------------------------");
+    zeilen.push("", S("SICHERHEITSANALYSE"));
     for (const h of b.sicherheits_hinweise) {
-      const prefix = h.stufe === "hoch" ? "[!]" : "[i]";
-      zeilen.push(`  ${prefix}  ${h.meldung}`);
+      const pfx = h.stufe === "hoch" ? "[!]" : "[i]";
+      zeilen.push(`  ${pfx}  ${trunc(h.meldung, 26)}`);
     }
   }
   if (b.suchlinks?.length) {
-    zeilen.push("", "--- REVERSE IMAGE SUCHLINKS -------------------");
-    for (const link of b.suchlinks) {
-      zeilen.push(`  [+]  ${link.name}`);
-    }
+    zeilen.push("", S("REVERSE IMAGE LINKS"));
+    for (const link of b.suchlinks) zeilen.push(`  [+]  ${trunc(link.name, 26)}`);
   }
   zeilen.push("", `  Analysiert: ${b.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
   return zeilen;
@@ -154,61 +147,55 @@ function bildZuTerminal(b: BildErgebnis): string[] {
 // ─── Demo-Ausgaben für Module ohne Backend ────────────────────────
 
 function erstelleDemoAusgabe(modulNummer: string, eingabe: string): string[] {
-  const rahmen = (text: string) => [
-    "+----------------------------------------------+",
-    "|  " + text.substring(0, 44).padEnd(44) + "|",
-    "+----------------------------------------------+",
-  ];
+  const rahmen = (text: string) => [R, K(text), R];
 
   if (modulNummer === "1") return [
     ...rahmen("STATUS -- Systempruefung"),
-    "", "--- LIVE-BACKEND (Contabo VPS) ------------",
+    "", S("LIVE-BACKEND (Contabo VPS)"),
     "  [ok]  FastAPI v0.115",
-    "  [ok]  dnspython (DNS-Resolver)",
-    "  [ok]  python-whois (WHOIS)",
-    "  [ok]  httpx (HTTP-Client)",
-    "  [ok]  slowapi (Rate-Limiter)",
-    "", "--- WERKZEUGE (LIVE) ---------------------",
-    "  [ok]  Domain / DNS / WHOIS  (Modul 5)",
-    "  [ok]  E-Mail Analyse        (Modul 2)",
-    "  [ok]  Username Suche        (Modul 3)",
-    "  [--]  Telefon Analyse       (Demo-Modus)",
-    "  [--]  Reverse Image         (Demo-Modus)",
+    "  [ok]  dnspython",
+    "  [ok]  python-whois",
+    "  [ok]  httpx / slowapi",
+    "", S("WERKZEUGE"),
+    "  [ok]  Domain / DNS / WHOIS",
+    "  [ok]  E-Mail Analyse",
+    "  [ok]  Username Suche",
+    "  [--]  Telefon  (Demo-Modus)",
+    "  [--]  Rev. Image (Demo-Modus)",
     "", "  3 von 5 Werkzeugen live aktiv",
   ];
 
   if (modulNummer === "4") {
     const landCode = eingabe.startsWith("+49") ? "DE" : eingabe.startsWith("+1") ? "US" : "XX";
-    const carrier = landCode === "DE" ? "T-Mobile / Telekom" : "Unknown Carrier";
+    const carrier  = landCode === "DE" ? "T-Mobile / Telekom" : "Unknown Carrier";
     return [
-      ...rahmen("TELEFON ANALYSE -- " + eingabe),
-      "", "  [Demo-Modus -- phoneinfoga nicht verfuegbar]",
-      "", "--- NUMVERIFY BASISDATEN -------------------",
-      "  Gueltig               : Ja",
-      "  Internationale Form   : " + eingabe,
-      "  Land-Code             : " + landCode,
-      "  Carrier               : " + carrier,
-      "  Leitungstyp           : mobile",
-      "", "--- SUCHLINKS ------------------------------",
-      "  [1]  facebook.com/search/?q=" + eingabe,
-      "  [2]  truecaller.com/search/" + eingabe,
-      "", "  Demo-Ausgabe / keine echten Daten",
+      ...rahmen(`TELEFON -- ${eingabe.substring(0, 20)}`),
+      "", "  [Demo-Modus]",
+      "", S("BASISDATEN"),
+      WW("Gueltig", "Ja"),
+      WW("Land",    landCode),
+      WW("Carrier", trunc(carrier, 20)),
+      WW("Typ",     "mobile"),
+      "", S("SUCHLINKS"),
+      `  [1]  Facebook`,
+      `  [2]  Truecaller`,
+      "", "  Demo / keine echten Daten",
     ];
   }
 
   if (modulNummer === "6") {
-    const dateiname = eingabe.split("/").pop() || "bild.jpg";
+    const dateiname = trunc(eingabe.split("/").pop() || "bild.jpg", 18);
     return [
-      ...rahmen("REVERSE IMAGE -- " + dateiname),
-      "", "  [Demo-Modus -- exiftool nicht verfuegbar]",
-      "", "--- BILD-HASHES ----------------------------",
-      "  MD5     : a1b2c3d4e5f6 (Demo)",
-      "  pHash   : d4e5f6a1b2c3 (Demo)",
-      "", "--- SUCHLINKS ------------------------------",
-      "  [1]  Google Lens  -> lens.google.com/...",
-      "  [2]  TinEye       -> tineye.com/search/...",
-      "  [3]  Yandex       -> yandex.com/images/...",
-      "", "  Demo-Ausgabe / keine echten Daten",
+      ...rahmen(`REVERSE IMAGE -- ${dateiname}`),
+      "", "  [Demo-Modus]",
+      "", S("BILD-HASHES"),
+      WW("MD5",   "a1b2c3d4e5f6 (Demo)"),
+      WW("pHash", "d4e5f6a1b2c3 (Demo)"),
+      "", S("SUCHLINKS"),
+      "  [1]  Google Lens",
+      "  [2]  TinEye",
+      "  [3]  Yandex Images",
+      "", "  Demo / keine echten Daten",
     ];
   }
 
@@ -219,38 +206,36 @@ function erstelleDemoAusgabe(modulNummer: string, eingabe: string): string[] {
 
 function domainZuTerminal(d: DomainErgebnis): string[] {
   const zeilen: string[] = [
-    `+----------------------------------------------+`,
-    `|  DOMAIN ANALYSE -- ${d.domain.substring(0, 25).padEnd(25)}|`,
-    `+----------------------------------------------+`,
-    "", "--- DNS-RECORDS ----------------------------",
+    R, K(`DOMAIN ANALYSE -- ${trunc(d.domain, 14)}`), R,
+    "", S("DNS-RECORDS"),
   ];
-  if (d.dns.a.length)    zeilen.push(...d.dns.a.map((ip, i) => `  A     [${i + 1}]  ${ip}`));
-  if (d.dns.aaaa.length) zeilen.push(`  AAAA  ->  ${d.dns.aaaa[0]}`);
-  if (d.dns.mx.length)   zeilen.push(...d.dns.mx.map(mx => `  MX    ->  ${mx}`));
-  if (d.dns.ns.length)   zeilen.push(...d.dns.ns.slice(0, 2).map(ns => `  NS    ->  ${ns}`));
-  if (d.dns.spf)         zeilen.push(`  SPF   ->  ${d.dns.spf.substring(0, 44)}`);
-  if (d.dns.dmarc)       zeilen.push(`  DMARC ->  ${d.dns.dmarc.substring(0, 44)}`);
+  d.dns.a.slice(0, 3).forEach((ip, i) => zeilen.push(`  A  [${i + 1}]  ${ip}`));
+  if (d.dns.aaaa.length) zeilen.push(`  AAAA  ${trunc(d.dns.aaaa[0], 24)}`);
+  d.dns.mx.slice(0, 2).forEach(mx => zeilen.push(`  MX    ${trunc(mx, 24)}`));
+  d.dns.ns.slice(0, 2).forEach(ns => zeilen.push(`  NS    ${trunc(ns, 24)}`));
+  if (d.dns.spf)   zeilen.push(`  SPF   ${trunc(d.dns.spf, 26)}`);
+  if (d.dns.dmarc) zeilen.push(`  DMARC ${trunc(d.dns.dmarc, 26)}`);
 
-  zeilen.push("", "--- ASN / PROVIDER -------------------------");
-  zeilen.push(`  Provider  : ${d.asn}`);
+  zeilen.push("", S("PROVIDER / ASN"));
+  zeilen.push(`  ${trunc(d.asn, 30)}`);
 
-  zeilen.push("", "--- WHOIS ----------------------------------");
-  if (d.whois.registrar)      zeilen.push(`  Registrar  : ${String(d.whois.registrar).substring(0, 40)}`);
-  if (d.whois.registriert_am) zeilen.push(`  Erstellt   : ${d.whois.registriert_am}`);
-  if (d.whois.ablauf_am)      zeilen.push(`  Ablauf     : ${d.whois.ablauf_am}`);
-  if (d.whois.fehler)         zeilen.push(`  WHOIS      : ${d.whois.fehler}`);
+  zeilen.push("", S("WHOIS"));
+  if (d.whois.registrar)      zeilen.push(WW("Registrar", trunc(String(d.whois.registrar), 18)));
+  if (d.whois.registriert_am) zeilen.push(WW("Erstellt",  trunc(d.whois.registriert_am, 18)));
+  if (d.whois.ablauf_am)      zeilen.push(WW("Ablauf",    trunc(d.whois.ablauf_am, 18)));
+  if (d.whois.fehler)         zeilen.push(`  ${trunc(d.whois.fehler, 30)}`);
 
-  zeilen.push("", "--- HTTP -----------------------------------");
-  zeilen.push(`  Erreichbar : ${d.http.erreichbar ? "Ja" : "Nein"}`);
-  if (d.http.status)  zeilen.push(`  Status     : ${d.http.status}`);
-  if (d.http.server)  zeilen.push(`  Server     : ${d.http.server}`);
-  if (d.http.weiterleitungsziel) zeilen.push(`  Redirect   : ${d.http.weiterleitungsziel.substring(0, 40)}`);
+  zeilen.push("", S("HTTP"));
+  zeilen.push(WW("Erreichbar", d.http.erreichbar ? "Ja" : "Nein"));
+  if (d.http.status) zeilen.push(WW("Status",    String(d.http.status)));
+  if (d.http.server) zeilen.push(WW("Server",    trunc(d.http.server, 20)));
+  if (d.http.weiterleitungsziel) zeilen.push(WW("Redirect", trunc(d.http.weiterleitungsziel, 18)));
 
-  const s = d.sicherheits_bewertung;
-  zeilen.push("", "--- SICHERHEITSBEWERTUNG -------------------");
-  zeilen.push(`  Score      : ${s.punkte}/${s.max} Punkte (${s.prozent}%) -- ${s.note.toUpperCase()}`);
-  for (const detail of s.details) {
-    zeilen.push(`  ${detail.ok ? "[ok]" : "[--]"}  ${detail.check}`);
+  const sv = d.sicherheits_bewertung;
+  zeilen.push("", S("SICHERHEITSBEWERTUNG"));
+  zeilen.push(`  Score: ${sv.punkte}/${sv.max} (${sv.prozent}%) — ${sv.note.toUpperCase()}`);
+  for (const det of sv.details) {
+    zeilen.push(`  ${det.ok ? "[ok]" : "[--]"}  ${trunc(det.check, 24)}`);
   }
 
   zeilen.push("", `  Analysiert: ${d.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
@@ -259,52 +244,41 @@ function domainZuTerminal(d: DomainErgebnis): string[] {
 
 function emailZuTerminal(e: EmailErgebnis): string[] {
   if (!e.gueltig) {
-    return [
-      `+----------------------------------------------+`,
-      `|  E-MAIL ANALYSE -- Fehler                    |`,
-      `+----------------------------------------------+`,
-      "", `  Fehler: ${e.fehler ?? "Ungueltige Adresse"}`,
-    ];
+    return [R, K("E-MAIL ANALYSE -- Fehler"), R, "", `  ${trunc(e.fehler ?? "Ungueltige Adresse", 30)}`];
   }
-
   const zeilen: string[] = [
-    `+----------------------------------------------+`,
-    `|  E-MAIL ANALYSE -- ${(e.adresse ?? "").substring(0, 26).padEnd(26)}|`,
-    `+----------------------------------------------+`,
-    "", "--- SYNTAX ---------------------------------",
-    `  Format     : Gueltig`,
-    `  Domain     : ${e.syntax?.domain ?? "?"}`,
-    `  Lokal-Teil : ${e.syntax?.lokal_teil ?? "?"}`,
-    "", "--- DOMAIN-DNS -----------------------------",
-    `  MX-Records : ${e.domain?.hat_mx ? `Ja (${e.domain.mx_records.length} Eintraege)` : "Nein -- Domain empfaengt keine E-Mails"}`,
+    R, K(`E-MAIL -- ${trunc(e.adresse ?? "", 22)}`), R,
+    "", S("SYNTAX"),
+    WW("Format",   "Gueltig"),
+    WW("Domain",   trunc(e.syntax?.domain ?? "?", 20)),
+    WW("Lokal",    trunc(e.syntax?.lokal_teil ?? "?", 20)),
+    "", S("DOMAIN-DNS"),
+    WW("MX-Records", e.domain?.hat_mx ? `Ja (${e.domain.mx_records.length})` : "Nein"),
   ];
+  if (e.domain?.spf)   zeilen.push(`  SPF   ${trunc(e.domain.spf, 26)}`);
+  if (e.domain?.dmarc) zeilen.push(`  DMARC ${trunc(e.domain.dmarc, 26)}`);
 
-  if (e.domain?.spf)   zeilen.push(`  SPF        : ${e.domain.spf.substring(0, 42)}`);
-  if (e.domain?.dmarc) zeilen.push(`  DMARC      : ${e.domain.dmarc.substring(0, 42)}`);
-
-  zeilen.push("", "--- KLASSIFIKATION -------------------------");
-  zeilen.push(`  Wegwerf    : ${e.klassifikation?.wegwerf ? "JA -- Bekannter Wegwerf-Anbieter" : "Nein"}`);
-  zeilen.push(`  Zustellbar : ${e.klassifikation?.zustellbar ? "Ja" : "Nein"}`);
+  zeilen.push("", S("KLASSIFIKATION"));
+  zeilen.push(WW("Wegwerf",    e.klassifikation?.wegwerf ? "JA" : "Nein"));
+  zeilen.push(WW("Zustellbar", e.klassifikation?.zustellbar ? "Ja" : "Nein"));
 
   if (e.datenleck) {
-    zeilen.push("", "--- DATENLECK (HaveIBeenPwned) -------------");
+    zeilen.push("", S("DATENLECK (HIBP)"));
     if (!e.datenleck.geprueft) {
-      zeilen.push("  Status     : HIBP nicht erreichbar");
+      zeilen.push("  Status: HIBP nicht erreichbar");
     } else if (e.datenleck.domain_betroffen) {
-      zeilen.push(`  Domain     : In oeffentlichen Leaks gefunden`);
-      if (e.datenleck.anzahl_nutzer) zeilen.push(`  Betroffene : ~${e.datenleck.anzahl_nutzer} Nutzer`);
+      zeilen.push("  [!]  In oeffentlichen Leaks");
+      if (e.datenleck.anzahl_nutzer) zeilen.push(`  Nutzer: ~${e.datenleck.anzahl_nutzer}`);
     } else {
-      zeilen.push("  Domain     : Keine bekannten Leaks gefunden");
+      zeilen.push("  [ok]  Keine bekannten Leaks");
     }
   }
 
   if (e.risiko) {
-    const risikoFarbe: Record<string, string> = { Hoch: "HOCH", Mittel: "MITTEL", Gering: "GERING", Keines: "KEINES" };
-    zeilen.push("", "--- RISIKOBEWERTUNG ------------------------");
-    zeilen.push(`  Risiko     : ${risikoFarbe[e.risiko.stufe] ?? e.risiko.stufe} (${e.risiko.punkte} Punkte)`);
-    for (const detail of e.risiko.details) {
-      zeilen.push(`  [!]  ${detail}`);
-    }
+    const rm: Record<string, string> = { Hoch: "HOCH", Mittel: "MITTEL", Gering: "GERING", Keines: "KEINES" };
+    zeilen.push("", S("RISIKOBEWERTUNG"));
+    zeilen.push(`  ${rm[e.risiko.stufe] ?? e.risiko.stufe} (${e.risiko.punkte} Punkte)`);
+    for (const det of e.risiko.details) zeilen.push(`  [!]  ${trunc(det, 26)}`);
   }
 
   zeilen.push("", `  Analysiert: ${e.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
@@ -313,37 +287,25 @@ function emailZuTerminal(e: EmailErgebnis): string[] {
 
 function benutzerZuTerminal(b: BenutzerErgebnis): string[] {
   if (b.fehler) {
-    return [
-      `+----------------------------------------------+`,
-      `|  USERNAME SUCHE -- Fehler                    |`,
-      `+----------------------------------------------+`,
-      "", `  Fehler: ${b.fehler}`,
-    ];
+    return [R, K("USERNAME SUCHE -- Fehler"), R, "", `  ${trunc(b.fehler, 30)}`];
   }
-
   const s = b.zusammenfassung!;
   const zeilen: string[] = [
-    `+----------------------------------------------+`,
-    `|  USERNAME SUCHE -- ${(b.benutzername ?? "").substring(0, 26).padEnd(26)}|`,
-    `+----------------------------------------------+`,
-    "", "--- ZUSAMMENFASSUNG ------------------------",
-    `  Geprueft     : ${s.geprueft} Plattformen`,
-    `  Gefunden     : ${s.gefunden} Treffer`,
-    `  Nicht gefunden: ${s.nicht_gefunden}`,
-    `  Treffer-Rate : ${s.treffer_rate}%`,
+    R, K(`USERNAME -- ${trunc(b.benutzername ?? "", 20)}`), R,
+    "", S("ZUSAMMENFASSUNG"),
+    WW("Geprueft",  `${s.geprueft} Plattformen`),
+    WW("Gefunden",  `${s.gefunden} Treffer`),
+    WW("Rate",      `${s.treffer_rate}%`),
   ];
-
   if (b.nach_kategorie && Object.keys(b.nach_kategorie).length > 0) {
-    zeilen.push("", "--- VERIFIZIERTE TREFFER -------------------");
+    zeilen.push("", S("VERIFIZIERTE TREFFER"));
     for (const [kategorie, plattformen] of Object.entries(b.nach_kategorie)) {
       zeilen.push(`  ${kategorie.charAt(0).toUpperCase() + kategorie.slice(1)}`);
       for (const p of plattformen) {
-        const kurzeUrl = p.url.replace("https://", "").replace("http://", "");
-        zeilen.push(`    [+]  ${p.plattform.padEnd(18)} -> ${kurzeUrl.substring(0, 28)}`);
+        zeilen.push(`    [+]  ${trunc(p.plattform, 26)}`);
       }
     }
   }
-
   zeilen.push("", `  Analysiert: ${b.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
   return zeilen;
 }
