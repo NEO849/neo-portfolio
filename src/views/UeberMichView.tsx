@@ -34,13 +34,13 @@ export default function UeberMichView() {
       >
         <InfoKarte lichtfarbe="99, 102, 241" klassen="p-6 md:p-8">
           <div className="space-y-4">
-            <p className="text-white/70 leading-relaxed">
+            <p className="text-white/80 leading-relaxed">
               Ich bin ein Mensch, der sich gerne weiterentwickelt, Verantwortung übernimmt und Dinge wirklich verstehen will. Mein Weg begann in der Technik, hat sich aber über die Jahre immer weiter in Richtung IT, Softwareentwicklung und moderne digitale Themen entwickelt. Dabei hilft mir mein praktischer Hintergrund sehr: Ich kenne nicht nur Theorie, sondern auch echte technische Arbeit, Fehlersuche, sauberes Vorgehen und den Anspruch, Probleme wirklich zu lösen.
             </p>
-            <p className="text-white/60 leading-relaxed">
+            <p className="text-white/75 leading-relaxed">
               Ich arbeite strukturiert, denke analytisch und habe Freude daran, mich in neue Themen tief einzuarbeiten. Wenn mich etwas interessiert, bleibe ich dran. Genau so habe ich mir in den letzten Jahren vieles im Bereich IT, App-Entwicklung, Linux, Server und technische Analyse aufgebaut. Ich mag es, Systeme zu verstehen, Zusammenhänge zu erkennen und Lösungen Schritt für Schritt sauber zu entwickeln.
             </p>
-            <p className="text-white/60 leading-relaxed">
+            <p className="text-white/75 leading-relaxed">
               Gleichzeitig ist mir der menschliche Aspekt sehr wichtig. Durch meine Zeit in der Fachklinik und die Zusammenarbeit mit unterschiedlichen Menschen habe ich gelernt, aufmerksam zuzuhören, ruhig zu bleiben und auch in anspruchsvollen Situationen verantwortungsvoll zu handeln. Ich denke, dass genau diese Mischung aus Technik, Ruhe, Einfühlungsvermögen und Lernbereitschaft mich gut beschreibt.
             </p>
           </div>
@@ -56,7 +56,7 @@ export default function UeberMichView() {
         className="mb-14"
       >
         <InfoKarte lichtfarbe="34, 211, 238" mitHoverAnimation={false} klassen="p-5">
-          <p className="text-white/50 leading-relaxed text-sm">
+          <p className="text-white/70 leading-relaxed text-sm">
             Auch abseits der Technik ist mir Ausdauer wichtig. In den Bergen bin ich zuhause – beim Wandern, Klettern und auf Klettersteigen. Diese Erfahrungen schärfen meinen Fokus, meine Geduld und meine Fähigkeit, in anspruchsvollen Situationen ruhig und strukturiert zu handeln.
           </p>
         </InfoKarte>
@@ -100,10 +100,10 @@ export default function UeberMichView() {
               >
                 <div className="flex items-center gap-3 mb-2">
                   <AbzeichenStatus variante={konfiguration.variante} text={eintrag.kategorie} />
-                  <span className="font-mono text-xs text-white/30">{eintrag.jahr}</span>
+                  <span className="font-mono text-xs text-white/55">{eintrag.jahr}</span>
                 </div>
                 <h3 className="font-display text-base font-bold text-white mb-1">{eintrag.titel}</h3>
-                <p className="text-sm text-white/50">{eintrag.beschreibung}</p>
+                <p className="text-sm text-white/70">{eintrag.beschreibung}</p>
               </InfoKarte>
             </motion.div>
           );
