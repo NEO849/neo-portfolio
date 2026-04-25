@@ -33,6 +33,7 @@ const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 export default function SecurityView() {
   const [aktiverTab, setAktiverTab] = useState<SecurityTab>("overview");
   const [aktiverSchritt, setAktiverSchritt] = useState<number | null>(null);
+  const [aktivesWerkzeug, setAktivesWerkzeug] = useState<string | null>(null);
 
   return (
     <section id="security" className="py-16 px-6 max-w-6xl mx-auto">
@@ -48,7 +49,7 @@ export default function SecurityView() {
         {TABS.map(tab => (
           <button
             key={tab.id}
-            onClick={() => { setAktiverTab(tab.id); setAktiverSchritt(null); }}
+            onClick={() => { setAktiverTab(tab.id); setAktiverSchritt(null); setAktivesWerkzeug(null); }}
             className={`relative flex-1 min-w-[80px] px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 flex items-center justify-center ${
               aktiverTab === tab.id
                 ? "text-white"
@@ -272,14 +273,47 @@ export default function SecurityView() {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.04, duration: 0.28 }}
                     >
-                      <InfoKarte lichtfarbe="34, 211, 238" akzentRand akzentFarbe="#22d3ee" mitHoverAnimation={false} klassen="p-3">
-                        <div className="flex items-center gap-3">
+                      <InfoKarte
+                        lichtfarbe="34, 211, 238"
+                        akzentRand={aktivesWerkzeug === werkzeug.name}
+                        akzentFarbe="#22d3ee"
+                        mitHoverAnimation={false}
+                        klassen="p-0"
+                      >
+                        <button
+                          onClick={() => setAktivesWerkzeug(aktivesWerkzeug === werkzeug.name ? null : werkzeug.name)}
+                          aria-expanded={aktivesWerkzeug === werkzeug.name}
+                          className="w-full flex items-center gap-3 p-3 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyber-400/40 rounded-xl"
+                        >
                           <div className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <span className="font-mono text-sm text-white font-medium">{werkzeug.name}</span>
                             <p className="text-xs text-white/35">{werkzeug.rolle}</p>
                           </div>
-                        </div>
+                          <motion.span
+                            animate={{ rotate: aktivesWerkzeug === werkzeug.name ? 45 : 0 }}
+                            transition={{ duration: 0.18 }}
+                            aria-hidden="true"
+                            className="text-cyber-400 text-lg flex-shrink-0 font-light pr-1"
+                          >
+                            +
+                          </motion.span>
+                        </button>
+                        <AnimatePresence>
+                          {aktivesWerkzeug === werkzeug.name && werkzeug.beschreibung && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.22 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-3 pb-3 border-t border-cyber-400/10">
+                                <p className="text-xs text-white/60 leading-relaxed pt-3">{werkzeug.beschreibung}</p>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </InfoKarte>
                     </motion.div>
                   ))}
@@ -293,26 +327,57 @@ export default function SecurityView() {
                   <span className="text-xs text-white/30">Professionelle Security-Toolchain</span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {TOOLS_STACK.filter(t => t.kategorie !== "eigenbau").map((werkzeug, index) => {
-                    return (
-                      <motion.div
-                        key={werkzeug.name}
-                        initial={{ opacity: 0, scale: 0.96 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: index * 0.04, duration: 0.28 }}
+                  {TOOLS_STACK.filter(t => t.kategorie !== "eigenbau").map((werkzeug, index) => (
+                    <motion.div
+                      key={werkzeug.name}
+                      initial={{ opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.04, duration: 0.28 }}
+                    >
+                      <InfoKarte
+                        lichtfarbe="34, 211, 238"
+                        akzentRand={aktivesWerkzeug === werkzeug.name}
+                        akzentFarbe="#22d3ee"
+                        mitHoverAnimation={false}
+                        klassen="p-0"
                       >
-                        <InfoKarte lichtfarbe="34, 211, 238" mitHoverAnimation={false} klassen="p-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <span className="font-mono text-sm text-white font-medium">{werkzeug.name}</span>
-                              <p className="text-xs text-white/35">{werkzeug.rolle}</p>
-                            </div>
+                        <button
+                          onClick={() => setAktivesWerkzeug(aktivesWerkzeug === werkzeug.name ? null : werkzeug.name)}
+                          aria-expanded={aktivesWerkzeug === werkzeug.name}
+                          className="w-full flex items-center gap-3 p-3 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyber-400/40 rounded-xl"
+                        >
+                          <div className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <span className="font-mono text-sm text-white font-medium">{werkzeug.name}</span>
+                            <p className="text-xs text-white/35">{werkzeug.rolle}</p>
                           </div>
-                        </InfoKarte>
-                      </motion.div>
-                    );
-                  })}
+                          <motion.span
+                            animate={{ rotate: aktivesWerkzeug === werkzeug.name ? 45 : 0 }}
+                            transition={{ duration: 0.18 }}
+                            aria-hidden="true"
+                            className="text-cyber-400 text-lg flex-shrink-0 font-light pr-1"
+                          >
+                            +
+                          </motion.span>
+                        </button>
+                        <AnimatePresence>
+                          {aktivesWerkzeug === werkzeug.name && werkzeug.beschreibung && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.22 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-3 pb-3 border-t border-cyber-400/10">
+                                <p className="text-xs text-white/60 leading-relaxed pt-3">{werkzeug.beschreibung}</p>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </InfoKarte>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
             </div>
