@@ -62,7 +62,7 @@ export function MobileMenu({ eintraege }: MobileMenuProps) {
                     transition-colors duration-200
                     ${isActive
                       ? "text-white bg-akzent-500/10 border border-akzent-400/20"
-                      : "text-white/75 hover:text-white hover:bg-white/[0.06]"
+                      : "text-white/85 hover:text-white hover:bg-white/[0.06]"
                     }
                   `}
                 >

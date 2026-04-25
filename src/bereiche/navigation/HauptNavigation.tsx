@@ -113,17 +113,17 @@ export function HauptNavigation() {
           >
             <motion.span
               animate={mobileMenuOffen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
-              className="block w-5 h-px bg-white/70 origin-center"
+              className="block w-5 h-px bg-white/90 origin-center"
               transition={{ duration: 0.25 }}
             />
             <motion.span
               animate={mobileMenuOffen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
-              className="block w-5 h-px bg-white/70"
+              className="block w-5 h-px bg-white/90"
               transition={{ duration: 0.2 }}
             />
             <motion.span
               animate={mobileMenuOffen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
-              className="block w-5 h-px bg-white/70 origin-center"
+              className="block w-5 h-px bg-white/90 origin-center"
               transition={{ duration: 0.25 }}
             />
           </button>
