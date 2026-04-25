@@ -135,7 +135,7 @@ export default function SecurityView() {
                           <motion.span
                             animate={{ rotate: aktiverSchritt === schritt.nummer ? 45 : 0 }}
                             transition={{ duration: 0.18 }}
-                            className="text-akzent-400 text-lg flex-shrink-0 font-light"
+                            className="text-cyber-400 text-lg flex-shrink-0 font-light"
                           >
                             +
                           </motion.span>
