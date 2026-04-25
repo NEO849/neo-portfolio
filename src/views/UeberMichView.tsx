@@ -41,7 +41,7 @@ export default function UeberMichView() {
               Meine Stärke liegt darin, komplexe Zusammenhänge greifbar zu machen. Ich denke in Architekturen, Protokollen, Repositories, ViewModels, Services, APIs, Datenflüssen und klar getrennten Verantwortlichkeiten. Dabei ist mir wichtig, dass Anwendungen nicht nur funktionieren, sondern verständlich, wartbar, testbar und langfristig erweiterbar bleiben.
             </p>
             <p className="text-white/75 leading-relaxed">
-              Aus der Arbeit in interdisziplinären Teams bringe ich außerdem Erfahrung im Umgang mit unterschiedlichen Menschen, Perspektiven und Anforderungen mit. Ich habe gelernt, ruhig zuzuhören, Verantwortung zu übernehmen und auch in anspruchsvollen Situationen klar zu bleiben. Diese Kombination aus technischer Tiefe, analytischem Denken, sauberer Struktur und menschlicher Ruhe prägt meine Arbeitsweise.
+              Aus der Arbeit in interdisziplinären Teams bringe ich Erfahrung im Umgang mit unterschiedlichen Perspektiven, Anforderungen und Kommunikationsstilen mit. Ich habe gelernt, aufmerksam zuzuhören, Verantwortung zu übernehmen und auch in anspruchsvollen Situationen klar und lösungsorientiert zu handeln. Diese Kombination aus technischer Tiefe, analytischem Denken, sauberer Struktur und Besonnenheit prägt meine Arbeitsweise.
             </p>
           </div>
         </InfoKarte>
