@@ -35,13 +35,13 @@ export default function UeberMichView() {
         <InfoKarte lichtfarbe="99, 102, 241" klassen="p-6 md:p-8">
           <div className="space-y-4">
             <p className="text-white/80 leading-relaxed">
-              Ich bin ein Mensch, der sich gerne weiterentwickelt, Verantwortung übernimmt und Dinge wirklich verstehen will. Mein Weg begann in der Technik, hat sich aber über die Jahre immer weiter in Richtung IT, Softwareentwicklung und moderne digitale Themen entwickelt. Dabei hilft mir mein praktischer Hintergrund sehr: Ich kenne nicht nur Theorie, sondern auch echte technische Arbeit, Fehlersuche, sauberes Vorgehen und den Anspruch, Probleme wirklich zu lösen.
+              Ich arbeite strukturiert, analytisch und mit dem Anspruch, Systeme wirklich zu verstehen. Neue Themen erschließe ich mir nicht oberflächlich, sondern Schritt für Schritt – durch Recherche, Dokumentation, Tests und praktische Umsetzung. Genau so habe ich mir in den letzten Jahren ein breites technisches Fundament aufgebaut: IT-Infrastruktur, Linux- und Server-Administration, iOS-Entwicklung mit SwiftUI und MVVM, moderne Web-Anwendungen, Security Research und eigene Bug-Bounty-Pipelines.
             </p>
             <p className="text-white/75 leading-relaxed">
-              Ich arbeite strukturiert, denke analytisch und habe Freude daran, mich in neue Themen tief einzuarbeiten. Wenn mich etwas interessiert, bleibe ich dran. Genau so habe ich mir in den letzten Jahren vieles im Bereich IT, App-Entwicklung, Linux, Server und technische Analyse aufgebaut. Ich mag es, Systeme zu verstehen, Zusammenhänge zu erkennen und Lösungen Schritt für Schritt sauber zu entwickeln.
+              Meine Stärke liegt darin, komplexe Zusammenhänge greifbar zu machen. Ich denke in Architekturen, Protokollen, Repositories, ViewModels, Services, APIs, Datenflüssen und klar getrennten Verantwortlichkeiten. Dabei ist mir wichtig, dass Anwendungen nicht nur funktionieren, sondern verständlich, wartbar, testbar und langfristig erweiterbar bleiben.
             </p>
             <p className="text-white/75 leading-relaxed">
-              Gleichzeitig ist mir der menschliche Aspekt sehr wichtig. Durch meine Zeit in der Fachklinik und die Zusammenarbeit mit unterschiedlichen Menschen habe ich gelernt, aufmerksam zuzuhören, ruhig zu bleiben und auch in anspruchsvollen Situationen verantwortungsvoll zu handeln. Ich denke, dass genau diese Mischung aus Technik, Ruhe, Einfühlungsvermögen und Lernbereitschaft mich gut beschreibt.
+              Aus der Arbeit in interdisziplinären Teams bringe ich außerdem Erfahrung im Umgang mit unterschiedlichen Menschen, Perspektiven und Anforderungen mit. Ich habe gelernt, ruhig zuzuhören, Verantwortung zu übernehmen und auch in anspruchsvollen Situationen klar zu bleiben. Diese Kombination aus technischer Tiefe, analytischem Denken, sauberer Struktur und menschlicher Ruhe prägt meine Arbeitsweise.
             </p>
           </div>
         </InfoKarte>
