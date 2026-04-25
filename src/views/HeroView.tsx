@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { PERSOENLICH } from "../models/daten";
 
@@ -164,40 +163,19 @@ export default function HeroView() {
           {PERSOENLICH.kurzvorstellung}
         </motion.p>
 
-        {/* CTA-Buttons */}
-        <motion.div variants={einblend(0.9)} initial="versteckt" animate="sichtbar"
-          className="flex flex-wrap gap-3 justify-center">
-          <Link
-            to="/kontakt"
-            className="px-6 py-3 rounded-xl font-medium text-sm text-white transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
-            style={{
-              background: "linear-gradient(135deg, rgba(99,102,241,0.22), rgba(6,182,212,0.12))",
-              border: "1px solid rgba(99,102,241,0.35)",
-              boxShadow: "0 0 30px rgba(99,102,241,0.08)",
-            }}
-          >
-            Kontakt aufnehmen
-          </Link>
-          <a
-            href={PERSOENLICH.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-3 rounded-xl font-medium text-sm text-white/80 hover:text-white/95 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
-            style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)" }}
-          >
-            GitHub →
-          </a>
-        </motion.div>
-
-        {/* Scroll Indikator */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5 }} className="mt-16">
-          <motion.div
-            animate={{ y: [0, 7, 0] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-            className="w-5 h-8 mx-auto rounded-full border border-white/12 flex justify-center pt-1.5"
-          >
-            <div className="w-1 h-2 rounded-full bg-white/20" />
-          </motion.div>
+        {/* Portfolio-Überblick */}
+        <motion.div
+          variants={einblend(0.9)}
+          initial="versteckt"
+          animate="sichtbar"
+          className="max-w-2xl mx-auto rounded-2xl px-6 py-5 text-sm text-white/70 leading-relaxed text-left backdrop-blur-sm"
+          style={{
+            background: "linear-gradient(135deg, rgba(99,102,241,0.07), rgba(6,182,212,0.04))",
+            border: "1px solid rgba(99,102,241,0.18)",
+            boxShadow: "0 0 40px rgba(99,102,241,0.07), 0 8px 32px rgba(0,0,0,0.3)",
+          }}
+        >
+          Diese Seite bündelt meine Projekte, Skills und mein technisches Setup – von iOS-Entwicklung über Web-Anwendungen bis hin zu Security Research. Datenschutz und digitale Sicherheit sind heute wichtiger denn je. Deshalb möchte ich meinen Teil dazu beitragen, das Internet ein Stück sicherer zu machen. Im Rahmen legitimer Bug-Bounty-Programme teste ich Webseiten, Anwendungen und Apps mit selbstgebauten Tools und Pipelines auf Schwachstellen. Mein OSINT Tool hilft zusätzlich dabei, öffentlich sichtbare Daten besser einzuordnen und einen ersten Überblick zu gewinnen – kostenlos und zugänglich.
         </motion.div>
       </div>
     </section>
