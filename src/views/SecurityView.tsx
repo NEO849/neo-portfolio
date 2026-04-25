@@ -49,7 +49,7 @@ export default function SecurityView() {
           <button
             key={tab.id}
             onClick={() => { setAktiverTab(tab.id); setAktiverSchritt(null); }}
-            className={`relative flex-1 min-w-[80px] px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+            className={`relative flex-1 min-w-[80px] px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 flex items-center justify-center ${
               aktiverTab === tab.id
                 ? "text-white"
                 : "text-white/45 hover:text-white/75"
@@ -101,7 +101,7 @@ export default function SecurityView() {
           {/* ── Pipeline ── */}
           {aktiverTab === "pipeline" && (
             <div>
-              <p className="font-mono text-xs text-white/35 mb-5">
+              <p className="font-mono text-xs text-white/60 mb-5">
                 run_master_pipeline.sh — Lockfile-geschützt · --resume-from · --skip-Flags · --dry-run
               </p>
               <div className="space-y-2">
@@ -135,7 +135,7 @@ export default function SecurityView() {
                           <motion.span
                             animate={{ rotate: aktiverSchritt === schritt.nummer ? 45 : 0 }}
                             transition={{ duration: 0.18 }}
-                            className="text-white/20 text-lg flex-shrink-0 font-light"
+                            className="text-akzent-400 text-lg flex-shrink-0 font-light"
                           >
                             +
                           </motion.span>

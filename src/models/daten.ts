@@ -140,7 +140,7 @@ export const ASSET_TIERS = [
 
 export const SECURITY_STATS: SecurityStatModel[] = [
   { label: "Plattformen",         wert: "2",       icon: "🎯" },
-  { label: "Reports eingereicht", wert: "5+",      icon: "📝" },
+  { label: "Reports eingereicht", wert: "9",       icon: "📝" },
   { label: "Aktive Targets",      wert: "4",       icon: "🔍" },
   { label: "Pipeline-Skripte",    wert: "30+",     icon: "⚙️" },
   { label: "Custom Tools",        wert: "13",      icon: "🛠️" },
