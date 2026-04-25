@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { PERSOENLICH } from "../models/daten";
+import { KartenLicht } from "../bewegung/KartenLicht";
 
 // ═══════════════════════════════════════════════════════
 // VIEW: Hero — Erster Eindruck
@@ -168,14 +169,20 @@ export default function HeroView() {
           variants={einblend(0.9)}
           initial="versteckt"
           animate="sichtbar"
-          className="max-w-2xl mx-auto rounded-2xl px-6 py-5 text-sm text-white/70 leading-relaxed text-left backdrop-blur-sm"
+          whileHover={{ scale: 1.015, y: -3, transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] } }}
+          whileTap={{ scale: 0.99, y: 0, transition: { duration: 0.1, ease: [0.4, 0, 0.2, 1] } }}
+          className="max-w-2xl mx-auto rounded-2xl backdrop-blur-sm overflow-hidden"
           style={{
             background: "linear-gradient(135deg, rgba(99,102,241,0.07), rgba(6,182,212,0.04))",
             border: "1px solid rgba(99,102,241,0.18)",
             boxShadow: "0 0 40px rgba(99,102,241,0.07), 0 8px 32px rgba(0,0,0,0.3)",
           }}
         >
-          Diese Seite bündelt meine Projekte, Skills und mein technisches Setup – von iOS-Entwicklung über Web-Anwendungen bis hin zu Security Research. Datenschutz und digitale Sicherheit sind heute wichtiger denn je. Deshalb möchte ich meinen Teil dazu beitragen, das Internet ein Stück sicherer zu machen. Im Rahmen legitimer Bug-Bounty-Programme teste ich Webseiten, Anwendungen und Apps mit selbstgebauten Tools und Pipelines auf Schwachstellen. Mein OSINT Tool hilft zusätzlich dabei, öffentlich sichtbare Daten besser einzuordnen und einen ersten Überblick zu gewinnen – kostenlos und zugänglich.
+          <KartenLicht lichtfarbe="99, 102, 241" intensitaet={0.1} radius={300}>
+            <p className="px-6 py-5 text-sm text-white/70 leading-relaxed text-left">
+              Diese Seite bündelt meine Projekte, Skills und mein technisches Setup – von iOS-Entwicklung über Web-Anwendungen bis hin zu Security Research. Datenschutz und digitale Sicherheit sind heute wichtiger denn je. Deshalb möchte ich meinen Teil dazu beitragen, das Internet ein Stück sicherer zu machen. Im Rahmen legitimer Bug-Bounty-Programme teste ich Webseiten, Anwendungen und Apps mit selbstgebauten Tools und Pipelines auf Schwachstellen. Mein OSINT Tool hilft zusätzlich dabei, öffentlich sichtbare Daten besser einzuordnen und einen ersten Überblick zu gewinnen – kostenlos und zugänglich.
+            </p>
+          </KartenLicht>
         </motion.div>
       </div>
     </section>

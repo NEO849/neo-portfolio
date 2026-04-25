@@ -48,7 +48,7 @@ export function Fusszeile() {
                 <li key={link.pfad}>
                   <Link
                     to={link.pfad}
-                    className="text-sm text-white/80 hover:text-white transition-colors duration-200"
+                    className="text-sm text-white/80 hover:text-akzent-400 focus-visible:text-akzent-400 focus-visible:outline-none transition-colors duration-200"
                   >
                     {link.label}
                   </Link>
