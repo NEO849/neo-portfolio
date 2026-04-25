@@ -272,9 +272,9 @@ export default function SecurityView() {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.04, duration: 0.28 }}
                     >
-                      <InfoKarte lichtfarbe="34, 197, 94" akzentRand akzentFarbe="#22c55e" mitHoverAnimation={false} klassen="p-3">
+                      <InfoKarte lichtfarbe="34, 211, 238" akzentRand akzentFarbe="#22d3ee" mitHoverAnimation={false} klassen="p-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-1.5 h-1.5 rounded-full bg-signal-gruen flex-shrink-0" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <span className="font-mono text-sm text-white font-medium">{werkzeug.name}</span>
                             <p className="text-xs text-white/35">{werkzeug.rolle}</p>
@@ -294,7 +294,6 @@ export default function SecurityView() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {TOOLS_STACK.filter(t => t.kategorie !== "eigenbau").map((werkzeug, index) => {
-                    const lichtfarbe = WERKZEUG_FARBEN[werkzeug.kategorie] ?? "99, 102, 241";
                     return (
                       <motion.div
                         key={werkzeug.name}
@@ -302,9 +301,9 @@ export default function SecurityView() {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.04, duration: 0.28 }}
                       >
-                        <InfoKarte lichtfarbe={lichtfarbe} mitHoverAnimation={false} klassen="p-3">
+                        <InfoKarte lichtfarbe="34, 211, 238" mitHoverAnimation={false} klassen="p-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: `rgb(${lichtfarbe})` }} />
+                            <div className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" />
                             <div className="flex-1 min-w-0">
                               <span className="font-mono text-sm text-white font-medium">{werkzeug.name}</span>
                               <p className="text-xs text-white/35">{werkzeug.rolle}</p>
