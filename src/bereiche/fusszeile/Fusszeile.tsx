@@ -29,10 +29,10 @@ export function Fusszeile() {
 
           {/* Marke */}
           <div>
-            <p className="font-mono text-sm text-white/60 mb-1">
+            <p className="font-mono text-sm text-white/75 mb-1">
               FREE DATA <span className="text-akzent-400">solution's</span>
             </p>
-            <p className="text-xs text-white/60 leading-relaxed max-w-xs">
+            <p className="text-xs text-white/70 leading-relaxed max-w-xs">
               Fullstack Security Engineer. iOS Development,<br />
               Security Research, Bug Bounty.
             </p>
@@ -40,7 +40,7 @@ export function Fusszeile() {
 
           {/* Navigation */}
           <div>
-            <p className="font-mono text-xs text-white/50 mb-3 uppercase tracking-widest">
+            <p className="font-mono text-xs text-white/60 mb-3 uppercase tracking-widest">
               Navigation
             </p>
             <ul className="space-y-2">
@@ -48,7 +48,7 @@ export function Fusszeile() {
                 <li key={link.pfad}>
                   <Link
                     to={link.pfad}
-                    className="text-sm text-white/70 hover:text-white transition-colors duration-200"
+                    className="text-sm text-white/80 hover:text-white transition-colors duration-200"
                   >
                     {link.label}
                   </Link>
@@ -59,7 +59,7 @@ export function Fusszeile() {
 
           {/* Soziale Links */}
           <div>
-            <p className="font-mono text-xs text-white/50 mb-3 uppercase tracking-widest">
+            <p className="font-mono text-xs text-white/60 mb-3 uppercase tracking-widest">
               Profile
             </p>
             <ul className="space-y-2">
@@ -69,11 +69,11 @@ export function Fusszeile() {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-white/70 hover:text-akzent-400 transition-colors duration-200 group"
+                    className="flex items-center gap-2 text-sm text-white/80 hover:text-akzent-400 transition-colors duration-200 group"
                   >
                     <span className="w-1 h-1 rounded-full bg-white/20 group-hover:bg-akzent-400 transition-colors" />
                     <span>{link.label}</span>
-                    <span className="font-mono text-xs text-white/50">({link.kurz})</span>
+                    <span className="font-mono text-xs text-white/60">({link.kurz})</span>
                   </a>
                 </li>
               ))}
@@ -83,10 +83,10 @@ export function Fusszeile() {
 
         {/* Copyright-Zeile */}
         <div className="pt-8 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-white/55 font-mono">
+          <p className="text-xs text-white/65 font-mono">
             © {aktuellesJahr()} {PERSOENLICH.name} — Alle Rechte vorbehalten
           </p>
-          <p className="text-xs text-white/50 font-mono">
+          <p className="text-xs text-white/60 font-mono">
             Gebaut mit React · TypeScript · Framer Motion
           </p>
         </div>

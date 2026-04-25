@@ -145,7 +145,7 @@ export default function HeroView() {
 
         {/* Untertitel */}
         <motion.div variants={einblend(0.45)} initial="versteckt" animate="sichtbar"
-          className="font-mono text-xs md:text-sm text-white/65 mb-5 tracking-[0.22em] uppercase">
+          className="font-mono text-xs md:text-sm text-white/75 mb-5 tracking-[0.22em] uppercase">
           {PERSOENLICH.untertitel}
         </motion.div>
 
@@ -160,7 +160,7 @@ export default function HeroView() {
 
         {/* Kurzvorstellung */}
         <motion.p variants={einblend(0.75)} initial="versteckt" animate="sichtbar"
-          className="text-base md:text-lg text-white/75 max-w-xl mx-auto leading-relaxed mb-10">
+          className="text-base md:text-lg text-white/85 max-w-xl mx-auto leading-relaxed mb-10">
           {PERSOENLICH.kurzvorstellung}
         </motion.p>
 

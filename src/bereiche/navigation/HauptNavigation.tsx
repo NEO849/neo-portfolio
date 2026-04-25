@@ -56,7 +56,7 @@ export function HauptNavigation() {
             to="/"
             className="font-mono text-sm tracking-widest transition-colors duration-200 group"
           >
-            <span className="text-white/40 group-hover:text-white/60">FREE DATA </span>
+            <span className="text-white/65 group-hover:text-white/85">FREE DATA </span>
             <span className="text-akzent-400 group-hover:text-akzent-300 transition-colors">solution's</span>
           </Link>
 
