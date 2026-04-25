@@ -81,7 +81,7 @@ export default function HeroView() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-24 pb-12 px-6"
+      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-24 pb-4 px-6"
     >
       <CodeRainCanvas />
 
