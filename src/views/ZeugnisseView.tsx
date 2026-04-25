@@ -134,39 +134,41 @@ export default function ZeugnisseView() {
         </p>
       </motion.div>
 
-      {/* Kategorie-Auswahl — alle 4 Tabs in einer Zeile */}
-      <div className="flex gap-1.5 mb-8 p-1.5 rounded-2xl bg-white/[0.025] border border-white/[0.05] overflow-x-auto scrollbar-none">
-        {DOKUMENTE.map((dok, index) => (
-          <button
-            key={index}
-            onClick={() => navigiere(index)}
-            className={`relative flex-1 min-w-0 px-3 py-2 rounded-xl text-xs font-mono font-semibold whitespace-nowrap transition-all duration-200 ${
-              index === aktuellerIndex
-                ? "text-white"
-                : "text-white/40 hover:text-white/70"
-            }`}
-            style={index === aktuellerIndex ? {
-              background: `${dok.akzentFarbe}18`,
-              border: `1px solid ${dok.akzentFarbe}35`,
-              color: dok.akzentFarbe,
-            } : undefined}
-          >
-            {KATEGORIE_LABEL[dok.kategorie]}
-          </button>
-        ))}
+      {/* Kategorie-Auswahl — scrollbar auf Mobile, equal-width auf Desktop */}
+      <div className="overflow-x-auto scrollbar-none mb-8">
+        <div className="flex w-full min-w-max gap-1.5 p-1.5 rounded-2xl bg-white/[0.025] border border-white/[0.05]">
+          {DOKUMENTE.map((dok, index) => (
+            <button
+              key={index}
+              onClick={() => navigiere(index)}
+              className={`relative flex-1 min-w-max px-4 py-2 rounded-xl text-xs font-mono font-semibold whitespace-nowrap transition-all duration-200 flex items-center justify-center ${
+                index === aktuellerIndex
+                  ? "text-white"
+                  : "text-white/40 hover:text-white/70"
+              }`}
+              style={index === aktuellerIndex ? {
+                background: `${dok.akzentFarbe}18`,
+                border: `1px solid ${dok.akzentFarbe}35`,
+                color: dok.akzentFarbe,
+              } : undefined}
+            >
+              {KATEGORIE_LABEL[dok.kategorie]}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Karussell */}
+      {/* Karussell — px-10 auf Mobile hält Pfeile in der Padding-Zone */}
       <div
         ref={karussellRef}
-        className="relative"
+        className="relative px-10 md:px-0"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
         {/* Pfeile */}
         {[
-          { richtung: -1, fn: vorherige, pos: "left-0 -translate-x-3 md:-translate-x-5" },
-          { richtung:  1, fn: naechste,  pos: "right-0 translate-x-3 md:translate-x-5" },
+          { richtung: -1, fn: vorherige, pos: "left-0 md:-translate-x-5" },
+          { richtung:  1, fn: naechste,  pos: "right-0 md:translate-x-5"  },
         ].map(({ fn, pos }) => (
           <button
             key={pos}
@@ -190,7 +192,7 @@ export default function ZeugnisseView() {
 
               {/* Vorschau-Karte */}
               <motion.div
-                className="relative cursor-pointer group"
+                className="relative cursor-pointer group w-full min-w-0"
                 onClick={() => setLightboxOffen(true)}
                 whileHover={{ scale: 1.015 }}
                 transition={{ duration: 0.25 }}
@@ -208,7 +210,7 @@ export default function ZeugnisseView() {
                     <img
                       src={aktuell.vorschauBild}
                       alt={aktuell.titel}
-                      className="w-full h-auto object-contain block"
+                      className="w-full max-w-full h-auto object-contain block mx-auto"
                       style={{ maxHeight: "420px", objectPosition: "top" }}
                     />
                   </div>
@@ -235,7 +237,7 @@ export default function ZeugnisseView() {
               </motion.div>
 
               {/* Infospalte */}
-              <div className="flex flex-col justify-start pt-2">
+              <div className="flex flex-col justify-start pt-2 min-w-0">
                 <div className="flex items-center gap-2 mb-4">
                   <span
                     className="text-xs font-mono px-3 py-1 rounded-lg font-bold"
