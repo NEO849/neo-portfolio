@@ -134,27 +134,48 @@ export default function ZeugnisseView() {
         </p>
       </motion.div>
 
-      {/* Kategorie-Auswahl — scrollbar auf Mobile, equal-width auf Desktop */}
-      <div className="overflow-x-auto scrollbar-none mb-8">
-        <div className="flex w-full min-w-max gap-1.5 p-1.5 rounded-2xl bg-white/[0.025] border border-white/[0.05]">
-          {DOKUMENTE.map((dok, index) => (
-            <button
-              key={index}
-              onClick={() => navigiere(index)}
-              className={`relative flex-1 min-w-max px-4 py-2 rounded-xl text-xs font-mono font-semibold whitespace-nowrap transition-all duration-200 flex items-center justify-center ${
-                index === aktuellerIndex
-                  ? "text-white"
-                  : "text-white/40 hover:text-white/70"
-              }`}
-              style={index === aktuellerIndex ? {
-                background: `${dok.akzentFarbe}18`,
-                border: `1px solid ${dok.akzentFarbe}35`,
-                color: dok.akzentFarbe,
-              } : undefined}
-            >
-              {KATEGORIE_LABEL[dok.kategorie]}
-            </button>
-          ))}
+      {/*
+        ┌─ Schicht 1: Overflow-Guard ─────────────────────────────────────┐
+        │  overflow-hidden verhindert globalen Page-Overflow.              │
+        │  w-full max-w-full: bleibt exakt im Section-Content-Bereich.    │
+        └─────────────────────────────────────────────────────────────────┘
+        ┌─ Schicht 2: Scroll-Container ───────────────────────────────────┐
+        │  overflow-x-auto: nur diese Ebene scrollt horizontal.           │
+        │  scrollbar-none: Scrollbar ausgeblendet, Touch-Scroll bleibt.   │
+        │  scroll-smooth: sanftes Gleiten (programmatisch + Keyboard).    │
+        └─────────────────────────────────────────────────────────────────┘
+        ┌─ Schicht 3: Tab-Liste (inline-flex) ────────────────────────────┐
+        │  inline-flex: Content-Breite, NICHT durch containing block       │
+        │  beschränkt — der entscheidende Unterschied zu block-level flex. │
+        │  min-w-full: füllt auf Desktop die volle Breite.                │
+        └─────────────────────────────────────────────────────────────────┘
+      */}
+      <div className="w-full max-w-full overflow-hidden mb-8">
+        <div
+          className="overflow-x-auto scroll-smooth scrollbar-none"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          style={{ WebkitOverflowScrolling: "touch" } as any}
+        >
+          <div className="inline-flex min-w-full gap-1.5 p-1.5 rounded-2xl bg-white/[0.025] border border-white/[0.05]">
+            {DOKUMENTE.map((dok, index) => (
+              <button
+                key={index}
+                onClick={() => navigiere(index)}
+                className={`shrink-0 md:flex-1 relative px-4 py-2 rounded-xl text-xs font-mono font-semibold whitespace-nowrap transition-all duration-200 flex items-center justify-center ${
+                  index === aktuellerIndex
+                    ? "text-white"
+                    : "text-white/40 hover:text-white/70"
+                }`}
+                style={index === aktuellerIndex ? {
+                  background: `${dok.akzentFarbe}18`,
+                  border: `1px solid ${dok.akzentFarbe}35`,
+                  color: dok.akzentFarbe,
+                } : undefined}
+              >
+                {KATEGORIE_LABEL[dok.kategorie]}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

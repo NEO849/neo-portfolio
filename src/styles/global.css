@@ -54,6 +54,15 @@ body {
 ::-webkit-scrollbar-thumb { background: #ffffff15; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #ffffff25; }
 
+/* Scrollbar ausblenden — horizontal scrollbare Container (Tab-Leisten etc.) */
+.scrollbar-none {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE/Edge Legacy */
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;                  /* Chrome · Safari · neueres Edge */
+}
+
 /* ═══════════════ Selection ═══════════════ */
 ::selection {
   background: rgba(99,102,241,0.3);
