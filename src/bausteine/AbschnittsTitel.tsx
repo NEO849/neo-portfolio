@@ -41,7 +41,7 @@ export function AbschnittsTitel({
         {titel}
       </h2>
       {untertitel && (
-        <p className="text-white/50 max-w-2xl leading-relaxed">
+        <p className="text-white/70 max-w-2xl leading-relaxed">
           {untertitel}
         </p>
       )}

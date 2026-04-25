@@ -145,7 +145,7 @@ export default function HeroView() {
 
         {/* Untertitel */}
         <motion.div variants={einblend(0.45)} initial="versteckt" animate="sichtbar"
-          className="font-mono text-xs md:text-sm text-white/45 mb-5 tracking-[0.22em] uppercase">
+          className="font-mono text-xs md:text-sm text-white/65 mb-5 tracking-[0.22em] uppercase">
           {PERSOENLICH.untertitel}
         </motion.div>
 
@@ -160,7 +160,7 @@ export default function HeroView() {
 
         {/* Kurzvorstellung */}
         <motion.p variants={einblend(0.75)} initial="versteckt" animate="sichtbar"
-          className="text-base md:text-lg text-white/60 max-w-xl mx-auto leading-relaxed mb-10">
+          className="text-base md:text-lg text-white/75 max-w-xl mx-auto leading-relaxed mb-10">
           {PERSOENLICH.kurzvorstellung}
         </motion.p>
 
@@ -182,7 +182,7 @@ export default function HeroView() {
             href={PERSOENLICH.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-3 rounded-xl font-medium text-sm text-white/65 hover:text-white/90 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
+            className="px-6 py-3 rounded-xl font-medium text-sm text-white/80 hover:text-white/95 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
             style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)" }}
           >
             GitHub →

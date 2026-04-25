@@ -33,7 +33,7 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
                 text={projekt.kategorie}
                 mitPuls={projekt.status === "aktiv"}
               />
-              <span className="text-xs text-white/30 font-mono">{projekt.zeitraum}</span>
+              <span className="text-xs text-white/50 font-mono">{projekt.zeitraum}</span>
               {projekt.status === "aktiv" && (
                 <AbzeichenStatus variante="aktiv" text="aktiv" mitPuls />
               )}
@@ -48,7 +48,7 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
             +
           </motion.span>
         </div>
-        <p className="text-sm text-white/50">{projekt.kurzbeschreibung}</p>
+        <p className="text-sm text-white/65">{projekt.kurzbeschreibung}</p>
         <div className="flex flex-wrap gap-1.5 mt-3">
           {projekt.technologien.map(tech => (
             <TechTag key={tech} name={tech} />
@@ -66,11 +66,11 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
             className="overflow-hidden"
           >
             <div className="px-6 pb-6 border-t border-white/5 pt-4">
-              <p className="text-sm text-white/60 mb-4 leading-relaxed">{projekt.langbeschreibung}</p>
+              <p className="text-sm text-white/75 mb-4 leading-relaxed">{projekt.langbeschreibung}</p>
               <p className="font-mono text-xs text-akzent-400 mb-2 tracking-wider">HIGHLIGHTS</p>
               <ul className="space-y-1.5 mb-5">
                 {projekt.highlights.map((highlight, index) => (
-                  <li key={index} className="text-sm text-white/50 flex items-start gap-2">
+                  <li key={index} className="text-sm text-white/65 flex items-start gap-2">
                     <span className="text-cyber-400 mt-0.5 flex-shrink-0">›</span>
                     <span>{highlight}</span>
                   </li>
