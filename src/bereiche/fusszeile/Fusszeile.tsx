@@ -3,17 +3,10 @@
 // Seitenfuß mit Links, Copyright und Social-Profilen.
 // ═══════════════════════════════════════════════════════════════════
 
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { aktuellesJahr } from "../../hilfsmittel/formatierung";
 import { PERSOENLICH } from "../../models/daten";
-
-const FUSS_LINKS = [
-  { pfad: "/projekte",    label: "Projekte" },
-  { pfad: "/security",    label: "Security" },
-  { pfad: "/osint-tools", label: "OSINT Tools" },
-  { pfad: "/zeugnisse",   label: "Zeugnisse" },
-  { pfad: "/kontakt",     label: "Kontakt" },
-];
+import { NAV_EINTRAEGE } from "../navigation/navKonfiguration";
 
 const SOZIALE_LINKS = [
   { url: PERSOENLICH.github,    label: "GitHub",     kurz: "NEO849" },
@@ -44,14 +37,21 @@ export function Fusszeile() {
               Navigation
             </p>
             <ul className="space-y-2">
-              {FUSS_LINKS.map((link) => (
+              {NAV_EINTRAEGE.map((link) => (
                 <li key={link.pfad}>
-                  <Link
+                  <NavLink
                     to={link.pfad}
-                    className="text-sm text-white/80 hover:text-akzent-400 focus-visible:text-akzent-400 focus-visible:outline-none transition-colors duration-200"
+                    end={link.pfad === "/"}
+                    className={({ isActive }) =>
+                      `text-sm transition-colors duration-200 focus-visible:outline-none ${
+                        isActive
+                          ? "text-akzent-400 font-medium"
+                          : "text-white/80 hover:text-akzent-400 focus-visible:text-akzent-400"
+                      }`
+                    }
                   >
                     {link.label}
-                  </Link>
+                  </NavLink>
                 </li>
               ))}
             </ul>

@@ -10,21 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePortfolioZustand } from "../../zustaende/portfolioZustand";
 import { MOBILE_MENU, MOBILE_MENU_EINTRAG } from "../../bewegung/varianten";
 import { MobileMenu } from "./MobileMenu";
-
-interface NavEintrag {
-  readonly pfad: string;
-  readonly label: string;
-}
-
-const NAV_EINTRAEGE: NavEintrag[] = [
-  { pfad: "/",              label: "Start" },
-  { pfad: "/ueber-mich",    label: "Über mich" },
-  { pfad: "/projekte",      label: "Projekte" },
-  { pfad: "/security",      label: "Security" },
-  { pfad: "/osint-tools",   label: "OSINT Tools" },
-  { pfad: "/zeugnisse",     label: "Zeugnisse" },
-  { pfad: "/kontakt",       label: "Kontakt" },
-];
+import { NAV_EINTRAEGE } from "./navKonfiguration";
 
 export function HauptNavigation() {
   const { mobileMenuOffen, mobileMenuToggle } = usePortfolioZustand();
