@@ -83,7 +83,7 @@ export function Fusszeile() {
 
         {/* Copyright-Zeile */}
         <div className="pt-8 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-white/65 font-mono">
+          <p className="text-xs text-akzent-400 font-mono">
             © {aktuellesJahr()} {PERSOENLICH.name} — Alle Rechte vorbehalten
           </p>
           <p className="text-xs text-white/60 font-mono">
