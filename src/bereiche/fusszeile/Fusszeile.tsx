@@ -23,7 +23,7 @@ const SOZIALE_LINKS = [
 
 export function Fusszeile() {
   return (
-    <footer className="border-t border-white/[0.06] mt-24">
+    <footer className="border-t border-white/[0.06] mt-8">
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
 
