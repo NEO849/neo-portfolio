@@ -57,7 +57,7 @@ export default function UeberMichView() {
       >
         <InfoKarte lichtfarbe="34, 211, 238" mitHoverAnimation={false} klassen="p-5">
           <p className="text-white/70 leading-relaxed text-sm">
-            Auch abseits der Technik ist mir Ausdauer wichtig. In den Bergen bin ich zuhause – beim Wandern, Klettern und auf Klettersteigen. Diese Erfahrungen schärfen meinen Fokus, meine Geduld und meine Fähigkeit, in anspruchsvollen Situationen ruhig und strukturiert zu handeln.
+            Auch abseits der Technik ist mir Ausdauer wichtig. In den Bergen bin ich zuhause – beim Wandern, Klettern und auf Klettersteigen. Diese Erfahrungen schärfen meinen Fokus, meine Geduld und meine Fähigkeit, in anspruchsvollen Situationen ruhig und entschlossen zu handeln.
           </p>
         </InfoKarte>
       </motion.div>
