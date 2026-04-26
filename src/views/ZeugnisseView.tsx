@@ -404,14 +404,20 @@ export default function ZeugnisseView() {
 
               {/* Bild */}
               <div
-                className="flex-1 rounded-2xl overflow-hidden border border-white/10 bg-white flex items-start justify-center"
+                className="flex-1 rounded-2xl overflow-hidden border border-white/10 bg-white"
                 style={{ boxShadow: `0 0 80px ${aktuell.akzentFarbe}12`, overflowY: "auto" }}
               >
-                <img
-                  src={aktuell.vorschauBild}
-                  alt={aktuell.titel}
-                  className="w-full h-auto object-contain block"
-                />
+                {/* Innerer Wrapper: min-h-full stellt sicher dass der Flex-Container
+                    immer mindestens so hoch ist wie der scroll-fähige Außen-Container.
+                    Damit wird das Bild vertikal zentriert wenn es kürzer ist,
+                    und scrollt korrekt von oben wenn es höher ist. */}
+                <div className="min-h-full flex items-center justify-center w-full">
+                  <img
+                    src={aktuell.vorschauBild}
+                    alt={aktuell.titel}
+                    className="w-full h-auto object-contain block"
+                  />
+                </div>
               </div>
 
               {/* Lightbox-Navigation */}
