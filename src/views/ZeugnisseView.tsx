@@ -119,6 +119,14 @@ export default function ZeugnisseView() {
 
   const aktuell = DOKUMENTE[aktuellerIndex];
 
+  // In der Lightbox: kein Titel-h3, nur eine Zeile.
+  // Lebenslauf/Anschreiben haben "Michael Fleps" als Aussteller →
+  // ersetze durch den Kategorie-Namen, da er informativer ist.
+  const lightboxUntertitel =
+    aktuell.kategorie === "lebenslauf" || aktuell.kategorie === "anschreiben"
+      ? KATEGORIE_LABEL[aktuell.kategorie]
+      : aktuell.aussteller;
+
   // Crossfade-Varianten: nur opacity + scale — kein y, kein filter.
   // y würde den Content sichtbar hochrutschen lassen (Layout-Sprung).
   // filter:blur() ist teuer und verstärkt die visuelle Instabilität.
@@ -366,8 +374,7 @@ export default function ZeugnisseView() {
               {/* Lightbox-Header */}
               <div className="flex items-center justify-between mb-3 px-1">
                 <div>
-                  <h3 className="font-display text-base font-bold text-white">{aktuell.titel}</h3>
-                  <p className="font-mono text-xs text-white/30 mt-0.5">{aktuell.aussteller}</p>
+                  <p className="font-mono text-xs text-white/30">{lightboxUntertitel}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <a
