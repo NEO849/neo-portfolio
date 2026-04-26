@@ -16,9 +16,6 @@ interface DokumentEintrag {
   readonly vorschauBild: string;
   readonly kategorie: "zeugnis" | "zertifikat" | "lebenslauf" | "anschreiben";
   readonly akzentFarbe: string;
-  /** Optionale Tailwind-Klassen für das Lightbox-Bild.
-   *  Nur setzen wenn das Dokument vom Default "w-full h-auto" abweichen muss. */
-  readonly lightboxBildKlasse?: string;
 }
 
 const KATEGORIE_LABEL: Record<DokumentEintrag["kategorie"], string> = {
@@ -38,7 +35,6 @@ const DOKUMENTE: DokumentEintrag[] = [
     vorschauBild: "/gesellenbrief.jpg",
     kategorie: "zeugnis",
     akzentFarbe: "#818cf8",
-    lightboxBildKlasse: "w-auto max-w-full max-h-[72vh] object-contain block",
   },
   {
     titel: "IT-Fachkraft für App-Entwicklung (iOS & Android)",
@@ -408,20 +404,14 @@ export default function ZeugnisseView() {
 
               {/* Bild */}
               <div
-                className="flex-1 rounded-2xl overflow-hidden border border-white/10 bg-white"
+                className="flex-1 rounded-2xl overflow-hidden border border-white/10 bg-white flex items-start justify-center"
                 style={{ boxShadow: `0 0 80px ${aktuell.akzentFarbe}12`, overflowY: "auto" }}
               >
-                {/* Innerer Wrapper: min-h-full stellt sicher dass der Flex-Container
-                    immer mindestens so hoch ist wie der scroll-fähige Außen-Container.
-                    Damit wird das Bild vertikal zentriert wenn es kürzer ist,
-                    und scrollt korrekt von oben wenn es höher ist. */}
-                <div className="min-h-full flex items-center justify-center w-full">
-                  <img
-                    src={aktuell.vorschauBild}
-                    alt={aktuell.titel}
-                    className={aktuell.lightboxBildKlasse ?? "w-full h-auto object-contain block"}
-                  />
-                </div>
+                <img
+                  src={aktuell.vorschauBild}
+                  alt={aktuell.titel}
+                  className="w-full h-auto object-contain block"
+                />
               </div>
 
               {/* Lightbox-Navigation */}
