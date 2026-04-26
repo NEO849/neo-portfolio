@@ -333,17 +333,17 @@ export default function ZeugnisseView() {
                   >
                     {KATEGORIE_LABEL[aktuell.kategorie]}
                   </span>
-                  <span className="font-mono text-xs text-white/25">{aktuell.jahr}</span>
+                  <span className="font-mono text-xs text-white/40">{aktuell.jahr}</span>
                 </div>
 
                 <h3 className="font-display text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
                   {aktuell.titel}
                 </h3>
-                <p className="font-mono text-xs text-white/30 mb-4">{aktuell.aussteller}</p>
-                <p className="text-sm text-white/55 leading-relaxed">{aktuell.beschreibung}</p>
+                <p className="font-mono text-xs text-white/50 mb-4">{aktuell.aussteller}</p>
+                <p className="text-sm text-white/65 leading-relaxed">{aktuell.beschreibung}</p>
 
                 {/* Swipe-Hinweis auf Mobile */}
-                <p className="md:hidden mt-6 text-xs text-white/20 font-mono flex items-center gap-2">
+                <p className="md:hidden mt-6 text-xs text-white/30 font-mono flex items-center gap-2">
                   <span>←</span>
                   <span>wischen zum Blättern</span>
                   <span>→</span>
