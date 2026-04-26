@@ -152,8 +152,9 @@ export default function ZeugnisseView() {
         }}
         layoutId="dokumente-tab-bg"
         ariaLabel="Dokument-Navigation"
-        buttonClassName="min-w-max px-5"
-        className="mb-8"
+        scrollable={false}
+        buttonClassName="min-w-0 px-1.5 sm:px-4 text-[11px] sm:text-sm"
+        className="mb-8 w-full"
       />
 
       {/* Karussell — px-10 auf Mobile hält Pfeile in der Padding-Zone */}

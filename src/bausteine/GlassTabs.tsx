@@ -1,17 +1,20 @@
 // ═══════════════════════════════════════════════════════════════════
 // BAUSTEIN: GlassTabs
-// Wiederverwendbare Tab-Leiste — identisches Verhalten auf Mobile/Desktop.
-// Verwendet in: SecurityView, ZeugnisseView (und zukünftigen Sektionen).
+// Wiederverwendbare Tab-Leiste — zwei Modi:
 //
-// Technische Garantien:
-//  · flex + overflow-x-auto auf dem Container-Element selbst
-//    → Browser behandelt min-content der Flex-Items als Scroll-Grenze
-//  · min-w-[80px] + flex-1: auf Desktop gleichmäßige Verteilung,
-//    auf Mobile scrollen wenn Summe > Viewport
-//  · Kein overflow-x-hidden-Ancestor darf diese Komponente umhüllen
-//    (iOS Safari würde Child-Scroll unterdrücken)
-//  · Framer Motion layoutId: muss pro Usage-Stelle eindeutig sein
-//  · ARIA: role=tablist / role=tab / aria-selected / roving tabindex
+// scrollable=true (Default, SecurityView):
+//   · overflow-x-auto — scrollt wenn Summe der Buttons > Container
+//   · min-w-[80px] px-4 text-sm — kurze Labels passen nativ rein
+//
+// scrollable=false (ZeugnisseView, lange Labels):
+//   · overflow-hidden am Container — kein Scroll möglich
+//   · min-w-0 am Button — Flex teilt Breite exakt gleich auf (1/n)
+//   · overflow-hidden am Button — Clip-Sicherheit wenn Text zu breit
+//   · buttonClassName steuert Font + Padding: auf Mobile verkleinern
+//     bis Label sicher in den Slot passt (text-[11px] px-1.5)
+//   · Kein overflow-x-hidden-Ancestor (iOS Safari unterdrückt sonst Child-Scroll)
+//   · Framer Motion layoutId: pro Usage-Stelle eindeutig wählen
+//   · ARIA: role=tablist / role=tab / aria-selected / roving tabindex
 // ═══════════════════════════════════════════════════════════════════
 
 import { useRef } from "react";
@@ -29,8 +32,11 @@ interface GlassTabsProps {
   layoutId?: string;
   className?: string;
   /** Tailwind-Klassen für Breite + Padding der einzelnen Buttons.
-   *  Default "min-w-[80px] px-4" — für längere Labels "min-w-max px-5" o.ä. */
+   *  Default "min-w-[80px] px-4 text-sm" (scrollable=true, kurze Labels).
+   *  Für gleichmäßige Vollbreite ohne Scroll: "min-w-0 px-1.5 sm:px-4 text-[11px] sm:text-sm" */
   buttonClassName?: string;
+  /** false → kein horizontales Scrollen, alle Tabs verteilen sich gleichmäßig über die volle Breite */
+  scrollable?: boolean;
   ariaLabel?: string;
 }
 
@@ -40,7 +46,8 @@ export function GlassTabs({
   onTabChange,
   layoutId = "glass-tab-bg",
   className = "",
-  buttonClassName = "min-w-[80px] px-4",
+  buttonClassName = "min-w-[80px] px-4 text-sm",
+  scrollable = true,
   ariaLabel,
 }: GlassTabsProps) {
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -67,7 +74,7 @@ export function GlassTabs({
     <div
       role="tablist"
       aria-label={ariaLabel}
-      className={`flex gap-1.5 p-1.5 rounded-2xl bg-white/[0.025] border border-white/[0.05] overflow-x-auto scrollbar-none ${className}`}
+      className={`flex gap-1.5 p-1.5 rounded-2xl bg-white/[0.025] border border-white/[0.05] ${scrollable ? "overflow-x-auto scrollbar-none" : "overflow-hidden"} ${className}`}
     >
       {tabs.map((tab, index) => (
         <button
@@ -78,7 +85,7 @@ export function GlassTabs({
           tabIndex={activeId === tab.id ? 0 : -1}
           onClick={() => onTabChange(tab.id)}
           onKeyDown={(e) => handleKeyDown(e, index)}
-          className={`relative flex-1 ${buttonClassName} py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors duration-200 flex items-center justify-center ${
+          className={`relative flex-1 ${buttonClassName} py-2 rounded-xl font-medium whitespace-nowrap transition-colors duration-200 flex items-center justify-center overflow-hidden ${
             activeId === tab.id
               ? "text-white"
               : "text-white/45 hover:text-white/75"
