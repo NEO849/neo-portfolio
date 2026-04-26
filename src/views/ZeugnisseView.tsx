@@ -122,10 +122,13 @@ export default function ZeugnisseView() {
   // In der Lightbox: kein Titel-h3, nur eine Zeile.
   // Lebenslauf/Anschreiben haben "Michael Fleps" als Aussteller →
   // ersetze durch den Kategorie-Namen, da er informativer ist.
-  const lightboxUntertitel =
-    aktuell.kategorie === "lebenslauf" || aktuell.kategorie === "anschreiben"
-      ? KATEGORIE_LABEL[aktuell.kategorie]
-      : aktuell.aussteller;
+  const LIGHTBOX_UNTERTITEL: Record<DokumentEintrag["kategorie"], string> = {
+    zeugnis:     "Handwerkskammer Straubing",
+    zertifikat:  "(DIN EN ISO 9001)",
+    lebenslauf:  "Lebenslauf",
+    anschreiben: "Anschreiben",
+  };
+  const lightboxUntertitel = LIGHTBOX_UNTERTITEL[aktuell.kategorie];
 
   // Crossfade-Varianten: nur opacity + scale — kein y, kein filter.
   // y würde den Content sichtbar hochrutschen lassen (Layout-Sprung).
@@ -374,7 +377,7 @@ export default function ZeugnisseView() {
               {/* Lightbox-Header */}
               <div className="flex items-center justify-between mb-3 px-1">
                 <div>
-                  <p className="font-mono text-xs text-white/30">{lightboxUntertitel}</p>
+                  <p className="font-mono text-xs text-white/55">{lightboxUntertitel}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <a
@@ -388,7 +391,7 @@ export default function ZeugnisseView() {
                       border: `1px solid ${aktuell.akzentFarbe}30`,
                     }}
                   >
-                    ↓ Download
+                    Download
                   </a>
                   <button
                     onClick={() => setLightboxOffen(false)}
