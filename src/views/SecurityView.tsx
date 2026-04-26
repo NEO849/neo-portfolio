@@ -4,6 +4,7 @@ import { PIPELINE_SCHRITTE, SCORING_KATEGORIEN, ASSET_TIERS, SECURITY_STATS, TOO
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
 import { AbzeichenStatus } from "../bausteine/AbzeichenStatus";
+import { GlassTabs } from "../bausteine/GlassTabs";
 
 // ═══════════════════════════════════════════════════════
 // VIEW: Security Research — Tab-System
@@ -44,30 +45,18 @@ export default function SecurityView() {
         klassen="mb-10"
       />
 
-      {/* Tab-Leiste — immer eine Zeile, auf kleinen Screens scrollbar */}
-      <div className="flex gap-1.5 mb-8 p-1.5 rounded-2xl bg-white/[0.025] border border-white/[0.05] overflow-x-auto scrollbar-none">
-        {TABS.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => { setAktiverTab(tab.id); setAktiverSchritt(null); setAktivesWerkzeug(null); }}
-            className={`relative flex-1 min-w-[80px] px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 flex items-center justify-center ${
-              aktiverTab === tab.id
-                ? "text-white"
-                : "text-white/45 hover:text-white/75"
-            }`}
-          >
-            {aktiverTab === tab.id && (
-              <motion.div
-                layoutId="security-tab-bg"
-                className="absolute inset-0 rounded-xl"
-                style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(6,182,212,0.1))", border: "1px solid rgba(99,102,241,0.25)" }}
-                transition={{ type: "spring", stiffness: 400, damping: 32 }}
-              />
-            )}
-            <span className="relative z-10">{tab.label}</span>
-          </button>
-        ))}
-      </div>
+      <GlassTabs
+        tabs={TABS}
+        activeId={aktiverTab}
+        onTabChange={(id) => {
+          setAktiverTab(id as SecurityTab);
+          setAktiverSchritt(null);
+          setAktivesWerkzeug(null);
+        }}
+        layoutId="security-tab-bg"
+        ariaLabel="Security Research Navigation"
+        className="mb-8"
+      />
 
       {/* Tab-Inhalt */}
       <AnimatePresence mode="wait">
