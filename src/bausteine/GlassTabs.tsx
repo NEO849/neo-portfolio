@@ -95,7 +95,7 @@ export function GlassTabs({
             <motion.div
               layoutId={layoutId}
               className="absolute inset-0 rounded-xl bg-gradient-to-br from-akzent-500/20 to-cyber-500/10 border border-akzent-500/25"
-              transition={{ type: "spring", stiffness: 400, damping: 32 }}
+              transition={{ type: "spring", stiffness: 420, damping: 34, mass: 0.8 }}
             />
           )}
           <span className="relative z-10">{tab.label}</span>

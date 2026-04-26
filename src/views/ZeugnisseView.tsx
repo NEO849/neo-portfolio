@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { GlassTabs } from "../bausteine/GlassTabs";
 
 // ═══════════════════════════════════════════════════════
@@ -24,9 +24,6 @@ const KATEGORIE_LABEL: Record<DokumentEintrag["kategorie"], string> = {
   lebenslauf:  "Lebenslauf",
   anschreiben: "Anschreiben",
 };
-
-// GlassTabs-Daten: id = String(index), label = Kategorie-Label
-// Wird nach DOKUMENTE definiert — nach der DOKUMENTE-Konstante weiter unten genutzt.
 
 const DOKUMENTE: DokumentEintrag[] = [
   {
@@ -76,7 +73,10 @@ const DOKUMENT_TABS = DOKUMENTE.map((dok, index) => ({
   label: KATEGORIE_LABEL[dok.kategorie],
 }));
 
-const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+// Premium-Easing für alle Transitionen in dieser View
+const PREMIUM_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+// Leichter Ease für Lightbox
+const LIGHTBOX_EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 export default function ZeugnisseView() {
   const [aktuellerIndex, setAktuellerIndex] = useState(0);
@@ -84,6 +84,8 @@ export default function ZeugnisseView() {
   const [lightboxOffen, setLightboxOffen] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const karussellRef = useRef<HTMLDivElement>(null);
+  // prefers-reduced-motion: vereinfacht alle Animationen automatisch
+  const reduzierteBewegung = useReducedMotion();
 
   const navigiere = (neuerIndex: number) => {
     setRichtung(neuerIndex > aktuellerIndex ? 1 : -1);
@@ -117,10 +119,35 @@ export default function ZeugnisseView() {
 
   const aktuell = DOKUMENTE[aktuellerIndex];
 
+  // Premium-Transitionen: vertikales Fade + Scale + Blur statt horizontalem Slide.
+  // Bei reduzierteBewegung: nur simples Opacity-Fade ohne Bewegung.
   const kartenVarianten = {
-    eintreten: (r: number) => ({ opacity: 0, x: r * 40 }),
-    sichtbar:  { opacity: 1, x: 0, transition: { duration: 0.38, ease: EASE } },
-    verlassen: (r: number) => ({ opacity: 0, x: r * -40, transition: { duration: 0.28, ease: EASE } }),
+    eintreten: (_r: number) => ({
+      opacity: 0,
+      y:      reduzierteBewegung ? 0 : 10,
+      scale:  reduzierteBewegung ? 1 : 0.985,
+      filter: reduzierteBewegung ? "blur(0px)" : "blur(5px)",
+    }),
+    sichtbar: {
+      opacity: 1,
+      y:      0,
+      scale:  1,
+      filter: "blur(0px)",
+      transition: {
+        duration: reduzierteBewegung ? 0.15 : 0.22,
+        ease: PREMIUM_EASE,
+      },
+    },
+    verlassen: (_r: number) => ({
+      opacity: 0,
+      y:      reduzierteBewegung ? 0 : -6,
+      scale:  reduzierteBewegung ? 1 : 0.992,
+      filter: reduzierteBewegung ? "blur(0px)" : "blur(3px)",
+      transition: {
+        duration: reduzierteBewegung ? 0.1 : 0.18,
+        ease: PREMIUM_EASE,
+      },
+    }),
   };
 
   return (
@@ -157,7 +184,7 @@ export default function ZeugnisseView() {
         className="mb-8 w-full"
       />
 
-      {/* Karussell — px-10 auf Mobile hält Pfeile in der Padding-Zone */}
+      {/* Karussell */}
       <div
         ref={karussellRef}
         className="relative px-10 md:px-0"
@@ -166,8 +193,8 @@ export default function ZeugnisseView() {
       >
         {/* Pfeile */}
         {[
-          { richtung: -1, fn: vorherige, pos: "left-0 md:-translate-x-5" },
-          { richtung:  1, fn: naechste,  pos: "right-0 md:translate-x-5"  },
+          { fn: vorherige, pos: "left-0 md:-translate-x-5" },
+          { fn: naechste,  pos: "right-0 md:translate-x-5"  },
         ].map(({ fn, pos }) => (
           <button
             key={pos}
@@ -177,6 +204,22 @@ export default function ZeugnisseView() {
             {pos.startsWith("left") ? "‹" : "›"}
           </button>
         ))}
+
+        {/* Blauer Glow-Puls hinter der Preview-Card.
+            Feuert beim Dokumentwechsel via key-Reset, pointer-events-none. */}
+        {!reduzierteBewegung && (
+          <motion.div
+            key={`glow-${aktuellerIndex}`}
+            className="absolute left-0 top-0 w-full md:w-[calc(50%-12px)] h-full pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.22, 0] }}
+            transition={{ duration: 0.55, ease: PREMIUM_EASE, times: [0, 0.3, 1] }}
+            aria-hidden="true"
+            style={{
+              background: `radial-gradient(ellipse at 50% 38%, ${aktuell.akzentFarbe}50 0%, transparent 65%)`,
+            }}
+          />
+        )}
 
         <AnimatePresence mode="wait" custom={richtung}>
           <motion.div
@@ -213,6 +256,23 @@ export default function ZeugnisseView() {
                       style={{ maxHeight: "420px", objectPosition: "top" }}
                     />
                   </div>
+
+                  {/* Light-Sweep diagonal über die Card — nur bei vollem Motion */}
+                  {!reduzierteBewegung && (
+                    <motion.div
+                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      initial={{ x: "-110%", opacity: 0 }}
+                      animate={{
+                        x:       ["-110%", "50%", "210%"],
+                        opacity: [0, 0.13, 0],
+                      }}
+                      transition={{ duration: 0.6, ease: PREMIUM_EASE, times: [0, 0.45, 1] }}
+                      aria-hidden="true"
+                      style={{
+                        background: `linear-gradient(105deg, transparent 20%, ${aktuell.akzentFarbe}55 50%, transparent 80%)`,
+                      }}
+                    />
+                  )}
 
                   {/* Hover-Overlay */}
                   <div
@@ -276,8 +336,8 @@ export default function ZeugnisseView() {
               onClick={() => navigiere(index)}
               className="transition-all duration-300 rounded-full"
               style={{
-                width: index === aktuellerIndex ? "28px" : "6px",
-                height: "6px",
+                width:      index === aktuellerIndex ? "28px" : "6px",
+                height:     "6px",
                 background: index === aktuellerIndex ? dok.akzentFarbe : "rgba(255,255,255,0.15)",
               }}
               aria-label={KATEGORIE_LABEL[dok.kategorie]}
@@ -301,7 +361,7 @@ export default function ZeugnisseView() {
               initial={{ scale: 0.93, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.93, opacity: 0 }}
-              transition={{ duration: 0.25, ease: EASE }}
+              transition={{ duration: 0.25, ease: LIGHTBOX_EASE }}
               className="w-full max-w-3xl flex flex-col"
               style={{ maxHeight: "92vh" }}
               onClick={(e) => e.stopPropagation()}
