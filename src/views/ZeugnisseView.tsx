@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { GlassTabs } from "../bausteine/GlassTabs";
 
@@ -166,14 +166,25 @@ export default function ZeugnisseView() {
     }),
   };
 
-  // Lightbox Stage: reines Opacity-Crossfade — kein height/transform animiert.
-  // mode="sync": Alt und Neu liegen gleichzeitig übereinander (absolute inset-0),
-  // kein Leerraum zwischen den Übergängen.
-  const stageVarianten = {
-    eintreten: { opacity: 0 },
-    sichtbar:  { opacity: 1, transition: { duration: reduzierteBewegung ? 0.15 : 0.28, ease: PREMIUM_EASE } },
-    verlassen: { opacity: 0, transition: { duration: reduzierteBewegung ? 0.1  : 0.18, ease: PREMIUM_EASE } },
-  };
+  // Lightbox Stage: Opacity + Scale-Crossfade mit optionalem x-Slide je Richtung.
+  // useMemo: Varianten-Objekt nicht bei jedem Render neu erzeugen.
+  const stageVarianten = useMemo(() => ({
+    eintreten: (dir: number) => ({
+      opacity: 0,
+      scale:   reduzierteBewegung ? 1 : 0.992,
+      x:       reduzierteBewegung ? 0 : dir * 12,
+    }),
+    sichtbar: {
+      opacity: 1, scale: 1, x: 0,
+      transition: { duration: reduzierteBewegung ? 0.15 : 0.27, ease: PREMIUM_EASE },
+    },
+    verlassen: (dir: number) => ({
+      opacity: 0,
+      scale:   reduzierteBewegung ? 1 : 0.992,
+      x:       reduzierteBewegung ? 0 : -(dir * 12),
+      transition: { duration: reduzierteBewegung ? 0.1 : 0.20, ease: PREMIUM_EASE },
+    }),
+  }), [reduzierteBewegung]);
 
   return (
     <section
@@ -438,14 +449,16 @@ export default function ZeugnisseView() {
                   }}
                 />
 
-                <AnimatePresence mode="sync">
+                <AnimatePresence mode="sync" custom={richtung}>
                   <motion.div
                     key={aktuellerIndex}
+                    custom={richtung}
                     variants={stageVarianten}
                     initial="eintreten"
                     animate="sichtbar"
                     exit="verlassen"
                     className="absolute inset-0 flex items-center justify-center"
+                    style={{ willChange: "opacity, transform" }}
                   >
                     <img
                       src={aktuell.vorschauBild}
