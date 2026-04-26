@@ -99,7 +99,7 @@ export default function UeberMichView() {
                 klassen="p-4"
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <AbzeichenStatus variante={konfiguration.variante} text={eintrag.kategorie} />
+                  <AbzeichenStatus variante={konfiguration.variante} text={eintrag.kategorie} klassen="uppercase" />
                   <span className="font-mono text-xs text-white/55">{eintrag.jahr}</span>
                 </div>
                 <h3 className="font-display text-base font-bold text-white mb-1">{eintrag.titel}</h3>
