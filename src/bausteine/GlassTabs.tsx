@@ -28,6 +28,9 @@ interface GlassTabsProps {
   onTabChange: (id: string) => void;
   layoutId?: string;
   className?: string;
+  /** Tailwind-Klassen für Breite + Padding der einzelnen Buttons.
+   *  Default "min-w-[80px] px-4" — für längere Labels "min-w-max px-5" o.ä. */
+  buttonClassName?: string;
   ariaLabel?: string;
 }
 
@@ -37,6 +40,7 @@ export function GlassTabs({
   onTabChange,
   layoutId = "glass-tab-bg",
   className = "",
+  buttonClassName = "min-w-[80px] px-4",
   ariaLabel,
 }: GlassTabsProps) {
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -74,7 +78,7 @@ export function GlassTabs({
           tabIndex={activeId === tab.id ? 0 : -1}
           onClick={() => onTabChange(tab.id)}
           onKeyDown={(e) => handleKeyDown(e, index)}
-          className={`relative flex-1 min-w-[80px] px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors duration-200 flex items-center justify-center ${
+          className={`relative flex-1 ${buttonClassName} py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors duration-200 flex items-center justify-center ${
             activeId === tab.id
               ? "text-white"
               : "text-white/45 hover:text-white/75"

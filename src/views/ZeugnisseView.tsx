@@ -152,6 +152,7 @@ export default function ZeugnisseView() {
         }}
         layoutId="dokumente-tab-bg"
         ariaLabel="Dokument-Navigation"
+        buttonClassName="min-w-max px-5"
         className="mb-8"
       />
 
