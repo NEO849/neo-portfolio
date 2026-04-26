@@ -119,32 +119,29 @@ export default function ZeugnisseView() {
 
   const aktuell = DOKUMENTE[aktuellerIndex];
 
-  // Premium-Transitionen: vertikales Fade + Scale + Blur statt horizontalem Slide.
-  // Bei reduzierteBewegung: nur simples Opacity-Fade ohne Bewegung.
+  // Crossfade-Varianten: nur opacity + scale — kein y, kein filter.
+  // y würde den Content sichtbar hochrutschen lassen (Layout-Sprung).
+  // filter:blur() ist teuer und verstärkt die visuelle Instabilität.
+  // mode="popLayout" in AnimatePresence sorgt dafür, dass der neue Block
+  // sofort den Platz einnimmt — kein leerer Zwischenzustand.
   const kartenVarianten = {
-    eintreten: (_r: number) => ({
+    eintreten: () => ({
       opacity: 0,
-      y:      reduzierteBewegung ? 0 : 10,
-      scale:  reduzierteBewegung ? 1 : 0.985,
-      filter: reduzierteBewegung ? "blur(0px)" : "blur(5px)",
+      scale:   reduzierteBewegung ? 1 : 0.992,
     }),
     sichtbar: {
       opacity: 1,
-      y:      0,
-      scale:  1,
-      filter: "blur(0px)",
+      scale:   1,
       transition: {
-        duration: reduzierteBewegung ? 0.15 : 0.22,
+        duration: reduzierteBewegung ? 0.15 : 0.25,
         ease: PREMIUM_EASE,
       },
     },
-    verlassen: (_r: number) => ({
+    verlassen: () => ({
       opacity: 0,
-      y:      reduzierteBewegung ? 0 : -6,
-      scale:  reduzierteBewegung ? 1 : 0.992,
-      filter: reduzierteBewegung ? "blur(0px)" : "blur(3px)",
+      scale:   reduzierteBewegung ? 1 : 0.992,
       transition: {
-        duration: reduzierteBewegung ? 0.1 : 0.18,
+        duration: reduzierteBewegung ? 0.1 : 0.2,
         ease: PREMIUM_EASE,
       },
     }),
@@ -221,7 +218,7 @@ export default function ZeugnisseView() {
           />
         )}
 
-        <AnimatePresence mode="wait" custom={richtung}>
+        <AnimatePresence mode="popLayout">
           <motion.div
             key={aktuellerIndex}
             custom={richtung}
