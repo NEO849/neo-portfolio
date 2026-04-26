@@ -16,6 +16,8 @@ interface DokumentEintrag {
   readonly vorschauBild: string;
   readonly kategorie: "zeugnis" | "zertifikat" | "lebenslauf" | "anschreiben";
   readonly akzentFarbe: string;
+  /** "cover-top": object-cover object-top — falls Bild breiter als Stage */
+  readonly fitVariant?: "contain" | "cover-top";
 }
 
 const KATEGORIE_LABEL: Record<DokumentEintrag["kategorie"], string> = {
@@ -119,6 +121,12 @@ export default function ZeugnisseView() {
 
   const aktuell = DOKUMENTE[aktuellerIndex];
 
+  // Alle Vorschaubilder laden sobald Lightbox öffnet — kein Flackern beim Wechsel
+  useEffect(() => {
+    if (!lightboxOffen) return;
+    DOKUMENTE.forEach(dok => { new window.Image().src = dok.vorschauBild; });
+  }, [lightboxOffen]);
+
   // In der Lightbox: kein Titel-h3, nur eine Zeile.
   // Lebenslauf/Anschreiben haben "Michael Fleps" als Aussteller →
   // ersetze durch den Kategorie-Namen, da er informativer ist.
@@ -156,6 +164,15 @@ export default function ZeugnisseView() {
         ease: PREMIUM_EASE,
       },
     }),
+  };
+
+  // Lightbox Stage: reines Opacity-Crossfade — kein height/transform animiert.
+  // mode="sync": Alt und Neu liegen gleichzeitig übereinander (absolute inset-0),
+  // kein Leerraum zwischen den Übergängen.
+  const stageVarianten = {
+    eintreten: { opacity: 0 },
+    sichtbar:  { opacity: 1, transition: { duration: reduzierteBewegung ? 0.15 : 0.28, ease: PREMIUM_EASE } },
+    verlassen: { opacity: 0, transition: { duration: reduzierteBewegung ? 0.1  : 0.18, ease: PREMIUM_EASE } },
   };
 
   return (
@@ -371,11 +388,11 @@ export default function ZeugnisseView() {
               exit={{ scale: 0.93, opacity: 0 }}
               transition={{ duration: 0.25, ease: LIGHTBOX_EASE }}
               className="w-full max-w-3xl flex flex-col"
-              style={{ maxHeight: "92vh" }}
+              style={{ height: "min(88vh, 720px)" }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Lightbox-Header */}
-              <div className="flex items-center justify-between mb-3 px-1">
+              <div className="flex items-center justify-between mb-3 px-1 flex-shrink-0">
                 <div>
                   <p className="font-mono text-xs text-white/55">{lightboxUntertitel}</p>
                 </div>
@@ -402,20 +419,37 @@ export default function ZeugnisseView() {
                 </div>
               </div>
 
-              {/* Bild */}
+              {/* Stage — stabiler Container, alle Dokumente gleich groß.
+                  min-h-0 erlaubt flex-1 korrekt zu schrumpfen wenn parent fixe Höhe hat.
+                  Bilder liegen absolute inset-0, kein Layout-Jump beim Wechsel. */}
               <div
-                className="flex-1 rounded-2xl overflow-hidden border border-white/10 bg-white flex items-start justify-center"
-                style={{ boxShadow: `0 0 80px ${aktuell.akzentFarbe}12`, overflowY: "auto" }}
+                className="relative flex-1 min-h-0 rounded-2xl overflow-hidden border border-white/10 bg-white"
+                style={{ boxShadow: `0 0 80px ${aktuell.akzentFarbe}12` }}
               >
-                <img
-                  src={aktuell.vorschauBild}
-                  alt={aktuell.titel}
-                  className="w-full h-auto object-contain block"
-                />
+                <AnimatePresence mode="sync">
+                  <motion.div
+                    key={aktuellerIndex}
+                    variants={stageVarianten}
+                    initial="eintreten"
+                    animate="sichtbar"
+                    exit="verlassen"
+                    className="absolute inset-0 flex items-center justify-center"
+                  >
+                    <img
+                      src={aktuell.vorschauBild}
+                      alt={aktuell.titel}
+                      className={`w-full h-full block ${
+                        aktuell.fitVariant === "cover-top"
+                          ? "object-cover object-top"
+                          : "object-contain"
+                      }`}
+                    />
+                  </motion.div>
+                </AnimatePresence>
               </div>
 
               {/* Lightbox-Navigation */}
-              <div className="flex items-center justify-between mt-3 px-1">
+              <div className="flex items-center justify-between mt-3 px-1 flex-shrink-0">
                 <button
                   onClick={(e) => { e.stopPropagation(); vorherige(); }}
                   className="text-xs text-white/30 hover:text-white transition font-mono"
