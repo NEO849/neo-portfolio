@@ -55,6 +55,7 @@ export default function SecurityView() {
         }}
         layoutId="security-tab-bg"
         ariaLabel="Security Research Navigation"
+        buttonClassName="min-w-[80px] px-4 text-[11px] sm:text-sm"
         className="mb-8"
       />
 
