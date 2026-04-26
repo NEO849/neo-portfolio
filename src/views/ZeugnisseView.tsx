@@ -16,6 +16,9 @@ interface DokumentEintrag {
   readonly vorschauBild: string;
   readonly kategorie: "zeugnis" | "zertifikat" | "lebenslauf" | "anschreiben";
   readonly akzentFarbe: string;
+  /** Optionale Tailwind-Klassen für das Lightbox-Bild.
+   *  Nur setzen wenn das Dokument vom Default "w-full h-auto" abweichen muss. */
+  readonly lightboxBildKlasse?: string;
 }
 
 const KATEGORIE_LABEL: Record<DokumentEintrag["kategorie"], string> = {
@@ -35,6 +38,7 @@ const DOKUMENTE: DokumentEintrag[] = [
     vorschauBild: "/gesellenbrief.jpg",
     kategorie: "zeugnis",
     akzentFarbe: "#818cf8",
+    lightboxBildKlasse: "w-auto max-w-full max-h-[72vh] object-contain block",
   },
   {
     titel: "IT-Fachkraft für App-Entwicklung (iOS & Android)",
@@ -415,7 +419,7 @@ export default function ZeugnisseView() {
                   <img
                     src={aktuell.vorschauBild}
                     alt={aktuell.titel}
-                    className="w-full h-auto object-contain block"
+                    className={aktuell.lightboxBildKlasse ?? "w-full h-auto object-contain block"}
                   />
                 </div>
               </div>
