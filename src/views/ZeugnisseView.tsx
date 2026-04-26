@@ -423,9 +423,21 @@ export default function ZeugnisseView() {
                   min-h-0 erlaubt flex-1 korrekt zu schrumpfen wenn parent fixe Höhe hat.
                   Bilder liegen absolute inset-0, kein Layout-Jump beim Wechsel. */}
               <div
-                className="relative flex-1 min-h-0 rounded-2xl overflow-hidden border border-white/10 bg-white"
-                style={{ boxShadow: `0 0 80px ${aktuell.akzentFarbe}12` }}
+                className="relative flex-1 min-h-0 rounded-2xl overflow-hidden border border-akzent-500/20"
+                style={{
+                  background: "rgba(10, 12, 26, 0.90)",
+                  boxShadow: "0 0 0 1px rgba(129,140,248,0.08), 0 8px 56px rgba(129,140,248,0.13)",
+                }}
               >
+                {/* Radialer Blue-Ambient hinter dem Dokument — kein Neon, nur Tiefe */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  aria-hidden="true"
+                  style={{
+                    background: "radial-gradient(ellipse 70% 55% at 50% 44%, rgba(129,140,248,0.10) 0%, transparent 100%)",
+                  }}
+                />
+
                 <AnimatePresence mode="sync">
                   <motion.div
                     key={aktuellerIndex}
