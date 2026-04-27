@@ -310,6 +310,21 @@ function benutzerZuTerminal(b: BenutzerErgebnis): string[] {
   return zeilen;
 }
 
+// ─── Zentrale Download-Utility ───────────────────────────────────
+// <a> muss im DOM sein damit mobile Browser den Download auslösen.
+// revokeObjectURL erst nach Timeout — Browser braucht Zeit zum Starten.
+function downloadDatei(dateiname: string, inhalt: string, mimeType: string): void {
+  const blob = new Blob([inhalt], { type: mimeType });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = dateiname;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 150);
+}
+
 // ─── Komponente ─────────────────────────────────────────────────
 
 export default function OsintDemoView() {
@@ -329,25 +344,17 @@ export default function OsintDemoView() {
   // ─── Download-Funktionen ──────────────────────────────────────
   const alsTextHerunterladen = useCallback(() => {
     if (!ausgabeZeilen.length || !aktivesModul) return;
-    const inhalt = ausgabeZeilen.join("\n");
+    const inhalt      = ausgabeZeilen.join("\n");
     const zeitstempel = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
-    const dateiname = `osint-${aktivesModul.name.toLowerCase().replace(/\s+/g, "-")}-${zeitstempel}.txt`;
-    const blob = new Blob([inhalt], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = dateiname; a.click();
-    URL.revokeObjectURL(url);
+    const dateiname   = `osint-${aktivesModul.name.toLowerCase().replace(/\s+/g, "-")}-${zeitstempel}.txt`;
+    downloadDatei(dateiname, inhalt, "text/plain;charset=utf-8");
   }, [ausgabeZeilen, aktivesModul]);
 
   const alsJsonHerunterladen = useCallback(() => {
     if (!rohdaten || !aktivesModul) return;
     const zeitstempel = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
-    const dateiname = `osint-${aktivesModul.name.toLowerCase().replace(/\s+/g, "-")}-${zeitstempel}.json`;
-    const blob = new Blob([JSON.stringify(rohdaten, null, 2)], { type: "application/json;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = dateiname; a.click();
-    URL.revokeObjectURL(url);
+    const dateiname   = `osint-${aktivesModul.name.toLowerCase().replace(/\s+/g, "-")}-${zeitstempel}.json`;
+    downloadDatei(dateiname, JSON.stringify(rohdaten, null, 2), "application/json;charset=utf-8");
   }, [rohdaten, aktivesModul]);
 
   useEffect(() => {
@@ -623,7 +630,7 @@ export default function OsintDemoView() {
                     <div className="flex flex-wrap items-center gap-3">
                       {/* Download TXT */}
                       <button
-                        onClick={alsTextHerunterladen}
+                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsTextHerunterladen(); }}
                         className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-signal-gruen/10 border border-signal-gruen/25 text-signal-gruen/80 hover:bg-signal-gruen/20 hover:text-signal-gruen transition font-mono"
                       >
                         ↓ TXT
@@ -631,7 +638,7 @@ export default function OsintDemoView() {
                       {/* Download JSON — nur bei Live-Modulen */}
                       {rohdaten && (
                         <button
-                          onClick={alsJsonHerunterladen}
+                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsJsonHerunterladen(); }}
                           className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-akzent-500/10 border border-akzent-400/25 text-akzent-400/80 hover:bg-akzent-500/20 hover:text-akzent-400 transition font-mono"
                         >
                           ↓ JSON
