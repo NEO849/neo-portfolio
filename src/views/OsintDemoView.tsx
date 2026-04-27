@@ -565,6 +565,11 @@ export default function OsintDemoView() {
                   <input ref={eingabeRef} type="text" value={eingabeWert}
                     onChange={(event) => setEingabeWert(event.target.value)}
                     onKeyDown={(event) => event.key === "Enter" && eingabeAbsenden()}
+                    onFocus={() => {
+                      if (aktivesModul && eingabeWert === aktivesModul.beispielEingabe) {
+                        setEingabeWert("");
+                      }
+                    }}
                     className="flex-1 bg-transparent border-none outline-none text-white caret-signal-gruen font-mono text-[13px]"
                     spellCheck={false} autoComplete="off"
                   />
@@ -646,7 +651,7 @@ export default function OsintDemoView() {
         </div>
       </div>
 
-      <p className="text-center text-[11px] text-white/50 mt-4 font-mono">
+      <p className="text-center text-[11px] text-white/50 mt-8 font-mono">
         Module 2, 3, 5 live — Daten werden nicht gespeichert — Rate-Limit: 3–10 Anfragen/Minute
       </p>
     </section>
