@@ -310,38 +310,39 @@ function benutzerZuTerminal(b: BenutzerErgebnis): string[] {
   return zeilen;
 }
 
-// ─── Zentrale Download-Utility ───────────────────────────────────
-// iOS Safari ignoriert <a download> für Blob-URLs und navigiert stattdessen.
-// Web Share API ist der einzige zuverlässige Pfad auf iOS (ab iOS 15).
-// Desktop-Browser bekommen den Standard-Blob-Download.
+// ─── Download-Utilities ──────────────────────────────────────────
+// iOS Safari: text/plain Blob-URLs werden inline im selben Tab gepreviewt.
+// Das navigiert weg vom Portfolio → Zurück-Tap landet auf dem vorigen Tab (z.B. Indeed).
+// Lösung: Clipboard-Copy als primärer iOS-Pfad, Web Share als zweiter Fallback,
+// Blob-Download nur für Desktop. Revoke nach 30 s damit iOS genug Zeit hat.
+
+const isIOS = (): boolean =>
+  /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as unknown as Record<string, unknown>).MSStream;
 
 function blobDownload(blob: Blob, dateiname: string): void {
   const url = URL.createObjectURL(blob);
   const a   = document.createElement("a");
-  a.href    = url;
+  a.href     = url;
   a.download = dateiname;
-  a.rel     = "noopener noreferrer";
+  a.rel      = "noopener noreferrer";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  // 30 s Puffer — iOS braucht mehr Zeit als Desktop
+  setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }
 
 function downloadDatei(dateiname: string, inhalt: string, mimeType: string): void {
   const blob = new Blob([inhalt], { type: mimeType });
 
-  // Web Share API — primärer Pfad für iOS Safari (kein Blob-Navigation-Problem)
+  // Web Share API — Fallback wenn Clipboard nicht verfügbar (iOS 15+)
   try {
     const file = new File([blob], dateiname, { type: mimeType });
     if (typeof navigator.canShare === "function" && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], title: dateiname }).catch(() => {
-        blobDownload(blob, dateiname);
-      });
+      navigator.share({ files: [file], title: dateiname }).catch(() => blobDownload(blob, dateiname));
       return;
     }
-  } catch {
-    // Web Share API nicht verfügbar → Fallback
-  }
+  } catch { /* nicht verfügbar */ }
 
   blobDownload(blob, dateiname);
 }
@@ -359,15 +360,27 @@ export default function OsintDemoView() {
   const [rohdaten, setRohdaten] = useState<object | null>(null);
   const [modalOffen, setModalOffen] = useState(false);
   const [wartendesModul, setWartendesModul] = useState<DemoModul | null>(null);
+  const [txtKopiert, setTxtKopiert] = useState(false);
   const terminalRef = useRef<HTMLDivElement>(null);
   const eingabeRef = useRef<HTMLInputElement>(null);
 
   // ─── Download-Funktionen ──────────────────────────────────────
-  const alsTextHerunterladen = useCallback(() => {
+  const alsTextHerunterladen = useCallback(async () => {
     if (!ausgabeZeilen.length || !aktivesModul) return;
     const inhalt      = ausgabeZeilen.join("\n");
     const zeitstempel = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
     const dateiname   = `osint-${aktivesModul.name.toLowerCase().replace(/\s+/g, "-")}-${zeitstempel}.txt`;
+
+    // iOS: Clipboard-Copy vermeidet den Safari-Tab-Wechsel komplett
+    if (isIOS() && navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(inhalt);
+        setTxtKopiert(true);
+        setTimeout(() => setTxtKopiert(false), 2500);
+        return;
+      } catch { /* kein Clipboard-Zugriff → Fallback */ }
+    }
+
     downloadDatei(dateiname, inhalt, "text/plain;charset=utf-8");
   }, [ausgabeZeilen, aktivesModul]);
 
@@ -649,13 +662,13 @@ export default function OsintDemoView() {
                 {fertig && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-5 border-t border-white/5 pt-4">
                     <div className="flex flex-wrap items-center gap-3">
-                      {/* Download TXT */}
+                      {/* Download TXT / Kopieren auf iOS */}
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsTextHerunterladen(); }}
                         className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-signal-gruen/10 border border-signal-gruen/25 text-signal-gruen/80 hover:bg-signal-gruen/20 hover:text-signal-gruen transition font-mono"
                       >
-                        ↓ TXT
+                        {txtKopiert ? "✓ Kopiert" : "↓ TXT"}
                       </button>
                       {/* Download JSON — nur bei Live-Modulen */}
                       {rohdaten && (
