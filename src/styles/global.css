@@ -99,7 +99,12 @@ body {
 }
 .terminal-eingabe {
   border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.9);
+  caret-color: #818cf8;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.terminal-eingabe::placeholder {
+  color: rgba(255, 255, 255, 0.35);
 }
 .terminal-eingabe:focus,
 .terminal-eingabe:focus-visible {
