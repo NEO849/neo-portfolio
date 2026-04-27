@@ -580,7 +580,7 @@ export default function OsintDemoView() {
                     Enter ↵
                   </button>
                   <button onClick={zurueckSetzen}
-                    className="text-xs px-3 py-1.5 rounded-lg text-white/30 hover:text-white/60 transition">
+                    className="text-xs px-3 py-1.5 rounded-lg text-white/55 hover:text-white/80 transition">
                     Zurueck
                   </button>
                 </div>
@@ -633,7 +633,7 @@ export default function OsintDemoView() {
                         </button>
                       )}
                       <button onClick={zurueckSetzen}
-                        className="text-xs text-white/25 hover:text-white/60 transition font-mono ml-auto">
+                        className="text-xs text-white/50 hover:text-white/80 transition font-mono ml-auto">
                         [Neues Modul]
                       </button>
                     </div>

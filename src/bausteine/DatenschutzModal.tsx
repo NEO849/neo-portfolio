@@ -51,15 +51,15 @@ export function DatenschutzModal({ offen, modulName, hinweise, onBestaetigen, on
                 <div className="w-8 h-8 rounded-xl bg-signal-gelb/10 border border-signal-gelb/20 flex items-center justify-center flex-shrink-0 text-sm">⚠</div>
                 <div>
                   <h3 className="font-display text-sm font-bold text-white">Datenschutzhinweis</h3>
-                  <p className="text-xs text-white/35 font-mono mt-0.5">{modulName}</p>
+                  <p className="text-xs text-white/55 font-mono mt-0.5">{modulName}</p>
                 </div>
               </div>
 
               {/* Hinweise — kompakt */}
               <div className="px-5 py-4 space-y-1.5">
                 {hinweise.map((h, i) => (
-                  <div key={i} className="flex items-start gap-2 text-xs text-white/55">
-                    <span className="text-signal-gelb/60 flex-shrink-0 mt-px">›</span>
+                  <div key={i} className="flex items-start gap-2 text-xs text-white/72">
+                    <span className="text-signal-gelb/75 flex-shrink-0 mt-px">›</span>
                     <span>{h}</span>
                   </div>
                 ))}
@@ -80,7 +80,7 @@ export function DatenschutzModal({ offen, modulName, hinweise, onBestaetigen, on
                       )}
                     </div>
                   </div>
-                  <span className="text-xs text-white/50 leading-relaxed group-hover:text-white/70 transition">
+                  <span className="text-xs text-white/70 leading-relaxed group-hover:text-white/85 transition">
                     Ich habe die Hinweise gelesen und nutze das Tool auf eigene Verantwortung.
                   </span>
                 </label>
@@ -99,7 +99,7 @@ export function DatenschutzModal({ offen, modulName, hinweise, onBestaetigen, on
                   </button>
                   <button
                     onClick={handleAbbrechen}
-                    className="px-4 py-2 rounded-xl text-xs text-white/40 hover:text-white/70 transition"
+                    className="px-4 py-2 rounded-xl text-xs text-white/60 hover:text-white/85 transition"
                   >
                     Abbrechen
                   </button>
