@@ -311,13 +311,10 @@ function benutzerZuTerminal(b: BenutzerErgebnis): string[] {
 }
 
 // ─── Download-Utilities ──────────────────────────────────────────
-// iOS Safari: text/plain Blob-URLs werden inline im selben Tab gepreviewt.
-// Das navigiert weg vom Portfolio → Zurück-Tap landet auf dem vorigen Tab (z.B. Indeed).
-// Lösung: Clipboard-Copy als primärer iOS-Pfad, Web Share als zweiter Fallback,
-// Blob-Download nur für Desktop. Revoke nach 30 s damit iOS genug Zeit hat.
-
-const isIOS = (): boolean =>
-  /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as unknown as Record<string, unknown>).MSStream;
+// TXT und JSON nutzen identische Blob-Download-Logik.
+// iOS 15+: Web Share API zeigt das native Share Sheet (→ „In Dateien sichern" etc.)
+// Ältere Browser / Desktop: Standard <a download> Blob-Download.
+// revokeObjectURL erst nach 30 s — iOS braucht deutlich länger als Desktop.
 
 function blobDownload(blob: Blob, dateiname: string): void {
   const url = URL.createObjectURL(blob);
@@ -328,21 +325,20 @@ function blobDownload(blob: Blob, dateiname: string): void {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  // 30 s Puffer — iOS braucht mehr Zeit als Desktop
   setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }
 
 function downloadDatei(dateiname: string, inhalt: string, mimeType: string): void {
   const blob = new Blob([inhalt], { type: mimeType });
 
-  // Web Share API — Fallback wenn Clipboard nicht verfügbar (iOS 15+)
+  // Web Share API — primärer Pfad für iOS (Share Sheet statt Inline-Preview)
   try {
     const file = new File([blob], dateiname, { type: mimeType });
     if (typeof navigator.canShare === "function" && navigator.canShare({ files: [file] })) {
       navigator.share({ files: [file], title: dateiname }).catch(() => blobDownload(blob, dateiname));
       return;
     }
-  } catch { /* nicht verfügbar */ }
+  } catch { /* nicht verfügbar → Blob-Download */ }
 
   blobDownload(blob, dateiname);
 }
@@ -360,27 +356,15 @@ export default function OsintDemoView() {
   const [rohdaten, setRohdaten] = useState<object | null>(null);
   const [modalOffen, setModalOffen] = useState(false);
   const [wartendesModul, setWartendesModul] = useState<DemoModul | null>(null);
-  const [txtKopiert, setTxtKopiert] = useState(false);
   const terminalRef = useRef<HTMLDivElement>(null);
   const eingabeRef = useRef<HTMLInputElement>(null);
 
   // ─── Download-Funktionen ──────────────────────────────────────
-  const alsTextHerunterladen = useCallback(async () => {
+  const alsTextHerunterladen = useCallback(() => {
     if (!ausgabeZeilen.length || !aktivesModul) return;
     const inhalt      = ausgabeZeilen.join("\n");
     const zeitstempel = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
     const dateiname   = `osint-${aktivesModul.name.toLowerCase().replace(/\s+/g, "-")}-${zeitstempel}.txt`;
-
-    // iOS: Clipboard-Copy vermeidet den Safari-Tab-Wechsel komplett
-    if (isIOS() && navigator.clipboard?.writeText) {
-      try {
-        await navigator.clipboard.writeText(inhalt);
-        setTxtKopiert(true);
-        setTimeout(() => setTxtKopiert(false), 2500);
-        return;
-      } catch { /* kein Clipboard-Zugriff → Fallback */ }
-    }
-
     downloadDatei(dateiname, inhalt, "text/plain;charset=utf-8");
   }, [ausgabeZeilen, aktivesModul]);
 
@@ -668,7 +652,7 @@ export default function OsintDemoView() {
                         onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsTextHerunterladen(); }}
                         className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-signal-gruen/10 border border-signal-gruen/25 text-signal-gruen/80 hover:bg-signal-gruen/20 hover:text-signal-gruen transition font-mono"
                       >
-                        {txtKopiert ? "✓ Kopiert" : "↓ TXT"}
+                        ↓ TXT
                       </button>
                       {/* Download JSON — nur bei Live-Modulen */}
                       {rohdaten && (
