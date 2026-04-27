@@ -570,7 +570,7 @@ export default function OsintDemoView() {
                         setEingabeWert("");
                       }
                     }}
-                    className="flex-1 bg-transparent border-none outline-none text-white caret-signal-gruen font-mono text-[13px]"
+                    className="flex-1 bg-transparent border-none outline-none text-white caret-signal-gruen font-mono text-base"
                     spellCheck={false} autoComplete="off"
                   />
                 </div>
