@@ -311,18 +311,39 @@ function benutzerZuTerminal(b: BenutzerErgebnis): string[] {
 }
 
 // ─── Zentrale Download-Utility ───────────────────────────────────
-// <a> muss im DOM sein damit mobile Browser den Download auslösen.
-// revokeObjectURL erst nach Timeout — Browser braucht Zeit zum Starten.
-function downloadDatei(dateiname: string, inhalt: string, mimeType: string): void {
-  const blob = new Blob([inhalt], { type: mimeType });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement("a");
-  a.href     = url;
+// iOS Safari ignoriert <a download> für Blob-URLs und navigiert stattdessen.
+// Web Share API ist der einzige zuverlässige Pfad auf iOS (ab iOS 15).
+// Desktop-Browser bekommen den Standard-Blob-Download.
+
+function blobDownload(blob: Blob, dateiname: string): void {
+  const url = URL.createObjectURL(blob);
+  const a   = document.createElement("a");
+  a.href    = url;
   a.download = dateiname;
+  a.rel     = "noopener noreferrer";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 150);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function downloadDatei(dateiname: string, inhalt: string, mimeType: string): void {
+  const blob = new Blob([inhalt], { type: mimeType });
+
+  // Web Share API — primärer Pfad für iOS Safari (kein Blob-Navigation-Problem)
+  try {
+    const file = new File([blob], dateiname, { type: mimeType });
+    if (typeof navigator.canShare === "function" && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: dateiname }).catch(() => {
+        blobDownload(blob, dateiname);
+      });
+      return;
+    }
+  } catch {
+    // Web Share API nicht verfügbar → Fallback
+  }
+
+  blobDownload(blob, dateiname);
 }
 
 // ─── Komponente ─────────────────────────────────────────────────
@@ -630,6 +651,7 @@ export default function OsintDemoView() {
                     <div className="flex flex-wrap items-center gap-3">
                       {/* Download TXT */}
                       <button
+                        type="button"
                         onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsTextHerunterladen(); }}
                         className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-signal-gruen/10 border border-signal-gruen/25 text-signal-gruen/80 hover:bg-signal-gruen/20 hover:text-signal-gruen transition font-mono"
                       >
@@ -638,6 +660,7 @@ export default function OsintDemoView() {
                       {/* Download JSON — nur bei Live-Modulen */}
                       {rohdaten && (
                         <button
+                          type="button"
                           onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsJsonHerunterladen(); }}
                           className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-akzent-500/10 border border-akzent-400/25 text-akzent-400/80 hover:bg-akzent-500/20 hover:text-akzent-400 transition font-mono"
                         >
