@@ -502,7 +502,7 @@ export default function OsintDemoView() {
         viewport={{ once: true }} transition={{ duration: 0.5 }}>
         <p className="font-mono text-sm text-signal-gruen mb-2">&gt; osint_toolkit.live()</p>
         <h3 className="font-display text-2xl md:text-3xl font-bold mb-2">OSINT Toolkit — Live</h3>
-        <p className="text-white/40 text-sm mb-6">
+        <p className="text-white/65 text-sm mb-6">
           Domain, E-Mail und Username werden live gegen echte Datenquellen geprüft.
           Deine Daten verlassen den Browser nur für die Analyse — keine Speicherung.
         </p>
@@ -646,7 +646,7 @@ export default function OsintDemoView() {
         </div>
       </div>
 
-      <p className="text-center text-[11px] text-white/15 mt-4 font-mono">
+      <p className="text-center text-[11px] text-white/35 mt-4 font-mono">
         Module 2, 3, 5 live — Daten werden nicht gespeichert — Rate-Limit: 3–10 Anfragen/Minute
       </p>
     </section>
