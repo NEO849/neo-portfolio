@@ -477,16 +477,16 @@ export default function OsintDemoView() {
     if (zeile.includes("[ok]")) return "text-signal-gruen";
     if (zeile.includes("[!]")) return "text-signal-gelb";
     if (zeile.includes("[+]")) return "text-cyber-400";
-    if (zeile.includes("[--]")) return "text-white/35";
-    if (zeile.startsWith("+--")) return "text-white/20";
-    if (zeile.startsWith("|")) return "text-white/40";
-    if (zeile.startsWith("---")) return "text-akzent-400/40";
+    if (zeile.includes("[--]")) return "text-white/55";
+    if (zeile.startsWith("+--")) return "text-white/40";
+    if (zeile.startsWith("|")) return "text-white/65";
+    if (zeile.startsWith("---")) return "text-akzent-400/70";
     if (zeile.includes("  Score") || zeile.includes("  Risiko") || zeile.includes("  Erreichbar")) return "text-white";
-    if (zeile.includes("Analysiert:")) return "text-white/25";
-    if (zeile.match(/^\s{2}[A-Z][A-Za-z-]+\s+:/)) return "text-white/55";
-    if (zeile.match(/^\s{2}(Social|Development|Gaming|Beruf|Sicherheit|Sonstige)/)) return "text-white/35";
-    if (zeile.includes("->")) return "text-white/40";
-    return "text-white/65";
+    if (zeile.includes("Analysiert:")) return "text-white/50";
+    if (zeile.match(/^\s{2}[A-Z][A-Za-z-]+\s+:/)) return "text-white/72";
+    if (zeile.match(/^\s{2}(Social|Development|Gaming|Beruf|Sicherheit|Sonstige)/)) return "text-white/55";
+    if (zeile.includes("->")) return "text-white/55";
+    return "text-white/72";
   };
 
   return (
@@ -516,12 +516,12 @@ export default function OsintDemoView() {
             <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
             <div className="w-3 h-3 rounded-full bg-[#28c840]" />
           </div>
-          <span className="font-mono text-[11px] text-white/25 ml-3">
+          <span className="font-mono text-[11px] text-white/55 ml-3">
             neo@vps:~/osint-toolkit$ python3 main.py
           </span>
           <div className="ml-auto flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full bg-signal-gruen animate-pulse" />
-            <span className="font-mono text-[10px] text-signal-gruen/60">LIVE</span>
+            <span className="font-mono text-[10px] text-signal-gruen/80">LIVE</span>
           </div>
         </div>
 
@@ -533,32 +533,32 @@ export default function OsintDemoView() {
             {/* Menü */}
             {phase === "menue" && (
               <motion.div key="menue" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                <div className="text-white/25 text-xs mb-3">+== OSINT TOOLKIT -- Modul waehlen ==+</div>
+                <div className="text-white/50 text-xs mb-3">+== OSINT TOOLKIT -- Modul waehlen ==+</div>
                 {DEMO_MODULE.map(modul => (
                   <button key={modul.nummer} onClick={() => modulStarten(modul)}
                     className="block w-full text-left px-3 py-1.5 rounded-lg hover:bg-white/[0.04] transition-all group">
-                    <span className="text-white/30">[</span>
+                    <span className="text-white/50">[</span>
                     <span style={{ color: modul.farbe }} className="font-bold">{modul.nummer}</span>
-                    <span className="text-white/30">]  </span>
-                    <span className="text-white/60 group-hover:text-white transition">{modul.name}</span>
+                    <span className="text-white/50">]  </span>
+                    <span className="text-white/75 group-hover:text-white transition">{modul.name}</span>
                     {modul.eingabeTyp === "text" && modul.nummer !== "4" && modul.nummer !== "6" && (
-                      <span className="ml-2 text-[10px] text-signal-gruen/50">LIVE</span>
+                      <span className="ml-2 text-[10px] text-signal-gruen/70">LIVE</span>
                     )}
                     {(modul.nummer === "4" || modul.nummer === "6") && (
-                      <span className="ml-2 text-[10px] text-signal-gelb/60">LIVE ⚠</span>
+                      <span className="ml-2 text-[10px] text-signal-gelb/75">LIVE ⚠</span>
                     )}
                   </button>
                 ))}
-                <div className="mt-3 text-white/15 text-xs">+====================================+</div>
+                <div className="mt-3 text-white/40 text-xs">+====================================+</div>
               </motion.div>
             )}
 
             {/* Eingabe */}
             {phase === "eingabe" && aktivesModul && (
               <motion.div key="eingabe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                <div className="text-white/25 text-xs mb-3">
+                <div className="text-white/55 text-xs mb-3">
                   Modul [{aktivesModul.nummer}]: {aktivesModul.name}
-                  {aktivesModul.eingabeTyp === "text" && <span className="ml-2 text-signal-gruen/50">— LIVE API</span>}
+                  {aktivesModul.eingabeTyp === "text" && <span className="ml-2 text-signal-gruen/70">— LIVE API</span>}
                 </div>
                 <div className="flex items-center gap-2">
                   <span style={{ color: aktivesModul.farbe }} className="whitespace-nowrap">{aktivesModul.eingabeLabel}:</span>
@@ -590,15 +590,15 @@ export default function OsintDemoView() {
             {/* Laden */}
             {phase === "laden" && (
               <motion.div key="laden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                <div className="text-white/25 text-xs mb-4">Anfrage wird verarbeitet...</div>
-                <div className="flex items-center gap-2 text-signal-gruen/70">
+                <div className="text-white/55 text-xs mb-4">Anfrage wird verarbeitet...</div>
+                <div className="flex items-center gap-2 text-signal-gruen/85">
                   <motion.span
                     animate={{ opacity: [1, 0.3, 1] }}
                     transition={{ duration: 0.8, repeat: Infinity }}
                   >▶</motion.span>
                   <span>Verbindung zur OSINT-API...</span>
                 </div>
-                <div className="mt-2 text-white/30 text-xs">
+                <div className="mt-2 text-white/55 text-xs">
                   POST /api/v1/osint/{aktivesModul?.nummer === "5" ? "domain" : aktivesModul?.nummer === "2" ? "email" : "benutzername"}
                 </div>
               </motion.div>
@@ -646,7 +646,7 @@ export default function OsintDemoView() {
         </div>
       </div>
 
-      <p className="text-center text-[11px] text-white/35 mt-4 font-mono">
+      <p className="text-center text-[11px] text-white/50 mt-4 font-mono">
         Module 2, 3, 5 live — Daten werden nicht gespeichert — Rate-Limit: 3–10 Anfragen/Minute
       </p>
     </section>
