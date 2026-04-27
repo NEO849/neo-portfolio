@@ -555,13 +555,13 @@ export default function OsintDemoView() {
 
             {/* Eingabe */}
             {phase === "eingabe" && aktivesModul && (
-              <motion.div key="eingabe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+              <motion.div key="eingabe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="w-full min-w-0">
                 <div className="text-white/55 text-xs mb-3">
                   Modul [{aktivesModul.nummer}]: {aktivesModul.name}
                   {aktivesModul.eingabeTyp === "text" && <span className="ml-2 text-signal-gruen/70">— LIVE API</span>}
                 </div>
-                <div className="flex items-center gap-2">
-                  <span style={{ color: aktivesModul.farbe }} className="whitespace-nowrap">{aktivesModul.eingabeLabel}:</span>
+                <div className="flex items-center gap-2 w-full min-w-0">
+                  <span style={{ color: aktivesModul.farbe }} className="whitespace-nowrap flex-shrink-0">{aktivesModul.eingabeLabel}:</span>
                   <input ref={eingabeRef} type="text" value={eingabeWert}
                     onChange={(event) => setEingabeWert(event.target.value)}
                     onKeyDown={(event) => event.key === "Enter" && eingabeAbsenden()}
@@ -570,7 +570,7 @@ export default function OsintDemoView() {
                         setEingabeWert("");
                       }
                     }}
-                    className="flex-1 bg-transparent border-none outline-none text-white caret-signal-gruen font-mono text-base"
+                    className="flex-1 min-w-0 w-full max-w-full bg-transparent border-none outline-none text-white caret-signal-gruen font-mono text-base"
                     spellCheck={false} autoComplete="off"
                   />
                 </div>
