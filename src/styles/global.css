@@ -84,3 +84,25 @@ body {
 body {
   overflow-x: hidden;
 }
+
+/* ═══════════════ Terminal-Eingabe ═══════════════ */
+/* Überschreibt den globalen :focus-visible-Ring gezielt für Terminal-Inputs */
+.terminal-eingabe,
+.terminal-eingabe:focus,
+.terminal-eingabe:focus-visible {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+}
+.terminal-eingabe {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.terminal-eingabe:focus,
+.terminal-eingabe:focus-visible {
+  border-bottom-color: #818cf8;
+  box-shadow: 0 1px 0 0 rgba(129, 140, 248, 0.35);
+}
