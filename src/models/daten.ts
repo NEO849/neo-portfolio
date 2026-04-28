@@ -17,6 +17,24 @@ export const NAVIGATION: NavigationModel[] = [
 
 export const PROJEKTE: ProjektModel[] = [
   {
+    titel: "Neo Dev Stack – AI-Augmented Security Workstation",
+    kurzbeschreibung: "31 spezialisierte Claude-Agents, 15+ MCP-Server, lokale LLM-Inferenz (Ollama + Milvus) und 80+ Security-Tools – orchestriert zu einem intelligenten Pentest-Betriebssystem",
+    langbeschreibung: "Vollständig selbst gebaute, KI-augmentierte Entwicklungs- und Sicherheitsumgebung. 31 spezialisierte Pentest-Agents (Recon, Web, Cloud, Mobile, Forensics, Exploit-Chaining) laufen direkt in Claude Code und greifen über 15+ MCP-Server auf GitHub, GitLab, Firecrawl, Chrome DevTools Protocol, Brave Search und eine lokale Vektordatenbank (Milvus v2.6.14) zu. Ollama stellt lokale LLM-Inferenz bereit. Claude kann über den Chrome DevTools MCP authentifizierte Browser-Sessions steuern, DOM inspizieren und JavaScript live ausführen – ohne externen Proxy. Alle Security-Tools (osmedeus, nuclei, paramspider, sherlock, holehe, waymore) sind in 6 parallelen tmux-Sessions orchestriert. findings.db hält alle Bug-Bounty-Findings über sämtliche aktiven Targets in Sync. Die semantische Codebase-Indexierung über Milvus erlaubt bedeutungsbasierte Code-Suche über 9 indexierte Projekte.",
+    kategorie: "tooling",
+    technologien: ["Claude Code", "MCP Protocol", "Ollama", "Milvus", "Docker", "tmux", "Python", "Bash", "Chrome DevTools", "Firecrawl"],
+    highlights: [
+      "31 spezialisierte Pentest-Agents: Recon, Web, Cloud, Mobile, Forensics, Exploit-Chaining",
+      "15+ MCP-Server: GitHub, GitLab, Firecrawl, Chrome DevTools, Brave Search, Claude Context, YouTube",
+      "Lokale LLM-Inferenz: Ollama + Open WebUI + Milvus v2.6.14 (Vektordatenbank, 882 Chunks)",
+      "Chrome DevTools MCP: Claude steuert authentifizierte Browser-Sessions direkt aus dem Chat",
+      "6 parallele tmux-Sessions mit 80+ integrierten CLI-Security-Tools",
+      "Semantic Code Search: bedeutungsbasierte Suche über 9 indexierte Codebases",
+      "findings.db: SQLite-Tracking aller Bug-Bounty-Findings über alle aktiven Targets",
+    ],
+    zeitraum: "2025 – heute",
+    status: "aktiv",
+  },
+  {
     titel: "NeoRecon – Bug Bounty Exploit Engine",
     kurzbeschreibung: "7-Schritt Master-Pipeline: Automatisiertes Recon → Scoring → Live-Probe → Review-Plan",
     langbeschreibung: "Vollständiges, selbst gebautes Offensive Security Framework auf einem gehärteten VPS. Die Master-Pipeline (run_master_pipeline.sh) orchestriert 7 Phasen mit Lockfile-Schutz, --resume-from, --skip-Flags und --dry-run. Engine 01 nutzt einen Single-Pass awk-Algorithmus der 500.000 URLs in 15 Sekunden durch 12 gewichtete Sicherheits-Kategorien scored. Der Asset-Splitter klassifiziert Alive-URLs automatisch in 8 Tier-Klassen nach Bounty-Potential. Die Build-Kette erzeugt Focus5-Cards mit konkreten Prüfschritten pro Kandidat. Zusätzlich: 13 spezialisierte Tools auf dem VPS (GraphQL-Suite mit 5 Tools, SSTImap, Dependency Confusion Checker, OSINT-Tools), Custom Nuclei-Templates und eine vollständige 4-Phasen-Dokumentation.",
@@ -64,6 +82,23 @@ export const PROJEKTE: ProjektModel[] = [
       "MVVM mit sauberem Repository Pattern"
     ],
     zeitraum: "2024 – 2025",
+    status: "abgeschlossen",
+  },
+  {
+    titel: "Z Almanach – Native Android App",
+    kurzbeschreibung: "Native Android-App in Kotlin – wartbare Architektur mit Repository Pattern, Custom RecyclerView-Adaptern und SharedPreferences-Persistenz",
+    langbeschreibung: "Native Android-App, vollständig in Kotlin entwickelt – ohne externe Frameworks, direkt auf dem Android SDK aufgebaut. Repository Pattern kapselt die gesamte Datenzugriffslogik und entkoppelt die UI vollständig von der Datenschicht. Benutzerdefinierte RecyclerView-Adapter mit ViewHolder Pattern sorgen für performante, flüssige Listenansichten. Nutzerdaten und App-Zustand werden über SharedPreferences persistent gespeichert. Die modulare Paketstruktur nach Clean Architecture Prinzipien (data/, domain/, ui/) macht das Projekt leicht erweiterbar und wartbar – ein solides, eigenständiges Fundament als erste Android-App.",
+    kategorie: "development",
+    technologien: ["Kotlin", "Android SDK", "RecyclerView", "SharedPreferences", "Repository Pattern", "ViewHolder Pattern", "XML Layouts"],
+    highlights: [
+      "Repository Pattern als zentrale Datenschicht – UI vollständig entkoppelt",
+      "Custom RecyclerView-Adapter mit ViewHolder Pattern für performante Listen",
+      "SharedPreferences für persistente Nutzereinstellungen und App-Zustand",
+      "Modulare Paketstruktur nach Clean Architecture (data/, domain/, ui/)",
+      "Eigenständig in Kotlin entwickelt – keine externen Dependencies",
+    ],
+    linkGithub: "https://github.com/NEO849/Z-Almanach",
+    zeitraum: "2023",
     status: "abgeschlossen",
   },
   {
