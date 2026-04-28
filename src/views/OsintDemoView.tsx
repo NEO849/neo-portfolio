@@ -610,15 +610,7 @@ export default function OsintDemoView() {
                   </button>
                 ))}
                 <div className="mt-3 text-white/40 text-xs">+====================================+</div>
-                <div className="mt-8 text-[11px] font-mono select-none leading-relaxed">
-                  <div>
-                    <span className="text-akzent-400/50">&gt;</span>
-                    <span className="text-white/40 ml-1">output: </span>
-                    <span className="text-akzent-400/60">json</span>
-                    <span className="text-white/30"> · </span>
-                    <span className="text-signal-gruen/55">txt</span>
-                  </div>
-                  <div className="mt-5">
+                <div className="mt-8 text-[11px] font-mono select-none">
                     <button
                       type="button"
                       onClick={btcAdresseKopieren}
@@ -643,7 +635,6 @@ export default function OsintDemoView() {
                         </>
                       )}
                     </button>
-                  </div>
                 </div>
               </motion.div>
             )}
