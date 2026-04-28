@@ -537,8 +537,7 @@ export default function OsintDemoView() {
         <p className="font-mono text-sm text-signal-gruen mb-2">&gt; osint_toolkit.live()</p>
         <h3 className="font-display text-2xl md:text-3xl font-bold mb-2">OSINT Toolkit — Live</h3>
         <p className="text-white/65 text-sm mb-6">
-          Domain, E-Mail und Username werden live gegen echte Datenquellen geprüft.
-          Deine Daten verlassen den Browser nur für die Analyse — keine Speicherung.
+          Ein kompaktes OSINT-Toolkit für schnelle Erstanalysen: Domains, E-Mails, Usernames und weitere Hinweise werden live gegen öffentliche Datenquellen geprüft — transparent, kontrolliert und ohne dauerhafte Speicherung.
         </p>
       </motion.div>
 
@@ -584,6 +583,10 @@ export default function OsintDemoView() {
                   </button>
                 ))}
                 <div className="mt-3 text-white/40 text-xs">+====================================+</div>
+                <div className="mt-8 text-[11px] font-mono text-white/22 select-none leading-relaxed">
+                  <div><span className="text-white/30">›</span> bereit für analyse</div>
+                  <div className="ml-3 text-white/18">output: json · txt</div>
+                </div>
               </motion.div>
             )}
 
@@ -689,9 +692,10 @@ export default function OsintDemoView() {
         </div>
       </div>
 
-      <p className="text-center text-[11px] text-white/50 mt-8 font-mono">
-        Module 2, 3, 5 live — Daten werden nicht gespeichert — Rate-Limit: 3–10 Anfragen/Minute
-      </p>
+      <div className="mt-6 text-[11px] font-mono text-white/38 text-center leading-relaxed">
+        <div><span className="text-white/50">status:</span> live-checks aktiv</div>
+        <div><span className="text-white/50">privacy:</span> keine dauerhafte speicherung · rate-limit: 3–10/min</div>
+      </div>
     </section>
   );
 }
