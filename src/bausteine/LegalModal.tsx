@@ -79,6 +79,10 @@ function ImpressumInhalt() {
         <Zeile label="USt-IdNr." wert="DE459129384" />
       </Abschnitt>
 
+      <Abschnitt titel="Unterstützung / Zahlungen">
+        <Zeile label="Bitcoin (BTC)" wert="bc1qf666x5l4zs6tm9w69jsr9mn5glvf97fk9z6zs8" />
+      </Abschnitt>
+
       <Abschnitt titel="Verantwortlich für den Inhalt (§ 18 Abs. 2 MStV)">
         <Absatz>Michael Fleps, Adam-Klein-Str. 15, 90429 Nürnberg</Absatz>
       </Abschnitt>
@@ -95,13 +99,6 @@ function ImpressumInhalt() {
           zumutbar. Bei Bekanntwerden von Rechtsverstößen werden entsprechende Links entfernt.
         </p>
       </Abschnitt>
-
-      <Abschnitt titel="Unterstützung / Zahlungen">
-        <Zeile label="Bitcoin (BTC)" wert="bc1qf666x5l4zs6tm9w69jsr9mn5glvf97fk9z6zs8" />
-        <p className="text-[11px] font-mono text-white/28 mt-1 leading-relaxed">
-          Optional — kein Bestandteil des gesetzlichen Impressums.
-        </p>
-      </Abschnitt>
     </div>
   );
 }
@@ -111,13 +108,6 @@ function ImpressumInhalt() {
 function DatenschutzInhalt() {
   return (
     <div className="space-y-6">
-      <Abschnitt titel="Verantwortlicher (Art. 4 Nr. 7 DSGVO)">
-        <Zeile label="Name" wert="Michael Fleps" />
-        <Zeile label="Unternehmen" wert="FREE DATA solution's" />
-        <Zeile label="Anschrift" wert="Adam-Klein-Str. 15, 90429 Nürnberg" />
-        <Zeile label="E-Mail" wert="michael_fleps@aol.com" link="mailto:michael_fleps@aol.com" />
-      </Abschnitt>
-
       <Abschnitt titel="Hosting — Vercel Inc.">
         <Absatz>
           Diese Website wird bei Vercel Inc. (340 Pine Street, Suite 900, San Francisco, CA 94104, USA)
@@ -283,7 +273,7 @@ export function LegalModal({ offen, startTab = "impressum", onSchliessen }: Lega
                 <button
                   onClick={onSchliessen}
                   aria-label="Schließen"
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-akzent-400/50 hover:text-akzent-400 hover:bg-akzent-400/[0.08] transition font-mono text-xs"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-akzent-400/55 hover:text-akzent-400 hover:bg-akzent-400/[0.08] transition font-mono text-sm"
                 >
                   ✕
                 </button>
