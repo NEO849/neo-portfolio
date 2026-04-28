@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { PERSOENLICH } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
+import { LegalModal, type LegalTab } from "../bausteine/LegalModal";
 
 const CYBER_RGB = "22, 211, 238";
 const CYBER_HEX = "#22d3ee";
@@ -45,8 +47,22 @@ const KONTAKT_EINTRAEGE = [
 ];
 
 export default function KontaktView() {
+  const [modalOffen, setModalOffen] = useState(false);
+  const [modalTab, setModalTab] = useState<LegalTab>("impressum");
+
+  const legalOeffnen = (tab: LegalTab) => {
+    setModalTab(tab);
+    setModalOffen(true);
+  };
+
   return (
     <section id="kontakt" className="py-16 px-6 max-w-3xl mx-auto">
+      <LegalModal
+        offen={modalOffen}
+        startTab={modalTab}
+        onSchliessen={() => setModalOffen(false)}
+      />
+
       <AbschnittsTitel
         prefix="> kontakt"
         titel="Kontakt"
@@ -54,6 +70,7 @@ export default function KontaktView() {
         klassen="mb-10"
       />
 
+      {/* Kontaktkarten */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -105,14 +122,46 @@ export default function KontaktView() {
         ))}
       </motion.div>
 
+      {/* Legal-Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 0.42 }}
+        className="mt-4"
+      >
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.015] px-4 py-3 flex items-center gap-3">
+          <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.07] flex items-center justify-center flex-shrink-0 font-mono text-xs text-white/28">
+            §
+          </div>
+          <span className="text-[11px] font-mono text-white/25 flex-1 select-none">Rechtliches</span>
+          <div className="flex items-center gap-0.5">
+            <button
+              onClick={() => legalOeffnen("impressum")}
+              className="text-[11px] font-mono text-white/38 hover:text-cyber-400/80 px-2.5 py-1.5 rounded-lg hover:bg-cyber-400/[0.06] transition-all duration-200"
+            >
+              Impressum
+            </button>
+            <span className="text-white/18 text-[10px] select-none">·</span>
+            <button
+              onClick={() => legalOeffnen("datenschutz")}
+              className="text-[11px] font-mono text-white/38 hover:text-cyber-400/80 px-2.5 py-1.5 rounded-lg hover:bg-cyber-400/[0.06] transition-all duration-200"
+            >
+              Datenschutz
+            </button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Standort */}
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="mt-10 text-center"
+        transition={{ duration: 0.5, delay: 0.5 }}
+        className="mt-8 text-center"
       >
-        <p className="text-xs text-white/20 font-mono">{PERSOENLICH.standort}</p>
+        <p className="text-xs text-white/42 font-mono">{PERSOENLICH.standort}</p>
       </motion.div>
     </section>
   );
