@@ -3,6 +3,9 @@ import { PERSOENLICH } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
 
+const CYBER_RGB = "22, 211, 238";
+const CYBER_HEX = "#22d3ee";
+
 const KONTAKT_EINTRAEGE = [
   {
     href: `mailto:${PERSOENLICH.email}`,
@@ -10,8 +13,6 @@ const KONTAKT_EINTRAEGE = [
     icon: "📧",
     label: "E-Mail",
     wert: PERSOENLICH.email,
-    lichtfarbe: "99, 102, 241",
-    akzentFarbe: "#6366f1",
   },
   {
     href: `tel:${PERSOENLICH.telefon?.replace(/\s/g, "")}`,
@@ -19,8 +20,6 @@ const KONTAKT_EINTRAEGE = [
     icon: "📱",
     label: "Telefon",
     wert: PERSOENLICH.telefon,
-    lichtfarbe: "34, 197, 94",
-    akzentFarbe: "#22c55e",
   },
   {
     href: PERSOENLICH.github,
@@ -28,8 +27,6 @@ const KONTAKT_EINTRAEGE = [
     icon: "⌥",
     label: "GitHub",
     wert: "NEO849",
-    lichtfarbe: "255, 255, 255",
-    akzentFarbe: "#ffffff",
   },
   {
     href: PERSOENLICH.hackerone,
@@ -37,8 +34,6 @@ const KONTAKT_EINTRAEGE = [
     icon: "◎",
     label: "HackerOne",
     wert: "luicypher_neo",
-    lichtfarbe: "239, 68, 68",
-    akzentFarbe: "#ef4444",
   },
   {
     href: PERSOENLICH.intigriti,
@@ -46,8 +41,6 @@ const KONTAKT_EINTRAEGE = [
     icon: "◈",
     label: "Intigriti",
     wert: "cypherneo",
-    lichtfarbe: "34, 211, 238",
-    akzentFarbe: "#22d3ee",
   },
 ];
 
@@ -80,26 +73,31 @@ export default function KontaktView() {
               href={eintrag.href}
               target={eintrag.extern ? "_blank" : undefined}
               rel={eintrag.extern ? "noopener noreferrer" : undefined}
-              className="block"
+              className="block group"
             >
               <InfoKarte
-                lichtfarbe={eintrag.lichtfarbe}
+                lichtfarbe={CYBER_RGB}
                 akzentRand
-                akzentFarbe={eintrag.akzentFarbe}
-                klassen="p-5"
+                akzentFarbe={CYBER_HEX}
+                klassen="p-4"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 font-mono"
-                    style={{ background: `rgba(${eintrag.lichtfarbe}, 0.08)`, border: `1px solid rgba(${eintrag.lichtfarbe}, 0.2)` }}
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0"
+                    style={{
+                      background: `rgba(${CYBER_RGB}, 0.08)`,
+                      border: `1px solid rgba(${CYBER_RGB}, 0.22)`,
+                    }}
                   >
                     {eintrag.icon}
                   </div>
-                  <div>
-                    <div className="font-semibold text-white">{eintrag.label}</div>
-                    <div className="text-sm text-white/40 font-mono">{eintrag.wert}</div>
+                  <div className="min-w-0">
+                    <div className="font-semibold text-white text-sm leading-snug">{eintrag.label}</div>
+                    <div className="text-xs text-white/40 font-mono truncate">{eintrag.wert}</div>
                   </div>
-                  <div className="ml-auto text-white/20 text-sm">→</div>
+                  <div className="ml-auto pl-2 text-cyber-400/55 group-hover:text-cyber-400 transition-colors duration-200 text-sm flex-shrink-0">
+                    →
+                  </div>
                 </div>
               </InfoKarte>
             </a>

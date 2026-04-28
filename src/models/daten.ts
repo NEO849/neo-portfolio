@@ -225,13 +225,13 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
 
 export const PERSOENLICH = {
   name: "Michael Fleps",
-  standort: "Plattling, Niederbayern",
+  standort: "Nürnberg, Bayern",
   titel: "Security Researcher & iOS Developer",
   untertitel: "iOS Development • Security Research • Linux & Server Administration",
   kurzvorstellung: "15 Jahre Systemverständnis aus der Elektronik, moderne Software-Architektur und offensive Security Research – ich verbinde praktische Tiefe mit analytischem Denken und baue Anwendungen, die echte Probleme lösen.",
   email: "f.michi84.989@gmail.com",
   telefon: "0172 572 5081",
-  adresse: "Plattling, Niederbayern",
+  adresse: "Nürnberg, Bayern",
   github: "https://github.com/NEO849",
   hackerone: "https://hackerone.com/luicypher_neo",
   intigriti: "https://app.intigriti.com/researcher/profile/cypherneo",
