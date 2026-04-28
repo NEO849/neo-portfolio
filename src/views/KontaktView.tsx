@@ -147,7 +147,7 @@ export default function KontaktView() {
         transition={{ duration: 0.5, delay: 0.38 }}
         className="mt-8 text-center"
       >
-        <p className="text-xs text-cyber-400/50 font-mono">{PERSOENLICH.standort}</p>
+        <p className="text-xs text-akzent-400/55 font-mono">{PERSOENLICH.standort}</p>
       </motion.div>
     </section>
   );

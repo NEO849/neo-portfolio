@@ -59,22 +59,14 @@ function Absatz({ children }: { children: ReactNode }) {
 function ImpressumInhalt() {
   return (
     <div className="space-y-6">
-      {/* Platzhalter-Hinweis */}
-      <div className="px-3 py-2.5 rounded-xl border border-signal-gelb/20 bg-signal-gelb/[0.04] flex items-start gap-2.5">
-        <span className="text-signal-gelb/70 text-xs flex-shrink-0 mt-px">⚠</span>
-        <p className="text-[11px] font-mono text-signal-gelb/60 leading-relaxed">
-          Gelb markierte Felder sind Platzhalter — vor Veröffentlichung durch echte Daten ersetzen.
-        </p>
-      </div>
-
-      <Abschnitt titel="Angaben gemäß § 5 TMG">
+      <Abschnitt titel="Angaben gemäß § 5 DDG">
         <Zeile label="Name" wert="Michael Fleps" />
         <Zeile label="Unternehmen" wert="FREE DATA solution's" />
       </Abschnitt>
 
       <Abschnitt titel="Ladungsfähige Anschrift">
-        <Zeile label="Straße" wert="[Straße Hausnummer]" platzhalter />
-        <Zeile label="Ort" wert="[PLZ] Nürnberg, Bayern" platzhalter />
+        <Zeile label="Straße" wert="Adam-Klein-Str. 15" />
+        <Zeile label="Ort" wert="90429 Nürnberg" />
         <Zeile label="Land" wert="Deutschland" />
       </Abschnitt>
 
@@ -84,19 +76,18 @@ function ImpressumInhalt() {
       </Abschnitt>
 
       <Abschnitt titel="Steuerliche Angaben">
-        <Zeile label="Steuernummer" wert="auf Anfrage — nicht öffentlich" />
-        <Zeile label="USt-IdNr." wert="keine — Kleinunternehmer gem. § 19 UStG" />
+        <Zeile label="USt-IdNr." wert="DE459129384" />
       </Abschnitt>
 
       <Abschnitt titel="Verantwortlich für den Inhalt (§ 18 Abs. 2 MStV)">
-        <Absatz>Michael Fleps, [Straße Hausnummer], [PLZ] Nürnberg, Bayern</Absatz>
+        <Absatz>Michael Fleps, Adam-Klein-Str. 15, 90429 Nürnberg</Absatz>
       </Abschnitt>
 
       <Abschnitt titel="Haftungshinweis">
         <Absatz>
           Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Für Richtigkeit,
           Vollständigkeit und Aktualität wird keine Gewähr übernommen. Als Diensteanbieter bin ich
-          gemäß § 7 Abs. 1 TMG für eigene Inhalte nach den allgemeinen Gesetzen verantwortlich.
+          gemäß § 7 Abs. 1 DDG für eigene Inhalte nach den allgemeinen Gesetzen verantwortlich.
         </Absatz>
         <p className="text-xs text-white/55 leading-relaxed font-mono mt-2">
           Für externe Links gilt: Zum Zeitpunkt der Verlinkung lagen keine rechtswidrigen Inhalte vor.
@@ -123,7 +114,7 @@ function DatenschutzInhalt() {
       <Abschnitt titel="Verantwortlicher (Art. 4 Nr. 7 DSGVO)">
         <Zeile label="Name" wert="Michael Fleps" />
         <Zeile label="Unternehmen" wert="FREE DATA solution's" />
-        <Zeile label="Anschrift" wert="[Straße Hausnummer], [PLZ] Nürnberg" platzhalter />
+        <Zeile label="Anschrift" wert="Adam-Klein-Str. 15, 90429 Nürnberg" />
         <Zeile label="E-Mail" wert="f.michi84.989@gmail.com" link="mailto:f.michi84.989@gmail.com" />
       </Abschnitt>
 
@@ -174,9 +165,9 @@ function DatenschutzInhalt() {
 
       <Abschnitt titel="Externe Verlinkungen">
         <Absatz>
-          Die Website enthält Links zu externen Plattformen (GitHub, HackerOne, Intigriti). Eine
-          Datenübermittlung an diese Dienste erfolgt ausschließlich durch aktives Anklicken. Es gelten
-          die jeweiligen Datenschutzrichtlinien der Betreiber.
+          Die Website enthält Links zu externen Plattformen (GitHub). Eine Datenübermittlung
+          an diese Dienste erfolgt ausschließlich durch aktives Anklicken. Es gelten die
+          jeweiligen Datenschutzrichtlinien der Betreiber.
         </Absatz>
       </Abschnitt>
 
@@ -292,7 +283,7 @@ export function LegalModal({ offen, startTab = "impressum", onSchliessen }: Lega
                 <button
                   onClick={onSchliessen}
                   aria-label="Schließen"
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-white/30 hover:text-white/70 hover:bg-white/[0.06] transition font-mono text-xs"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-akzent-400/50 hover:text-akzent-400 hover:bg-akzent-400/[0.08] transition font-mono text-xs"
                 >
                   ✕
                 </button>
@@ -348,7 +339,7 @@ export function LegalModal({ offen, startTab = "impressum", onSchliessen }: Lega
               <div className="border-t border-white/[0.05] px-6 py-4 flex-shrink-0 flex justify-end">
                 <button
                   onClick={onSchliessen}
-                  className="px-5 py-2 rounded-xl text-xs font-mono bg-white/[0.04] border border-white/[0.08] text-white/50 hover:text-white/80 hover:bg-white/[0.07] transition"
+                  className="px-5 py-2 rounded-xl text-xs font-mono bg-akzent-500/[0.08] border border-akzent-400/20 text-akzent-400/65 hover:text-akzent-400 hover:bg-akzent-500/[0.15] transition"
                 >
                   Schließen
                 </button>
