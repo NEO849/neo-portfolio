@@ -311,10 +311,15 @@ function benutzerZuTerminal(b: BenutzerErgebnis): string[] {
 }
 
 // ─── Download-Utilities ──────────────────────────────────────────
-// TXT und JSON nutzen identische Blob-Download-Logik.
-// iOS 15+: Web Share API zeigt das native Share Sheet (→ „In Dateien sichern" etc.)
-// Ältere Browser / Desktop: Standard <a download> Blob-Download.
-// revokeObjectURL erst nach 60 s — iOS braucht deutlich länger als Desktop.
+// Desktop: Standard Blob-Download via <a download>.
+// iOS: Ausschließlich Web Share API — kein Blob-Fallback.
+//   Blob-Downloads auf iOS landen in der Safari-Downloadliste und erzeugen
+//   eine navigierbare Blob-URL. Das QuickLook-Preview re-navigiert diese URL →
+//   bei revoced/ungültiger URL springt Safari in die Browser-History (z.B. Indeed).
+//   Web Share API schickt die Datei direkt ins Ziel (Files, Mail, AirDrop) —
+//   keine Downloadliste, keine Blob-URL-History, kein QuickLook-Problem.
+
+const isIOS = (): boolean => /iPad|iPhone|iPod/.test(navigator.userAgent);
 
 function blobDownload(blob: Blob, dateiname: string): void {
   const url = URL.createObjectURL(blob);
@@ -331,16 +336,20 @@ function blobDownload(blob: Blob, dateiname: string): void {
 function downloadDatei(dateiname: string, inhalt: string, mimeType: string): void {
   const blob = new Blob([inhalt], { type: mimeType });
 
-  // Web Share API — primärer Pfad für iOS (Share Sheet statt Inline-Preview)
+  // Web Share API — auf iOS der einzig sichere Pfad (kein Blob in Downloadliste)
   try {
     const file = new File([blob], dateiname, { type: mimeType });
     if (typeof navigator.canShare === "function" && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], title: dateiname }).catch(() => blobDownload(blob, dateiname));
+      navigator.share({ files: [file], title: dateiname }).catch(() => {
+        // User hat Share Sheet abgebrochen oder Fehler — auf iOS kein Fallback
+        if (!isIOS()) blobDownload(blob, dateiname);
+      });
       return;
     }
-  } catch { /* nicht verfügbar → Blob-Download */ }
+  } catch { /* Web Share nicht verfügbar */ }
 
-  blobDownload(blob, dateiname);
+  // Desktop: Blob-Download — auf iOS nicht aufrufen (QuickLook-Problem)
+  if (!isIOS()) blobDownload(blob, dateiname);
 }
 
 // ─── Komponente ─────────────────────────────────────────────────
@@ -365,9 +374,7 @@ export default function OsintDemoView() {
     const inhalt      = ausgabeZeilen.join("\n");
     const zeitstempel = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
     const dateiname   = `osint-${aktivesModul.name.toLowerCase().replace(/\s+/g, "-")}-${zeitstempel}.txt`;
-    // octet-stream verhindert iOS-Safari Inline-Preview (text/plain öffnet im selben Tab).
-    // Dateiname .txt stellt sicher dass das OS die Datei als Text behandelt.
-    downloadDatei(dateiname, inhalt, "application/octet-stream");
+    downloadDatei(dateiname, inhalt, "text/plain;charset=utf-8");
   }, [ausgabeZeilen, aktivesModul]);
 
   const alsJsonHerunterladen = useCallback(() => {
