@@ -583,9 +583,9 @@ export default function OsintDemoView() {
                   </button>
                 ))}
                 <div className="mt-3 text-white/40 text-xs">+====================================+</div>
-                <div className="mt-8 text-[11px] font-mono text-white/22 select-none leading-relaxed">
-                  <div><span className="text-white/30">›</span> bereit für analyse</div>
-                  <div className="ml-3 text-white/18">output: json · txt</div>
+                <div className="mt-8 text-[11px] font-mono select-none leading-relaxed">
+                  <span className="text-akzent-400/50">&gt;</span>
+                  <span className="text-white/20 ml-1">output: json · txt</span>
                 </div>
               </motion.div>
             )}
@@ -626,6 +626,43 @@ export default function OsintDemoView() {
                     Zurueck
                   </button>
                 </div>
+
+                {/* Imgur-Anleitung — nur bei Modul 6 */}
+                {aktivesModul?.nummer === "6" && (
+                  <div className="mt-5 border-t border-white/[0.06] pt-4 text-[11px] font-mono leading-relaxed">
+                    <div className="text-akzent-400/65 mb-2.5">[?] Bild-URL erforderlich — Anleitung</div>
+                    <div className="space-y-1 text-white/38">
+                      <div>
+                        <span className="text-white/55">[1]</span>{" "}
+                        <a
+                          href="https://imgur.com/upload"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-akzent-400/75 hover:text-akzent-400 transition underline underline-offset-2"
+                        >
+                          imgur.com/upload
+                        </a>{" "}
+                        <span className="text-white/28">öffnen — kostenlos, kein Account nötig</span>
+                      </div>
+                      <div>
+                        <span className="text-white/55">[2]</span>{" "}
+                        Bild per Drag &amp; Drop oder Datei hochladen
+                      </div>
+                      <div>
+                        <span className="text-white/55">[3]</span>{" "}
+                        Nach dem Upload: Rechtsklick auf das Bild{" "}
+                        <span className="text-signal-gruen/65">→ Bildadresse kopieren</span>
+                      </div>
+                      <div>
+                        <span className="text-white/55">[4]</span>{" "}
+                        URL oben einfügen und Enter drücken
+                      </div>
+                    </div>
+                    <div className="mt-2.5 text-white/22">
+                      Beispiel: i.imgur.com/AbCdEfG.jpg
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -692,9 +729,9 @@ export default function OsintDemoView() {
         </div>
       </div>
 
-      <div className="mt-6 text-[11px] font-mono text-white/38 text-center leading-relaxed">
-        <div><span className="text-white/50">status:</span> live-checks aktiv</div>
-        <div><span className="text-white/50">privacy:</span> keine dauerhafte speicherung · rate-limit: 3–10/min</div>
+      <div className="mt-6 text-[11px] font-mono text-white/30 text-center leading-relaxed">
+        <div><span className="text-akzent-400/55">status:</span> live-checks aktiv</div>
+        <div><span className="text-akzent-400/55">privacy:</span> keine dauerhafte speicherung · rate-limit: 3–10/min</div>
       </div>
     </section>
   );
