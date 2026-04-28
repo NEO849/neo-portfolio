@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { useLocation } from "react-router-dom";
 import { PERSOENLICH } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
@@ -8,7 +7,6 @@ import { LegalModal, type LegalTab } from "../bausteine/LegalModal";
 
 const CYBER_RGB = "22, 211, 238";
 const CYBER_HEX = "#22d3ee";
-const BTC_ADRESSE = "HIER_BTC_ADRESSE_EINTRAGEN";
 
 const KONTAKT_EINTRAEGE = [
   {
@@ -37,39 +35,10 @@ const KONTAKT_EINTRAEGE = [
 export default function KontaktView() {
   const [modalOffen, setModalOffen] = useState(false);
   const [modalTab, setModalTab] = useState<LegalTab>("impressum");
-  const [kopiert, setKopiert] = useState(false);
-  const location = useLocation();
-
-  useEffect(() => {
-    if ((location.state as { anchor?: string } | null)?.anchor === "support") {
-      setTimeout(() => {
-        document.getElementById("support")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 250);
-    }
-  }, [location.state]);
 
   const legalOeffnen = (tab: LegalTab) => {
     setModalTab(tab);
     setModalOffen(true);
-  };
-
-  const adresseKopieren = async () => {
-    try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(BTC_ADRESSE);
-      } else {
-        const el = document.createElement("textarea");
-        el.value = BTC_ADRESSE;
-        el.setAttribute("readonly", "");
-        el.style.cssText = "position:absolute;left:-9999px;top:0";
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand("copy");
-        document.body.removeChild(el);
-      }
-      setKopiert(true);
-      setTimeout(() => setKopiert(false), 2000);
-    } catch { /* silent fail */ }
   };
 
   return (
@@ -170,70 +139,12 @@ export default function KontaktView() {
         </div>
       </motion.div>
 
-      {/* Bitcoin Support */}
-      <motion.div
-        id="support"
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4, delay: 0.38 }}
-        className="mt-4"
-      >
-        <div className="rounded-xl border border-akzent-400/[0.10] bg-akzent-400/[0.02] px-4 py-4">
-          <div className="flex items-center gap-2.5 mb-3">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 font-mono text-sm"
-              style={{
-                background: "rgba(129, 140, 248, 0.07)",
-                border: "1px solid rgba(129, 140, 248, 0.18)",
-                color: "rgba(129, 140, 248, 0.70)",
-              }}
-            >
-              ₿
-            </div>
-            <span className="text-[11px] font-mono text-akzent-400/60 select-none">
-              Bitcoin Support
-            </span>
-          </div>
-
-          <p className="text-[11px] text-white/32 font-mono leading-relaxed mb-3">
-            Wenn du meine freien Tools und Projekte unterstützen möchtest,
-            kannst du freiwillig per Bitcoin spenden.
-          </p>
-
-          <div className="flex items-center gap-2 rounded-lg bg-[#08080f] border border-white/[0.06] px-3 py-2">
-            <span className="font-mono text-[10px] text-white/28 flex-shrink-0 select-none">BTC</span>
-            <span className="font-mono text-[11px] text-white/50 flex-1 truncate select-all break-all">
-              {BTC_ADRESSE}
-            </span>
-            <button
-              type="button"
-              onClick={adresseKopieren}
-              className="flex-shrink-0 text-[10px] font-mono px-2.5 py-1 rounded-md transition-all duration-200"
-              style={{
-                background: kopiert
-                  ? "rgba(34, 197, 94, 0.10)"
-                  : "rgba(129, 140, 248, 0.08)",
-                border: kopiert
-                  ? "1px solid rgba(34, 197, 94, 0.25)"
-                  : "1px solid rgba(129, 140, 248, 0.18)",
-                color: kopiert
-                  ? "rgba(34, 197, 94, 0.85)"
-                  : "rgba(129, 140, 248, 0.65)",
-              }}
-            >
-              {kopiert ? "Kopiert ✓" : "Adresse kopieren"}
-            </button>
-          </div>
-        </div>
-      </motion.div>
-
       {/* Standort */}
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.45 }}
+        transition={{ duration: 0.5, delay: 0.38 }}
         className="mt-8 text-center"
       >
         <p className="text-xs text-akzent-400/55 font-mono">{PERSOENLICH.standort}</p>

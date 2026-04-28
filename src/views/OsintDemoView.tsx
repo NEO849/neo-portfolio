@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import {
   domainAnalysieren, emailAnalysieren, benutzernameSuchen,
   telefonAnalysieren, bildAnalysieren,
@@ -52,6 +51,8 @@ const DATENSCHUTZ_HINWEISE: Record<string, string[]> = {
     "Nutze dieses Tool nur für Bilder, für deren Analyse du berechtigt bist.",
   ],
 };
+
+const BITCOIN_ADDRESS = "HIER_BTC_ADRESSE_EINTRAGEN";
 
 // ─── Terminal-Hilfsfunktionen ─────────────────────────────────────
 // Box: 36 Zeichen breit — passt auf Mobile ohne horizontalen Scroll.
@@ -356,7 +357,6 @@ function downloadDatei(dateiname: string, inhalt: string, mimeType: string): voi
 // ─── Komponente ─────────────────────────────────────────────────
 
 export default function OsintDemoView() {
-  const navigate = useNavigate();
   const [phase, setPhase] = useState<"menue" | "eingabe" | "laden" | "ausgabe">("menue");
   const [aktivesModul, setAktivesModul] = useState<DemoModul | null>(null);
   const [eingabeWert, setEingabeWert] = useState("");
@@ -367,6 +367,7 @@ export default function OsintDemoView() {
   const [rohdaten, setRohdaten] = useState<object | null>(null);
   const [modalOffen, setModalOffen] = useState(false);
   const [wartendesModul, setWartendesModul] = useState<DemoModul | null>(null);
+  const [btcKopiert, setBtcKopiert] = useState<"idle" | "success" | "error">("idle");
   const terminalRef = useRef<HTMLDivElement>(null);
   const eingabeRef = useRef<HTMLInputElement>(null);
 
@@ -385,6 +386,30 @@ export default function OsintDemoView() {
     const dateiname   = `osint-${aktivesModul.name.toLowerCase().replace(/\s+/g, "-")}-${zeitstempel}.json`;
     downloadDatei(dateiname, JSON.stringify(rohdaten, null, 2), "application/json;charset=utf-8");
   }, [rohdaten, aktivesModul]);
+
+  const btcAdresseKopieren = useCallback(async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(BITCOIN_ADDRESS);
+      } else {
+        const el = document.createElement("textarea");
+        el.value = BITCOIN_ADDRESS;
+        el.setAttribute("readonly", "");
+        el.style.cssText = "position:absolute;left:-9999px;top:0";
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+      }
+      setBtcKopiert("success");
+    } catch {
+      setBtcKopiert("error");
+    } finally {
+      setTimeout(() => setBtcKopiert("idle"), 2000);
+    }
+  }, []);
 
   useEffect(() => {
     if (phase !== "ausgabe" || ausgabeZeilen.length === 0) return;
@@ -585,7 +610,7 @@ export default function OsintDemoView() {
                   </button>
                 ))}
                 <div className="mt-3 text-white/40 text-xs">+====================================+</div>
-                <div className="mt-8 text-[11px] font-mono select-none leading-relaxed space-y-2">
+                <div className="mt-8 text-[11px] font-mono select-none leading-relaxed">
                   <div>
                     <span className="text-akzent-400/50">&gt;</span>
                     <span className="text-white/40 ml-1">output: </span>
@@ -593,15 +618,32 @@ export default function OsintDemoView() {
                     <span className="text-white/30"> · </span>
                     <span className="text-signal-gruen/55">txt</span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => navigate("/kontakt", { state: { anchor: "support" } })}
-                    className="block text-left group"
-                  >
-                    <span className="text-akzent-400/35 group-hover:text-akzent-400/55 transition-colors duration-200">&gt;</span>
-                    <span className="ml-1 text-white/28 group-hover:text-white/55 transition-colors duration-200">Projekt unterstützen</span>
-                    <span className="ml-1 text-cyber-400/40 group-hover:text-cyber-400/70 transition-colors duration-200">→</span>
-                  </button>
+                  <div className="mt-5">
+                    <button
+                      type="button"
+                      onClick={btcAdresseKopieren}
+                      className={[
+                        "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border font-mono text-[11px] transition-all duration-200 select-none",
+                        btcKopiert === "success"
+                          ? "border-signal-gruen/35 bg-signal-gruen/[0.06] text-signal-gruen/80"
+                          : btcKopiert === "error"
+                          ? "border-signal-rot/30 bg-signal-rot/[0.05] text-signal-rot/70"
+                          : "border-akzent-400/[0.22] bg-akzent-400/[0.04] hover:border-akzent-400/40 hover:bg-akzent-400/[0.09] active:bg-akzent-400/[0.14]",
+                      ].join(" ")}
+                    >
+                      {btcKopiert === "success" ? (
+                        "BTC-Adresse kopiert"
+                      ) : btcKopiert === "error" ? (
+                        "Kopieren fehlgeschlagen"
+                      ) : (
+                        <>
+                          <span className="text-white/35">Projekt unterstützen</span>
+                          <span className="text-akzent-400/40">-&gt;</span>
+                          <span className="text-akzent-400/70 font-semibold">Copy BTC</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             )}
