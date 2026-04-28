@@ -17,14 +17,14 @@ const KATEGORIE_KONFIGURATION: Record<string, {
   label: string;
 }> = {
   security:    { lichtfarbe: "239, 68, 68",   akzentFarbe: "#ef4444", variante: "aktiv",   label: "Security"    },
-  development: { lichtfarbe: "99, 102, 241",  akzentFarbe: "#6366f1", variante: "akzent",  label: "Development" },
+  development: { lichtfarbe: "99, 102, 241",  akzentFarbe: "#6366f1", variante: "akzent",  label: "Mobil"       },
   tooling:     { lichtfarbe: "34, 211, 238",  akzentFarbe: "#22d3ee", variante: "cyber",   label: "Tooling"     },
 };
 
 const FILTER_TABS: GlassTab[] = [
   { id: "alle",        label: "Alle" },
   { id: "security",    label: "Security" },
-  { id: "development", label: "Development" },
+  { id: "development", label: "Mobil" },
   { id: "tooling",     label: "Tooling" },
 ];
 
@@ -66,8 +66,8 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
           <motion.div
             animate={{ rotate: offen ? 45 : 0 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="text-white/25 text-xl flex-shrink-0 leading-none mt-0.5"
-            style={{ color: offen ? cfg.akzentFarbe : undefined, opacity: offen ? 0.6 : undefined }}
+            className="text-xl flex-shrink-0 leading-none mt-0.5 transition-colors duration-200"
+            style={{ color: cfg.akzentFarbe, opacity: offen ? 0.85 : 0.45 }}
           >
             +
           </motion.div>
