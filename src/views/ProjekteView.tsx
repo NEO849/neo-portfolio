@@ -16,7 +16,7 @@ const KATEGORIE_KONFIGURATION: Record<string, {
   variante: "aktiv" | "akzent" | "cyber";
   label: string;
 }> = {
-  security:    { lichtfarbe: "239, 68, 68",   akzentFarbe: "#ef4444", variante: "aktiv",   label: "Security"    },
+  security:    { lichtfarbe: "249, 115, 22",  akzentFarbe: "#f97316", variante: "aktiv",   label: "Security"    },
   development: { lichtfarbe: "99, 102, 241",  akzentFarbe: "#6366f1", variante: "akzent",  label: "Mobil"       },
   tooling:     { lichtfarbe: "34, 211, 238",  akzentFarbe: "#22d3ee", variante: "cyber",   label: "Tooling"     },
 };
