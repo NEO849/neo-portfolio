@@ -314,7 +314,7 @@ function benutzerZuTerminal(b: BenutzerErgebnis): string[] {
 // TXT und JSON nutzen identische Blob-Download-Logik.
 // iOS 15+: Web Share API zeigt das native Share Sheet (→ „In Dateien sichern" etc.)
 // Ältere Browser / Desktop: Standard <a download> Blob-Download.
-// revokeObjectURL erst nach 30 s — iOS braucht deutlich länger als Desktop.
+// revokeObjectURL erst nach 60 s — iOS braucht deutlich länger als Desktop.
 
 function blobDownload(blob: Blob, dateiname: string): void {
   const url = URL.createObjectURL(blob);
@@ -325,7 +325,7 @@ function blobDownload(blob: Blob, dateiname: string): void {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 30_000);
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 function downloadDatei(dateiname: string, inhalt: string, mimeType: string): void {
@@ -365,7 +365,9 @@ export default function OsintDemoView() {
     const inhalt      = ausgabeZeilen.join("\n");
     const zeitstempel = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
     const dateiname   = `osint-${aktivesModul.name.toLowerCase().replace(/\s+/g, "-")}-${zeitstempel}.txt`;
-    downloadDatei(dateiname, inhalt, "text/plain;charset=utf-8");
+    // octet-stream verhindert iOS-Safari Inline-Preview (text/plain öffnet im selben Tab).
+    // Dateiname .txt stellt sicher dass das OS die Datei als Text behandelt.
+    downloadDatei(dateiname, inhalt, "application/octet-stream");
   }, [ausgabeZeilen, aktivesModul]);
 
   const alsJsonHerunterladen = useCallback(() => {
