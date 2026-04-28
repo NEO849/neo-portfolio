@@ -646,14 +646,16 @@ export default function OsintDemoView() {
                 {fertig && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-5 border-t border-white/5 pt-4">
                     <div className="flex flex-wrap items-center gap-3">
-                      {/* Download TXT / Kopieren auf iOS */}
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsTextHerunterladen(); }}
-                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-signal-gruen/10 border border-signal-gruen/25 text-signal-gruen/80 hover:bg-signal-gruen/20 hover:text-signal-gruen transition font-mono"
-                      >
-                        ↓ TXT
-                      </button>
+                      {/* Download TXT — nicht beim Status-Check (Modul 1) */}
+                      {aktivesModul?.nummer !== "1" && (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsTextHerunterladen(); }}
+                          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-signal-gruen/10 border border-signal-gruen/25 text-signal-gruen/80 hover:bg-signal-gruen/20 hover:text-signal-gruen transition font-mono"
+                        >
+                          ↓ TXT
+                        </button>
+                      )}
                       {/* Download JSON — nur bei Live-Modulen */}
                       {rohdaten && (
                         <button
