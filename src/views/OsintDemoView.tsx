@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   domainAnalysieren, emailAnalysieren, benutzernameSuchen,
   telefonAnalysieren, bildAnalysieren,
@@ -355,6 +356,7 @@ function downloadDatei(dateiname: string, inhalt: string, mimeType: string): voi
 // ─── Komponente ─────────────────────────────────────────────────
 
 export default function OsintDemoView() {
+  const navigate = useNavigate();
   const [phase, setPhase] = useState<"menue" | "eingabe" | "laden" | "ausgabe">("menue");
   const [aktivesModul, setAktivesModul] = useState<DemoModul | null>(null);
   const [eingabeWert, setEingabeWert] = useState("");
@@ -583,9 +585,23 @@ export default function OsintDemoView() {
                   </button>
                 ))}
                 <div className="mt-3 text-white/40 text-xs">+====================================+</div>
-                <div className="mt-8 text-[11px] font-mono select-none leading-relaxed">
-                  <span className="text-akzent-400/50">&gt;</span>
-                  <span className="text-white/20 ml-1">output: json · txt</span>
+                <div className="mt-8 text-[11px] font-mono select-none leading-relaxed space-y-2">
+                  <div>
+                    <span className="text-akzent-400/50">&gt;</span>
+                    <span className="text-white/40 ml-1">output: </span>
+                    <span className="text-akzent-400/60">json</span>
+                    <span className="text-white/30"> · </span>
+                    <span className="text-signal-gruen/55">txt</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/kontakt", { state: { anchor: "support" } })}
+                    className="block text-left group"
+                  >
+                    <span className="text-akzent-400/35 group-hover:text-akzent-400/55 transition-colors duration-200">&gt;</span>
+                    <span className="ml-1 text-white/28 group-hover:text-white/55 transition-colors duration-200">Projekt unterstützen</span>
+                    <span className="ml-1 text-cyber-400/40 group-hover:text-cyber-400/70 transition-colors duration-200">→</span>
+                  </button>
                 </div>
               </motion.div>
             )}
