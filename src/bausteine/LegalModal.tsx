@@ -71,7 +71,7 @@ function ImpressumInhalt() {
       </Abschnitt>
 
       <Abschnitt titel="Kontakt">
-        <Zeile label="E-Mail" wert="f.michi84.989@gmail.com" link="mailto:f.michi84.989@gmail.com" />
+        <Zeile label="E-Mail" wert="michael_fleps@aol.com" link="mailto:michael_fleps@aol.com" />
         <Zeile label="Telefon" wert="+49 172 572 5081" link="tel:+491725725081" />
       </Abschnitt>
 
@@ -97,7 +97,7 @@ function ImpressumInhalt() {
       </Abschnitt>
 
       <Abschnitt titel="Unterstützung / Zahlungen">
-        <Zeile label="Bitcoin (BTC)" wert="[bc1q ··· BTC-Adresse eintragen ···]" platzhalter />
+        <Zeile label="Bitcoin (BTC)" wert="bc1qf666x5l4zs6tm9w69jsr9mn5glvf97fk9z6zs8" />
         <p className="text-[11px] font-mono text-white/28 mt-1 leading-relaxed">
           Optional — kein Bestandteil des gesetzlichen Impressums.
         </p>
@@ -115,7 +115,7 @@ function DatenschutzInhalt() {
         <Zeile label="Name" wert="Michael Fleps" />
         <Zeile label="Unternehmen" wert="FREE DATA solution's" />
         <Zeile label="Anschrift" wert="Adam-Klein-Str. 15, 90429 Nürnberg" />
-        <Zeile label="E-Mail" wert="f.michi84.989@gmail.com" link="mailto:f.michi84.989@gmail.com" />
+        <Zeile label="E-Mail" wert="michael_fleps@aol.com" link="mailto:michael_fleps@aol.com" />
       </Abschnitt>
 
       <Abschnitt titel="Hosting — Vercel Inc.">
@@ -190,10 +190,10 @@ function DatenschutzInhalt() {
         <p className="text-xs text-white/55 leading-relaxed font-mono mt-3">
           Anfragen richten Sie an:{" "}
           <a
-            href="mailto:f.michi84.989@gmail.com"
+            href="mailto:michael_fleps@aol.com"
             className="text-cyber-400/70 hover:text-cyber-400 transition"
           >
-            f.michi84.989@gmail.com
+            michael_fleps@aol.com
           </a>
         </p>
       </Abschnitt>
