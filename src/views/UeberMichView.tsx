@@ -49,8 +49,7 @@ export default function UeberMichView() {
   return (
     <section id="ueber" className="py-16 px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
-        prefix="> ueber_mich"
-        titel="Über mich"
+        prefix="> über_mich"
         klassen="mb-10"
       />
 
@@ -108,8 +107,7 @@ export default function UeberMichView() {
         transition={{ duration: 0.45 }}
         className="mb-2"
       >
-        <p className="font-mono text-sm text-akzent-400/60 mb-1">› mein_weg</p>
-        <h3 className="font-display text-xl font-bold text-white/85">Mein Weg</h3>
+        <h3 className="font-mono text-base md:text-lg font-semibold text-akzent-400/80 tracking-wider">&gt; mein_weg</h3>
       </motion.div>
 
       {/* Filter-Tabs */}

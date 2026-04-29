@@ -51,7 +51,6 @@ export default function KontaktView() {
 
       <AbschnittsTitel
         prefix="> kontakt"
-        titel="Kontakt"
         untertitel="Interesse an Zusammenarbeit, Jobangeboten oder fachlichem Austausch? Ich freue mich auf deine Nachricht."
         klassen="mb-10"
       />

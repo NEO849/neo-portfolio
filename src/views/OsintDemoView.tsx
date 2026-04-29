@@ -561,8 +561,7 @@ export default function OsintDemoView() {
       />
       <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }} transition={{ duration: 0.5 }}>
-        <p className="font-mono text-sm text-signal-gruen mb-2">&gt; osint_toolkit.live()</p>
-        <h3 className="font-display text-2xl md:text-3xl font-bold mb-2">OSINT Toolkit — Live</h3>
+        <h2 className="font-mono text-xl md:text-2xl font-semibold text-signal-gruen mb-3 tracking-wider">&gt; osint_tools</h2>
         <p className="text-white/65 text-sm mb-6">
           Ein kompaktes OSINT-Toolkit für schnelle Erstanalysen: Domains, E-Mails, Usernames und weitere Hinweise werden live gegen öffentliche Datenquellen geprüft — transparent, kontrolliert und ohne dauerhafte Speicherung.
         </p>

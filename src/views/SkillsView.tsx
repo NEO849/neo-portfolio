@@ -31,7 +31,6 @@ export default function SkillsView() {
     <section id="skills" className="py-16 px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
         prefix="> skills"
-        titel="Fähigkeiten"
         untertitel="Nicht nur Buzzwords – reale Kompetenz mit messbarem Level."
         klassen="mb-8"
       />

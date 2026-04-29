@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { GlassTabs } from "../bausteine/GlassTabs";
+import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 
 // ═══════════════════════════════════════════════════════
 // VIEW: Dokumente — Zeugnisse, Zertifikate, Lebenslauf, Anschreiben
@@ -191,20 +192,11 @@ export default function ZeugnisseView() {
       id="zeugnisse"
       className="py-16 px-6 max-w-5xl mx-auto"
     >
-      {/* Titel */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.5 }}
-        className="mb-10"
-      >
-        <p className="font-mono text-sm text-akzent-400 mb-2">&gt; dokumente</p>
-        <h2 className="font-display text-3xl md:text-4xl font-bold mb-3">Dokumente & Qualifikationen</h2>
-        <p className="text-white/50 text-sm max-w-xl">
-          Zeugnisse, Zertifikate und Bewerbungsunterlagen — klicke zur Vorschau.
-        </p>
-      </motion.div>
+      <AbschnittsTitel
+        prefix="> dokumente"
+        untertitel="Zeugnisse, Zertifikate und Bewerbungsunterlagen — klicke zur Vorschau."
+        klassen="mb-10"
+      />
 
       <GlassTabs
         tabs={DOKUMENT_TABS}

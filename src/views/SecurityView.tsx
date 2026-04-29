@@ -40,7 +40,6 @@ export default function SecurityView() {
     <section id="security" className="py-16 px-6 max-w-6xl mx-auto">
       <AbschnittsTitel
         prefix="> security_research"
-        titel="Security Research & Tooling"
         untertitel="Eigene Infrastruktur, eigene Tools, eigene Pipeline — vom Recon bis zum fertigen Report."
         klassen="mb-10"
       />
