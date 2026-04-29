@@ -286,7 +286,7 @@ export const PERSOENLICH = {
   untertitel: "iOS Development • Security Research • Linux & Server Administration",
   kurzvorstellung: "15 Jahre Systemverständnis aus der Elektronik, moderne Software-Architektur und offensive Security Research – ich verbinde praktische Tiefe mit analytischem Denken und baue Anwendungen, die echte Probleme lösen.",
   email: "michael_fleps@aol.com",
-  telefon: "0172 572 5081",
+  telefon: "015678 309580",
   adresse: "Nürnberg, Bayern",
   github: "https://github.com/NEO849",
   hackerone: "https://hackerone.com/luicypher_neo",

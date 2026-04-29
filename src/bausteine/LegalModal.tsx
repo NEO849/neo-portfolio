@@ -72,7 +72,7 @@ function ImpressumInhalt() {
 
       <Abschnitt titel="Kontakt">
         <Zeile label="E-Mail" wert="michael_fleps@aol.com" link="mailto:michael_fleps@aol.com" />
-        <Zeile label="Telefon" wert="+49 172 572 5081" link="tel:+491725725081" />
+        <Zeile label="Telefon" wert="+49 15678 309580" link="tel:+4915678309580" />
       </Abschnitt>
 
       <Abschnitt titel="Steuerliche Angaben">
