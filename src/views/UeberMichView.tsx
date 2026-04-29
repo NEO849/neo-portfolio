@@ -107,7 +107,10 @@ export default function UeberMichView() {
         transition={{ duration: 0.45 }}
         className="mb-2"
       >
-        <h3 className="font-mono text-base md:text-lg font-semibold text-akzent-400/80 tracking-wider">&gt; mein_weg</h3>
+        <h3 className="font-mono text-base md:text-lg font-semibold tracking-wider">
+          <span className="text-akzent-400">&gt;</span>
+          <span className="text-white/70"> mein_weg</span>
+        </h3>
       </motion.div>
 
       {/* Filter-Tabs */}

@@ -21,6 +21,9 @@ export function AbschnittsTitel({
   klassen = "",
 }: AbschnittsTitelProps) {
   const ausrichtung = zentriert ? "text-center" : "text-left";
+  const spaceIdx = prefix.indexOf(" ");
+  const zeichen  = spaceIdx > -1 ? prefix.slice(0, spaceIdx) : prefix;
+  const label    = spaceIdx > -1 ? prefix.slice(spaceIdx) : "";
 
   return (
     <motion.div
@@ -30,8 +33,9 @@ export function AbschnittsTitel({
       whileInView="sichtbar"
       viewport={{ once: true, margin: "-80px" }}
     >
-      <h2 className="font-mono text-xl md:text-2xl font-semibold text-akzent-400 mb-3 tracking-wider">
-        {prefix}
+      <h2 className="font-mono text-xl md:text-2xl font-semibold tracking-wider mb-3">
+        <span className="text-akzent-400">{zeichen}</span>
+        {label && <span className="text-white/70">{label}</span>}
       </h2>
       {untertitel && (
         <p className="text-white/70 max-w-2xl leading-relaxed">
