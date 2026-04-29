@@ -13,6 +13,51 @@ import { GlassTabs } from "../bausteine/GlassTabs";
 
 type SecurityTab = "overview" | "pipeline" | "scoring" | "tools";
 
+const WORKFLOW_PHASEN = [
+  {
+    nr: "01",
+    name: "Target",
+    tools: ["scope.md", "HackerOne", "Intigriti"],
+    output: "Domain · Scope · Ziele",
+    rgb: "129,140,248",
+  },
+  {
+    nr: "02",
+    name: "Recon",
+    tools: ["subfinder", "amass", "httpx", "ParamSpider"],
+    output: "50k+ URLs · Subdomains · JS",
+    rgb: "34,211,238",
+  },
+  {
+    nr: "03",
+    name: "Scoring",
+    tools: ["awk Engine", "12 Kategorien", "Tier-Split"],
+    output: "Tier 1–3 · Focus5-Cards",
+    rgb: "245,158,11",
+  },
+  {
+    nr: "04",
+    name: "Hunting",
+    tools: ["Caido", "Nuclei", "dalfox", "sqlmap"],
+    output: "Kandidaten · CVE-Hits",
+    rgb: "239,68,68",
+  },
+  {
+    nr: "05",
+    name: "Validate",
+    tools: ["PoC-Scripts", "interactsh", "exploit-chainer"],
+    output: "Confirmed · CVSS-Score",
+    rgb: "34,197,94",
+  },
+  {
+    nr: "06",
+    name: "Report",
+    tools: ["AI Agents", "HackerOne"],
+    output: "Fertiger Report · $$$",
+    rgb: "129,140,248",
+  },
+];
+
 const TABS: { id: SecurityTab; label: string; beschreibung: string }[] = [
   { id: "overview",  label: "Überblick",  beschreibung: "Kennzahlen & Aktivität" },
   { id: "pipeline",  label: "Pipeline",   beschreibung: "7-Schritt Master-Pipeline" },
@@ -40,9 +85,61 @@ export default function SecurityView() {
     <section id="security" className="py-16 px-6 max-w-6xl mx-auto">
       <AbschnittsTitel
         prefix="> security_research"
-        untertitel="Eigene Infrastruktur, eigene Tools, eigene Pipeline — vom Recon bis zum fertigen Report."
-        klassen="mb-10"
+        untertitel="Vom ersten DNS-Query bis zum fertigen Report — sechs Phasen, 13 Custom-Tools, eigene VPS-Infrastruktur."
+        klassen="mb-6"
       />
+
+      {/* Workflow Flow — Visual Pipeline */}
+      <div className="mb-8 -mx-1 overflow-x-auto scrollbar-none pb-2">
+        <div className="flex items-center gap-1.5 min-w-max px-1">
+          {WORKFLOW_PHASEN.map((p, i) => (
+            <motion.div
+              key={p.nr}
+              className="flex items-center gap-1.5"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ delay: i * 0.08, duration: 0.35 }}
+            >
+              <div
+                className="w-[138px] rounded-xl border border-white/[0.07] bg-white/[0.025] p-2.5 flex flex-col gap-1.5"
+                style={{ boxShadow: `0 2px 18px rgba(${p.rgb},0.08)` }}
+              >
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-[10px] font-bold" style={{ color: `rgb(${p.rgb})` }}>
+                    {p.nr}
+                  </span>
+                  <span className="text-[11px] font-bold text-white tracking-wide">{p.name.toUpperCase()}</span>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {p.tools.map((t) => (
+                    <span
+                      key={t}
+                      className="font-mono text-[9px] px-1.5 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.07] text-white/40 leading-none"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+                <p className="font-mono text-[9px] text-white/20 leading-snug pt-0.5 border-t border-white/[0.05] mt-0.5">
+                  → {p.output}
+                </p>
+              </div>
+              {i < WORKFLOW_PHASEN.length - 1 && (
+                <motion.span
+                  className="text-white/15 text-base font-light flex-shrink-0 select-none"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 + 0.25, duration: 0.25 }}
+                >
+                  ›
+                </motion.span>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      </div>
 
       <GlassTabs
         tabs={TABS}
