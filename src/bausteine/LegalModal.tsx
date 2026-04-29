@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export type LegalTab = "impressum" | "datenschutz";
@@ -217,10 +217,14 @@ function DatenschutzInhalt() {
 
 export function LegalModal({ offen, startTab = "impressum", onSchliessen }: LegalModalProps) {
   const [aktiv, setAktiv] = useState<LegalTab>(startTab);
+  const warOffen = useRef(false);
 
-  // Sync aktiver Tab wenn Modal geöffnet wird
+  // Tab nur beim Öffnen (false → true) zurücksetzen, nicht bei jedem Re-Render
   useEffect(() => {
-    if (offen) setAktiv(startTab);
+    if (offen && !warOffen.current) {
+      setAktiv(startTab);
+    }
+    warOffen.current = offen;
   }, [offen, startTab]);
 
   // ESC-Taste schließt Modal
@@ -284,6 +288,7 @@ export function LegalModal({ offen, startTab = "impressum", onSchliessen }: Lega
                 {TABS.map(({ id, label }) => (
                   <button
                     key={id}
+                    type="button"
                     onClick={() => setAktiv(id)}
                     className={`px-4 py-1.5 rounded-lg text-xs font-mono transition-all duration-200 ${
                       aktiv === id
