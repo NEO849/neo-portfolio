@@ -85,24 +85,24 @@ export default function SecurityView() {
     <section id="security" className="py-16 px-6 max-w-6xl mx-auto">
       <AbschnittsTitel
         prefix="> security_research"
-        untertitel="Vom ersten DNS-Query bis zum fertigen Report — sechs Phasen, 13 Custom-Tools, eigene VPS-Infrastruktur."
+        untertitel="Vom ersten DNS-Query bis zum validierten Report — sechs Phasen, 13 Custom-Tools, eigene VPS-Infrastruktur. Jede Phase liefert konkrete Zwischenergebnisse: von priorisierten Angriffsflächen über reproduzierbare PoC-Skripte bis zur manuellen Bestätigung der Schwachstelle."
         klassen="mb-6"
       />
 
       {/* Workflow Flow — Visual Pipeline */}
       <div className="mb-8 -mx-1 overflow-x-auto scrollbar-none pb-2">
-        <div className="flex items-center gap-1.5 min-w-max px-1">
+        <div className="flex items-stretch gap-1.5 min-w-max px-1">
           {WORKFLOW_PHASEN.map((p, i) => (
             <motion.div
               key={p.nr}
-              className="flex items-center gap-1.5"
+              className="flex items-stretch gap-1.5"
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ delay: i * 0.08, duration: 0.35 }}
             >
               <div
-                className="w-[138px] rounded-xl border border-white/[0.07] bg-white/[0.025] p-2.5 flex flex-col gap-1.5"
+                className="w-[138px] rounded-xl border border-white/[0.07] bg-white/[0.025] p-2.5 flex flex-col gap-1.5 h-full"
                 style={{ boxShadow: `0 2px 18px rgba(${p.rgb},0.08)` }}
               >
                 <div className="flex items-center gap-1.5">
@@ -111,23 +111,23 @@ export default function SecurityView() {
                   </span>
                   <span className="text-[11px] font-bold text-white tracking-wide">{p.name.toUpperCase()}</span>
                 </div>
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-1 flex-1">
                   {p.tools.map((t) => (
                     <span
                       key={t}
-                      className="font-mono text-[9px] px-1.5 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.07] text-white/40 leading-none"
+                      className="font-mono text-[9px] px-1.5 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.07] text-white/55 leading-none h-fit"
                     >
                       {t}
                     </span>
                   ))}
                 </div>
-                <p className="font-mono text-[9px] text-white/20 leading-snug pt-0.5 border-t border-white/[0.05] mt-0.5">
+                <p className="font-mono text-[9px] text-white/35 leading-snug pt-0.5 border-t border-white/[0.05] mt-auto">
                   → {p.output}
                 </p>
               </div>
               {i < WORKFLOW_PHASEN.length - 1 && (
                 <motion.span
-                  className="text-white/15 text-base font-light flex-shrink-0 select-none"
+                  className="text-white/15 text-base font-light flex-shrink-0 select-none self-center"
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
@@ -409,8 +409,8 @@ export default function SecurityView() {
               {/* Integriert */}
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <AbzeichenStatus variante="neutral" text="INTEGRIERT" />
-                  <span className="text-xs text-white/30">Professionelle Security-Toolchain</span>
+                  <AbzeichenStatus variante="akzent" text="INTEGRIERT" />
+                  <span className="text-xs text-white/50">Professionelle Security-Toolchain</span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {TOOLS_STACK.filter(t => t.kategorie !== "eigenbau").map((werkzeug, index) => (

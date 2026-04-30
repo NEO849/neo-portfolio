@@ -49,7 +49,7 @@ export default function UeberMichView() {
   return (
     <section id="ueber" className="py-16 px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
-        prefix="> über_mich"
+        prefix="> ueber_mich"
         klassen="mb-10"
       />
 
