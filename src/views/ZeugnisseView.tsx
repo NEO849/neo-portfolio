@@ -8,6 +8,28 @@ import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 // Einheitliches Karussell mit Swipe-Support
 // ═══════════════════════════════════════════════════════
 
+// iOS Safari öffnet PDFs per <a download> im QuickLook statt zu speichern.
+// Web Share API zeigt das native Share Sheet → "In Dateien sichern" klappt.
+// Desktop: default-Verhalten des <a download> bleibt unverändert.
+function pdfDownload(
+  e: React.MouseEvent<HTMLAnchorElement>,
+  pfad: string,
+) {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (!isIOS) return;
+  e.preventDefault();
+  const dateiname = pfad.split("/").pop() ?? "dokument.pdf";
+  fetch(pfad)
+    .then((r) => r.blob())
+    .then((blob) => {
+      const file = new File([blob], dateiname, { type: "application/pdf" });
+      if (navigator.canShare?.({ files: [file] })) {
+        navigator.share({ files: [file], title: dateiname }).catch(() => {});
+      }
+    })
+    .catch(() => {});
+}
+
 interface DokumentEintrag {
   readonly titel: string;
   readonly aussteller: string;
@@ -403,7 +425,7 @@ export default function ZeugnisseView() {
                   <a
                     href={aktuell.pdfPfad}
                     download
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => { e.stopPropagation(); pdfDownload(e, aktuell.pdfPfad); }}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all hover:scale-[1.03]"
                     style={{
                       background: `${aktuell.akzentFarbe}15`,
