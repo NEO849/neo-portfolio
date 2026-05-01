@@ -79,17 +79,6 @@ export function HauptNavigation() {
             ))}
           </ul>
 
-          {/* Desktop CTA */}
-          <Link
-            to="/kontakt"
-            className="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
-              text-white bg-akzent-500/90 border border-akzent-400/30
-              hover:bg-akzent-400 hover:shadow-[0_0_20px_rgba(99,102,241,0.3)]
-              transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-akzent-400"
-          >
-            Kontakt
-          </Link>
-
           {/* Hamburger (Mobile) */}
           <button
             onClick={mobileMenuToggle}
