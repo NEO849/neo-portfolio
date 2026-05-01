@@ -27,7 +27,7 @@ export function Fusszeile() {
             </p>
             <p className="text-xs text-white/70 leading-relaxed max-w-xs">
               Fullstack Security Engineer. iOS Development,<br />
-              Security Research, Linux & Server Administration, Bug Bounty.
+              Security Research, Linux & Server Administration.
             </p>
           </div>
 
