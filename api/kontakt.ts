@@ -83,56 +83,61 @@ function htmlEmail(
 </html>`;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// Reine Node.js-Antwort — kein res.status().json() (Vercel-Helper nicht garantiert)
+function jsonAntwort(res: any, statusCode: number, data: unknown): void {
+  res.statusCode = statusCode;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.end(JSON.stringify(data));
+}
+
 export default async function handler(req: any, res: any) {
-
-  // CORS-Header für alle Responses
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ fehler: "Methode nicht erlaubt." });
-  }
-
-  // Body parsen — Vercel parsed JSON automatisch, aber defensiv absichern
-  let body: { name?: string; email?: string; telefon?: string; nachricht?: string } = {};
-  if (typeof req.body === "string") {
-    try { body = JSON.parse(req.body); } catch { /* ungültiger JSON-Body */ }
-  } else if (req.body && typeof req.body === "object") {
-    body = req.body as typeof body;
-  }
-
-  const { name, email, telefon, nachricht } = body;
-
-  // Server-seitige Validierung
-  if (!name?.trim() || !email?.trim() || !nachricht?.trim()) {
-    return res.status(400).json({ fehler: "Pflichtfelder fehlen." });
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-    return res.status(400).json({ fehler: "Ungültige E-Mail-Adresse." });
-  }
-  if (nachricht.trim().length < 10) {
-    return res.status(400).json({ fehler: "Nachricht ist zu kurz." });
-  }
-
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.error("[kontakt] RESEND_API_KEY fehlt — Vercel Project Settings prüfen.");
-    return res.status(500).json({ fehler: "E-Mail-Dienst nicht konfiguriert." });
-  }
-
-  const cleanName      = name.trim();
-  const cleanEmail     = email.trim();
-  const cleanTelefon   = telefon?.trim() || undefined;
-  const cleanNachricht = nachricht.trim();
-  const zeit           = zeitstempel();
-
   try {
+    res.setHeader("Access-Control-Allow-Origin",  "*");
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+      res.statusCode = 204;
+      res.end();
+      return;
+    }
+
+    if (req.method !== "POST") {
+      return jsonAntwort(res, 405, { fehler: "Methode nicht erlaubt." });
+    }
+
+    // Body parsen — Vercel parsed JSON-Bodies automatisch; defensiv absichern
+    let body: { name?: string; email?: string; telefon?: string; nachricht?: string } = {};
+    if (typeof req.body === "string") {
+      try { body = JSON.parse(req.body); } catch { /* ungültiger Body */ }
+    } else if (req.body && typeof req.body === "object") {
+      body = req.body as typeof body;
+    }
+
+    const { name, email, telefon, nachricht } = body;
+
+    if (!name?.trim() || !email?.trim() || !nachricht?.trim()) {
+      return jsonAntwort(res, 400, { fehler: "Pflichtfelder fehlen." });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return jsonAntwort(res, 400, { fehler: "Ungültige E-Mail-Adresse." });
+    }
+    if (nachricht.trim().length < 10) {
+      return jsonAntwort(res, 400, { fehler: "Nachricht ist zu kurz." });
+    }
+
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.error("[kontakt] RESEND_API_KEY fehlt — Vercel Project Settings prüfen.");
+      return jsonAntwort(res, 500, { fehler: "E-Mail-Dienst nicht konfiguriert." });
+    }
+
+    const cleanName      = name.trim();
+    const cleanEmail     = email.trim();
+    const cleanTelefon   = telefon?.trim() || undefined;
+    const cleanNachricht = nachricht.trim();
+    const zeit           = zeitstempel();
+
     const resendAntwort = await fetch(RESEND_URL, {
       method:  "POST",
       headers: {
@@ -153,16 +158,21 @@ export default async function handler(req: any, res: any) {
       try { details = await resendAntwort.json(); }
       catch { details = await resendAntwort.text().catch(() => "(kein Body)"); }
       console.error(`[kontakt] Resend abgelehnt — HTTP ${resendAntwort.status}`, JSON.stringify(details));
-      return res.status(502).json({ fehler: "E-Mail konnte nicht gesendet werden." });
+      return jsonAntwort(res, 502, { fehler: "E-Mail konnte nicht gesendet werden." });
     }
 
     const daten = await resendAntwort.json() as { id?: string };
     console.info(`[kontakt] ✓ Gesendet — Resend-ID: ${daten.id ?? "?"} → ${EMPFAENGER}`);
-    return res.status(200).json({ erfolg: true });
+    return jsonAntwort(res, 200, { erfolg: true });
 
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error(`[kontakt] Fehler: ${msg}`);
-    return res.status(500).json({ fehler: "Interner Serverfehler. Bitte versuche es erneut." });
+    console.error(`[kontakt] Fatal:`, msg);
+    // Reine Node.js-Methoden für Fehlerantwort — niemals res.json() hier
+    try {
+      res.statusCode = 500;
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.end(JSON.stringify({ fehler: "Interner Serverfehler. Bitte versuche es erneut." }));
+    } catch { /* Headers schon gesendet */ }
   }
 }
