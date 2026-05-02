@@ -4,6 +4,7 @@ import { PERSOENLICH } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
 import { LegalModal, type LegalTab } from "../bausteine/LegalModal";
+import { STATISCHE_TEXTKARTE } from "../bewegung/varianten";
 
 const CYBER_RGB = "22, 211, 238";
 const CYBER_HEX = "#22d3ee";
@@ -31,6 +32,304 @@ const KONTAKT_EINTRAEGE = [
     wert: "NEO849",
   },
 ];
+
+// ─── Formular-Typen ──────────────────────────────────────────────
+
+type FormFelder = {
+  name: string;
+  email: string;
+  telefon: string;
+  nachricht: string;
+};
+
+type FormFehler = Partial<Record<keyof FormFelder, string>>;
+
+const FORM_LEER: FormFelder = { name: "", email: "", telefon: "", nachricht: "" };
+
+// ─── Eingabe-Feld ────────────────────────────────────────────────
+
+function EingabeFeld({
+  label,
+  name,
+  type = "text",
+  value,
+  onChange,
+  placeholder,
+  fehler,
+  autoComplete,
+}: {
+  label: string;
+  name: string;
+  type?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  fehler?: string;
+  autoComplete?: string;
+}) {
+  return (
+    <div>
+      <label
+        htmlFor={`kf-${name}`}
+        className="block text-[10px] font-mono text-white/35 uppercase tracking-widest mb-1.5"
+      >
+        {label}
+      </label>
+      <input
+        id={`kf-${name}`}
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        className={`w-full bg-transparent border-b text-sm font-mono text-white/80 py-2 outline-none placeholder:text-white/20 transition-colors duration-200 focus:placeholder:text-white/10 ${
+          fehler
+            ? "border-signal-rot/55"
+            : "border-white/[0.1] focus:border-cyber-400/50"
+        }`}
+      />
+      {fehler && (
+        <p className="mt-1 text-[10px] font-mono text-signal-rot/75 leading-relaxed">
+          {fehler}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ─── Kontakt-Formular ────────────────────────────────────────────
+
+function KontaktFormular() {
+  const [felder, setFelder] = useState<FormFelder>(FORM_LEER);
+  const [fehler, setFehler] = useState<FormFehler>({});
+  const [sendet, setSendet] = useState(false);
+  const [erfolg, setErfolg] = useState(false);
+  const [serverFehler, setServerFehler] = useState<string | null>(null);
+  const [honigTopf, setHonigTopf] = useState(""); // Anti-Spam
+
+  function felderAendern(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) {
+    const { name, value } = e.target;
+    setFelder((f) => ({ ...f, [name]: value }));
+    if (fehler[name as keyof FormFelder]) {
+      setFehler((f) => ({ ...f, [name]: undefined }));
+    }
+    if (serverFehler) setServerFehler(null);
+  }
+
+  function validieren(): FormFehler {
+    const neu: FormFehler = {};
+    if (!felder.name.trim()) {
+      neu.name = "Name ist erforderlich.";
+    }
+    if (!felder.email.trim()) {
+      neu.email = "E-Mail ist erforderlich.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(felder.email.trim())) {
+      neu.email = "Bitte eine gültige E-Mail-Adresse eingeben.";
+    }
+    if (!felder.nachricht.trim()) {
+      neu.nachricht = "Bitte hinterlasse eine Nachricht.";
+    } else if (felder.nachricht.trim().length < 10) {
+      neu.nachricht = "Nachricht ist zu kurz (mind. 10 Zeichen).";
+    }
+    return neu;
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    // Honeypot: Bot füllt verstecktes Feld aus → stille Pseudo-Weiterleitung
+    if (honigTopf) {
+      setErfolg(true);
+      return;
+    }
+
+    const validierungsFehler = validieren();
+    if (Object.keys(validierungsFehler).length > 0) {
+      setFehler(validierungsFehler);
+      return;
+    }
+
+    setSendet(true);
+    setServerFehler(null);
+
+    try {
+      // TODO: Backend-Anbindung hier einfügen.
+      // Beispiel Resend / Nodemailer / eigener API-Endpunkt:
+      //   await fetch("/api/kontakt", {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify({
+      //       name: felder.name,
+      //       email: felder.email,
+      //       telefon: felder.telefon || undefined,
+      //       nachricht: felder.nachricht,
+      //     }),
+      //   });
+      await new Promise((r) => setTimeout(r, 1000)); // MOCK — bei echter Anbindung entfernen
+      setErfolg(true);
+      setFelder(FORM_LEER);
+    } catch {
+      setServerFehler(
+        "Beim Senden ist ein Fehler aufgetreten. Bitte versuche es erneut."
+      );
+    } finally {
+      setSendet(false);
+    }
+  }
+
+  if (erfolg) {
+    return (
+      <motion.div
+        key="erfolg"
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        className="rounded-xl border border-cyber-400/20 bg-cyber-400/[0.04] p-8 text-center"
+      >
+        <div className="w-10 h-10 rounded-full bg-cyber-400/[0.1] border border-cyber-400/25 flex items-center justify-center mx-auto mb-3">
+          <span className="text-cyber-400 text-base">✓</span>
+        </div>
+        <p className="text-sm font-mono text-white/75 mb-1">Nachricht gesendet.</p>
+        <p className="text-xs font-mono text-white/35">
+          Ich melde mich so bald wie möglich.
+        </p>
+        <button
+          type="button"
+          onClick={() => setErfolg(false)}
+          className="mt-5 text-[10px] font-mono text-white/30 hover:text-white/55 transition-colors duration-200"
+        >
+          Neue Nachricht verfassen
+        </button>
+      </motion.div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} noValidate>
+      <InfoKarte lichtfarbe={CYBER_RGB} mitHoverAnimation={false} klassen="p-5 md:p-6">
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-5">
+          <span className="font-mono text-[11px] text-cyber-400/55">
+            › kontakt_formular
+          </span>
+          <div className="h-px flex-1 bg-white/[0.04]" />
+        </div>
+
+        {/* Name + E-Mail */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <EingabeFeld
+            label="Name *"
+            name="name"
+            value={felder.name}
+            onChange={felderAendern}
+            placeholder="Dein Name"
+            fehler={fehler.name}
+            autoComplete="name"
+          />
+          <EingabeFeld
+            label="E-Mail *"
+            name="email"
+            type="email"
+            value={felder.email}
+            onChange={felderAendern}
+            placeholder="name@domain.de"
+            fehler={fehler.email}
+            autoComplete="email"
+          />
+        </div>
+
+        {/* Telefon */}
+        <div className="mb-4">
+          <EingabeFeld
+            label="Telefon (optional)"
+            name="telefon"
+            type="tel"
+            value={felder.telefon}
+            onChange={felderAendern}
+            placeholder="+49 …"
+            autoComplete="tel"
+          />
+        </div>
+
+        {/* Nachricht */}
+        <div>
+          <label
+            htmlFor="kf-nachricht"
+            className="block text-[10px] font-mono text-white/35 uppercase tracking-widest mb-1.5"
+          >
+            Nachricht *
+          </label>
+          <textarea
+            id="kf-nachricht"
+            name="nachricht"
+            value={felder.nachricht}
+            onChange={felderAendern}
+            placeholder="Deine Nachricht…"
+            rows={4}
+            className={`w-full bg-transparent border-b text-sm font-mono text-white/80 py-2 outline-none resize-none placeholder:text-white/20 transition-colors duration-200 focus:placeholder:text-white/10 ${
+              fehler.nachricht
+                ? "border-signal-rot/55"
+                : "border-white/[0.1] focus:border-cyber-400/50"
+            }`}
+          />
+          {fehler.nachricht && (
+            <p className="mt-1 text-[10px] font-mono text-signal-rot/75 leading-relaxed">
+              {fehler.nachricht}
+            </p>
+          )}
+        </div>
+
+        {/* Honeypot — für Bots sichtbar, für Menschen nicht erreichbar */}
+        <div
+          aria-hidden="true"
+          style={{ position: "absolute", left: "-5000px", top: "auto", width: "1px", height: "1px", overflow: "hidden" }}
+        >
+          <input
+            type="text"
+            name="_website"
+            value={honigTopf}
+            onChange={(e) => setHonigTopf(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
+
+        {/* Server-Fehler */}
+        {serverFehler && (
+          <p className="mt-3 text-[10px] font-mono text-signal-rot/75 leading-relaxed">
+            {serverFehler}
+          </p>
+        )}
+
+        {/* Footer: Datenschutz-Hinweis + Senden-Button */}
+        <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <p className="text-[10px] font-mono text-white/25 leading-relaxed">
+            Deine Angaben werden nur zur Bearbeitung deiner Nachricht verwendet.
+          </p>
+          <button
+            type="submit"
+            disabled={sendet}
+            className="w-full sm:w-auto flex-shrink-0 px-5 py-2 rounded-xl text-xs font-mono border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-cyber-400/[0.06] border-cyber-400/25 text-cyber-400/75 hover:text-cyber-400 hover:bg-cyber-400/[0.12] hover:border-cyber-400/45"
+          >
+            {sendet ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="inline-block w-3 h-3 border border-cyber-400/60 border-t-transparent rounded-full animate-spin" />
+                Senden…
+              </span>
+            ) : (
+              "Nachricht senden →"
+            )}
+          </button>
+        </div>
+      </InfoKarte>
+    </form>
+  );
+}
+
+// ─── View ────────────────────────────────────────────────────────
 
 export default function KontaktView() {
   const [modalOffen, setModalOffen] = useState(false);
@@ -94,8 +393,12 @@ export default function KontaktView() {
                     {eintrag.icon}
                   </div>
                   <div className="min-w-0">
-                    <div className="font-semibold text-white text-sm leading-snug">{eintrag.label}</div>
-                    <div className="text-xs text-white/40 font-mono truncate">{eintrag.wert}</div>
+                    <div className="font-semibold text-white text-sm leading-snug">
+                      {eintrag.label}
+                    </div>
+                    <div className="text-xs text-white/40 font-mono truncate">
+                      {eintrag.wert}
+                    </div>
                   </div>
                   <div className="ml-auto pl-2 text-cyber-400/55 group-hover:text-cyber-400 transition-colors duration-200 text-sm flex-shrink-0">
                     →
@@ -105,6 +408,18 @@ export default function KontaktView() {
             </a>
           </motion.div>
         ))}
+      </motion.div>
+
+      {/* Kontaktformular */}
+      <motion.div
+        variants={STATISCHE_TEXTKARTE}
+        initial="versteckt"
+        whileInView="sichtbar"
+        viewport={{ once: true, margin: "-40px" }}
+        transition={{ delay: 0.15 }}
+        className="mt-4"
+      >
+        <KontaktFormular />
       </motion.div>
 
       {/* Legal-Card */}
@@ -119,7 +434,9 @@ export default function KontaktView() {
           <div className="w-7 h-7 rounded-lg bg-cyber-400/[0.08] border border-cyber-400/20 flex items-center justify-center flex-shrink-0 font-mono text-xs text-white/45">
             §
           </div>
-          <span className="text-[11px] font-mono text-white/45 flex-1 select-none">Rechtliches</span>
+          <span className="text-[11px] font-mono text-white/45 flex-1 select-none">
+            Rechtliches
+          </span>
           <div className="flex items-center gap-0.5">
             <button
               onClick={() => legalOeffnen("impressum")}
