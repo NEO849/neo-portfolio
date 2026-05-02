@@ -1,21 +1,13 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ZEITSTRAHL } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
 import { AbzeichenStatus } from "../bausteine/AbzeichenStatus";
+import { GlassTabs, type GlassTab } from "../bausteine/GlassTabs";
 
-// ═══════════════════════════════════════════════════════════════════
-// VIEW: Über mich — Profil + mein_weg mit Year-Wheel Zeitstrahl
-// ═══════════════════════════════════════════════════════════════════
+// ─── Kategorie-Konfiguration ──────────────────────────────────────
 
-// ─── Wheel-Konstanten ────────────────────────────────────────────
-const ITEM_H   = 56;                       // Pixel pro Slot
-const SICHTBAR = 5;                        // Sichtbare Slots (2 + aktiv + 2)
-const WHEEL_H  = ITEM_H * SICHTBAR;       // 280 px Gesamthöhe
-const HALBRAD  = Math.floor(SICHTBAR / 2); // 2 — Slots über dem aktiven Item
-
-// ─── Kategorie-Konfiguration ─────────────────────────────────────
 type ZeitstrahlKat = "beruf" | "bildung" | "security" | "meilenstein";
 
 const KATEGORIE_CFG: Record<ZeitstrahlKat, {
@@ -30,142 +22,36 @@ const KATEGORIE_CFG: Record<ZeitstrahlKat, {
   meilenstein: { variante: "entwicklung", lichtfarbe: "34, 197, 94",   akzentFarbe: "#22c55e", label: "Meilenstein" },
 };
 
-// ─── YearWheel ───────────────────────────────────────────────────
-interface YearWheelProps {
-  eintraege: typeof ZEITSTRAHL;
-  aktiversIndex: number;
-  onSelect: (idx: number) => void;
-}
+const FILTER_TABS: GlassTab[] = [
+  { id: "alle",        label: "Alle"        },
+  { id: "beruf",       label: "Beruf"       },
+  { id: "bildung",     label: "Bildung"     },
+  { id: "security",    label: "Security"    },
+  { id: "meilenstein", label: "Meilenstein" },
+];
 
-function YearWheel({ eintraege, aktiversIndex, onSelect }: YearWheelProps) {
-  return (
-    <div
-      className="relative select-none"
-      style={{
-        height: WHEEL_H,
-        overflow: "hidden",
-        maskImage:
-          "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 18%, black 32%, black 68%, rgba(0,0,0,0.5) 82%, transparent 100%)",
-        WebkitMaskImage:
-          "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 18%, black 32%, black 68%, rgba(0,0,0,0.5) 82%, transparent 100%)",
-      }}
-    >
-      {/* Aktiv-Slot Highlight */}
-      <div
-        className="absolute inset-x-0 pointer-events-none"
-        style={{
-          top: HALBRAD * ITEM_H,
-          height: ITEM_H,
-          background: "linear-gradient(90deg, rgba(99,102,241,0.08), transparent 75%)",
-          borderTop: "1px solid rgba(99,102,241,0.15)",
-          borderBottom: "1px solid rgba(99,102,241,0.15)",
-        }}
-      />
+// ─── View ─────────────────────────────────────────────────────────
 
-      {eintraege.map((eintrag, i) => {
-        const abstand    = i - aktiversIndex;
-        const absAbstand = Math.abs(abstand);
-        const istAktiv   = abstand === 0;
-
-        return (
-          <motion.button
-            key={i}
-            type="button"
-            onClick={() => onSelect(i)}
-            aria-label={`${eintrag.jahr} — ${eintrag.titel}`}
-            aria-pressed={istAktiv}
-            className="absolute inset-x-0 flex items-center justify-end pr-5 focus:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-akzent-400/30"
-            style={{ height: ITEM_H, top: 0 }}
-            animate={{
-              y:       (HALBRAD + abstand) * ITEM_H,
-              scale:   Math.max(0.60, 1 - absAbstand * 0.13),
-              opacity: Math.max(0.06, 1 - absAbstand * 0.33),
-              filter:  `blur(${Math.min(absAbstand * 1.5, 6)}px)`,
-            }}
-            transition={{ type: "spring", stiffness: 280, damping: 30, mass: 0.85 }}
-          >
-            <span
-              className="font-mono leading-none"
-              style={{
-                fontSize:      istAktiv ? 15 : 12,
-                fontWeight:    istAktiv ? 700 : 400,
-                color:         istAktiv ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.45)",
-                letterSpacing: istAktiv ? "0.06em" : "0.02em",
-              }}
-            >
-              {eintrag.jahr}
-            </span>
-          </motion.button>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── TimelineCard ────────────────────────────────────────────────
-interface TimelineCardProps {
-  eintrag: typeof ZEITSTRAHL[number];
-  aktiv: boolean;
-}
-
-function TimelineCard({ eintrag, aktiv }: TimelineCardProps) {
-  const cfg = KATEGORIE_CFG[eintrag.kategorie as ZeitstrahlKat] ?? KATEGORIE_CFG.beruf;
-
-  return (
-    <div className={`transition-opacity duration-500 ${aktiv ? "opacity-100" : "opacity-55"}`}>
-      <InfoKarte
-        lichtfarbe={cfg.lichtfarbe}
-        akzentRand
-        akzentFarbe={cfg.akzentFarbe}
-        mitHoverAnimation={false}
-        klassen="p-4"
-        stil={aktiv ? { boxShadow: `0 0 32px ${cfg.akzentFarbe}20` } : undefined}
-      >
-        <div className="flex items-center gap-3 mb-2">
-          <AbzeichenStatus variante={cfg.variante} text={cfg.label} klassen="uppercase" />
-          <span className="font-mono text-xs text-white/45">{eintrag.jahr}</span>
-        </div>
-        <h3 className="font-display text-base font-bold text-white mb-1.5">
-          {eintrag.titel}
-        </h3>
-        <p className="text-sm text-white/65 leading-relaxed">
-          {eintrag.beschreibung}
-        </p>
-      </InfoKarte>
-    </div>
-  );
-}
-
-// ─── View ────────────────────────────────────────────────────────
 export default function UeberMichView() {
-  const [aktiversIndex, setAktiversIndex] = useState(0);
-  const kartenRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [aktiverFilter, setAktiverFilter] = useState<string>("alle");
 
-  // IntersectionObserver: aktive Card → Wheel synchronisieren
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const idx = kartenRefs.current.findIndex((r) => r === entry.target);
-          if (idx !== -1) setAktiversIndex(idx);
-        });
-      },
-      { rootMargin: "-28% 0px -55% 0px", threshold: 0 },
-    );
-    const snapshot = [...kartenRefs.current];
-    snapshot.forEach((ref) => ref && observer.observe(ref));
-    return () => observer.disconnect();
-  }, []);
+  const gefilterteEintraege = aktiverFilter === "alle"
+    ? ZEITSTRAHL
+    : ZEITSTRAHL.filter(e => e.kategorie === aktiverFilter);
 
-  const scrollToCard = (idx: number) => {
-    setAktiversIndex(idx);
-    kartenRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "center" });
+  const anzahl = {
+    beruf:       ZEITSTRAHL.filter(e => e.kategorie === "beruf").length,
+    bildung:     ZEITSTRAHL.filter(e => e.kategorie === "bildung").length,
+    security:    ZEITSTRAHL.filter(e => e.kategorie === "security").length,
+    meilenstein: ZEITSTRAHL.filter(e => e.kategorie === "meilenstein").length,
   };
 
   return (
     <section id="ueber" className="py-16 px-6 max-w-5xl mx-auto">
-      <AbschnittsTitel prefix="> ueber_mich" klassen="mb-10" />
+      <AbschnittsTitel
+        prefix="> ueber_mich"
+        klassen="mb-10"
+      />
 
       {/* Profil-Text */}
       <motion.div
@@ -213,13 +99,13 @@ export default function UeberMichView() {
         </InfoKarte>
       </motion.div>
 
-      {/* mein_weg Header */}
+      {/* Zeitstrahl Header */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.45 }}
-        className="mb-8"
+        className="mb-2"
       >
         <h3 className="font-mono text-base md:text-lg font-semibold tracking-wider">
           <span className="text-akzent-400">&gt;</span>
@@ -227,92 +113,112 @@ export default function UeberMichView() {
         </h3>
       </motion.div>
 
-      {/* Mobile: kompakte horizontale Jahres-Auswahl */}
-      <div className="md:hidden flex items-center gap-5 overflow-x-auto scrollbar-none mb-6 pb-1">
-        {ZEITSTRAHL.map((e, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => scrollToCard(i)}
-            className={`flex-shrink-0 font-mono text-[11px] transition-all duration-300 focus:outline-none ${
-              i === aktiversIndex
-                ? "text-akzent-400 font-bold"
-                : "text-white/30 hover:text-white/55"
-            }`}
-          >
-            {e.jahr}
-          </button>
-        ))}
-      </div>
-
-      {/* Year Wheel + Cards */}
-      <div className="flex gap-0 md:gap-10">
-
-        {/* Linke Spalte: sticky Year Wheel (nur Desktop) */}
-        <div className="hidden md:block flex-shrink-0 w-[108px] relative">
-          {/* Vertikale Verbindungslinie */}
-          <div
-            className="absolute right-0 top-0 bottom-0 w-px pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(to bottom, transparent 0%, rgba(99,102,241,0.22) 15%, rgba(99,102,241,0.22) 85%, transparent 100%)",
-            }}
-          />
-          {/* Aktiv-Punkt auf der Linie (klebt am Wheel) */}
-          <div
-            className="sticky pointer-events-none"
-            style={{ top: `calc(50vh - ${WHEEL_H / 2}px)` }}
-          >
-            <motion.div
-              className="absolute rounded-full bg-akzent-400 z-10"
-              style={{
-                right: -3,
-                top:   HALBRAD * ITEM_H + ITEM_H / 2 - 3.5,
-                width:  7,
-                height: 7,
-              }}
-              animate={{
-                boxShadow: [
-                  "0 0 4px rgba(99,102,241,0.45)",
-                  "0 0 12px rgba(99,102,241,0.85)",
-                  "0 0 4px rgba(99,102,241,0.45)",
-                ],
-              }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-            />
+      {/* Filter-Tabs */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="mb-6 mt-4"
+      >
+        <GlassTabs
+          tabs={FILTER_TABS}
+          activeId={aktiverFilter}
+          onTabChange={setAktiverFilter}
+          layoutId="weg-filter"
+          scrollable
+          ariaLabel="Karrierestationen nach Kategorie filtern"
+          buttonClassName="min-w-[80px] px-4 text-sm"
+        />
+        <div className="mt-2.5 flex items-center justify-between px-0.5">
+          <div className="flex items-center gap-3">
+            {(["beruf", "bildung", "security", "meilenstein"] as ZeitstrahlKat[]).map(kat => {
+              const c = KATEGORIE_CFG[kat];
+              return (
+                <button
+                  key={kat}
+                  type="button"
+                  onClick={() => setAktiverFilter(kat)}
+                  className="flex items-center gap-1.5"
+                >
+                  <span
+                    className="w-1.5 h-1.5 rounded-full flex-shrink-0 transition-opacity duration-200"
+                    style={{
+                      background: c.akzentFarbe,
+                      opacity: aktiverFilter === kat || aktiverFilter === "alle" ? 0.7 : 0.25,
+                    }}
+                  />
+                  <span
+                    className="font-mono text-[10px] transition-colors duration-200"
+                    style={{ color: aktiverFilter === kat ? c.akzentFarbe : "rgba(255,255,255,0.28)" }}
+                  >
+                    {anzahl[kat]}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-
-          {/* Wheel selbst */}
-          <div
-            className="sticky"
-            style={{ top: `calc(50vh - ${WHEEL_H / 2}px)` }}
-          >
-            <YearWheel
-              eintraege={ZEITSTRAHL}
-              aktiversIndex={aktiversIndex}
-              onSelect={scrollToCard}
-            />
-          </div>
+          <span className="font-mono text-[10px] text-white/25">
+            {gefilterteEintraege.length} / {ZEITSTRAHL.length} Stationen
+          </span>
         </div>
+      </motion.div>
 
-        {/* Rechte Spalte: Timeline Cards */}
-        <div className="flex-1 min-w-0 space-y-8">
-          {ZEITSTRAHL.map((eintrag, i) => (
-            <div
-              key={`${eintrag.kategorie}-${i}`}
-              ref={(el) => { kartenRefs.current[i] = el; }}
-            >
+      {/* Timeline */}
+      <div className="relative">
+        <div className="absolute left-4 md:left-8 top-0 bottom-0 w-px bg-gradient-to-b from-akzent-500/40 via-cyber-400/20 to-transparent" />
+
+        <motion.div
+          key={aktiverFilter}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.18 }}
+        >
+          {gefilterteEintraege.map((eintrag, index) => {
+            const cfg = KATEGORIE_CFG[eintrag.kategorie as ZeitstrahlKat] ?? KATEGORIE_CFG.beruf;
+            return (
               <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.38, ease: [0.25, 0.1, 0.25, 1] }}
+                key={`${eintrag.kategorie}-${eintrag.jahr}`}
+                initial={{ opacity: 0, x: -16 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.06, duration: 0.35, ease: "easeOut" }}
+                className="relative pl-12 md:pl-20 pb-6 last:pb-0"
               >
-                <TimelineCard eintrag={eintrag} aktiv={i === aktiversIndex} />
+                {/* Timeline-Punkt */}
+                <div
+                  className="absolute left-[10px] md:left-[26px] top-[18px] w-3 h-3 rounded-full border-2 transition-colors duration-200"
+                  style={{
+                    borderColor: cfg.akzentFarbe,
+                    background: `${cfg.akzentFarbe}20`,
+                  }}
+                />
+
+                <InfoKarte
+                  lichtfarbe={cfg.lichtfarbe}
+                  akzentRand
+                  akzentFarbe={cfg.akzentFarbe}
+                  mitHoverAnimation={false}
+                  klassen="p-4"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <AbzeichenStatus
+                      variante={cfg.variante}
+                      text={cfg.label}
+                      klassen="uppercase"
+                    />
+                    <span className="font-mono text-xs text-white/45">{eintrag.jahr}</span>
+                  </div>
+                  <h3 className="font-display text-base font-bold text-white mb-1.5">
+                    {eintrag.titel}
+                  </h3>
+                  <p className="text-sm text-white/65 leading-relaxed">
+                    {eintrag.beschreibung}
+                  </p>
+                </InfoKarte>
               </motion.div>
-            </div>
-          ))}
-        </div>
+            );
+          })}
+        </motion.div>
       </div>
     </section>
   );
