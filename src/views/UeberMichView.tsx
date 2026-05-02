@@ -3,6 +3,7 @@ import { ZEITSTRAHL } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
 import { AbzeichenStatus } from "../bausteine/AbzeichenStatus";
+import { STATISCHE_TEXTKARTE } from "../bewegung/varianten";
 // ─── Kategorie-Konfiguration ──────────────────────────────────────
 
 type ZeitstrahlKat = "beruf" | "bildung" | "security" | "meilenstein";
@@ -32,10 +33,10 @@ export default function UeberMichView() {
 
       {/* Profil-Text */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.55 }}
+        variants={STATISCHE_TEXTKARTE}
+        initial="versteckt"
+        whileInView="sichtbar"
+        viewport={{ once: true, margin: "-40px" }}
         className="mb-4"
       >
         <InfoKarte lichtfarbe="99, 102, 241" klassen="p-6 md:p-8">
@@ -59,10 +60,11 @@ export default function UeberMichView() {
 
       {/* Hobbys */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.1 }}
+        variants={STATISCHE_TEXTKARTE}
+        initial="versteckt"
+        whileInView="sichtbar"
+        viewport={{ once: true, margin: "-40px" }}
+        transition={{ delay: 0.1 }}
         className="mb-14"
       >
         <InfoKarte lichtfarbe="34, 211, 238" mitHoverAnimation={false} klassen="p-5">

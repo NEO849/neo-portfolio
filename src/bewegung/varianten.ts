@@ -31,6 +31,18 @@ export const EINBLENDEN: Variants = {
   },
 };
 
+// Statische Textboxen: ruhiges Fade + subtiles Slide-up beim Scroll-Reveal.
+// Keine interaktiven Elemente, kein Bounce, keine Layout-Sprünge.
+// Framer Motion respektiert `prefers-reduced-motion` automatisch.
+export const STATISCHE_TEXTKARTE: Variants = {
+  versteckt: { opacity: 0, y: 20 },
+  sichtbar: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: KURVEN.expressiv },
+  },
+};
+
 export const EINBLENDEN_LINKS: Variants = {
   versteckt: { opacity: 0, x: -32 },
   sichtbar: {
