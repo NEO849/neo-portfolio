@@ -1,0 +1,7 @@
+# Python OSINT-API läuft auf dem VPS (Contabo) – nicht auf Vercel deployen
+api/__init__.py
+api/main.py
+api/osint-api.service
+api/routen/
+api/werkzeuge/
+api/__pycache__/

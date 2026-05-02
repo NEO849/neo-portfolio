@@ -111,3 +111,44 @@ body {
   border-bottom-color: #818cf8;
   box-shadow: 0 1px 0 0 rgba(129, 140, 248, 0.35);
 }
+
+/* ═══════════════ Kontaktformular-Eingabe ═══════════════ */
+/* Exakt gleicher Stil wie .terminal-eingabe — konsistentes Design */
+.formular-eingabe,
+.formular-eingabe:focus,
+.formular-eingabe:focus-visible {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  resize: none;
+}
+.formular-eingabe {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.88);
+  caret-color: #818cf8;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  scroll-margin-top: 80px;
+  scroll-margin-bottom: 16px;
+}
+.formular-eingabe::placeholder {
+  color: rgba(255, 255, 255, 0.28);
+}
+.formular-eingabe:focus,
+.formular-eingabe:focus-visible {
+  border-bottom-color: #818cf8;
+  box-shadow: 0 1px 0 0 rgba(129, 140, 248, 0.28);
+}
+.formular-eingabe.fehler {
+  border-bottom-color: rgba(239, 68, 68, 0.5);
+}
+.formular-eingabe.fehler:focus,
+.formular-eingabe.fehler:focus-visible {
+  border-bottom-color: rgba(239, 68, 68, 0.7);
+  box-shadow: 0 1px 0 0 rgba(239, 68, 68, 0.18);
+}

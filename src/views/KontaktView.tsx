@@ -33,12 +33,20 @@ const KONTAKT_EINTRAEGE = [
   },
 ];
 
+// ─── iOS-Keyboard: fokussiertes Feld weich scrollen ──────────────
+// Delay 320 ms: iOS-Tastaturanimation abwarten, dann erst scrollen
+function scrollZuFeld(el: HTMLElement) {
+  setTimeout(() => {
+    el.scrollIntoView({ block: "start", behavior: "smooth" });
+  }, 320);
+}
+
 // ─── Formular-Typen ──────────────────────────────────────────────
 
 type FormFelder = {
-  name: string;
-  email: string;
-  telefon: string;
+  name:      string;
+  email:     string;
+  telefon:   string;
   nachricht: string;
 };
 
@@ -58,20 +66,20 @@ function EingabeFeld({
   fehler,
   autoComplete,
 }: {
-  label: string;
-  name: string;
-  type?: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-  fehler?: string;
+  label:         string;
+  name:          string;
+  type?:         string;
+  value:         string;
+  onChange:      (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?:  string;
+  fehler?:       string;
   autoComplete?: string;
 }) {
   return (
-    <div>
+    <div className="min-w-0">
       <label
         htmlFor={`kf-${name}`}
-        className="block text-[10px] font-mono text-white/35 uppercase tracking-widest mb-1.5"
+        className="block text-[10px] font-mono text-white/55 uppercase tracking-widest mb-1.5"
       >
         {label}
       </label>
@@ -83,11 +91,8 @@ function EingabeFeld({
         onChange={onChange}
         placeholder={placeholder}
         autoComplete={autoComplete}
-        className={`w-full bg-transparent border-b text-sm font-mono text-white/80 py-2 outline-none placeholder:text-white/20 transition-colors duration-200 focus:placeholder:text-white/10 ${
-          fehler
-            ? "border-signal-rot/55"
-            : "border-white/[0.1] focus:border-cyber-400/50"
-        }`}
+        onFocus={(e) => scrollZuFeld(e.currentTarget)}
+        className={`formular-eingabe font-mono text-sm py-2 ${fehler ? "fehler" : ""}`}
       />
       {fehler && (
         <p className="mt-1 text-[10px] font-mono text-signal-rot/75 leading-relaxed">
@@ -101,12 +106,12 @@ function EingabeFeld({
 // ─── Kontakt-Formular ────────────────────────────────────────────
 
 function KontaktFormular() {
-  const [felder, setFelder] = useState<FormFelder>(FORM_LEER);
-  const [fehler, setFehler] = useState<FormFehler>({});
-  const [sendet, setSendet] = useState(false);
-  const [erfolg, setErfolg] = useState(false);
+  const [felder,      setFelder]      = useState<FormFelder>(FORM_LEER);
+  const [fehler,      setFehler]      = useState<FormFehler>({});
+  const [sendet,      setSendet]      = useState(false);
+  const [erfolg,      setErfolg]      = useState(false);
   const [serverFehler, setServerFehler] = useState<string | null>(null);
-  const [honigTopf, setHonigTopf] = useState(""); // Anti-Spam
+  const [honigTopf,   setHonigTopf]   = useState(""); // Anti-Spam
 
   function felderAendern(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -140,7 +145,7 @@ function KontaktFormular() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // Honeypot: Bot füllt verstecktes Feld aus → stille Pseudo-Weiterleitung
+    // Honeypot: Bot füllt verstecktes Feld → stille Weiterleitung ohne echten Versand
     if (honigTopf) {
       setErfolg(true);
       return;
@@ -156,30 +161,35 @@ function KontaktFormular() {
     setServerFehler(null);
 
     try {
-      // TODO: Backend-Anbindung hier einfügen.
-      // Beispiel Resend / Nodemailer / eigener API-Endpunkt:
-      //   await fetch("/api/kontakt", {
-      //     method: "POST",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify({
-      //       name: felder.name,
-      //       email: felder.email,
-      //       telefon: felder.telefon || undefined,
-      //       nachricht: felder.nachricht,
-      //     }),
-      //   });
-      await new Promise((r) => setTimeout(r, 1000)); // MOCK — bei echter Anbindung entfernen
+      const antwort = await fetch("/api/kontakt", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({
+          name:     felder.name.trim(),
+          email:    felder.email.trim(),
+          telefon:  felder.telefon.trim() || undefined,
+          nachricht: felder.nachricht.trim(),
+        }),
+      });
+
+      const daten = await antwort.json() as { erfolg?: boolean; fehler?: string };
+
+      if (!antwort.ok) {
+        setServerFehler(daten.fehler ?? "Beim Senden ist ein Fehler aufgetreten.");
+        return;
+      }
+
       setErfolg(true);
       setFelder(FORM_LEER);
+
     } catch {
-      setServerFehler(
-        "Beim Senden ist ein Fehler aufgetreten. Bitte versuche es erneut."
-      );
+      setServerFehler("Keine Verbindung möglich. Bitte versuche es erneut.");
     } finally {
       setSendet(false);
     }
   }
 
+  // ── Erfolgs-State ──────────────────────────────────────────────
   if (erfolg) {
     return (
       <motion.div
@@ -207,9 +217,11 @@ function KontaktFormular() {
     );
   }
 
+  // ── Formular ───────────────────────────────────────────────────
   return (
     <form onSubmit={handleSubmit} noValidate>
       <InfoKarte lichtfarbe={CYBER_RGB} mitHoverAnimation={false} klassen="p-5 md:p-6">
+
         {/* Header */}
         <div className="flex items-center gap-2 mb-5">
           <span className="font-mono text-[11px] text-cyber-400/55">
@@ -218,7 +230,7 @@ function KontaktFormular() {
           <div className="h-px flex-1 bg-white/[0.04]" />
         </div>
 
-        {/* Name + E-Mail */}
+        {/* Name + E-Mail — 2 Spalten ab sm */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <EingabeFeld
             label="Name *"
@@ -255,10 +267,10 @@ function KontaktFormular() {
         </div>
 
         {/* Nachricht */}
-        <div>
+        <div className="min-w-0">
           <label
             htmlFor="kf-nachricht"
-            className="block text-[10px] font-mono text-white/35 uppercase tracking-widest mb-1.5"
+            className="block text-[10px] font-mono text-white/55 uppercase tracking-widest mb-1.5"
           >
             Nachricht *
           </label>
@@ -269,11 +281,8 @@ function KontaktFormular() {
             onChange={felderAendern}
             placeholder="Deine Nachricht…"
             rows={4}
-            className={`w-full bg-transparent border-b text-sm font-mono text-white/80 py-2 outline-none resize-none placeholder:text-white/20 transition-colors duration-200 focus:placeholder:text-white/10 ${
-              fehler.nachricht
-                ? "border-signal-rot/55"
-                : "border-white/[0.1] focus:border-cyber-400/50"
-            }`}
+            onFocus={(e) => scrollZuFeld(e.currentTarget)}
+            className={`formular-eingabe font-mono text-sm py-2 ${fehler.nachricht ? "fehler" : ""}`}
           />
           {fehler.nachricht && (
             <p className="mt-1 text-[10px] font-mono text-signal-rot/75 leading-relaxed">
@@ -282,10 +291,17 @@ function KontaktFormular() {
           )}
         </div>
 
-        {/* Honeypot — für Bots sichtbar, für Menschen nicht erreichbar */}
+        {/* Honeypot — off-screen, für Bots sichtbar, für Menschen nicht */}
         <div
           aria-hidden="true"
-          style={{ position: "absolute", left: "-5000px", top: "auto", width: "1px", height: "1px", overflow: "hidden" }}
+          style={{
+            position: "absolute",
+            left: "-5000px",
+            top: "auto",
+            width: "1px",
+            height: "1px",
+            overflow: "hidden",
+          }}
         >
           <input
             type="text"
@@ -304,7 +320,7 @@ function KontaktFormular() {
           </p>
         )}
 
-        {/* Footer: Datenschutz-Hinweis + Senden-Button */}
+        {/* Footer: Datenschutz-Hinweis + Button */}
         <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <p className="text-[10px] font-mono text-white/25 leading-relaxed">
             Deine Angaben werden nur zur Bearbeitung deiner Nachricht verwendet.
@@ -324,6 +340,7 @@ function KontaktFormular() {
             )}
           </button>
         </div>
+
       </InfoKarte>
     </form>
   );
@@ -333,7 +350,7 @@ function KontaktFormular() {
 
 export default function KontaktView() {
   const [modalOffen, setModalOffen] = useState(false);
-  const [modalTab, setModalTab] = useState<LegalTab>("impressum");
+  const [modalTab,   setModalTab]   = useState<LegalTab>("impressum");
 
   const legalOeffnen = (tab: LegalTab) => {
     setModalTab(tab);
@@ -387,7 +404,7 @@ export default function KontaktView() {
                     className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0"
                     style={{
                       background: `rgba(${CYBER_RGB}, 0.08)`,
-                      border: `1px solid rgba(${CYBER_RGB}, 0.22)`,
+                      border:     `1px solid rgba(${CYBER_RGB}, 0.22)`,
                     }}
                   >
                     {eintrag.icon}
@@ -410,14 +427,14 @@ export default function KontaktView() {
         ))}
       </motion.div>
 
-      {/* Kontaktformular */}
+      {/* Kontaktformular — mx-2 sm:mx-0: mobile etwas mehr Luft zu den Rändern */}
       <motion.div
         variants={STATISCHE_TEXTKARTE}
         initial="versteckt"
         whileInView="sichtbar"
         viewport={{ once: true, margin: "-40px" }}
         transition={{ delay: 0.15 }}
-        className="mt-4"
+        className="mt-4 mx-2 sm:mx-0"
       >
         <KontaktFormular />
       </motion.div>
