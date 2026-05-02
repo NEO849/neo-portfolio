@@ -165,17 +165,20 @@ function KontaktFormular() {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({
-          name:     felder.name.trim(),
-          email:    felder.email.trim(),
-          telefon:  felder.telefon.trim() || undefined,
+          name:      felder.name.trim(),
+          email:     felder.email.trim(),
+          telefon:   felder.telefon.trim() || undefined,
           nachricht: felder.nachricht.trim(),
         }),
       });
 
-      const daten = await antwort.json() as { erfolg?: boolean; fehler?: string };
+      // JSON separat parsen — nicht-JSON-Antworten (HTML-Fehlerseiten) dürfen
+      // den eigentlichen HTTP-Status-Check nicht blockieren
+      let daten: { erfolg?: boolean; fehler?: string } = {};
+      try { daten = await antwort.json(); } catch { /* non-JSON body */ }
 
       if (!antwort.ok) {
-        setServerFehler(daten.fehler ?? "Beim Senden ist ein Fehler aufgetreten.");
+        setServerFehler(daten.fehler ?? "Fehler beim Senden. Bitte versuche es erneut.");
         return;
       }
 
