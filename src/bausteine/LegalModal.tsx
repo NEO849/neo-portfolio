@@ -54,6 +54,36 @@ function Absatz({ children }: { children: ReactNode }) {
   return <p className="text-xs text-white/55 leading-relaxed font-mono">{children}</p>;
 }
 
+function ZeileKopierbar({ label, wert }: { label: string; wert: string }) {
+  const [kopiert, setKopiert] = useState(false);
+
+  function kopieren() {
+    navigator.clipboard.writeText(wert.replace(/\s/g, "")).then(() => {
+      setKopiert(true);
+      setTimeout(() => setKopiert(false), 1800);
+    });
+  }
+
+  return (
+    <div className="flex gap-3 text-xs font-mono items-center">
+      <span className="text-white/30 w-28 flex-shrink-0 leading-relaxed">{label}</span>
+      <span className="text-white/65 break-all leading-relaxed flex-1">{wert}</span>
+      <button
+        type="button"
+        onClick={kopieren}
+        title={kopiert ? "Kopiert!" : "Kopieren"}
+        className={`flex-shrink-0 h-5 px-1.5 rounded text-[10px] border transition-all duration-200 ${
+          kopiert
+            ? "border-cyber-400/40 text-cyber-400 bg-cyber-400/[0.08]"
+            : "border-white/[0.08] text-white/30 hover:border-white/20 hover:text-white/55 bg-white/[0.03]"
+        }`}
+      >
+        {kopiert ? "✓" : "⧉"}
+      </button>
+    </div>
+  );
+}
+
 // ─── Impressum ───────────────────────────────────────────────
 
 function ImpressumInhalt() {
@@ -80,6 +110,9 @@ function ImpressumInhalt() {
       </Abschnitt>
 
       <Abschnitt titel="Unterstützung / Zahlungen">
+        <ZeileKopierbar label="IBAN" wert="DE80 1001 0178 6044 6214 43" />
+        <Zeile label="BIC" wert="REVODEB2" />
+        <Zeile label="Bank" wert="Revolut Bank UAB, Zweigniederlassung Deutschland" />
         <Zeile label="Bitcoin (BTC)" wert="bc1qf666x5l4zs6tm9w69jsr9mn5glvf97fk9z6zs8" />
       </Abschnitt>
 
