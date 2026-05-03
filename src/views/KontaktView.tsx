@@ -79,7 +79,7 @@ function EingabeFeld({
     <div className="min-w-0">
       <label
         htmlFor={`kf-${name}`}
-        className="block text-[10px] font-mono text-white/55 uppercase tracking-widest mb-1.5"
+        className="block text-[10px] font-mono text-white/70 uppercase tracking-widest mb-1.5"
       >
         {label}
       </label>
@@ -278,7 +278,7 @@ function KontaktFormular() {
         <div className="min-w-0">
           <label
             htmlFor="kf-nachricht"
-            className="block text-[10px] font-mono text-white/55 uppercase tracking-widest mb-1.5"
+            className="block text-[10px] font-mono text-white/70 uppercase tracking-widest mb-1.5"
           >
             Nachricht *
           </label>
