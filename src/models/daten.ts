@@ -267,12 +267,34 @@ export const SKILLS: SkillModel[] = [
 // ═══════════════════════════════════════════════════════
 
 export const ZEITSTRAHL: ZeitstrahlModel[] = [
-  { jahr: "1999–2014", titel: "Elektroniker",                     beschreibung: "15 Jahre Berufserfahrung – Aufbau von Serverfarmen, Netzwerkinfrastruktur, Telefon- & Videoanalagenanlagen, Schaltkreise, Hardware-Debugging und systematisches Denken in Zuständen.", kategorie: "beruf" },
-  { jahr: "2023–2025", titel: "Syntax Institut Berlin",           beschreibung: "Softwareentwicklung: Swift, SwiftUI, MVVM, Clean Architecture, iOS/macOS", kategorie: "bildung" },
-  { jahr: "2024",      titel: "Erste iOS-Apps",                   beschreibung: "ONE (Multi-Agent AI), SwiftScout, NeoVimExplorer, Sports Almanach", kategorie: "meilenstein" },
-  { jahr: "2025",      titel: "Bug Bounty Einstieg",              beschreibung: "Intigriti + HackerOne. Reports: Superdrug, Yahoo, Whatnot, Axel Springer", kategorie: "security" },
-  { jahr: "2025",      titel: "VPS Security Lab",                 beschreibung: "Hardened Contabo VPS: Caido, Docker/Kali, Recon-Pipeline, NeoRecon CLI", kategorie: "security" },
-  { jahr: "2026",      titel: "Exploit Engine v3",                beschreibung: "7-Schritt Master-Pipeline, Scoring-Algorithmus, Google CSE Dorking, Multi-Agent System", kategorie: "security" },
+  {
+    jahr: "1999–2014",
+    titel: "Elektroniker",
+    beschreibung: "15 Jahre Berufserfahrung – Aufbau von Serverfarmen, Netzwerkinfrastruktur, Telefon- & Videoanlagen, Schaltkreise, Hardware-Debugging und systematisches Denken in Zuständen.",
+    kategorie: "beruf",
+  },
+  { jahr: "—", titel: "", beschreibung: "", kategorie: "platzhalter" },
+  { jahr: "—", titel: "", beschreibung: "", kategorie: "platzhalter" },
+  { jahr: "—", titel: "", beschreibung: "", kategorie: "platzhalter" },
+  { jahr: "—", titel: "", beschreibung: "", kategorie: "platzhalter" },
+  {
+    jahr: "2023–2025",
+    titel: "Syntax Institut Berlin",
+    beschreibung: "Vollzeit-Ausbildung in Softwareentwicklung: Swift, SwiftUI, UIKit, MVVM, Clean Architecture, iOS- & macOS-Entwicklung.",
+    kategorie: "bildung",
+  },
+  {
+    jahr: "2023–2024",
+    titel: "Erste Android & iOS Apps",
+    beschreibung: "Z Almanach (Kotlin/Android), ONE (Multi-Agent AI, SwiftUI), Sports Almanach, NeoVimExplorer – native Apps auf beiden Plattformen.",
+    kategorie: "meilenstein",
+  },
+  {
+    jahr: "2025–2026",
+    titel: "Security Research",
+    beschreibung: "Bug Bounty auf Intigriti & HackerOne – Reports bei Superdrug, Yahoo, Whatnot, Axel Springer. Gehärteter Contabo VPS mit Caido, Docker/Kali & vollständiger Recon-Pipeline. NeoRecon Exploit Engine v3: 7-Schritt Master-Pipeline, Scoring-Algorithmus, 31 KI-Agents.",
+    kategorie: "security",
+  },
 ];
 
 // ═══════════════════════════════════════════════════════

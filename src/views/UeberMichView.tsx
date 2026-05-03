@@ -6,7 +6,7 @@ import { AbzeichenStatus } from "../bausteine/AbzeichenStatus";
 import { STATISCHE_TEXTKARTE } from "../bewegung/varianten";
 // ─── Kategorie-Konfiguration ──────────────────────────────────────
 
-type ZeitstrahlKat = "beruf" | "bildung" | "security" | "meilenstein";
+type ZeitstrahlKat = "beruf" | "bildung" | "security" | "meilenstein" | "platzhalter";
 
 const KATEGORIE_CFG: Record<ZeitstrahlKat, {
   variante: "akzent" | "cyber" | "aktiv" | "entwicklung";
@@ -18,6 +18,7 @@ const KATEGORIE_CFG: Record<ZeitstrahlKat, {
   bildung:     { variante: "cyber",       lichtfarbe: "34, 211, 238",  akzentFarbe: "#22d3ee", label: "Bildung"     },
   security:    { variante: "aktiv",       lichtfarbe: "148, 163, 184", akzentFarbe: "#94a3b8", label: "Security"    },
   meilenstein: { variante: "entwicklung", lichtfarbe: "34, 197, 94",   akzentFarbe: "#22c55e", label: "Meilenstein" },
+  platzhalter: { variante: "aktiv",       lichtfarbe: "71, 85, 105",   akzentFarbe: "#334155", label: "Folgt"       },
 };
 
 // ─── View ─────────────────────────────────────────────────────────
@@ -98,10 +99,11 @@ export default function UeberMichView() {
 
         <div>
           {ZEITSTRAHL.map((eintrag, index) => {
+            const isPlatzhalter = eintrag.kategorie === "platzhalter";
             const cfg = KATEGORIE_CFG[eintrag.kategorie as ZeitstrahlKat] ?? KATEGORIE_CFG.beruf;
             return (
               <motion.div
-                key={`${eintrag.kategorie}-${eintrag.jahr}`}
+                key={index}
                 initial={{ opacity: 0, x: -16 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.06, duration: 0.35, ease: "easeOut" }}
@@ -109,35 +111,56 @@ export default function UeberMichView() {
               >
                 {/* Timeline-Punkt */}
                 <div
-                  className="absolute left-[10px] md:left-[26px] top-[18px] w-3 h-3 rounded-full border-2 transition-colors duration-200"
-                  style={{
+                  className={`absolute top-[18px] rounded-full border transition-colors duration-200 ${
+                    isPlatzhalter
+                      ? "left-[11px] md:left-[27px] w-2 h-2 border border-slate-600/50"
+                      : "left-[10px] md:left-[26px] w-3 h-3 border-2"
+                  }`}
+                  style={isPlatzhalter ? {} : {
                     borderColor: cfg.akzentFarbe,
                     background: `${cfg.akzentFarbe}20`,
                   }}
                 />
 
-                <InfoKarte
-                  lichtfarbe={cfg.lichtfarbe}
-                  akzentRand
-                  akzentFarbe={cfg.akzentFarbe}
-                  mitHoverAnimation={false}
-                  klassen="p-4"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <AbzeichenStatus
-                      variante={cfg.variante}
-                      text={cfg.label}
-                      klassen="uppercase"
-                    />
-                    <span className="font-mono text-xs text-white/45">{eintrag.jahr}</span>
+                {isPlatzhalter ? (
+                  <div className="rounded-2xl p-4 opacity-40 select-none"
+                    style={{ border: "1px dashed rgba(255,255,255,0.10)", background: "rgba(255,255,255,0.012)" }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="font-mono text-[10px] text-white/30 tracking-[0.20em] uppercase">
+                        · · ·  folgt  · · ·
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-2.5 rounded-full w-2/5" style={{ background: "rgba(255,255,255,0.07)" }} />
+                      <div className="h-1.5 rounded-full w-full mt-1" style={{ background: "rgba(255,255,255,0.04)" }} />
+                      <div className="h-1.5 rounded-full w-3/4" style={{ background: "rgba(255,255,255,0.04)" }} />
+                    </div>
                   </div>
-                  <h3 className="font-display text-base font-bold text-white mb-1.5">
-                    {eintrag.titel}
-                  </h3>
-                  <p className="text-sm text-white/65 leading-relaxed">
-                    {eintrag.beschreibung}
-                  </p>
-                </InfoKarte>
+                ) : (
+                  <InfoKarte
+                    lichtfarbe={cfg.lichtfarbe}
+                    akzentRand
+                    akzentFarbe={cfg.akzentFarbe}
+                    mitHoverAnimation={false}
+                    klassen="p-4"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <AbzeichenStatus
+                        variante={cfg.variante}
+                        text={cfg.label}
+                        klassen="uppercase"
+                      />
+                      <span className="font-mono text-xs text-white/45">{eintrag.jahr}</span>
+                    </div>
+                    <h3 className="font-display text-base font-bold text-white mb-1.5">
+                      {eintrag.titel}
+                    </h3>
+                    <p className="text-sm text-white/65 leading-relaxed">
+                      {eintrag.beschreibung}
+                    </p>
+                  </InfoKarte>
+                )}
               </motion.div>
             );
           })}
