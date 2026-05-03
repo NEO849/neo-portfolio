@@ -21,11 +21,17 @@ export interface SkillModel {
   readonly kategorie: "security" | "development" | "infrastructure" | "tools";
 }
 
+export interface ZeitstrahlModul {
+  readonly name: string;
+  readonly skills: ReadonlyArray<string>;
+}
+
 export interface ZeitstrahlModel {
   readonly jahr: string;
   readonly titel: string;
   readonly beschreibung: string;
   readonly kategorie: "beruf" | "teamarbeit" | "infrastruktur" | "bildung" | "entwicklung" | "security" | "eigenbau";
+  readonly module?: ReadonlyArray<ZeitstrahlModul>;
 }
 
 export interface SecurityStatModel {

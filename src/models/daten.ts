@@ -287,9 +287,15 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
   },
   {
     jahr: "2023–2024",
-    titel: "Syntax Institut Berlin – App-Entwicklung",
-    beschreibung: "2.300 Unterrichtseinheiten Remote Learning. Module: iOS App Development (Swift, SwiftUI, Core Data), Android (Kotlin, MVVM, Room, Retrofit), Mobile UX/UI Design und Softwarearchitektur. Abschluss: 07. November 2024. CERTQUA-zertifiziert (DIN EN ISO 9001).",
+    titel: "Syntax Institut",
+    beschreibung: "IT-Fachkraft für App-Entwicklung (iOS & Android) · 2.300 Unterrichtseinheiten · CERTQUA-zertifiziert (DIN EN ISO 9001)",
     kategorie: "bildung",
+    module: [
+      { name: "Mobile UX/UI Design",        skills: ["Figma", "User Flows", "Prototyping", "Wireframes", "User Research", "iOS HIG"] },
+      { name: "Grundlagen Programmierung",   skills: ["Kotlin", "Funktionen", "Schleifen", "OOP", "Git", "GitHub", "Datenstrukturen"] },
+      { name: "Android App Development",     skills: ["Android Studio", "Kotlin", "MVVM", "Retrofit API", "Room", "Coroutines"] },
+      { name: "iOS App Development",         skills: ["Xcode", "Swift", "SwiftUI", "MVVM", "Core Data", "Firebase", "Navigation"] },
+    ],
   },
   {
     jahr: "2024–2025",

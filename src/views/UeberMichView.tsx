@@ -214,6 +214,47 @@ export default function UeberMichView() {
                   <p className="text-sm text-white/60 leading-relaxed">
                     {eintrag.beschreibung}
                   </p>
+
+                  {eintrag.module && (
+                    <div className="mt-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-mono text-[10px] text-white/28 uppercase tracking-widest">Module & Schwerpunkte</span>
+                        <div className="h-px flex-1 bg-white/[0.04]" />
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                        {eintrag.module.map((mod) => (
+                          <div
+                            key={mod.name}
+                            className="rounded-md p-2"
+                            style={{
+                              background: `rgba(${cfg.lichtfarbe}, 0.04)`,
+                              border: `1px solid ${cfg.akzentFarbe}20`,
+                            }}
+                          >
+                            <p className="font-mono text-[10px] font-semibold mb-1.5 tracking-wide"
+                               style={{ color: `${cfg.akzentFarbe}bb` }}>
+                              {mod.name}
+                            </p>
+                            <div className="flex flex-wrap gap-1">
+                              {mod.skills.map((skill) => (
+                                <span
+                                  key={skill}
+                                  className="text-[10px] px-1.5 py-[2px] rounded font-mono"
+                                  style={{
+                                    background: `${cfg.akzentFarbe}10`,
+                                    color: `${cfg.akzentFarbe}99`,
+                                    border: `1px solid ${cfg.akzentFarbe}1a`,
+                                  }}
+                                >
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </InfoKarte>
               </motion.div>
             );
