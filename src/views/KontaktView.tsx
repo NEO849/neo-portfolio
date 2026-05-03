@@ -92,7 +92,7 @@ function EingabeFeld({
         placeholder={placeholder}
         autoComplete={autoComplete}
         onFocus={(e) => scrollZuFeld(e.currentTarget)}
-        className={`formular-eingabe font-mono text-sm py-2 ${fehler ? "fehler" : ""}`}
+        className={`formular-eingabe font-mono text-base sm:text-sm py-2 ${fehler ? "fehler" : ""}`}
       />
       {fehler && (
         <p className="mt-1 text-[10px] font-mono text-signal-rot/75 leading-relaxed">
@@ -285,7 +285,7 @@ function KontaktFormular() {
             placeholder="Deine Nachricht…"
             rows={4}
             onFocus={(e) => scrollZuFeld(e.currentTarget)}
-            className={`formular-eingabe font-mono text-sm py-2 ${fehler.nachricht ? "fehler" : ""}`}
+            className={`formular-eingabe font-mono text-base sm:text-sm py-2 ${fehler.nachricht ? "fehler" : ""}`}
           />
           {fehler.nachricht && (
             <p className="mt-1 text-[10px] font-mono text-signal-rot/75 leading-relaxed">
@@ -430,14 +430,14 @@ export default function KontaktView() {
         ))}
       </motion.div>
 
-      {/* Kontaktformular — mx-2 sm:mx-0: mobile etwas mehr Luft zu den Rändern */}
+      {/* Kontaktformular */}
       <motion.div
         variants={STATISCHE_TEXTKARTE}
         initial="versteckt"
         whileInView="sichtbar"
         viewport={{ once: true, margin: "-40px" }}
         transition={{ delay: 0.15 }}
-        className="mt-4 mx-2 sm:mx-0"
+        className="mt-4"
       >
         <KontaktFormular />
       </motion.div>
