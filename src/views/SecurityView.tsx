@@ -115,7 +115,11 @@ export default function SecurityView() {
                   {p.tools.map((t) => (
                     <span
                       key={t}
-                      className="font-mono text-[9px] px-1.5 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.07] text-white/55 leading-none h-fit"
+                      className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border text-white/72 leading-none h-fit"
+                      style={{
+                        backgroundColor: `rgba(${p.rgb}, 0.09)`,
+                        borderColor: `rgba(${p.rgb}, 0.25)`,
+                      }}
                     >
                       {t}
                     </span>
