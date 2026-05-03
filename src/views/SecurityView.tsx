@@ -53,7 +53,7 @@ const WORKFLOW_PHASEN = [
     nr: "06",
     name: "Report",
     tools: ["AI Agents", "HackerOne"],
-    output: "Fertiger Report · $$$",
+    output: "Fertiger Report · Bounty",
     rgb: "129,140,248",
   },
 ];
@@ -125,7 +125,7 @@ export default function SecurityView() {
                     </span>
                   ))}
                 </div>
-                <p className="font-mono text-[9px] text-white/35 leading-snug pt-0.5 border-t border-white/[0.05] mt-auto">
+                <p className="font-mono text-[9px] text-white/60 leading-snug pt-0.5 border-t border-white/[0.07] mt-auto">
                   → {p.output}
                 </p>
               </div>
