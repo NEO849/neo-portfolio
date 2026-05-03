@@ -223,7 +223,12 @@ function KontaktFormular() {
   // ── Formular ───────────────────────────────────────────────────
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <InfoKarte lichtfarbe={CYBER_RGB} mitHoverAnimation={false} klassen="p-5 md:p-6">
+      <InfoKarte
+        lichtfarbe={CYBER_RGB}
+        mitHoverAnimation={false}
+        klassen="overflow-hidden p-5 pl-6 md:p-6"
+        stil={{ backgroundImage: "linear-gradient(to right, rgba(22,211,238,0.04) 0%, transparent 40%)" }}
+      >
 
         {/* Header */}
         <div className="flex items-center gap-2 mb-5">
