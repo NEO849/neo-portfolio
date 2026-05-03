@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { ZEITSTRAHL } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
@@ -25,6 +26,26 @@ const KATEGORIE_CFG: Record<ZeitstrahlKat, {
 // ─── View ─────────────────────────────────────────────────────────
 
 export default function UeberMichView() {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const entryRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const prefersReducedMotion = useReducedMotion() === true;
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = entryRefs.current.findIndex(r => r === entry.target);
+            if (idx >= 0) setActiveIdx(idx);
+          }
+        });
+      },
+      { rootMargin: "-35% 0px -35% 0px", threshold: 0 },
+    );
+    const els = entryRefs.current;
+    els.forEach(el => { if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section id="ueber" className="py-16 px-6 max-w-5xl mx-auto">
@@ -102,10 +123,11 @@ export default function UeberMichView() {
         <div>
           {ZEITSTRAHL.map((eintrag, index) => {
             const cfg = KATEGORIE_CFG[eintrag.kategorie as ZeitstrahlKat] ?? KATEGORIE_CFG.beruf;
-            const isLast = index === ZEITSTRAHL.length - 1;
+            const isActive = activeIdx === index;
             return (
               <motion.div
                 key={index}
+                ref={(el) => { entryRefs.current[index] = el; }}
                 initial={{ opacity: 0, x: -18 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
@@ -114,7 +136,7 @@ export default function UeberMichView() {
               >
                 {/* Dot-Container */}
                 <div className="absolute left-[10px] md:left-[26px] top-[18px] w-3 h-3">
-                  {/* Sonar-Ring: einmaliger Ping beim Eintritt ins Viewport */}
+                  {/* Entrance-Sonar: einmaliger Ping beim ersten Viewport-Eintritt */}
                   <motion.div
                     className="absolute rounded-full pointer-events-none"
                     style={{
@@ -126,20 +148,33 @@ export default function UeberMichView() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.95, delay: 0.12, ease: "easeOut" }}
                   />
-                  {/* Aktiver Puls für den neuesten Eintrag */}
-                  {isLast && (
-                    <span
-                      className="absolute inset-0 rounded-full animate-ping opacity-30"
-                      style={{ backgroundColor: cfg.akzentFarbe }}
-                    />
-                  )}
-                  {/* Dot */}
-                  <div
-                    className="relative w-3 h-3 rounded-full border-2"
+                  {/* Aktiver Dauer-Ring: läuft solange die Card aktiv ist */}
+                  <motion.div
+                    className="absolute rounded-full pointer-events-none"
                     style={{
-                      borderColor: cfg.akzentFarbe,
-                      background: `${cfg.akzentFarbe}18`,
+                      top: "-5px", right: "-5px", bottom: "-5px", left: "-5px",
+                      border: `1px solid ${cfg.akzentFarbe}`,
                     }}
+                    animate={isActive && !prefersReducedMotion
+                      ? { scale: [1, 2.3], opacity: [0.58, 0] }
+                      : { scale: 1, opacity: 0 }}
+                    transition={isActive && !prefersReducedMotion
+                      ? { duration: 2.2, repeat: Infinity, ease: "easeOut", repeatDelay: 0.55 }
+                      : { duration: 0.4, ease: "easeOut" }}
+                  />
+                  {/* Dot: atmet wenn aktiv */}
+                  <motion.div
+                    className="relative w-3 h-3 rounded-full border-2"
+                    style={{ borderColor: cfg.akzentFarbe, backgroundColor: `${cfg.akzentFarbe}18` }}
+                    animate={isActive && !prefersReducedMotion
+                      ? {
+                          scale: [1, 1.15, 1],
+                          backgroundColor: [`${cfg.akzentFarbe}18`, `${cfg.akzentFarbe}44`, `${cfg.akzentFarbe}18`],
+                        }
+                      : { scale: 1, backgroundColor: `${cfg.akzentFarbe}18` }}
+                    transition={isActive && !prefersReducedMotion
+                      ? { duration: 2.2, repeat: Infinity, ease: "easeInOut" }
+                      : { duration: 0.35 }}
                   />
                 </div>
 
