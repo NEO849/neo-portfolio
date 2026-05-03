@@ -218,32 +218,27 @@ export default function UeberMichView() {
                   {eintrag.module && (
                     <div className="mt-3">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-mono text-[10px] text-white/28 uppercase tracking-widest">Module & Schwerpunkte</span>
+                        <span className="font-mono text-[10px] text-white/25 uppercase tracking-widest">Module & Schwerpunkte</span>
                         <div className="h-px flex-1 bg-white/[0.04]" />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                         {eintrag.module.map((mod) => (
                           <div
                             key={mod.name}
-                            className="rounded-md p-2"
-                            style={{
-                              background: `rgba(${cfg.lichtfarbe}, 0.04)`,
-                              border: `1px solid ${cfg.akzentFarbe}20`,
-                            }}
+                            className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-2.5"
+                            style={{ boxShadow: `0 2px 14px rgba(${cfg.lichtfarbe}, 0.05)` }}
                           >
-                            <p className="font-mono text-[10px] font-semibold mb-1.5 tracking-wide"
-                               style={{ color: `${cfg.akzentFarbe}bb` }}>
+                            <p className="font-mono text-[10px] font-semibold mb-1.5 text-white/45 tracking-wide">
                               {mod.name}
                             </p>
                             <div className="flex flex-wrap gap-1">
                               {mod.skills.map((skill) => (
                                 <span
                                   key={skill}
-                                  className="text-[10px] px-1.5 py-[2px] rounded font-mono"
+                                  className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border text-white/65 leading-none"
                                   style={{
-                                    background: `${cfg.akzentFarbe}10`,
-                                    color: `${cfg.akzentFarbe}99`,
-                                    border: `1px solid ${cfg.akzentFarbe}1a`,
+                                    backgroundColor: `rgba(${cfg.lichtfarbe}, 0.07)`,
+                                    borderColor: `rgba(${cfg.lichtfarbe}, 0.22)`,
                                   }}
                                 >
                                   {skill}
