@@ -25,7 +25,7 @@ export interface ZeitstrahlModel {
   readonly jahr: string;
   readonly titel: string;
   readonly beschreibung: string;
-  readonly kategorie: "bildung" | "beruf" | "security" | "meilenstein" | "platzhalter";
+  readonly kategorie: "beruf" | "teamarbeit" | "infrastruktur" | "bildung" | "entwicklung" | "security" | "eigenbau";
 }
 
 export interface SecurityStatModel {

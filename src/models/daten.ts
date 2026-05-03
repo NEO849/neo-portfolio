@@ -269,31 +269,45 @@ export const SKILLS: SkillModel[] = [
 export const ZEITSTRAHL: ZeitstrahlModel[] = [
   {
     jahr: "1999–2014",
-    titel: "Elektroniker",
-    beschreibung: "15 Jahre Berufserfahrung – Aufbau von Serverfarmen, Netzwerkinfrastruktur, Telefon- & Videoanlagen, Schaltkreise, Hardware-Debugging und systematisches Denken in Zuständen.",
+    titel: "Elektronik & technische Systeme",
+    beschreibung: "15 Jahre Praxis in Elektronik, Netzwerk-, Server-, Telefon- und Videoanlagen. Starkes Fundament in Fehlersuche, Dokumentation, Systemlogik und sauberer technischer Umsetzung.",
     kategorie: "beruf",
   },
-  { jahr: "—", titel: "", beschreibung: "", kategorie: "platzhalter" },
-  { jahr: "—", titel: "", beschreibung: "", kategorie: "platzhalter" },
-  { jahr: "—", titel: "", beschreibung: "", kategorie: "platzhalter" },
-  { jahr: "—", titel: "", beschreibung: "", kategorie: "platzhalter" },
+  {
+    jahr: "2014–2018",
+    titel: "Interdisziplinäre Praxis & Verantwortung",
+    beschreibung: "Arbeit in einem interdisziplinären Team mit Verantwortung für Gruppen, strukturierte Abläufe und Dokumentation. Kommunikation, Konfliktlösung, Qualitätsdenken und ruhiges Handeln in anspruchsvollen Situationen.",
+    kategorie: "teamarbeit",
+  },
+  {
+    jahr: "2020–2026",
+    titel: "Linux, Server & Administration",
+    beschreibung: "Aufbau und Betrieb von Linux-Systemen, VPS-Umgebungen, SSH, Docker, Firewalling, Terminal-Workflows und reproduzierbaren Toolchains.",
+    kategorie: "infrastruktur",
+  },
   {
     jahr: "2023–2025",
     titel: "Syntax Institut Berlin",
-    beschreibung: "Vollzeit-Ausbildung in Softwareentwicklung: Swift, SwiftUI, UIKit, MVVM, Clean Architecture, iOS- & macOS-Entwicklung.",
+    beschreibung: "Vollzeit-Ausbildung in Softwareentwicklung mit Fokus auf Swift, SwiftUI, UIKit, Kotlin, MVVM, Clean Architecture, iOS/macOS und Android.",
     kategorie: "bildung",
   },
   {
-    jahr: "2023–2024",
-    titel: "Erste Android & iOS Apps",
-    beschreibung: "Z Almanach (Kotlin/Android), ONE (Multi-Agent AI, SwiftUI), Sports Almanach, NeoVimExplorer – native Apps auf beiden Plattformen.",
-    kategorie: "meilenstein",
+    jahr: "2024–2025",
+    titel: "Native Apps & Architektur",
+    beschreibung: "ONE, Sports Almanach, NeoVimExplorer und weitere App-Projekte mit SwiftUI, MVVM, modularer Struktur, API-Anbindung, State-Management und sauberer Wartbarkeit.",
+    kategorie: "entwicklung",
   },
   {
     jahr: "2025–2026",
-    titel: "Security Research",
-    beschreibung: "Bug Bounty auf Intigriti & HackerOne – Reports bei Superdrug, Yahoo, Whatnot, Axel Springer. Gehärteter Contabo VPS mit Caido, Docker/Kali & vollständiger Recon-Pipeline. NeoRecon Exploit Engine v3: 7-Schritt Master-Pipeline, Scoring-Algorithmus, 31 KI-Agents.",
+    titel: "Security Research & Bug Bounty",
+    beschreibung: "Eigene Recon-, OSINT- und Bug-Bounty-Pipelines auf Linux/VPS-Basis. Fokus auf GraphQL, OAuth, API-Security, Scoring, Reporting und reproduzierbare Schwachstellenanalyse.",
     kategorie: "security",
+  },
+  {
+    jahr: "2026",
+    titel: "Tooling & Automatisierung",
+    beschreibung: "Eigene Tools: Recon-Search-Assistant, Pipeline-Engine, Dashboard, OSINT Toolkit und Security-Helfer für strukturierte Analyse, Priorisierung und Reporting.",
+    kategorie: "eigenbau",
   },
 ];
 
