@@ -45,7 +45,7 @@ const WORKFLOW_PHASEN = [
   {
     nr: "05",
     name: "Validation",
-    beschreibung: "Schwachstellen kontrolliert, legal und reproduzierbar bestätigen.",
+    beschreibung: "Schwachstellen kontrolliert und reproduzierbar bestätigen.",
     outputs: ["PoC", "Impact", "CVSS"],
     rgb: "34,197,94",
   },
