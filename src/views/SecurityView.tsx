@@ -16,44 +16,44 @@ type SecurityTab = "overview" | "pipeline" | "scoring" | "tools";
 const WORKFLOW_PHASEN = [
   {
     nr: "01",
-    name: "Target",
-    tools: ["scope.md", "HackerOne", "Intigriti"],
-    output: "Domain · Scope · Ziele",
+    name: "Target Scope",
+    beschreibung: "Programme, erlaubte Assets und Testgrenzen sauber definieren.",
+    outputs: ["Scope", "Plattform", "Ziele"],
     rgb: "129,140,248",
   },
   {
     nr: "02",
     name: "Recon",
-    tools: ["subfinder", "amass", "httpx", "ParamSpider"],
-    output: "50k+ URLs · Subdomains · JS",
+    beschreibung: "Subdomains, URLs, Parameter und Einstiegspunkte systematisch erfassen.",
+    outputs: ["Live Hosts", "URLs", "Parameter"],
     rgb: "34,211,238",
   },
   {
     nr: "03",
-    name: "Scoring",
-    tools: ["awk Engine", "12 Kategorien", "Tier-Split"],
-    output: "Tier 1–3 · Focus5-Cards",
+    name: "Signal Scoring",
+    beschreibung: "Rohdaten nach Risiko, Relevanz und Prüfqualität priorisieren.",
+    outputs: ["High-Value URLs", "Kandidaten"],
     rgb: "245,158,11",
   },
   {
     nr: "04",
-    name: "Hunting",
-    tools: ["Caido", "Nuclei", "dalfox", "sqlmap"],
-    output: "Kandidaten · CVE-Hits",
+    name: "Manual Review",
+    beschreibung: "Verdächtige Endpunkte gezielt testen und Verhalten reproduzieren.",
+    outputs: ["Requests", "Replays", "Evidence"],
     rgb: "239,68,68",
   },
   {
     nr: "05",
-    name: "Validate",
-    tools: ["PoC-Scripts", "interactsh", "exploit-chainer"],
-    output: "Confirmed · CVSS-Score",
+    name: "Validation",
+    beschreibung: "Schwachstellen kontrolliert, legal und reproduzierbar bestätigen.",
+    outputs: ["PoC", "Impact", "CVSS"],
     rgb: "34,197,94",
   },
   {
     nr: "06",
     name: "Report",
-    tools: ["AI Agents", "HackerOne"],
-    output: "Fertiger Report · Bounty",
+    beschreibung: "Bestätigte Findings klar und mit sauberer Beweiskette dokumentieren.",
+    outputs: ["Summary", "Steps", "Impact"],
     rgb: "129,140,248",
   },
 ];
@@ -102,32 +102,34 @@ export default function SecurityView() {
               transition={{ delay: i * 0.08, duration: 0.35 }}
             >
               <div
-                className="w-[138px] rounded-xl border border-white/[0.07] bg-white/[0.025] p-2.5 flex flex-col gap-1.5 h-full"
-                style={{ boxShadow: `0 2px 18px rgba(${p.rgb},0.08)` }}
+                className="w-[158px] rounded-xl border border-white/[0.07] bg-white/[0.025] p-2.5 flex flex-col gap-2 h-full"
+                style={{ boxShadow: `0 2px 18px rgba(${p.rgb},0.07)` }}
               >
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-[10px] font-bold" style={{ color: `rgb(${p.rgb})` }}>
-                    {p.nr}
-                  </span>
-                  <span className="text-[11px] font-bold text-white tracking-wide">{p.name.toUpperCase()}</span>
+                {/* Nummer + Titel */}
+                <div>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="font-mono text-[10px] font-bold tabular-nums" style={{ color: `rgb(${p.rgb})` }}>
+                      {p.nr}
+                    </span>
+                    <span className="text-[11px] font-bold text-white tracking-wide leading-none">{p.name.toUpperCase()}</span>
+                  </div>
+                  <p className="text-[9px] text-white/50 leading-snug">{p.beschreibung}</p>
                 </div>
-                <div className="flex flex-wrap gap-1 flex-1">
-                  {p.tools.map((t) => (
+                {/* Output-Tags */}
+                <div className="flex flex-wrap gap-1 mt-auto pt-1.5 border-t border-white/[0.05]">
+                  {p.outputs.map((o) => (
                     <span
-                      key={t}
-                      className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border text-white/72 leading-none h-fit"
+                      key={o}
+                      className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border text-white/65 leading-none"
                       style={{
-                        backgroundColor: `rgba(${p.rgb}, 0.09)`,
-                        borderColor: `rgba(${p.rgb}, 0.25)`,
+                        backgroundColor: `rgba(${p.rgb}, 0.08)`,
+                        borderColor: `rgba(${p.rgb}, 0.22)`,
                       }}
                     >
-                      {t}
+                      {o}
                     </span>
                   ))}
                 </div>
-                <p className="font-mono text-[9px] text-white/60 leading-snug pt-0.5 border-t border-white/[0.07] mt-auto">
-                  → {p.output}
-                </p>
               </div>
               {i < WORKFLOW_PHASEN.length - 1 && (
                 <motion.span
