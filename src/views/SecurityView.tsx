@@ -113,17 +113,17 @@ export default function SecurityView() {
                     </span>
                     <span className="text-[11px] font-bold text-white tracking-wide leading-none">{p.name.toUpperCase()}</span>
                   </div>
-                  <p className="text-[9px] text-white/50 leading-snug">{p.beschreibung}</p>
+                  <p className="text-[9px] text-white/70 leading-snug">{p.beschreibung}</p>
                 </div>
                 {/* Output-Tags */}
                 <div className="flex flex-wrap gap-1 mt-auto pt-1.5 border-t border-white/[0.05]">
                   {p.outputs.map((o) => (
                     <span
                       key={o}
-                      className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border text-white/65 leading-none"
+                      className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border text-white/72 leading-none"
                       style={{
-                        backgroundColor: `rgba(${p.rgb}, 0.08)`,
-                        borderColor: `rgba(${p.rgb}, 0.22)`,
+                        backgroundColor: `rgba(${p.rgb}, 0.09)`,
+                        borderColor: `rgba(${p.rgb}, 0.25)`,
                       }}
                     >
                       {o}
