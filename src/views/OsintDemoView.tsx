@@ -52,7 +52,7 @@ const DATENSCHUTZ_HINWEISE: Record<string, string[]> = {
   ],
 };
 
-const BITCOIN_ADDRESS = "HIER_BTC_ADRESSE_EINTRAGEN";
+const BITCOIN_ADDRESS = "bc1qf666x5l4zs6tm9w69jsr9mn5glvf97fk9z6zs8";
 
 // ─── Terminal-Hilfsfunktionen ─────────────────────────────────────
 // Box: 36 Zeichen breit — passt auf Mobile ohne horizontalen Scroll.
