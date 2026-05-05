@@ -18,12 +18,12 @@ export const NAVIGATION: NavigationModel[] = [
 export const PROJEKTE: ProjektModel[] = [
   {
     titel: "Neo Dev Stack – AI-Augmented Security Workstation",
-    kurzbeschreibung: "31 spezialisierte Claude-Agents, 15+ MCP-Server, lokale LLM-Inferenz (Ollama + Milvus) und 80+ Security-Tools – orchestriert zu einem intelligenten Pentest-Betriebssystem",
-    langbeschreibung: "Vollständig selbst gebaute, KI-augmentierte Entwicklungs- und Sicherheitsumgebung. 31 spezialisierte Pentest-Agents (Recon, Web, Cloud, Mobile, Forensics, Exploit-Chaining) laufen direkt in Claude Code und greifen über 15+ MCP-Server auf GitHub, GitLab, Firecrawl, Chrome DevTools Protocol, Brave Search und eine lokale Vektordatenbank (Milvus v2.6.14) zu. Ollama stellt lokale LLM-Inferenz bereit. Claude kann über den Chrome DevTools MCP authentifizierte Browser-Sessions steuern, DOM inspizieren und JavaScript live ausführen – ohne externen Proxy. Alle Security-Tools (osmedeus, nuclei, paramspider, sherlock, holehe, waymore) sind in 6 parallelen tmux-Sessions orchestriert. findings.db hält alle Bug-Bounty-Findings über sämtliche aktiven Targets in Sync. Die semantische Codebase-Indexierung über Milvus erlaubt bedeutungsbasierte Code-Suche über 9 indexierte Projekte.",
+    kurzbeschreibung: "32 spezialisierte Claude-Agents, 15+ MCP-Server, lokale LLM-Inferenz (Ollama + Milvus) und 80+ Security-Tools – orchestriert zu einem intelligenten Pentest-Betriebssystem",
+    langbeschreibung: "Vollständig selbst gebaute, KI-augmentierte Entwicklungs- und Sicherheitsumgebung. 32 spezialisierte Pentest-Agents (Recon, Web, Cloud, Mobile, Forensics, Exploit-Chaining) laufen direkt in Claude Code und greifen über 15+ MCP-Server auf GitHub, GitLab, Firecrawl, Chrome DevTools Protocol, Brave Search und eine lokale Vektordatenbank (Milvus v2.6.14) zu. Ollama stellt lokale LLM-Inferenz bereit. Claude kann über den Chrome DevTools MCP authentifizierte Browser-Sessions steuern, DOM inspizieren und JavaScript live ausführen – ohne externen Proxy. Alle Security-Tools (osmedeus, nuclei, paramspider, sherlock, holehe, waymore) sind in 6 parallelen tmux-Sessions orchestriert. findings.db hält alle Bug-Bounty-Findings über sämtliche aktiven Targets in Sync. Die semantische Codebase-Indexierung über Milvus erlaubt bedeutungsbasierte Code-Suche über 9 indexierte Projekte.",
     kategorie: "tooling",
     technologien: ["Claude Code", "MCP Protocol", "Ollama", "Milvus", "Docker", "tmux", "Python", "Bash", "Chrome DevTools", "Firecrawl"],
     highlights: [
-      "31 spezialisierte Pentest-Agents: Recon, Web, Cloud, Mobile, Forensics, Exploit-Chaining",
+      "32 spezialisierte Pentest-Agents: Recon, Web, Cloud, Mobile, Forensics, Exploit-Chaining",
       "15+ MCP-Server: GitHub, GitLab, Firecrawl, Chrome DevTools, Brave Search, Claude Context, YouTube",
       "Lokale LLM-Inferenz: Ollama + Open WebUI + Milvus v2.6.14 (Vektordatenbank, 882 Chunks)",
       "Chrome DevTools MCP: Claude steuert authentifizierte Browser-Sessions direkt aus dem Chat",
