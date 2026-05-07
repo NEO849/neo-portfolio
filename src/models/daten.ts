@@ -284,6 +284,11 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
     titel: "Linux, VPS & Infrastruktur",
     beschreibung: "Aufbau und Betrieb gehärteter Linux-Systeme: VPS-Setup, SSH-Härtung, Firewalling, Docker-Containerisierung, tmux-Orchestrierung und reproduzierbare Toolchains. Basis für alle Security-, Recon- und KI-Workloads, die heute auf dieser Infrastruktur laufen.",
     kategorie: "infrastruktur",
+    module: [
+      { name: "System-Basis",     skills: ["VPS", "SSH-Hardening", "UFW", "fail2ban", "Docker", "tmux"] },
+      { name: "Target-Struktur",  skills: ["scope.md", "meta/", "recon/", "exploit/", "findings/", "reports/"] },
+      { name: "Masterpipeline",   skills: ["RECON", "POST-PROC", "MERGE", "HUNT-SHEET", "CHECKS", "VALIDATE", "REPORT"] },
+    ],
   },
   {
     jahr: "2023–2024",

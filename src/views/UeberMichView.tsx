@@ -5,25 +5,6 @@ import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
 import { STATISCHE_TEXTKARTE } from "../bewegung/varianten";
 
-// ─── Architektur-Card Daten ───────────────────────────────────────
-
-const PIPELINE_STAGES = [
-  { label: "SCOPE",    color: "#818cf8" },
-  { label: "RECON",    color: "#38bdf8" },
-  { label: "DEDUP",    color: "#22d3ee" },
-  { label: "HUNT",     color: "#34d399" },
-  { label: "CHECKS",   color: "#fb923c" },
-  { label: "VALIDATE", color: "#94a3b8" },
-  { label: "REPORT",   color: "#a78bfa" },
-] as const;
-
-const ARCH_STATS = [
-  { label: "agents",   value: "32",  rgb: "251, 146, 60"  },
-  { label: "targets",  value: "8",   rgb: "56, 189, 248"  },
-  { label: "reports",  value: "9",   rgb: "148, 163, 184" },
-  { label: "mcp",      value: "15+", rgb: "167, 139, 250" },
-] as const;
-
 // ─── Kategorie-Konfiguration ──────────────────────────────────────
 
 type ZeitstrahlKat = "beruf" | "teamarbeit" | "infrastruktur" | "bildung" | "entwicklung" | "security" | "eigenbau";
@@ -96,91 +77,6 @@ export default function UeberMichView() {
             <p className="text-white/70 leading-relaxed">
               Aus der Arbeit in interdisziplinären Teams bringe ich Erfahrung im Umgang mit unterschiedlichen Perspektiven, Anforderungen und Kommunikationsstilen mit. Ich habe gelernt, aufmerksam zuzuhören, Verantwortung zu übernehmen und auch in anspruchsvollen Situationen klar und lösungsorientiert zu handeln. Diese Kombination aus technischer Tiefe, analytischem Denken, sauberer Struktur und Besonnenheit prägt meine Arbeitsweise.
             </p>
-          </div>
-        </InfoKarte>
-      </motion.div>
-
-      {/* Architektur-Card */}
-      <motion.div
-        variants={STATISCHE_TEXTKARTE}
-        initial="versteckt"
-        whileInView="sichtbar"
-        viewport={{ once: true, margin: "-40px" }}
-        transition={{ delay: 0.05 }}
-        className="mb-4"
-      >
-        <InfoKarte lichtfarbe="56, 189, 248" klassen="p-5 md:p-7">
-          <div className="flex items-center gap-2 mb-5">
-            <span className="font-mono text-[11px] text-cyber-400/55">› workstation_architektur</span>
-            <div className="h-px flex-1 bg-white/[0.04]" />
-          </div>
-
-          <div className="flex flex-col lg:flex-row gap-5 lg:gap-7">
-
-            {/* Pipeline */}
-            <div className="flex-1 min-w-0">
-              <p className="font-mono text-[9px] text-white/22 uppercase tracking-[0.14em] mb-3">Masterpipeline</p>
-              <div className="flex flex-wrap items-center gap-y-2">
-                {PIPELINE_STAGES.map((stage, i) => (
-                  <div key={stage.label} className="flex items-center">
-                    <span
-                      className="inline-flex px-2 py-[5px] rounded-lg border font-mono text-[9px] font-bold tracking-[0.12em] uppercase leading-none"
-                      style={{
-                        background: `${stage.color}12`,
-                        borderColor: `${stage.color}28`,
-                        color: stage.color,
-                        textShadow: `0 0 10px ${stage.color}40`,
-                      }}
-                    >
-                      {stage.label}
-                    </span>
-                    {i < PIPELINE_STAGES.length - 1 && (
-                      <span className="mx-1.5 text-[10px] text-white/15 select-none">›</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <p className="mt-3.5 text-[11px] text-white/40 leading-relaxed font-mono">
-                Rohdaten / Run → dedupliziert in{" "}
-                <span className="text-cyber-400/65">best_recon_run</span>{" "}
-                → Exploit Engine → priorisierter Review-Plan.{" "}
-                Finale Validierung bleibt manuell &amp; scope-konform.
-              </p>
-            </div>
-
-            <div className="hidden lg:block w-px bg-white/[0.04] my-1 self-stretch" />
-            <div className="lg:hidden h-px bg-white/[0.04]" />
-
-            {/* Target-Tree */}
-            <div className="lg:w-44 shrink-0">
-              <p className="font-mono text-[9px] text-white/22 uppercase tracking-[0.14em] mb-3">Target-Struktur</p>
-              <div className="font-mono text-[10px] leading-[1.7]">
-                <div><span className="text-cyber-400/55">targets/</span></div>
-                <div><span className="text-white/16">├─ </span><span className="text-white/28">scope.md</span></div>
-                <div><span className="text-white/16">├─ </span><span className="text-akzent-400/48">meta/</span></div>
-                <div><span className="text-white/16">├─ </span><span className="text-akzent-400/48">recon/</span></div>
-                <div><span className="text-white/16">├─ </span><span className="text-akzent-400/48">exploit/</span></div>
-                <div><span className="text-white/16">├─ </span><span className="text-akzent-400/48">findings/</span></div>
-                <div><span className="text-white/16">└─ </span><span className="text-akzent-400/48">reports/</span></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="mt-4 pt-3.5 border-t border-white/[0.04] flex flex-wrap gap-2">
-            {ARCH_STATS.map((s) => (
-              <div
-                key={s.label}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono"
-                style={{
-                  background: `rgba(${s.rgb}, 0.06)`,
-                  borderColor: `rgba(${s.rgb}, 0.18)`,
-                }}
-              >
-                <span className="text-[8px] text-white/28 uppercase tracking-widest">{s.label}</span>
-                <span className="text-[11px] font-bold" style={{ color: `rgba(${s.rgb}, 0.82)` }}>{s.value}</span>
-              </div>
-            ))}
           </div>
         </InfoKarte>
       </motion.div>
