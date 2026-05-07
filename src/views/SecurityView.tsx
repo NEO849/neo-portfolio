@@ -79,8 +79,7 @@ const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 export default function SecurityView() {
   const [aktiverTab, setAktiverTab] = useState<SecurityTab>("overview");
   const [aktiverSchritt, setAktiverSchritt] = useState<number | null>(null);
-  const [aktivesEigenbau, setAktivesEigenbau] = useState<string | null>(null);
-  const [aktivesIntegriert, setAktivesIntegriert] = useState<string | null>(null);
+  const [aktivesWerkzeug, setAktivesWerkzeug] = useState<string | null>(null);
 
   return (
     <section id="security" className="py-16 px-6 max-w-6xl mx-auto">
@@ -154,8 +153,7 @@ export default function SecurityView() {
         onTabChange={(id) => {
           setAktiverTab(id as SecurityTab);
           setAktiverSchritt(null);
-          setAktivesEigenbau(null);
-          setAktivesIntegriert(null);
+          setAktivesWerkzeug(null);
         }}
         layoutId="security-tab-bg"
         ariaLabel="Security Research Navigation"
@@ -370,14 +368,14 @@ export default function SecurityView() {
                     >
                       <InfoKarte
                         lichtfarbe="34, 211, 238"
-                        akzentRand={aktivesEigenbau === werkzeug.name}
+                        akzentRand={aktivesWerkzeug === werkzeug.name}
                         akzentFarbe="#22d3ee"
                         mitHoverAnimation={false}
                         klassen="p-0"
                       >
                         <button
-                          onClick={() => setAktivesEigenbau(aktivesEigenbau === werkzeug.name ? null : werkzeug.name)}
-                          aria-expanded={aktivesEigenbau === werkzeug.name}
+                          onClick={() => setAktivesWerkzeug(aktivesWerkzeug === werkzeug.name ? null : werkzeug.name)}
+                          aria-expanded={aktivesWerkzeug === werkzeug.name}
                           className="w-full flex items-center gap-3 p-3 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyber-400/40 rounded-xl"
                         >
                           <div className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" />
@@ -386,7 +384,7 @@ export default function SecurityView() {
                             <p className="text-xs text-white/35">{werkzeug.rolle}</p>
                           </div>
                           <motion.span
-                            animate={{ rotate: aktivesEigenbau === werkzeug.name ? 45 : 0 }}
+                            animate={{ rotate: aktivesWerkzeug === werkzeug.name ? 45 : 0 }}
                             transition={{ duration: 0.18 }}
                             aria-hidden="true"
                             className="text-cyber-400 text-lg flex-shrink-0 font-light pr-1"
@@ -395,7 +393,7 @@ export default function SecurityView() {
                           </motion.span>
                         </button>
                         <AnimatePresence>
-                          {aktivesEigenbau === werkzeug.name && werkzeug.beschreibung && (
+                          {aktivesWerkzeug === werkzeug.name && werkzeug.beschreibung && (
                             <motion.div
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: "auto" }}
@@ -431,14 +429,14 @@ export default function SecurityView() {
                     >
                       <InfoKarte
                         lichtfarbe="34, 211, 238"
-                        akzentRand={aktivesIntegriert === werkzeug.name}
+                        akzentRand={aktivesWerkzeug === werkzeug.name}
                         akzentFarbe="#22d3ee"
                         mitHoverAnimation={false}
                         klassen="p-0"
                       >
                         <button
-                          onClick={() => setAktivesIntegriert(aktivesIntegriert === werkzeug.name ? null : werkzeug.name)}
-                          aria-expanded={aktivesIntegriert === werkzeug.name}
+                          onClick={() => setAktivesWerkzeug(aktivesWerkzeug === werkzeug.name ? null : werkzeug.name)}
+                          aria-expanded={aktivesWerkzeug === werkzeug.name}
                           className="w-full flex items-center gap-3 p-3 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyber-400/40 rounded-xl"
                         >
                           <div className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" />
@@ -447,7 +445,7 @@ export default function SecurityView() {
                             <p className="text-xs text-white/35">{werkzeug.rolle}</p>
                           </div>
                           <motion.span
-                            animate={{ rotate: aktivesIntegriert === werkzeug.name ? 45 : 0 }}
+                            animate={{ rotate: aktivesWerkzeug === werkzeug.name ? 45 : 0 }}
                             transition={{ duration: 0.18 }}
                             aria-hidden="true"
                             className="text-cyber-400 text-lg flex-shrink-0 font-light pr-1"
@@ -456,7 +454,7 @@ export default function SecurityView() {
                           </motion.span>
                         </button>
                         <AnimatePresence>
-                          {aktivesIntegriert === werkzeug.name && werkzeug.beschreibung && (
+                          {aktivesWerkzeug === werkzeug.name && werkzeug.beschreibung && (
                             <motion.div
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: "auto" }}
