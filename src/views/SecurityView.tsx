@@ -66,13 +66,12 @@ const TABS: { id: SecurityTab; label: string; beschreibung: string }[] = [
 ];
 
 const WERKZEUG_FARBEN: Record<string, string> = {
-  eigenbau:       "34, 197, 94",
-  proxy:          "239, 68, 68",
-  recon:          "34, 211, 238",
-  scanner:        "245, 158, 11",
-  osint:          "34, 197, 94",
-  automation:     "167, 139, 250",
-  infrastructure: "56, 189, 248",
+  eigenbau:   "34, 197, 94",
+  proxy:      "239, 68, 68",
+  recon:      "34, 211, 238",
+  scanner:    "245, 158, 11",
+  osint:      "34, 197, 94",
+  automation: "167, 139, 250",
 };
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
@@ -80,7 +79,8 @@ const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 export default function SecurityView() {
   const [aktiverTab, setAktiverTab] = useState<SecurityTab>("overview");
   const [aktiverSchritt, setAktiverSchritt] = useState<number | null>(null);
-  const [aktivesWerkzeug, setAktivesWerkzeug] = useState<string | null>(null);
+  const [aktivesEigenbau, setAktivesEigenbau] = useState<string | null>(null);
+  const [aktivesIntegriert, setAktivesIntegriert] = useState<string | null>(null);
 
   return (
     <section id="security" className="py-16 px-6 max-w-6xl mx-auto">
@@ -154,7 +154,8 @@ export default function SecurityView() {
         onTabChange={(id) => {
           setAktiverTab(id as SecurityTab);
           setAktiverSchritt(null);
-          setAktivesWerkzeug(null);
+          setAktivesEigenbau(null);
+          setAktivesIntegriert(null);
         }}
         layoutId="security-tab-bg"
         ariaLabel="Security Research Navigation"
@@ -351,135 +352,127 @@ export default function SecurityView() {
 
           {/* ── Tools ── */}
           {aktiverTab === "tools" && (
-            <div className="flex flex-col lg:flex-row gap-5 lg:gap-6 lg:items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:items-start">
 
-              {/* ── Links: Tool-Navigation (stabile Liste ohne Layout-Shifts) ── */}
-              <div className="lg:w-72 xl:w-80 flex-shrink-0 space-y-5">
-
-                {/* Eigenbau */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <AbzeichenStatus variante="aktiv" text="EIGENBAU" mitPuls />
-                    <span className="text-xs text-white/30">Selbst entwickelt &amp; deployed</span>
-                  </div>
-                  <div className="space-y-1">
-                    {TOOLS_STACK.filter(t => t.kategorie === "eigenbau").map((werkzeug, index) => {
-                      const istAktiv = aktivesWerkzeug === werkzeug.name;
-                      return (
-                        <motion.button
-                          key={werkzeug.name}
-                          onClick={() => setAktivesWerkzeug(istAktiv ? null : werkzeug.name)}
-                          aria-expanded={istAktiv}
-                          initial={{ opacity: 0, x: -8 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.04, duration: 0.28 }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyber-400/40 ${
-                            istAktiv
-                              ? "border-cyber-400/30 bg-cyber-400/[0.06]"
-                              : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.1] hover:bg-white/[0.04]"
-                          }`}
-                        >
-                          <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors duration-150 ${istAktiv ? "bg-cyber-400" : "bg-white/20"}`} />
-                          <div className="flex-1 min-w-0">
-                            <span className="font-mono text-sm text-white/90 font-medium block truncate">{werkzeug.name}</span>
-                            <p className="text-[10px] text-white/35 truncate mt-0.5">{werkzeug.rolle}</p>
-                          </div>
-                        </motion.button>
-                      );
-                    })}
-                  </div>
+              {/* ── Eigenbau (linke Spalte, eigener State) ── */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <AbzeichenStatus variante="aktiv" text="EIGENBAU" mitPuls />
+                  <span className="text-xs text-white/30">Selbst entwickelt & auf VPS deployed</span>
                 </div>
-
-                {/* Integriert */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <AbzeichenStatus variante="akzent" text="INTEGRIERT" />
-                    <span className="text-xs text-white/50">Professionelle Toolchain</span>
-                  </div>
-                  <div className="space-y-1">
-                    {TOOLS_STACK.filter(t => t.kategorie !== "eigenbau").map((werkzeug, index) => {
-                      const istAktiv = aktivesWerkzeug === werkzeug.name;
-                      return (
-                        <motion.button
-                          key={werkzeug.name}
-                          onClick={() => setAktivesWerkzeug(istAktiv ? null : werkzeug.name)}
-                          aria-expanded={istAktiv}
-                          initial={{ opacity: 0, x: -8 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.04, duration: 0.28 }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyber-400/40 ${
-                            istAktiv
-                              ? "border-cyber-400/30 bg-cyber-400/[0.06]"
-                              : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.1] hover:bg-white/[0.04]"
-                          }`}
+                <div className="space-y-2">
+                  {TOOLS_STACK.filter(t => t.kategorie === "eigenbau").map((werkzeug, index) => (
+                    <motion.div
+                      key={werkzeug.name}
+                      initial={{ opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.04, duration: 0.28 }}
+                    >
+                      <InfoKarte
+                        lichtfarbe="34, 211, 238"
+                        akzentRand={aktivesEigenbau === werkzeug.name}
+                        akzentFarbe="#22d3ee"
+                        mitHoverAnimation={false}
+                        klassen="p-0"
+                      >
+                        <button
+                          onClick={() => setAktivesEigenbau(aktivesEigenbau === werkzeug.name ? null : werkzeug.name)}
+                          aria-expanded={aktivesEigenbau === werkzeug.name}
+                          className="w-full flex items-center gap-3 p-3 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyber-400/40 rounded-xl"
                         >
-                          <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors duration-150 ${istAktiv ? "bg-cyber-400" : "bg-white/20"}`} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <span className="font-mono text-sm text-white/90 font-medium block truncate">{werkzeug.name}</span>
-                            <p className="text-[10px] text-white/35 truncate mt-0.5">{werkzeug.rolle}</p>
+                            <span className="font-mono text-sm text-white font-medium">{werkzeug.name}</span>
+                            <p className="text-xs text-white/35">{werkzeug.rolle}</p>
                           </div>
-                        </motion.button>
-                      );
-                    })}
-                  </div>
+                          <motion.span
+                            animate={{ rotate: aktivesEigenbau === werkzeug.name ? 45 : 0 }}
+                            transition={{ duration: 0.18 }}
+                            aria-hidden="true"
+                            className="text-cyber-400 text-lg flex-shrink-0 font-light pr-1"
+                          >
+                            +
+                          </motion.span>
+                        </button>
+                        <AnimatePresence>
+                          {aktivesEigenbau === werkzeug.name && werkzeug.beschreibung && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.22 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-3 pb-3 border-t border-cyber-400/10">
+                                <p className="text-xs text-white/60 leading-relaxed pt-3">{werkzeug.beschreibung}</p>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </InfoKarte>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
 
-              {/* ── Rechts: stabiles Detail-Panel ── */}
-              <div className="flex-1 min-w-0 lg:sticky lg:top-24">
-                <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] min-h-[260px] overflow-hidden">
-                  <AnimatePresence mode="wait">
-                    {(() => {
-                      const tool = TOOLS_STACK.find(t => t.name === aktivesWerkzeug);
-                      if (!tool) {
-                        return (
-                          <motion.div
-                            key="__leer__"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.18 }}
-                            className="flex items-center justify-center min-h-[260px]"
-                          >
-                            <span className="font-mono text-[11px] text-white/18">← Tool auswählen</span>
-                          </motion.div>
-                        );
-                      }
-                      const rgb = WERKZEUG_FARBEN[tool.kategorie] ?? "34, 211, 238";
-                      return (
-                        <motion.div
-                          key={tool.name}
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -6 }}
-                          transition={{ duration: 0.22, ease: EASE }}
-                          className="p-5 md:p-6"
+              {/* ── Integriert (rechte Spalte, eigener State) ── */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <AbzeichenStatus variante="akzent" text="INTEGRIERT" />
+                  <span className="text-xs text-white/50">Professionelle Security-Toolchain</span>
+                </div>
+                <div className="space-y-2">
+                  {TOOLS_STACK.filter(t => t.kategorie !== "eigenbau").map((werkzeug, index) => (
+                    <motion.div
+                      key={werkzeug.name}
+                      initial={{ opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.04, duration: 0.28 }}
+                    >
+                      <InfoKarte
+                        lichtfarbe="34, 211, 238"
+                        akzentRand={aktivesIntegriert === werkzeug.name}
+                        akzentFarbe="#22d3ee"
+                        mitHoverAnimation={false}
+                        klassen="p-0"
+                      >
+                        <button
+                          onClick={() => setAktivesIntegriert(aktivesIntegriert === werkzeug.name ? null : werkzeug.name)}
+                          aria-expanded={aktivesIntegriert === werkzeug.name}
+                          className="w-full flex items-center gap-3 p-3 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyber-400/40 rounded-xl"
                         >
-                          <div className="flex items-start justify-between gap-3 mb-4">
-                            <div className="min-w-0">
-                              <h4 className="font-mono text-base font-bold text-white leading-snug mb-1">{tool.name}</h4>
-                              <p className="text-xs text-white/45">{tool.rolle}</p>
-                            </div>
-                            <span
-                              className="font-mono text-[9px] px-2 py-1 rounded-lg border uppercase tracking-widest flex-shrink-0 leading-none mt-0.5"
-                              style={{
-                                color: `rgba(${rgb}, 0.85)`,
-                                borderColor: `rgba(${rgb}, 0.25)`,
-                                backgroundColor: `rgba(${rgb}, 0.08)`,
-                              }}
-                            >
-                              {tool.kategorie}
-                            </span>
+                          <div className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <span className="font-mono text-sm text-white font-medium">{werkzeug.name}</span>
+                            <p className="text-xs text-white/35">{werkzeug.rolle}</p>
                           </div>
-                          <div
-                            className="h-px mb-4"
-                            style={{ background: `linear-gradient(to right, rgba(${rgb}, 0.3), transparent)` }}
-                          />
-                          <p className="text-sm text-white/65 leading-relaxed">{tool.beschreibung}</p>
-                        </motion.div>
-                      );
-                    })()}
-                  </AnimatePresence>
+                          <motion.span
+                            animate={{ rotate: aktivesIntegriert === werkzeug.name ? 45 : 0 }}
+                            transition={{ duration: 0.18 }}
+                            aria-hidden="true"
+                            className="text-cyber-400 text-lg flex-shrink-0 font-light pr-1"
+                          >
+                            +
+                          </motion.span>
+                        </button>
+                        <AnimatePresence>
+                          {aktivesIntegriert === werkzeug.name && werkzeug.beschreibung && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.22 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-3 pb-3 border-t border-cyber-400/10">
+                                <p className="text-xs text-white/60 leading-relaxed pt-3">{werkzeug.beschreibung}</p>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </InfoKarte>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
 
