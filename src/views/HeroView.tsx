@@ -45,15 +45,7 @@ function CodeRainCanvas() {
       }
     };
 
-    let letztesFrame = 0;
-    let animationId: number;
-    const animate = (ts: number) => {
-      animationId = requestAnimationFrame(animate);
-      if (ts - letztesFrame < 50) return;
-      letztesFrame = ts;
-      zeichnen();
-    };
-    animationId = requestAnimationFrame(animate);
+    const intervall = setInterval(zeichnen, 50);
     const resize = () => {
       w = window.innerWidth; h = window.innerHeight;
       canvas.width = w; canvas.height = h;
@@ -61,7 +53,7 @@ function CodeRainCanvas() {
       tropfen = Array(spalten).fill(0).map(() => Math.random() * -80);
     };
     window.addEventListener("resize", resize);
-    return () => { cancelAnimationFrame(animationId); window.removeEventListener("resize", resize); };
+    return () => { clearInterval(intervall); window.removeEventListener("resize", resize); };
   }, []);
 
   return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" style={{ opacity: 0.55 }} />;
