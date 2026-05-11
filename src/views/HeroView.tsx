@@ -184,6 +184,71 @@ export default function HeroView() {
             </p>
           </KartenLicht>
         </motion.div>
+
+        {/* Mehrwert */}
+        <motion.div
+          variants={einblend(1.05)}
+          initial="versteckt"
+          animate="sichtbar"
+          whileHover={{ scale: 1.015, y: -3, transition: { duration: 0.3, ease: EASE } }}
+          whileTap={{ scale: 0.99, y: 0, transition: { duration: 0.1, ease: [0.4, 0, 0.2, 1] } }}
+          className="max-w-2xl mx-auto mt-3 rounded-2xl backdrop-blur-sm overflow-hidden"
+          style={{
+            background: "linear-gradient(135deg, rgba(34,211,238,0.06), rgba(99,102,241,0.03))",
+            border: "1px solid rgba(34,211,238,0.14)",
+            boxShadow: "0 0 40px rgba(34,211,238,0.05), 0 8px 32px rgba(0,0,0,0.3)",
+          }}
+        >
+          <KartenLicht lichtfarbe="34, 211, 238" intensitaet={0.09} radius={320}>
+            <div className="px-6 py-5 text-left">
+
+              {/* Header */}
+              <div className="flex items-center gap-2 mb-3">
+                <span className="font-mono text-[11px] text-cyber-400/55">› mehrwert</span>
+                <div className="h-px flex-1 bg-white/[0.04]" />
+              </div>
+
+              {/* Body */}
+              <div className="space-y-2.5 text-sm text-white/68 leading-relaxed mb-4">
+                <p>
+                  Seit 2022 arbeite ich intensiv mit KI – nicht als Chat-Tool, sondern als produktiven technischen Workflow mit klaren Rollen, iterativen Schleifen, Agenten-Logik und MCP-Anbindungen.
+                </p>
+                <p>
+                  Mit 32 spezialisierten Agents, 15+ MCP-Servern und eigener Automatisierung unterstütze ich App-Entwicklung, Testing, Security-Analysen, Dokumentation und strukturierte Kommunikation.
+                </p>
+                <p>
+                  <span className="text-cyber-400/75 font-medium">Das Ergebnis:</span>{" "}
+                  schnellere Prototypen, klarere Entscheidungen und Lösungen, die nicht nur modern wirken, sondern wirklich nutzbar sind.
+                </p>
+              </div>
+
+              {/* Value Chips */}
+              <div className="flex flex-wrap gap-1.5 pt-3 border-t border-white/[0.04]">
+                {[
+                  "KI seit 2022",
+                  "32 Agents",
+                  "15+ MCPs",
+                  "SwiftUI & Android",
+                  "Security Research",
+                  "Linux & VPS",
+                ].map((chip) => (
+                  <span
+                    key={chip}
+                    className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border text-white/55 leading-none"
+                    style={{
+                      backgroundColor: "rgba(34, 211, 238, 0.07)",
+                      borderColor: "rgba(34, 211, 238, 0.20)",
+                    }}
+                  >
+                    {chip}
+                  </span>
+                ))}
+              </div>
+
+            </div>
+          </KartenLicht>
+        </motion.div>
+
       </div>
     </section>
   );
