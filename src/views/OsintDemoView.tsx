@@ -1271,7 +1271,7 @@ export default function OsintDemoView() {
       )}
 
       <div className="mt-6 text-[11px] font-mono text-white/30 text-center leading-relaxed">
-        <div><span className="text-akzent-400/55">status:</span> live-checks aktiv · 11 module · FBI-inspired</div>
+        <div><span className="text-akzent-400/55">status:</span> live-checks aktiv</div>
         <div><span className="text-akzent-400/55">privacy:</span> keine dauerhafte speicherung · rate-limit: 3–20/min</div>
       </div>
     </section>
