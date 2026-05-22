@@ -28,19 +28,17 @@ interface DemoModul {
   readonly eingabeTyp: "text" | "none" | "demo";
 }
 
+// 8 konsolidierte Module — keine Redundanz, jedes Tool macht intern Vollanalyse.
+// Email/Username/Domain führen mehrere Backend-Calls parallel und mergen die Outputs.
 const DEMO_MODULE: DemoModul[] = [
-  { nummer: "1",  name: "Status pruefen",        farbe: "#9ca3af", eingabeLabel: "",                   beispielEingabe: "",                              eingabeTyp: "none" },
-  { nummer: "2",  name: "E-Mail Analyse",        farbe: "#818cf8", eingabeLabel: "E-Mail eingeben",    beispielEingabe: "demo@gmail.com",                eingabeTyp: "text" },
-  { nummer: "3",  name: "Username Suche",        farbe: "#c084fc", eingabeLabel: "Username eingeben",  beispielEingabe: "cypherneo",                     eingabeTyp: "text" },
-  { nummer: "4",  name: "Telefon Analyse",       farbe: "#eab308", eingabeLabel: "Telefonnummer",      beispielEingabe: "+4915112345678",                eingabeTyp: "text" },
-  { nummer: "5",  name: "Domain / DNS / WHOIS",  farbe: "#22d3ee", eingabeLabel: "Domain eingeben",    beispielEingabe: "example.com",                   eingabeTyp: "text" },
-  { nummer: "6",  name: "Reverse Image",         farbe: "#22c55e", eingabeLabel: "Bild-URL",           beispielEingabe: "https://example.com/foto.jpg",  eingabeTyp: "text" },
-  // ── Senior-Elite Erweiterungen (basierend auf FBI-OSINT Video) ──
-  { nummer: "7",  name: "Username Vollscan (600+)", farbe: "#d946ef", eingabeLabel: "Username eingeben",  beispielEingabe: "cypherneo",                  eingabeTyp: "text" },
-  { nummer: "8",  name: "Shodan InternetDB",     farbe: "#ef4444", eingabeLabel: "IP oder Domain",     beispielEingabe: "1.1.1.1",                       eingabeTyp: "text" },
-  { nummer: "9",  name: "E-Mail Tiefen-Recon",   farbe: "#f97316", eingabeLabel: "E-Mail eingeben",    beispielEingabe: "demo@gmail.com",                eingabeTyp: "text" },
-  { nummer: "10", name: "Intel Search-Aggregator", farbe: "#06b6d4", eingabeLabel: "Wert (Auto-Typ)",  beispielEingabe: "cypherneo",                     eingabeTyp: "text" },
-  { nummer: "11", name: "Vollanalyse Orchestrator", farbe: "#10b981", eingabeLabel: "Beliebiges Target", beispielEingabe: "example.com",                 eingabeTyp: "text" },
+  { nummer: "1", name: "Status pruefen",          farbe: "#9ca3af", eingabeLabel: "",                    beispielEingabe: "",                              eingabeTyp: "none" },
+  { nummer: "2", name: "E-Mail Vollanalyse",      farbe: "#818cf8", eingabeLabel: "E-Mail eingeben",     beispielEingabe: "demo@gmail.com",                eingabeTyp: "text" },
+  { nummer: "3", name: "Username Vollscan (600+)", farbe: "#c084fc", eingabeLabel: "Username eingeben",  beispielEingabe: "cypherneo",                     eingabeTyp: "text" },
+  { nummer: "4", name: "Telefon Analyse",         farbe: "#eab308", eingabeLabel: "Telefonnummer",       beispielEingabe: "+4915112345678",                eingabeTyp: "text" },
+  { nummer: "5", name: "Domain & Shodan",         farbe: "#22d3ee", eingabeLabel: "Domain eingeben",     beispielEingabe: "example.com",                   eingabeTyp: "text" },
+  { nummer: "6", name: "Reverse Image",           farbe: "#22c55e", eingabeLabel: "Bild-URL",            beispielEingabe: "https://example.com/foto.jpg",  eingabeTyp: "text" },
+  { nummer: "7", name: "Intel Search-Aggregator", farbe: "#06b6d4", eingabeLabel: "Wert (Auto-Typ)",     beispielEingabe: "cypherneo",                     eingabeTyp: "text" },
+  { nummer: "8", name: "Vollanalyse Orchestrator", farbe: "#10b981", eingabeLabel: "Beliebiges Target",  beispielEingabe: "example.com",                   eingabeTyp: "text" },
 ];
 
 // ─── Datenschutz-Konfiguration für sensitive Module ──────────────
@@ -169,19 +167,18 @@ function erstelleDemoAusgabe(modulNummer: string, eingabe: string): string[] {
     "  [ok]  dnspython / python-whois",
     "  [ok]  httpx / slowapi",
     "  [ok]  WhatsMyName-DB cached",
-    "", S("KERN-WERKZEUGE"),
-    "  [ok]  Domain / DNS / WHOIS",
-    "  [ok]  E-Mail Analyse",
-    "  [ok]  Username Suche (Tier-1)",
-    "  [ok]  Telefon Analyse",
-    "  [ok]  Reverse Image (EXIF + GPS)",
-    "", S("SENIOR-ELITE MODULE (V2)"),
-    "  [ok]  Vollscan WhatsMyName 600+",
-    "  [ok]  Shodan InternetDB",
-    "  [ok]  E-Mail Tiefen-Recon (GHunt)",
-    "  [ok]  Intel Search-Aggregator",
-    "  [ok]  SpiderFoot-Orchestrator",
-    "", "  11 von 11 Werkzeugen live aktiv",
+    "  [ok]  Shodan InternetDB connected",
+    "", S("MODULE (V2-konsolidiert)"),
+    "  [ok]  [2] E-Mail Vollanalyse",
+    "         DNS+SPF+DMARC+Gravatar+GHunt+HIBP+GitHub",
+    "  [ok]  [3] Username Vollscan (WhatsMyName 600+)",
+    "  [ok]  [4] Telefon Analyse",
+    "  [ok]  [5] Domain & Shodan",
+    "         DNS+WHOIS+ASN+HTTP-Sec+Ports+CVEs",
+    "  [ok]  [6] Reverse Image (EXIF + GPS)",
+    "  [ok]  [7] Intel Search-Aggregator",
+    "  [ok]  [8] Vollanalyse Orchestrator + Graph",
+    "", "  8 Module live -- alle Vollanalyse",
     "  Inspiriert vom FBI-OSINT-Toolkit",
   ];
 
@@ -331,10 +328,128 @@ function benutzerZuTerminal(b: BenutzerErgebnis): string[] {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// SENIOR-ELITE RENDERER (Module 7-11) — FBI/OSINT Video-Tools
+// SENIOR-ELITE RENDERER — konsolidiert (8 Module)
 // ═══════════════════════════════════════════════════════════════════
 
-// ─── Modul 7: Username Vollscan (WhatsMyName 600+) ──────────────
+// ─── E-Mail VOLLANALYSE: merge Basis (DNS/MX/SPF) + Recon (GHunt) ──
+
+function emailVollZuTerminal(e: EmailErgebnis, r: EmailReconErgebnis | null): string[] {
+  if (!e.gueltig) {
+    return [R, K("E-MAIL VOLLANALYSE -- Fehler"), R, "", `  ${trunc(e.fehler ?? "Ungueltige Adresse", 30)}`];
+  }
+  const zeilen: string[] = [
+    R, K(`E-MAIL VOLL -- ${trunc(e.adresse ?? "", 18)}`), R,
+    "", S("SYNTAX & KLASSIFIKATION"),
+    WW("Format",     "Gueltig"),
+    WW("Domain",     trunc(e.syntax?.domain ?? "?", 20)),
+    WW("Lokal",      trunc(e.syntax?.lokal_teil ?? "?", 20)),
+    WW("Wegwerf",    e.klassifikation?.wegwerf ? "JA" : "Nein"),
+    WW("Zustellbar", e.klassifikation?.zustellbar ? "Ja" : "Nein"),
+  ];
+
+  // DNS aus Basis
+  zeilen.push("", S("DOMAIN-DNS"));
+  zeilen.push(WW("MX-Records", e.domain?.hat_mx ? `Ja (${e.domain.mx_records.length})` : "Nein"));
+  if (e.domain?.spf)   zeilen.push(`  SPF   ${trunc(e.domain.spf, 26)}`);
+  if (e.domain?.dmarc) zeilen.push(`  DMARC ${trunc(e.domain.dmarc, 26)}`);
+
+  // Hashes aus Recon
+  if (r?.hashes) {
+    zeilen.push("", S("HASHES (Cross-Ref)"));
+    zeilen.push(WW("MD5",    trunc(r.hashes.md5, 22)));
+    zeilen.push(WW("SHA-1",  trunc(r.hashes.sha1, 22)));
+  }
+
+  // Gravatar aus Recon
+  if (r?.gravatar) {
+    zeilen.push("", S("GRAVATAR"));
+    if (r.gravatar.gefunden) {
+      zeilen.push("  [ok]  Profil gefunden");
+      const pd = r.gravatar.profil_daten;
+      if (pd?.anzeigename)  zeilen.push(WW("Name", trunc(pd.anzeigename, 20)));
+      if (pd?.benutzername) zeilen.push(WW("User", trunc(pd.benutzername, 20)));
+      if (pd?.ort)          zeilen.push(WW("Ort",  trunc(pd.ort, 20)));
+      const konten = pd?.verifizierte_konten ?? [];
+      if (konten.length) {
+        zeilen.push("  Verknuepfte Konten:");
+        for (const k of konten.slice(0, 4)) {
+          zeilen.push(`    ${k.verifiziert ? "[++]" : "[+]"}  ${trunc(k.name, 22)}`);
+        }
+      }
+    } else {
+      zeilen.push("  [-]  Kein Gravatar-Profil");
+    }
+  }
+
+  // Google GAIA aus Recon
+  if (r?.google) {
+    zeilen.push("", S("GOOGLE (GAIA)"));
+    if (r.google.google_konto_wahrscheinlich) {
+      zeilen.push("  [+]  Gmail-Konto wahrscheinlich");
+      zeilen.push("  Pivot-Links:");
+      for (const key of Object.keys(r.google.links ?? {}).slice(0, 4)) {
+        zeilen.push(`    [+]  ${trunc(key.replace(/_/g, " "), 22)}`);
+      }
+    } else {
+      zeilen.push("  [-]  Kein Google-Signal");
+    }
+  }
+
+  // HIBP — nutze tiefere Recon-Variante falls verfügbar, sonst Basis-Variante
+  zeilen.push("", S("HIBP DATENLECKS"));
+  if (r?.hibp?.geprueft && r.hibp.domain_betroffen) {
+    zeilen.push(`  [!]  ${r.hibp.anzahl_breaches} Breach(es) fuer Domain`);
+    for (const b of (r.hibp.breaches ?? []).slice(0, 4)) {
+      zeilen.push(`    [!]  ${trunc(b.titel, 18)} (${b.datum})`);
+    }
+  } else if (r?.hibp?.geprueft) {
+    zeilen.push("  [ok]  Keine bekannten Breaches");
+  } else if (e.datenleck?.domain_betroffen) {
+    zeilen.push("  [!]  In oeffentlichen Leaks");
+    if (e.datenleck.anzahl_nutzer) zeilen.push(`  Nutzer: ~${e.datenleck.anzahl_nutzer}`);
+  } else {
+    zeilen.push("  HIBP nicht erreichbar");
+  }
+
+  // GitHub aus Recon
+  if (r?.github) {
+    zeilen.push("", S("GITHUB-DISCOVERY"));
+    if (r.github.gefunden) {
+      zeilen.push(`  [+]  ${r.github.treffer} GitHub-Konto(s)`);
+      for (const n of (r.github.nutzer ?? []).slice(0, 3)) {
+        zeilen.push(`    [+]  @${trunc(n.login, 22)}`);
+      }
+    } else {
+      zeilen.push(`  [-]  ${trunc(r.github.hinweis ?? "Keine GitHub-Treffer", 30)}`);
+    }
+  }
+
+  // WER IST DAS aus Recon
+  if ((r?.wer_ist_das?.length ?? 0) > 0) {
+    zeilen.push("", S("WER IST DAS?"));
+    for (const w of r!.wer_ist_das!.slice(0, 6)) {
+      const kSym = w.konfidenz === "hoch" ? "[++]" : "[+]";
+      zeilen.push(`  ${kSym}  ${trunc(w.quelle + ": " + w.wert, 28)}`);
+    }
+  }
+
+  // Risiko — nimm den höheren der beiden
+  const rmBasis  = e.risiko?.punkte ?? 0;
+  const rmRecon  = r?.risiko?.punkte ?? 0;
+  if (e.risiko || r?.risiko) {
+    zeilen.push("", S("RISIKO-BEWERTUNG"));
+    const stufe = rmRecon >= rmBasis ? (r?.risiko?.stufe ?? "?") : (e.risiko?.stufe ?? "?");
+    const total = rmBasis + rmRecon;
+    zeilen.push(`  ${String(stufe).toUpperCase()} (${total} Punkte gesamt)`);
+    for (const d of e.risiko?.details ?? [])    zeilen.push(`  [!]  ${trunc(d, 26)}`);
+    for (const d of r?.risiko?.details ?? [])   zeilen.push(`  [!]  ${trunc(d, 26)}`);
+  }
+
+  zeilen.push("", `  Analysiert: ${e.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
+  return zeilen;
+}
+
+// ─── Username Vollscan (WhatsMyName 600+) ───────────────────────
 
 function vollscanZuTerminal(b: BenutzerErgebnis): string[] {
   if (b.fehler) return [R, K("VOLLSCAN -- Fehler"), R, "", `  ${trunc(b.fehler, 30)}`];
@@ -365,7 +480,90 @@ function vollscanZuTerminal(b: BenutzerErgebnis): string[] {
   return zeilen;
 }
 
-// ─── Modul 8: Shodan InternetDB ─────────────────────────────────
+// ─── Domain & Shodan VOLLANALYSE: merge DNS/WHOIS/HTTP + Shodan ─
+
+function domainVollZuTerminal(d: DomainErgebnis, s: ShodanErgebnis | null): string[] {
+  const zeilen: string[] = [
+    R, K(`DOMAIN VOLL -- ${trunc(d.domain, 18)}`), R,
+    "", S("DNS-RECORDS"),
+  ];
+  d.dns.a.slice(0, 3).forEach((ip, i) => zeilen.push(`  A  [${i + 1}]  ${ip}`));
+  if (d.dns.aaaa.length) zeilen.push(`  AAAA  ${trunc(d.dns.aaaa[0], 24)}`);
+  d.dns.mx.slice(0, 2).forEach(mx => zeilen.push(`  MX    ${trunc(mx, 24)}`));
+  d.dns.ns.slice(0, 2).forEach(ns => zeilen.push(`  NS    ${trunc(ns, 24)}`));
+  if (d.dns.spf)   zeilen.push(`  SPF   ${trunc(d.dns.spf, 26)}`);
+  if (d.dns.dmarc) zeilen.push(`  DMARC ${trunc(d.dns.dmarc, 26)}`);
+
+  zeilen.push("", S("PROVIDER / ASN"));
+  zeilen.push(`  ${trunc(d.asn, 30)}`);
+
+  zeilen.push("", S("WHOIS"));
+  if (d.whois.registrar)      zeilen.push(WW("Registrar", trunc(String(d.whois.registrar), 18)));
+  if (d.whois.registriert_am) zeilen.push(WW("Erstellt",  trunc(d.whois.registriert_am, 18)));
+  if (d.whois.ablauf_am)      zeilen.push(WW("Ablauf",    trunc(d.whois.ablauf_am, 18)));
+  if (d.whois.fehler)         zeilen.push(`  ${trunc(d.whois.fehler, 30)}`);
+
+  zeilen.push("", S("HTTP"));
+  zeilen.push(WW("Erreichbar", d.http.erreichbar ? "Ja" : "Nein"));
+  if (d.http.status) zeilen.push(WW("Status", String(d.http.status)));
+  if (d.http.server) zeilen.push(WW("Server", trunc(d.http.server, 20)));
+  if (d.http.weiterleitungsziel) zeilen.push(WW("Redirect", trunc(d.http.weiterleitungsziel, 18)));
+
+  const sv = d.sicherheits_bewertung;
+  zeilen.push("", S("HTTP-SICHERHEIT"));
+  zeilen.push(`  Score: ${sv.punkte}/${sv.max} (${sv.prozent}%) -- ${sv.note.toUpperCase()}`);
+  for (const det of sv.details) {
+    zeilen.push(`  ${det.ok ? "[ok]" : "[--]"}  ${trunc(det.check, 24)}`);
+  }
+
+  // ─── Shodan-Ergänzung ─────────────────────────────────────────
+  if (s && !s.fehler && s.aggregiert) {
+    const a = s.aggregiert;
+    zeilen.push("", S("SHODAN: OFFENE PORTS"));
+    if (a.ports_anzahl === 0) {
+      zeilen.push("  [ok]  Keine Ports in Shodan-DB");
+    } else {
+      zeilen.push(WW("Anzahl", String(a.ports_anzahl)));
+      for (const p of a.ports.slice(0, 8)) {
+        const pSym = p.gefaehrlich ? "[!]" : "[+]";
+        const svc  = p.service ? trunc(p.service, 18) : "";
+        zeilen.push(`  ${pSym}  ${String(p.port).padEnd(6)} ${svc}`);
+      }
+      if (a.ports.length > 8) zeilen.push(`  ... +${a.ports.length - 8} weitere`);
+    }
+
+    zeilen.push("", S("SHODAN: VULNS (CVE)"));
+    if (a.vulns_anzahl === 0) {
+      zeilen.push("  [ok]  Keine bekannten CVEs");
+    } else {
+      zeilen.push(WW("Anzahl", String(a.vulns_anzahl)));
+      for (const v of a.vulns.slice(0, 6)) zeilen.push(`  [!]  ${trunc(v, 26)}`);
+      if (a.vulns.length > 6) zeilen.push(`  ... +${a.vulns.length - 6} weitere`);
+    }
+
+    if (a.tags.length) {
+      zeilen.push("", S("SHODAN: TAGS"));
+      for (const t of a.tags.slice(0, 5)) zeilen.push(`  [#]  ${trunc(t.tag + ": " + t.bedeutung, 28)}`);
+    }
+
+    if (s.risiko) {
+      zeilen.push("", S("SHODAN-RISIKO"));
+      zeilen.push(`  Score: ${s.risiko.punkte}/${s.risiko.max} -- ${s.risiko.stufe.toUpperCase()}`);
+      for (const dt of s.risiko.details) {
+        const dSym = dt.stufe === "hoch" ? "[!]" : "[i]";
+        zeilen.push(`  ${dSym}  ${trunc(dt.meldung, 26)}`);
+      }
+    }
+  } else if (s?.fehler) {
+    zeilen.push("", S("SHODAN"));
+    zeilen.push(`  ${trunc(s.fehler, 30)}`);
+  }
+
+  zeilen.push("", `  Analysiert: ${d.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
+  return zeilen;
+}
+
+// ─── Shodan standalone (für Orchestrator-Reuse) ─────────────────
 
 function shodanZuTerminal(s: ShodanErgebnis): string[] {
   if (s.fehler) return [R, K("SHODAN -- Fehler"), R, "", `  ${trunc(s.fehler, 30)}`];
@@ -730,40 +928,43 @@ export default function OsintDemoView() {
     try {
       let zeilen: string[] = [];
 
-      if (aktivesModul.nummer === "5") {
-        const ergebnis = await domainAnalysieren(wert);
-        zeilen = domainZuTerminal(ergebnis);
-        setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "2") {
-        const ergebnis = await emailAnalysieren(wert);
-        zeilen = emailZuTerminal(ergebnis);
-        setRohdaten(ergebnis);
+      if (aktivesModul.nummer === "2") {
+        // E-Mail Vollanalyse: Basis + Recon parallel
+        const [basis, recon] = await Promise.allSettled([
+          emailAnalysieren(wert),
+          emailReconnaissance(wert),
+        ]);
+        const basisOk = basis.status === "fulfilled" ? basis.value : null;
+        const reconOk = recon.status === "fulfilled" ? recon.value : null;
+        if (!basisOk) throw basis.status === "rejected" ? basis.reason : new Apifehler("Basis-Email-Check fehlgeschlagen");
+        zeilen = emailVollZuTerminal(basisOk, reconOk);
+        setRohdaten({ basis: basisOk, recon: reconOk });
       } else if (aktivesModul.nummer === "3") {
-        const ergebnis = await benutzernameSuchen(wert);
-        zeilen = benutzerZuTerminal(ergebnis);
+        // Username: nur noch Vollscan (600+ Plattformen)
+        const ergebnis = await benutzernameVollscan(wert);
+        zeilen = vollscanZuTerminal(ergebnis);
         setRohdaten(ergebnis);
       } else if (aktivesModul.nummer === "4") {
         const ergebnis = await telefonAnalysieren(wert);
         zeilen = telefonZuTerminal(ergebnis);
         setRohdaten(ergebnis);
+      } else if (aktivesModul.nummer === "5") {
+        // Domain + Shodan parallel
+        const [domain, shodan] = await Promise.allSettled([
+          domainAnalysieren(wert),
+          shodanAbfragen(wert),
+        ]);
+        const domainOk = domain.status === "fulfilled" ? domain.value : null;
+        const shodanOk = shodan.status === "fulfilled" ? shodan.value : null;
+        if (!domainOk) throw domain.status === "rejected" ? domain.reason : new Apifehler("Domain-Check fehlgeschlagen");
+        zeilen = domainVollZuTerminal(domainOk, shodanOk);
+        setRohdaten({ domain: domainOk, shodan: shodanOk });
       } else if (aktivesModul.nummer === "6") {
         const ergebnis = await bildAnalysieren(wert);
         zeilen = bildZuTerminal(ergebnis);
         setRohdaten(ergebnis);
       } else if (aktivesModul.nummer === "7") {
-        const ergebnis = await benutzernameVollscan(wert);
-        zeilen = vollscanZuTerminal(ergebnis);
-        setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "8") {
-        const ergebnis = await shodanAbfragen(wert);
-        zeilen = shodanZuTerminal(ergebnis);
-        setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "9") {
-        const ergebnis = await emailReconnaissance(wert);
-        zeilen = emailReconZuTerminal(ergebnis);
-        setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "10") {
-        // Auto-Typ-Erkennung für Aggregator (heuristisch)
+        // Aggregator mit Auto-Typ-Erkennung
         const v = wert.trim();
         const typ: "email" | "username" | "domain" | "phone" | "image" | "ip" =
           /^[a-zA-Z0-9._%+\-]+@/.test(v) ? "email" :
@@ -775,7 +976,7 @@ export default function OsintDemoView() {
         const ergebnis = await searchAggregator(typ, wert);
         zeilen = aggregatorZuTerminal(ergebnis);
         setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "11") {
+      } else if (aktivesModul.nummer === "8") {
         const ergebnis = await orchestrator(wert, 2);
         zeilen = orchestratorZuTerminal(ergebnis);
         setRohdaten(ergebnis);
@@ -1053,8 +1254,8 @@ export default function OsintDemoView() {
         </div>
       </div>
 
-      {/* Maltego-Style Graph — nur bei Modul 11 (Orchestrator) mit Graph-Daten */}
-      {fertig && aktivesModul?.nummer === "11" && rohdaten && (rohdaten as OrchestratorErgebnis).graph && (
+      {/* Maltego-Style Graph — nur bei Modul 8 (Orchestrator) mit Graph-Daten */}
+      {fertig && aktivesModul?.nummer === "8" && rohdaten && (rohdaten as OrchestratorErgebnis).graph && (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-6">
           <div className="flex items-center gap-2 px-4 py-2.5 bg-[#12121f] rounded-t-2xl border border-white/[0.08] border-b-0">
             <span className="font-mono text-[11px] text-white/55">graph_visualization — maltego_style</span>
