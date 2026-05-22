@@ -414,6 +414,59 @@ function emailVollZuTerminal(e: EmailErgebnis, r: EmailReconErgebnis | null): st
     zeilen.push("  HIBP nicht erreichbar");
   }
 
+  // XposedOrNot — Email-Level Breach (HIBP-Replacement)
+  if (r?.xposedornot?.geprueft) {
+    zeilen.push("", S("XPOSEDORNOT BREACHES"));
+    const n = r.xposedornot.anzahl_breaches ?? 0;
+    if (n > 0) {
+      zeilen.push(`  [!]  ${n} Email-Level Breach(es)`);
+      for (const name of (r.xposedornot.breaches ?? []).slice(0, 5)) {
+        zeilen.push(`    [!]  ${trunc(name, 26)}`);
+      }
+      const exposed = r.xposedornot.exposed_fields ?? [];
+      if (exposed.length) {
+        zeilen.push("  Exposed Fields:");
+        for (const f of exposed.slice(0, 4)) {
+          const clean = f.replace(/^data_/, "");
+          zeilen.push(`    [+]  ${trunc(clean, 26)}`);
+        }
+      }
+      if ((r.xposedornot.pastes_count ?? 0) > 0) {
+        zeilen.push(`  Pastes: ${r.xposedornot.pastes_count}`);
+      }
+    } else {
+      zeilen.push("  [ok]  Email nicht in Breach-DBs");
+    }
+  }
+
+  // LeakCheck — 3. Index-Quelle
+  if (r?.leakcheck?.geprueft) {
+    zeilen.push("", S("LEAKCHECK"));
+    const n = r.leakcheck.anzahl ?? 0;
+    if (n > 0) {
+      zeilen.push(`  [!]  ${n} weitere Breach-Quelle(n)`);
+      for (const s of (r.leakcheck.sources ?? []).slice(0, 4)) {
+        const ds = s.datum ? ` (${s.datum})` : "";
+        zeilen.push(`    [!]  ${trunc(s.name + ds, 26)}`);
+      }
+    } else {
+      zeilen.push("  [ok]  Keine LeakCheck-Treffer");
+    }
+  }
+
+  // PGP Keyserver — Existenz-Check
+  if (r?.pgp?.geprueft) {
+    zeilen.push("", S("PGP KEYSERVER"));
+    if (r.pgp.hat_pgp_key) {
+      zeilen.push(`  [+]  ${r.pgp.anzahl} PGP-Key(s) - sicherheitsaffin`);
+      for (const k of (r.pgp.keys ?? []).slice(0, 2)) {
+        zeilen.push(`    Fingerprint: ${trunc(k.fingerprint, 20)}`);
+      }
+    } else {
+      zeilen.push("  [-]  Kein PGP-Key gefunden");
+    }
+  }
+
   // GitHub aus Recon
   if (r?.github) {
     zeilen.push("", S("GITHUB-DISCOVERY"));

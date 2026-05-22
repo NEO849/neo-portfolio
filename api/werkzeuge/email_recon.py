@@ -169,6 +169,129 @@ async def _hibp_passwort_pruefen(client: httpx.AsyncClient, email: str) -> dict:
         return {"geprueft": False, "hinweis": "HIBP nicht erreichbar"}
 
 
+# ─── XposedOrNot — tieferer Breach-Kontext ─────────────────────────
+
+async def _xposedornot_pruefen(client: httpx.AsyncClient, email: str) -> dict:
+    """
+    XposedOrNot bietet ähnliche Daten wie HIBP aber ohne Paid-Key.
+    /v1/check-email — Liste der Breach-Namen
+    /v1/breach-analytics — exposed data types, paste exposure
+    """
+    try:
+        # 1. Liste der Breach-Namen
+        r1 = await client.get(
+            f"https://api.xposedornot.com/v1/check-email/{email}",
+            timeout=TIMEOUT_S,
+        )
+        breaches: list[str] = []
+        if r1.status_code == 200:
+            data = r1.json()
+            raw = data.get("breaches") or []
+            if raw and isinstance(raw[0], list):
+                breaches = list(raw[0])
+
+        # 2. Analytics (Paste-Counts + Exposed Fields)
+        exposed_fields: list[str] = []
+        pastes_count = 0
+        try:
+            r2 = await client.get(
+                "https://api.xposedornot.com/v1/breach-analytics",
+                params={"email": email},
+                timeout=TIMEOUT_S,
+            )
+            if r2.status_code == 200:
+                d2 = r2.json()
+                metrics = d2.get("BreachMetrics") or {}
+                if isinstance(metrics, dict):
+                    xposed = metrics.get("xposed_data") or []
+                    if isinstance(xposed, list):
+                        for entry in xposed:
+                            if isinstance(entry, dict):
+                                for child in entry.get("children", []) or []:
+                                    for grand in child.get("children", []) or []:
+                                        if isinstance(grand, dict) and grand.get("name"):
+                                            exposed_fields.append(grand["name"])
+                pastes = d2.get("PastesSummary") or {}
+                if isinstance(pastes, dict):
+                    pastes_count = pastes.get("cnt", 0) or 0
+        except Exception:
+            pass
+
+        return {
+            "geprueft": True,
+            "anzahl_breaches": len(breaches),
+            "breaches": breaches[:15],
+            "exposed_fields": list(dict.fromkeys(exposed_fields))[:10],
+            "pastes_count": pastes_count,
+        }
+    except Exception:
+        return {"geprueft": False, "hinweis": "XposedOrNot nicht erreichbar"}
+
+
+# ─── LeakCheck — 3. Index-Quelle ────────────────────────────────────
+
+async def _leakcheck_pruefen(client: httpx.AsyncClient, email: str) -> dict:
+    """LeakCheck Public API — 1 req/s, keyless."""
+    try:
+        r = await client.get(
+            "https://leakcheck.io/api/public",
+            params={"check": email},
+            timeout=TIMEOUT_S,
+        )
+        if r.status_code == 200:
+            data = r.json()
+            if data.get("success") and (data.get("found") or 0) > 0:
+                sources = data.get("sources") or []
+                return {
+                    "geprueft": True,
+                    "anzahl": len(sources),
+                    "sources": [
+                        {
+                            "name": (s.get("name") if isinstance(s, dict) else str(s)),
+                            "datum": (s.get("date") if isinstance(s, dict) else ""),
+                        }
+                        for s in sources[:10]
+                    ],
+                }
+            return {"geprueft": True, "anzahl": 0, "sources": []}
+    except Exception:
+        pass
+    return {"geprueft": False, "hinweis": "LeakCheck nicht erreichbar"}
+
+
+# ─── PGP Keyserver — Existenz-Check ─────────────────────────────────
+
+async def _pgp_pruefen(client: httpx.AsyncClient, email: str) -> dict:
+    """keys.openpgp.org HKP-Lookup — gibt Hinweis ob User PGP nutzt."""
+    try:
+        r = await client.get(
+            "https://keys.openpgp.org/pks/lookup",
+            params={"op": "vindex", "options": "mr", "search": email},
+            timeout=TIMEOUT_S,
+        )
+        if r.status_code == 200 and "pub:" in r.text:
+            keys: list[dict] = []
+            for line in r.text.splitlines():
+                if line.startswith("pub:"):
+                    parts = line.split(":")
+                    if len(parts) >= 5:
+                        keys.append({
+                            "fingerprint": parts[1],
+                            "created": parts[4],
+                        })
+            return {
+                "geprueft": True,
+                "hat_pgp_key": bool(keys),
+                "anzahl": len(keys),
+                "keys": keys[:3],
+            }
+        elif r.status_code in (200, 404):
+            return {"geprueft": True, "hat_pgp_key": False, "anzahl": 0}
+    except Exception:
+        pass
+    return {"geprueft": False, "hinweis": "PGP-Keyserver nicht erreichbar"}
+
+
 # ─── GitHub Email-User Discovery ────────────────────────────────────
 
 async def _github_user_finden(client: httpx.AsyncClient, email: str) -> dict:
@@ -256,11 +379,14 @@ async def email_recon(email: str) -> dict:
     domain = email.split("@")[1]
 
     async with httpx.AsyncClient(verify=False) as client:
-        gravatar, google_id, hibp, github = await asyncio.gather(
+        gravatar, google_id, hibp, github, xposedornot, leakcheck, pgp = await asyncio.gather(
             _gravatar_pruefen(client, email),
             _google_id_pruefen(client, email),
             _hibp_passwort_pruefen(client, email),
             _github_user_finden(client, email),
+            _xposedornot_pruefen(client, email),
+            _leakcheck_pruefen(client, email),
+            _pgp_pruefen(client, email),
         )
 
     # Aggregiertes "wer-ist-das"
@@ -285,25 +411,43 @@ async def email_recon(email: str) -> dict:
                 "url": nutzer.get("url"),
                 "konfidenz": "hoch",
             })
+    if pgp.get("hat_pgp_key"):
+        wer_ist_das.append({
+            "quelle": "PGP-Keyserver",
+            "wert": f"{pgp['anzahl']} PGP-Key(s) - sicherheitsaffiner User",
+            "konfidenz": "hoch",
+        })
 
     # Risiko
     risiko_punkte = 0
     risiko_details = []
     if hibp.get("domain_betroffen"):
         risiko_punkte += 3
-        risiko_details.append(f"Domain in {hibp.get('anzahl_breaches')} bekannten Breaches")
+        risiko_details.append(f"Domain in {hibp.get('anzahl_breaches')} bekannten HIBP-Breaches")
+    if xposedornot.get("anzahl_breaches", 0) > 0:
+        risiko_punkte += 3
+        risiko_details.append(f"Email in {xposedornot['anzahl_breaches']} XposedOrNot-Breach(es)")
+    if xposedornot.get("exposed_fields"):
+        risiko_punkte += 1
+        risiko_details.append(f"Exposed Fields: {', '.join(xposedornot['exposed_fields'][:5])}")
+    if leakcheck.get("anzahl", 0) > 0:
+        risiko_punkte += 2
+        risiko_details.append(f"LeakCheck: {leakcheck['anzahl']} weitere Breach-Quelle(n)")
     if gravatar.get("gefunden"):
         risiko_punkte += 1
-        risiko_details.append("Gravatar-Profil öffentlich — Persona-Verknüpfung möglich")
+        risiko_details.append("Gravatar-Profil öffentlich - Persona-Verknüpfung möglich")
     if google_id.get("google_konto_wahrscheinlich"):
         risiko_punkte += 1
-        risiko_details.append("Google-Konto wahrscheinlich — Maps/YouTube ggf. öffentlich verknüpft")
+        risiko_details.append("Google-Konto wahrscheinlich - Maps/YouTube ggf. öffentlich verknüpft")
     if github.get("gefunden"):
         risiko_punkte += 1
         risiko_details.append(f"{github.get('treffer', 0)} GitHub-Konten verknüpft")
+    if pgp.get("hat_pgp_key"):
+        risiko_punkte += 1
+        risiko_details.append("PGP-Key öffentlich - User ist sicherheitsbewusst")
 
-    stufe = ("Hoch" if risiko_punkte >= 4 else
-             "Mittel" if risiko_punkte >= 2 else
+    stufe = ("Hoch" if risiko_punkte >= 6 else
+             "Mittel" if risiko_punkte >= 3 else
              "Gering" if risiko_punkte else "Keines")
 
     return {
@@ -316,6 +460,9 @@ async def email_recon(email: str) -> dict:
         "google": google_id,
         "hibp": hibp,
         "github": github,
+        "xposedornot": xposedornot,
+        "leakcheck": leakcheck,
+        "pgp": pgp,
         "wer_ist_das": wer_ist_das,
         "risiko": {
             "stufe": stufe,
@@ -325,6 +472,9 @@ async def email_recon(email: str) -> dict:
         "quellen": [
             "Gravatar Public API",
             "HaveIBeenPwned Public Breaches API",
+            "XposedOrNot Public API",
+            "LeakCheck Public API",
+            "keys.openpgp.org HKP",
             "GitHub Public Search API",
             "Google Public Endpoints (Maps/Calendar/Drive)",
         ],

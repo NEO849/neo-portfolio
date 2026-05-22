@@ -402,6 +402,27 @@ export interface EmailReconErgebnis {
     nutzer?: Array<{ login: string; url: string; avatar: string; typ: string }>;
     hinweis?: string;
   };
+  xposedornot?: {
+    geprueft: boolean;
+    anzahl_breaches?: number;
+    breaches?: string[];
+    exposed_fields?: string[];
+    pastes_count?: number;
+    hinweis?: string;
+  };
+  leakcheck?: {
+    geprueft: boolean;
+    anzahl?: number;
+    sources?: Array<{ name: string; datum: string }>;
+    hinweis?: string;
+  };
+  pgp?: {
+    geprueft: boolean;
+    hat_pgp_key?: boolean;
+    anzahl?: number;
+    keys?: Array<{ fingerprint: string; created: string }>;
+    hinweis?: string;
+  };
   wer_ist_das?: Array<{ quelle: string; wert: string; konfidenz: string; url?: string }>;
   risiko?: {
     stufe: string;

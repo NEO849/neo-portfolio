@@ -161,15 +161,29 @@ async def bild_analysieren(bild_url: str) -> dict:
     groesse_kb = round(len(bild_bytes) / 1024, 1)
     groesse_mb = round(len(bild_bytes) / (1024 * 1024), 2)
 
-    # Reverse Image Suchlinks
+    # Reverse Image Suchlinks — kuratiert über alle Coverage-Bereiche
     from urllib.parse import quote
     url_encoded = quote(bild_url, safe="")
     suchlinks = [
-        {"name": "Google Lens",  "url": f"https://lens.google.com/uploadbyurl?url={url_encoded}"},
-        {"name": "TinEye",       "url": f"https://tineye.com/search?url={url_encoded}"},
-        {"name": "Yandex",       "url": f"https://yandex.com/images/search?url={url_encoded}&rpt=imageview"},
-        {"name": "Bing Visual",  "url": f"https://www.bing.com/images/search?view=detailv2&iss=sbi&q=imgurl:{url_encoded}"},
-        {"name": "Baidu",        "url": f"https://image.baidu.com/pcdutu?queryImageUrl={url_encoded}"},
+        # Mainstream
+        {"name": "Google Lens",   "kategorie": "Mainstream",  "url": f"https://lens.google.com/uploadbyurl?url={url_encoded}"},
+        {"name": "Google Images", "kategorie": "Mainstream",  "url": f"https://www.google.com/searchbyimage?image_url={url_encoded}"},
+        {"name": "TinEye",        "kategorie": "Mainstream",  "url": f"https://tineye.com/search?url={url_encoded}"},
+        {"name": "Bing Visual",   "kategorie": "Mainstream",  "url": f"https://www.bing.com/images/search?view=detailv2&iss=sbi&q=imgurl:{url_encoded}"},
+        # Regional
+        {"name": "Yandex",        "kategorie": "EU/CIS",      "url": f"https://yandex.com/images/search?url={url_encoded}&rpt=imageview"},
+        {"name": "Baidu",         "kategorie": "China",       "url": f"https://image.baidu.com/pcdutu?queryImageUrl={url_encoded}"},
+        # Face-Engines (paid, manuell)
+        {"name": "PimEyes",       "kategorie": "Face (paid)", "url": "https://pimeyes.com/en"},
+        {"name": "FaceCheck.ID",  "kategorie": "Face (paid)", "url": "https://facecheck.id"},
+        {"name": "Search4Faces",  "kategorie": "Face CIS",    "url": "https://search4faces.com/en/"},
+        {"name": "FindClone",     "kategorie": "Face CIS",    "url": "https://findclone.ru/"},
+        {"name": "Lenso.ai",      "kategorie": "Face AI",     "url": "https://lenso.ai/"},
+        # Art/Anime
+        {"name": "SauceNAO",      "kategorie": "Anime/Art",   "url": f"https://saucenao.com/search.php?url={url_encoded}"},
+        {"name": "IQDB",          "kategorie": "Anime/Art",   "url": f"https://iqdb.org/?url={url_encoded}"},
+        # Celebs
+        {"name": "PicTriev",      "kategorie": "Celebrity",   "url": "http://www.pictriev.com"},
     ]
 
     # Sicherheitsanalyse
