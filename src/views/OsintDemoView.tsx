@@ -178,8 +178,6 @@ function erstelleDemoAusgabe(modulNummer: string, eingabe: string): string[] {
     "  [ok]  [6] Reverse Image (EXIF + GPS)",
     "  [ok]  [7] Intel Search-Aggregator",
     "  [ok]  [8] Vollanalyse Orchestrator + Graph",
-    "", "  8 Module live -- alle Vollanalyse",
-    "  Inspiriert vom FBI-OSINT-Toolkit",
   ];
 
   if (modulNummer === "4") {
