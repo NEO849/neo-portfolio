@@ -170,14 +170,19 @@ function erstelleDemoAusgabe(modulNummer: string, eingabe: string): string[] {
     "  [ok]  Shodan InternetDB connected",
     "", S("MODULE (V2-konsolidiert)"),
     "  [ok]  [2] E-Mail Vollanalyse",
-    "         DNS+SPF+DMARC+Gravatar+GHunt+HIBP+GitHub",
-    "  [ok]  [3] Username Vollscan (WhatsMyName 600+)",
+    "  ›  DNS · SPF · DMARC · Gravatar · GHunt · HIBP · GitHub",
+    "  [ok]  [3] Username Vollscan",
+    "  ›  WhatsMyName-DB · 600+ Plattformen",
     "  [ok]  [4] Telefon Analyse",
+    "  ›  Format · Carrier · Land · Suchlinks",
     "  [ok]  [5] Domain & Shodan",
-    "         DNS+WHOIS+ASN+HTTP-Sec+Ports+CVEs",
-    "  [ok]  [6] Reverse Image (EXIF + GPS)",
+    "  ›  DNS · WHOIS · ASN · HTTP-Sec · Ports · CVEs",
+    "  [ok]  [6] Reverse Image",
+    "  ›  EXIF · GPS · pHash · Reverse-Suche",
     "  [ok]  [7] Intel Search-Aggregator",
-    "  [ok]  [8] Vollanalyse Orchestrator + Graph",
+    "  ›  60+ kuratierte Such-Quellen",
+    "  [ok]  [8] Vollanalyse Orchestrator",
+    "  ›  Auto-Pivot · Maltego-Graph",
   ];
 
   if (modulNummer === "4") {
@@ -1209,11 +1214,25 @@ export default function OsintDemoView() {
             {/* Ausgabe */}
             {phase === "ausgabe" && (
               <motion.div key="ausgabe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                {ausgabeZeilen.slice(0, zeilenIndex + 1).map((zeile, index) => (
-                  <div key={index} className={`whitespace-pre-wrap break-words ${zeileFarbe(zeile)}`}>
-                    {zeile || "\u00A0"}
-                  </div>
-                ))}
+                {ausgabeZeilen.slice(0, zeilenIndex + 1).map((zeile, index) => {
+                  // Subline-Marker "  \u203A" \u2014 dezent, kleiner, hanging-indent, wrappable
+                  if (zeile.startsWith("  \u203A")) {
+                    const inhalt = zeile.replace(/^\s*\u203A\s+/, "");
+                    return (
+                      <div
+                        key={index}
+                        className="text-white/45 text-[11px] leading-snug pl-[58px] pr-2 break-words whitespace-normal -mt-0.5 mb-1"
+                      >
+                        {inhalt}
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={index} className={`whitespace-pre-wrap break-words ${zeileFarbe(zeile)}`}>
+                      {zeile || "\u00A0"}
+                    </div>
+                  );
+                })}
                 {!fertig && <span className="text-signal-gruen/60 animate-pulse">█</span>}
                 {fertig && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-5 border-t border-white/5 pt-4">
