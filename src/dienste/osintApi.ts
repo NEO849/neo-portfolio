@@ -98,6 +98,8 @@ export interface PlattformErgebnis {
   url: string;
   gefunden: boolean | null;
   status?: number;
+  konfidenz?: "hoch" | "mittel" | "niedrig";
+  tier?: number;
   fehler?: string;
   hinweis?: string;
 }
@@ -105,6 +107,7 @@ export interface PlattformErgebnis {
 export interface BenutzerErgebnis {
   benutzername: string;
   analysiert_am: string;
+  modus?: "tier1" | "vollscan";
   fehler?: string;
   zusammenfassung?: {
     geprueft: number;
@@ -112,6 +115,9 @@ export interface BenutzerErgebnis {
     nicht_gefunden: number;
     fehler: number;
     treffer_rate: number;
+    konfidenz_hoch?: number;
+    konfidenz_mittel?: number;
+    konfidenz_niedrig?: number;
   };
   plattformen?: {
     gefunden: PlattformErgebnis[];
@@ -290,4 +296,220 @@ export async function apiGesund(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SENIOR-ELITE ERWEITERUNGEN
+// Shodan InternetDB, Email-Recon (GHunt/Epieos), Aggregator, Orchestrator
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── Typen: Shodan InternetDB ─────────────────────────────────────
+
+export interface ShodanPortDetail {
+  port: number;
+  gefaehrlich: boolean;
+  service: string | null;
+}
+
+export interface ShodanTagDetail {
+  tag: string;
+  bedeutung: string;
+}
+
+export interface ShodanRisiko {
+  punkte: number;
+  max: number;
+  stufe: "Kritisch" | "Hoch" | "Mittel" | "Gering" | "Keines";
+  details: Array<{ stufe: string; meldung: string }>;
+}
+
+export interface ShodanErgebnis {
+  ziel: string;
+  eingabe_typ: "ip" | "domain";
+  analysiert_am: string;
+  fehler?: string;
+  ip_count?: number;
+  ips?: string[];
+  ergebnisse_pro_ip?: Array<{
+    ip: string;
+    in_shodan: boolean;
+    ports?: number[];
+    vulns?: string[];
+    tags?: string[];
+    hostnames?: string[];
+    cpes?: string[];
+    fehler?: string;
+  }>;
+  aggregiert?: {
+    ports: ShodanPortDetail[];
+    ports_anzahl: number;
+    vulns: string[];
+    vulns_anzahl: number;
+    tags: ShodanTagDetail[];
+    hostnames: string[];
+    cpes: string[];
+  };
+  risiko?: ShodanRisiko;
+  quelle?: string;
+}
+
+// ─── Typen: Email-Recon ───────────────────────────────────────────
+
+export interface EmailReconErgebnis {
+  email: string;
+  gueltig: boolean;
+  fehler?: string;
+  analysiert_am: string;
+  domain?: string;
+  hashes?: { md5: string; sha1: string; sha256: string };
+  gravatar?: {
+    gefunden: boolean;
+    hash_md5: string;
+    profil_url: string;
+    avatar_url: string;
+    avatar_existiert?: boolean;
+    profil_daten?: {
+      anzeigename?: string | null;
+      benutzername?: string | null;
+      ort?: string | null;
+      bio?: string | null;
+      verifizierte_konten?: Array<{ name: string; url: string; verifiziert: boolean }>;
+      urls?: string[];
+    };
+    fehler?: string;
+  };
+  google?: {
+    google_konto_wahrscheinlich: boolean;
+    hinweis?: string;
+    links?: Record<string, string>;
+  };
+  hibp?: {
+    geprueft: boolean;
+    domain_betroffen?: boolean;
+    anzahl_breaches?: number;
+    breaches?: Array<{
+      name: string;
+      titel: string;
+      datum: string;
+      betroffene: number;
+      datenklassen: string[];
+    }>;
+    hinweis?: string;
+  };
+  github?: {
+    gefunden: boolean;
+    treffer?: number;
+    nutzer?: Array<{ login: string; url: string; avatar: string; typ: string }>;
+    hinweis?: string;
+  };
+  wer_ist_das?: Array<{ quelle: string; wert: string; konfidenz: string; url?: string }>;
+  risiko?: {
+    stufe: string;
+    punkte: number;
+    details: string[];
+  };
+  quellen?: string[];
+}
+
+// ─── Typen: Search-Aggregator ─────────────────────────────────────
+
+export interface AggregatorLink {
+  name: string;
+  kategorie: string;
+  url: string;
+}
+
+export interface AggregatorErgebnis {
+  typ: string;
+  wert: string;
+  analysiert_am: string;
+  anzahl: number;
+  links: AggregatorLink[];
+  nach_kategorie: Record<string, AggregatorLink[]>;
+  hinweis?: string;
+  fehler?: string;
+}
+
+// ─── Typen: Orchestrator ──────────────────────────────────────────
+
+export interface GraphNode {
+  id: string;
+  label: string;
+  typ: string;  // email|domain|username|ip|account|cve|asn|nameserver|carrier|land|phone
+  daten: Record<string, unknown>;
+}
+
+export interface GraphEdge {
+  von: string;
+  zu: string;
+  beziehung: string;
+}
+
+export interface OrchestratorErgebnis {
+  eingabe: string;
+  typ: "email" | "domain" | "username" | "ip" | "phone" | "unknown";
+  tiefe?: number;
+  fehler?: string;
+  analysiert_am: string;
+  module?: Record<string, unknown>;
+  graph?: {
+    nodes: GraphNode[];
+    edges: GraphEdge[];
+    statistik: {
+      knoten_gesamt: number;
+      kanten_gesamt: number;
+      nach_typ: Record<string, number>;
+    };
+  };
+  zusammenfassung?: {
+    module_ausgefuehrt: string[];
+    pivots_entdeckt: number;
+  };
+}
+
+// ─── Neue API-Funktionen ──────────────────────────────────────────
+
+/**
+ * Shodan InternetDB Recon — kostenlos, kein Key.
+ * Liefert offene Ports, CVEs, Tags für eine IP oder Domain.
+ */
+export async function shodanAbfragen(ziel: string): Promise<ShodanErgebnis> {
+  return apiFetch<ShodanErgebnis>("/shodan", { ziel });
+}
+
+/**
+ * E-Mail Tiefen-Recon (Epieos/GHunt-Style).
+ * Gravatar + Google + HIBP + GitHub parallel.
+ */
+export async function emailReconnaissance(email: string): Promise<EmailReconErgebnis> {
+  return apiFetch<EmailReconErgebnis>("/email-recon", { email });
+}
+
+/**
+ * IntelTechniques-Style Search-Aggregator.
+ * Generiert 50+ kuratierte Search-Links pro Target-Typ.
+ */
+export async function searchAggregator(
+  typ: "email" | "username" | "domain" | "phone" | "image" | "ip",
+  wert: string,
+): Promise<AggregatorErgebnis> {
+  return apiFetch<AggregatorErgebnis>("/aggregator", { typ, wert });
+}
+
+/**
+ * SpiderFoot-Style Orchestrator — Vollanalyse mit automatischer Typ-Erkennung.
+ */
+export async function orchestrator(
+  eingabe: string,
+  tiefe: 1 | 2 | 3 = 2,
+): Promise<OrchestratorErgebnis> {
+  return apiFetch<OrchestratorErgebnis>("/orchestrator", { eingabe, tiefe });
+}
+
+/**
+ * Benutzername-Vollscan (WhatsMyName-DB, 600+ Plattformen).
+ * Variante von benutzernameSuchen() mit vollscan=true.
+ */
+export async function benutzernameVollscan(benutzername: string): Promise<BenutzerErgebnis> {
+  return apiFetch<BenutzerErgebnis>("/benutzername", { benutzername, vollscan: true });
 }

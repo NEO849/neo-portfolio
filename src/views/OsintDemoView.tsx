@@ -3,11 +3,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   domainAnalysieren, emailAnalysieren, benutzernameSuchen,
   telefonAnalysieren, bildAnalysieren,
+  shodanAbfragen, emailReconnaissance, searchAggregator, orchestrator,
+  benutzernameVollscan,
   Apifehler,
   type DomainErgebnis, type EmailErgebnis, type BenutzerErgebnis,
   type TelefonErgebnis, type BildErgebnis,
+  type ShodanErgebnis, type EmailReconErgebnis,
+  type AggregatorErgebnis, type OrchestratorErgebnis,
 } from "../dienste/osintApi";
 import { DatenschutzModal } from "../bausteine/DatenschutzModal";
+import OsintGraph from "../bausteine/OsintGraph";
 
 // ═══════════════════════════════════════════════════════
 // OSINT TOOLKIT – LIVE TERMINAL MIT ECHTEM BACKEND
@@ -24,12 +29,18 @@ interface DemoModul {
 }
 
 const DEMO_MODULE: DemoModul[] = [
-  { nummer: "1", name: "Status pruefen",        farbe: "#9ca3af", eingabeLabel: "",                    beispielEingabe: "",              eingabeTyp: "none" },
-  { nummer: "2", name: "E-Mail Analyse",        farbe: "#818cf8", eingabeLabel: "E-Mail eingeben",    beispielEingabe: "demo@gmail.com", eingabeTyp: "text" },
-  { nummer: "3", name: "Username Suche",        farbe: "#c084fc", eingabeLabel: "Username eingeben",  beispielEingabe: "cypherneo",      eingabeTyp: "text" },
-  { nummer: "4", name: "Telefon Analyse",       farbe: "#eab308", eingabeLabel: "Telefonnummer",   beispielEingabe: "+4915112345678",        eingabeTyp: "text" },
-  { nummer: "5", name: "Domain / DNS / WHOIS",  farbe: "#22d3ee", eingabeLabel: "Domain eingeben", beispielEingabe: "example.com",            eingabeTyp: "text" },
-  { nummer: "6", name: "Reverse Image",         farbe: "#22c55e", eingabeLabel: "Bild-URL",        beispielEingabe: "https://example.com/foto.jpg", eingabeTyp: "text" },
+  { nummer: "1",  name: "Status pruefen",        farbe: "#9ca3af", eingabeLabel: "",                   beispielEingabe: "",                              eingabeTyp: "none" },
+  { nummer: "2",  name: "E-Mail Analyse",        farbe: "#818cf8", eingabeLabel: "E-Mail eingeben",    beispielEingabe: "demo@gmail.com",                eingabeTyp: "text" },
+  { nummer: "3",  name: "Username Suche",        farbe: "#c084fc", eingabeLabel: "Username eingeben",  beispielEingabe: "cypherneo",                     eingabeTyp: "text" },
+  { nummer: "4",  name: "Telefon Analyse",       farbe: "#eab308", eingabeLabel: "Telefonnummer",      beispielEingabe: "+4915112345678",                eingabeTyp: "text" },
+  { nummer: "5",  name: "Domain / DNS / WHOIS",  farbe: "#22d3ee", eingabeLabel: "Domain eingeben",    beispielEingabe: "example.com",                   eingabeTyp: "text" },
+  { nummer: "6",  name: "Reverse Image",         farbe: "#22c55e", eingabeLabel: "Bild-URL",           beispielEingabe: "https://example.com/foto.jpg",  eingabeTyp: "text" },
+  // ── Senior-Elite Erweiterungen (basierend auf FBI-OSINT Video) ──
+  { nummer: "7",  name: "Username Vollscan (600+)", farbe: "#d946ef", eingabeLabel: "Username eingeben",  beispielEingabe: "cypherneo",                  eingabeTyp: "text" },
+  { nummer: "8",  name: "Shodan InternetDB",     farbe: "#ef4444", eingabeLabel: "IP oder Domain",     beispielEingabe: "1.1.1.1",                       eingabeTyp: "text" },
+  { nummer: "9",  name: "E-Mail Tiefen-Recon",   farbe: "#f97316", eingabeLabel: "E-Mail eingeben",    beispielEingabe: "demo@gmail.com",                eingabeTyp: "text" },
+  { nummer: "10", name: "Intel Search-Aggregator", farbe: "#06b6d4", eingabeLabel: "Wert (Auto-Typ)",  beispielEingabe: "cypherneo",                     eingabeTyp: "text" },
+  { nummer: "11", name: "Vollanalyse Orchestrator", farbe: "#10b981", eingabeLabel: "Beliebiges Target", beispielEingabe: "example.com",                 eingabeTyp: "text" },
 ];
 
 // ─── Datenschutz-Konfiguration für sensitive Module ──────────────
@@ -155,16 +166,23 @@ function erstelleDemoAusgabe(modulNummer: string, eingabe: string): string[] {
     ...rahmen("STATUS -- Systempruefung"),
     "", S("LIVE-BACKEND (Contabo VPS)"),
     "  [ok]  FastAPI v0.115",
-    "  [ok]  dnspython",
-    "  [ok]  python-whois",
+    "  [ok]  dnspython / python-whois",
     "  [ok]  httpx / slowapi",
-    "", S("WERKZEUGE"),
+    "  [ok]  WhatsMyName-DB cached",
+    "", S("KERN-WERKZEUGE"),
     "  [ok]  Domain / DNS / WHOIS",
     "  [ok]  E-Mail Analyse",
-    "  [ok]  Username Suche",
+    "  [ok]  Username Suche (Tier-1)",
     "  [ok]  Telefon Analyse",
-    "  [ok]  Reverse Image",
-    "", "  5 von 5 Werkzeugen live aktiv",
+    "  [ok]  Reverse Image (EXIF + GPS)",
+    "", S("SENIOR-ELITE MODULE (V2)"),
+    "  [ok]  Vollscan WhatsMyName 600+",
+    "  [ok]  Shodan InternetDB",
+    "  [ok]  E-Mail Tiefen-Recon (GHunt)",
+    "  [ok]  Intel Search-Aggregator",
+    "  [ok]  SpiderFoot-Orchestrator",
+    "", "  11 von 11 Werkzeugen live aktiv",
+    "  Inspiriert vom FBI-OSINT-Toolkit",
   ];
 
   if (modulNummer === "4") {
@@ -309,6 +327,232 @@ function benutzerZuTerminal(b: BenutzerErgebnis): string[] {
     }
   }
   zeilen.push("", `  Analysiert: ${b.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
+  return zeilen;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SENIOR-ELITE RENDERER (Module 7-11) — FBI/OSINT Video-Tools
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── Modul 7: Username Vollscan (WhatsMyName 600+) ──────────────
+
+function vollscanZuTerminal(b: BenutzerErgebnis): string[] {
+  if (b.fehler) return [R, K("VOLLSCAN -- Fehler"), R, "", `  ${trunc(b.fehler, 30)}`];
+  const s = b.zusammenfassung!;
+  const zeilen: string[] = [
+    R, K(`VOLLSCAN -- ${trunc(b.benutzername ?? "", 19)}`), R,
+    "", S("ZUSAMMENFASSUNG"),
+    WW("Geprueft",   `${s.geprueft} Plattformen`),
+    WW("Gefunden",   `${s.gefunden} Treffer (${s.treffer_rate}%)`),
+    WW("Konf. hoch", String(s.konfidenz_hoch ?? 0)),
+    WW("Konf. mitt", String(s.konfidenz_mittel ?? 0)),
+    WW("Konf. nied", String(s.konfidenz_niedrig ?? 0)),
+    WW("Fehler",     String(s.fehler)),
+  ];
+  if (b.nach_kategorie && Object.keys(b.nach_kategorie).length > 0) {
+    zeilen.push("", S("TREFFER NACH KATEGORIE"));
+    for (const [kat, plattformen] of Object.entries(b.nach_kategorie)) {
+      zeilen.push(`  ${kat.charAt(0).toUpperCase() + kat.slice(1)} (${plattformen.length})`);
+      for (const p of plattformen.slice(0, 8)) {
+        const kSym = p.konfidenz === "hoch" ? "[++]" : p.konfidenz === "mittel" ? "[+]" : "[?]";
+        zeilen.push(`    ${kSym}  ${trunc(p.plattform, 22)}`);
+      }
+      if (plattformen.length > 8) zeilen.push(`    ... +${plattformen.length - 8} weitere`);
+    }
+  }
+  zeilen.push("", `  WhatsMyName-DB (${b.modus})`,
+              `  Analysiert: ${b.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
+  return zeilen;
+}
+
+// ─── Modul 8: Shodan InternetDB ─────────────────────────────────
+
+function shodanZuTerminal(s: ShodanErgebnis): string[] {
+  if (s.fehler) return [R, K("SHODAN -- Fehler"), R, "", `  ${trunc(s.fehler, 30)}`];
+  const r = s.risiko!;
+  const a = s.aggregiert!;
+  const zeilen: string[] = [
+    R, K(`SHODAN -- ${trunc(s.ziel, 25)}`), R,
+    "", S("ZIEL"),
+    WW("Typ",       s.eingabe_typ ?? "?"),
+    WW("IPs",       `${s.ip_count ?? 0} aufgeloest`),
+    "", S("OFFENE PORTS"),
+    WW("Anzahl",    String(a.ports_anzahl)),
+  ];
+  for (const p of a.ports.slice(0, 8)) {
+    const pSym = p.gefaehrlich ? "[!]" : "[+]";
+    const svc  = p.service ? trunc(p.service, 18) : "";
+    zeilen.push(`  ${pSym}  ${String(p.port).padEnd(6)} ${svc}`);
+  }
+  if (a.ports.length > 8) zeilen.push(`  ... +${a.ports.length - 8} weitere`);
+
+  zeilen.push("", S("VULNS (CVE)"));
+  if (a.vulns_anzahl === 0) {
+    zeilen.push("  [ok]  Keine bekannten CVEs");
+  } else {
+    zeilen.push(WW("Anzahl", String(a.vulns_anzahl)));
+    for (const v of a.vulns.slice(0, 6)) zeilen.push(`  [!]  ${trunc(v, 26)}`);
+    if (a.vulns.length > 6) zeilen.push(`  ... +${a.vulns.length - 6} weitere`);
+  }
+
+  if (a.tags.length) {
+    zeilen.push("", S("TAGS"));
+    for (const t of a.tags.slice(0, 6)) zeilen.push(`  [#]  ${trunc(t.tag + ": " + t.bedeutung, 28)}`);
+  }
+  if (a.hostnames.length) {
+    zeilen.push("", S("rDNS-HOSTNAMES"));
+    for (const h of a.hostnames.slice(0, 4)) zeilen.push(`  ${trunc(h, 30)}`);
+  }
+
+  zeilen.push("", S("RISIKO"));
+  zeilen.push(`  Score: ${r.punkte}/${r.max} -- ${r.stufe.toUpperCase()}`);
+  for (const d of r.details) {
+    const dSym = d.stufe === "hoch" ? "[!]" : d.stufe === "mittel" ? "[!]" : "[i]";
+    zeilen.push(`  ${dSym}  ${trunc(d.meldung, 26)}`);
+  }
+  zeilen.push("", `  Quelle: Shodan InternetDB`,
+              `  Analysiert: ${s.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
+  return zeilen;
+}
+
+// ─── Modul 9: E-Mail Tiefen-Recon ───────────────────────────────
+
+function emailReconZuTerminal(e: EmailReconErgebnis): string[] {
+  if (!e.gueltig) return [R, K("EMAIL-RECON -- Fehler"), R, "", `  ${trunc(e.fehler ?? "ungueltig", 30)}`];
+  const zeilen: string[] = [
+    R, K(`EMAIL-RECON -- ${trunc(e.email, 18)}`), R,
+    "", S("BASIS"),
+    WW("Domain",  trunc(e.domain ?? "", 20)),
+    WW("MD5",     trunc(e.hashes?.md5 ?? "", 20)),
+  ];
+
+  zeilen.push("", S("GRAVATAR"));
+  if (e.gravatar?.gefunden) {
+    zeilen.push("  [ok]  Profil gefunden");
+    if (e.gravatar.profil_daten?.anzeigename) zeilen.push(WW("Name", trunc(e.gravatar.profil_daten.anzeigename, 20)));
+    if (e.gravatar.profil_daten?.benutzername) zeilen.push(WW("User", trunc(e.gravatar.profil_daten.benutzername, 20)));
+    if (e.gravatar.profil_daten?.ort) zeilen.push(WW("Ort", trunc(e.gravatar.profil_daten.ort, 20)));
+    const konten = e.gravatar.profil_daten?.verifizierte_konten ?? [];
+    if (konten.length) {
+      zeilen.push("  Verknuepfte Konten:");
+      for (const k of konten.slice(0, 4)) {
+        const vSym = k.verifiziert ? "[++]" : "[+]";
+        zeilen.push(`    ${vSym}  ${trunc(k.name, 22)}`);
+      }
+    }
+  } else {
+    zeilen.push("  [-]  Kein Gravatar-Profil");
+  }
+
+  zeilen.push("", S("GOOGLE (GAIA)"));
+  if (e.google?.google_konto_wahrscheinlich) {
+    zeilen.push("  [+]  Gmail-Konto wahrscheinlich");
+    zeilen.push("  Pivot-Links generiert:");
+    for (const key of Object.keys(e.google.links ?? {}).slice(0, 4)) {
+      zeilen.push(`    [+]  ${trunc(key.replace(/_/g, " "), 22)}`);
+    }
+  } else {
+    zeilen.push("  [-]  Kein Google-Signal");
+  }
+
+  zeilen.push("", S("HIBP BREACHES"));
+  if (!e.hibp?.geprueft) {
+    zeilen.push(`  ${trunc(e.hibp?.hinweis ?? "HIBP nicht erreichbar", 30)}`);
+  } else if (e.hibp.domain_betroffen) {
+    zeilen.push(`  [!]  ${e.hibp.anzahl_breaches} Breach(es) fuer Domain`);
+    for (const b of (e.hibp.breaches ?? []).slice(0, 4)) {
+      zeilen.push(`    [!]  ${trunc(b.titel, 18)} (${b.datum})`);
+    }
+  } else {
+    zeilen.push("  [ok]  Keine bekannten Breaches");
+  }
+
+  zeilen.push("", S("GITHUB"));
+  if (e.github?.gefunden) {
+    zeilen.push(`  [+]  ${e.github.treffer} GitHub-Konto(s)`);
+    for (const n of (e.github.nutzer ?? []).slice(0, 3)) {
+      zeilen.push(`    [+]  @${trunc(n.login, 22)}`);
+    }
+  } else {
+    zeilen.push(`  [-]  ${trunc(e.github?.hinweis ?? "Keine GitHub-Treffer", 30)}`);
+  }
+
+  if ((e.wer_ist_das?.length ?? 0) > 0) {
+    zeilen.push("", S("WER IST DAS?"));
+    for (const w of e.wer_ist_das!.slice(0, 6)) {
+      const kSym = w.konfidenz === "hoch" ? "[++]" : "[+]";
+      zeilen.push(`  ${kSym}  ${trunc(w.quelle + ": " + w.wert, 28)}`);
+    }
+  }
+
+  if (e.risiko) {
+    zeilen.push("", S("RISIKO"));
+    zeilen.push(`  ${e.risiko.stufe.toUpperCase()} (${e.risiko.punkte} Punkte)`);
+    for (const d of e.risiko.details) zeilen.push(`  [!]  ${trunc(d, 26)}`);
+  }
+
+  zeilen.push("", `  Analysiert: ${e.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
+  return zeilen;
+}
+
+// ─── Modul 10: Intel Search-Aggregator ──────────────────────────
+
+function aggregatorZuTerminal(a: AggregatorErgebnis): string[] {
+  if (a.fehler) return [R, K("AGGREGATOR -- Fehler"), R, "", `  ${trunc(a.fehler, 30)}`];
+  const zeilen: string[] = [
+    R, K(`AGGREGATOR -- ${trunc(a.wert, 19)}`), R,
+    "", S("UEBERSICHT"),
+    WW("Typ",       a.typ.toUpperCase()),
+    WW("Links",     `${a.anzahl} generiert`),
+    WW("Kategor.",  String(Object.keys(a.nach_kategorie).length)),
+  ];
+  zeilen.push("", S("NACH KATEGORIE"));
+  for (const [kat, links] of Object.entries(a.nach_kategorie)) {
+    zeilen.push(`  ${kat} (${links.length})`);
+    for (const link of links.slice(0, 5)) {
+      zeilen.push(`    [+]  ${trunc(link.name, 24)}`);
+    }
+    if (links.length > 5) zeilen.push(`    ... +${links.length - 5} weitere`);
+  }
+  zeilen.push("", `  ${trunc(a.hinweis ?? "Statisch generiert", 30)}`,
+              `  Analysiert: ${a.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
+  return zeilen;
+}
+
+// ─── Modul 11: Orchestrator (SpiderFoot-Style mit Graph) ────────
+
+function orchestratorZuTerminal(o: OrchestratorErgebnis): string[] {
+  if (o.fehler) return [R, K("ORCHESTRATOR -- Fehler"), R, "", `  ${trunc(o.fehler, 30)}`];
+  const g = o.graph!;
+  const zeilen: string[] = [
+    R, K(`ORCHESTRATOR -- ${trunc(o.eingabe, 16)}`), R,
+    "", S("AUTO-ERKENNUNG"),
+    WW("Typ",       o.typ.toUpperCase()),
+    WW("Tiefe",     String(o.tiefe ?? 2)),
+    WW("Module",    String(o.zusammenfassung?.module_ausgefuehrt.length ?? 0)),
+    "", S("GRAPH-STATISTIK"),
+    WW("Knoten",    String(g.statistik.knoten_gesamt)),
+    WW("Kanten",    String(g.statistik.kanten_gesamt)),
+    WW("Pivots",    String(o.zusammenfassung?.pivots_entdeckt ?? 0)),
+  ];
+  zeilen.push("", S("KNOTEN NACH TYP"));
+  for (const [typ, anzahl] of Object.entries(g.statistik.nach_typ)) {
+    zeilen.push(`  [#]  ${typ.padEnd(12)} ${anzahl}`);
+  }
+  zeilen.push("", S("AUSGEFUEHRTE MODULE"));
+  for (const m of o.zusammenfassung?.module_ausgefuehrt ?? []) {
+    zeilen.push(`  [ok]  ${trunc(m, 28)}`);
+  }
+  zeilen.push("", S("ENTDECKTE PIVOTS"));
+  const pivots = g.nodes.filter(n => !n.daten.primaer).slice(0, 8);
+  for (const p of pivots) {
+    zeilen.push(`  [>]  ${trunc(`${p.typ}: ${p.label}`, 30)}`);
+  }
+  if (g.nodes.length - 1 > 8) {
+    zeilen.push(`  ... +${g.nodes.length - 1 - 8} weitere`);
+  }
+  zeilen.push("", `  Graph in JSON-Export verfuegbar`,
+              `  Analysiert: ${o.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
   return zeilen;
 }
 
@@ -505,6 +749,35 @@ export default function OsintDemoView() {
       } else if (aktivesModul.nummer === "6") {
         const ergebnis = await bildAnalysieren(wert);
         zeilen = bildZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
+      } else if (aktivesModul.nummer === "7") {
+        const ergebnis = await benutzernameVollscan(wert);
+        zeilen = vollscanZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
+      } else if (aktivesModul.nummer === "8") {
+        const ergebnis = await shodanAbfragen(wert);
+        zeilen = shodanZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
+      } else if (aktivesModul.nummer === "9") {
+        const ergebnis = await emailReconnaissance(wert);
+        zeilen = emailReconZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
+      } else if (aktivesModul.nummer === "10") {
+        // Auto-Typ-Erkennung für Aggregator (heuristisch)
+        const v = wert.trim();
+        const typ: "email" | "username" | "domain" | "phone" | "image" | "ip" =
+          /^[a-zA-Z0-9._%+\-]+@/.test(v) ? "email" :
+          /^https?:\/\//.test(v) ? "image" :
+          /^\+?[0-9\s\-()]{6,}$/.test(v) ? "phone" :
+          /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/.test(v) ? "ip" :
+          /\.[a-zA-Z]{2,}$/.test(v) ? "domain" :
+          "username";
+        const ergebnis = await searchAggregator(typ, wert);
+        zeilen = aggregatorZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
+      } else if (aktivesModul.nummer === "11") {
+        const ergebnis = await orchestrator(wert, 2);
+        zeilen = orchestratorZuTerminal(ergebnis);
         setRohdaten(ergebnis);
       } else {
         zeilen = erstelleDemoAusgabe(aktivesModul.nummer, wert);
@@ -780,9 +1053,27 @@ export default function OsintDemoView() {
         </div>
       </div>
 
+      {/* Maltego-Style Graph — nur bei Modul 11 (Orchestrator) mit Graph-Daten */}
+      {fertig && aktivesModul?.nummer === "11" && rohdaten && (rohdaten as OrchestratorErgebnis).graph && (
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-6">
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-[#12121f] rounded-t-2xl border border-white/[0.08] border-b-0">
+            <span className="font-mono text-[11px] text-white/55">graph_visualization — maltego_style</span>
+            <span className="ml-auto font-mono text-[10px] text-akzent-400/70">
+              {(rohdaten as OrchestratorErgebnis).graph!.statistik.knoten_gesamt} Knoten · {(rohdaten as OrchestratorErgebnis).graph!.statistik.kanten_gesamt} Kanten
+            </span>
+          </div>
+          <div className="rounded-b-2xl overflow-hidden border border-white/[0.08] border-t-0">
+            <OsintGraph
+              nodes={(rohdaten as OrchestratorErgebnis).graph!.nodes}
+              edges={(rohdaten as OrchestratorErgebnis).graph!.edges}
+            />
+          </div>
+        </motion.div>
+      )}
+
       <div className="mt-6 text-[11px] font-mono text-white/30 text-center leading-relaxed">
-        <div><span className="text-akzent-400/55">status:</span> live-checks aktiv</div>
-        <div><span className="text-akzent-400/55">privacy:</span> keine dauerhafte speicherung · rate-limit: 3–10/min</div>
+        <div><span className="text-akzent-400/55">status:</span> live-checks aktiv · 11 module · FBI-inspired</div>
+        <div><span className="text-akzent-400/55">privacy:</span> keine dauerhafte speicherung · rate-limit: 3–20/min</div>
       </div>
     </section>
   );
