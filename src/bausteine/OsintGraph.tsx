@@ -171,6 +171,30 @@ export default function OsintGraph({ nodes, edges, breite = 720, hoehe = 480 }: 
         className="w-full bg-[#08080f] rounded-xl border border-white/[0.06]"
         style={{ maxHeight: hoehe }}
       >
+        {/* ─── SVG-Definitionen: Radial-Gradients + Glow pro Node-Farbe ─── */}
+        <defs>
+          {/* Glow-Filter — gemeinsam für alle Nodes */}
+          <filter id="node-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          {/* Drop-Shadow für Tiefe */}
+          <filter id="node-shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="1" stdDeviation="1.2" floodColor="#000" floodOpacity="0.6" />
+          </filter>
+          {/* Radial-Gradient pro Farbe für volumetrischen Look */}
+          {Object.entries(NODE_FARBEN).map(([typ, farbe]) => (
+            <radialGradient key={`grad-${typ}`} id={`grad-${typ}`} cx="35%" cy="30%" r="75%">
+              <stop offset="0%"   stopColor={farbe} stopOpacity="1" />
+              <stop offset="55%"  stopColor={farbe} stopOpacity="0.85" />
+              <stop offset="100%" stopColor={farbe} stopOpacity="0.55" />
+            </radialGradient>
+          ))}
+        </defs>
+
         {/* Edges */}
         <g className="edges">
           {edges.map((e, i) => {
@@ -223,30 +247,38 @@ export default function OsintGraph({ nodes, edges, breite = 720, hoehe = 480 }: 
                 onClick={() => setAuswahl(n)}
                 style={{ cursor: "pointer" }}
               >
+                {/* Pulsierender Halo um Primary-Node */}
                 {istPrimaer && (
-                  <circle
-                    r={r + 8}
-                    fill="none"
-                    stroke={farbe}
-                    strokeWidth={1}
-                    opacity={0.3}
-                  />
+                  <>
+                    <circle r={r + 12} fill="none" stroke={farbe} strokeWidth={0.5} opacity={0.18} />
+                    <circle r={r + 8}  fill="none" stroke={farbe} strokeWidth={1}   opacity={0.35} />
+                  </>
                 )}
+                {/* Hauptkreis mit Radial-Gradient + Drop-Shadow */}
                 <circle
                   r={r}
-                  fill={farbe}
-                  fillOpacity={hover ? 0.95 : 0.75}
-                  stroke="rgba(0,0,0,0.5)"
-                  strokeWidth={1}
+                  fill={`url(#grad-${n.typ})`}
+                  stroke="rgba(255,255,255,0.18)"
+                  strokeWidth={hover ? 1.5 : 0.8}
+                  filter={hover ? "url(#node-glow)" : "url(#node-shadow)"}
+                />
+                {/* Specular Highlight oben links für 3D-Effekt */}
+                <ellipse
+                  cx={-r * 0.3}
+                  cy={-r * 0.4}
+                  rx={r * 0.4}
+                  ry={r * 0.25}
+                  fill="rgba(255,255,255,0.32)"
+                  pointerEvents="none"
                 />
                 <text
-                  y={r + 13}
-                  fill="rgba(255,255,255,0.85)"
-                  fontSize={istPrimaer ? 12 : 10}
-                  fontWeight={istPrimaer ? 600 : 400}
+                  y={r + 14}
+                  fill="rgba(255,255,255,0.92)"
+                  fontSize={istPrimaer ? 13 : 11}
+                  fontWeight={istPrimaer ? 600 : 500}
                   textAnchor="middle"
                   className="font-mono pointer-events-none"
-                  style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}
+                  style={{ textShadow: "0 1px 3px rgba(0,0,0,0.95), 0 0 4px rgba(0,0,0,0.6)" }}
                 >
                   {n.label.length > 22 ? n.label.substring(0, 20) + "…" : n.label}
                 </text>
@@ -255,17 +287,82 @@ export default function OsintGraph({ nodes, edges, breite = 720, hoehe = 480 }: 
           })}
         </g>
 
-        {/* Legende */}
-        <g transform={`translate(12, ${hoehe - 16 * Object.keys(NODE_FARBEN).length - 12})`}>
-          {Object.entries(NODE_FARBEN).map(([typ, farbe], i) => (
-            <g key={typ} transform={`translate(0, ${i * 14})`}>
-              <circle cx={6} cy={6} r={4} fill={farbe} />
-              <text x={16} y={9} fontSize={9} fill="rgba(255,255,255,0.5)" className="font-mono">
-                {typ}
+        {/* ─── Legende: größeres Panel mit Background, hochwertigen Kreisen ─── */}
+        {(() => {
+          const ROW_H    = 22;
+          const PAD_X    = 12;
+          const PAD_Y    = 10;
+          const TITLE_H  = 18;
+          const types    = Object.entries(NODE_FARBEN);
+          const panelH   = TITLE_H + types.length * ROW_H + PAD_Y + 4;
+          const panelW   = 140;
+          const panelX   = 10;
+          const panelY   = hoehe - panelH - 10;
+          return (
+            <g transform={`translate(${panelX}, ${panelY})`}>
+              {/* Background-Panel */}
+              <rect
+                width={panelW}
+                height={panelH}
+                rx={10}
+                fill="rgba(12, 12, 22, 0.85)"
+                stroke="rgba(255,255,255,0.08)"
+                strokeWidth={1}
+                filter="url(#node-shadow)"
+              />
+              {/* Title */}
+              <text
+                x={PAD_X}
+                y={PAD_Y + 9}
+                fontSize={10}
+                fontWeight={600}
+                letterSpacing={1.5}
+                fill="rgba(255,255,255,0.55)"
+                className="font-mono"
+              >
+                LEGENDE
               </text>
+              {/* Entries */}
+              {types.map(([typ, farbe], i) => {
+                const cy = TITLE_H + PAD_Y + i * ROW_H + ROW_H / 2;
+                return (
+                  <g key={typ}>
+                    {/* Glow-Halo */}
+                    <circle cx={PAD_X + 7} cy={cy} r={9} fill={farbe} opacity={0.18} />
+                    {/* Hauptkreis mit Gradient + Highlight */}
+                    <circle
+                      cx={PAD_X + 7}
+                      cy={cy}
+                      r={6}
+                      fill={`url(#grad-${typ})`}
+                      stroke="rgba(255,255,255,0.22)"
+                      strokeWidth={0.8}
+                    />
+                    <ellipse
+                      cx={PAD_X + 7 - 2.2}
+                      cy={cy - 2.5}
+                      rx={2.6}
+                      ry={1.6}
+                      fill="rgba(255,255,255,0.35)"
+                      pointerEvents="none"
+                    />
+                    {/* Label */}
+                    <text
+                      x={PAD_X + 22}
+                      y={cy + 4}
+                      fontSize={11}
+                      fontWeight={500}
+                      fill="rgba(255,255,255,0.78)"
+                      className="font-mono"
+                    >
+                      {typ}
+                    </text>
+                  </g>
+                );
+              })}
             </g>
-          ))}
-        </g>
+          );
+        })()}
       </svg>
 
       {/* Detail-Panel */}
