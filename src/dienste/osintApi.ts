@@ -199,54 +199,119 @@ export interface BildErgebnis {
 
 // ─── API-Fehler-Klasse ────────────────────────────────────────────
 
+export type FehlerArt =
+  | "netzwerk"      // DNS, TCP, TLS — connection-level
+  | "timeout"       // AbortController hit
+  | "rate_limit"    // 429
+  | "server"        // 5xx
+  | "client"        // 4xx (außer 429)
+  | "unbekannt";
+
 export class Apifehler extends Error {
   constructor(
     message: string,
     public readonly statusCode?: number,
-    public readonly istRateLimit = false,
+    public readonly art: FehlerArt = "unbekannt",
+    public readonly versuche: number = 1,
   ) {
     super(message);
     this.name = "Apifehler";
   }
+
+  get istRateLimit(): boolean {
+    return this.art === "rate_limit";
+  }
 }
 
-// ─── Hilfsfunktion: Fetch mit Fehlerbehandlung ────────────────────
+// ─── Konfiguration: Retry & Timeout ───────────────────────────────
+
+const ANFRAGE_TIMEOUT_MS = 15_000;       // Pro-Versuch-Hardlimit
+const MAX_VERSUCHE = 3;                  // 1 initial + 2 Retries
+const BACKOFF_BASIS_MS = 500;            // 500ms → 1000ms → 2000ms
+
+function warte(ms: number): Promise<void> {
+  return new Promise((res) => setTimeout(res, ms));
+}
+
+// ─── Hilfsfunktion: Fetch mit Retry + Fehlerklassifikation ────────
 
 async function apiFetch<T>(endpunkt: string, koerper: unknown): Promise<T> {
-  let antwort: Response;
-  try {
-    antwort = await fetch(`${API_PFAD}${endpunkt}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(koerper),
-    });
-  } catch {
-    throw new Apifehler(
-      "API nicht erreichbar. Bitte später erneut versuchen.",
-      0,
-    );
-  }
+  let letzterFehler: Apifehler | null = null;
 
-  if (antwort.status === 429) {
-    throw new Apifehler(
-      "Zu viele Anfragen. Bitte warte einen Moment.",
-      429,
-      true,
-    );
-  }
+  for (let versuch = 1; versuch <= MAX_VERSUCHE; versuch++) {
+    const abbrecher = new AbortController();
+    const timeoutId = setTimeout(() => abbrecher.abort(), ANFRAGE_TIMEOUT_MS);
 
-  if (!antwort.ok) {
-    let detail = "Unbekannter Fehler";
+    let antwort: Response;
     try {
-      const fehlerDaten = await antwort.json();
-      detail = fehlerDaten.detail ?? detail;
-    } catch {
-      // ignore
+      antwort = await fetch(`${API_PFAD}${endpunkt}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(koerper),
+        signal: abbrecher.signal,
+      });
+    } catch (ursache) {
+      clearTimeout(timeoutId);
+
+      const istTimeout = (ursache as Error)?.name === "AbortError";
+      const art: FehlerArt = istTimeout ? "timeout" : "netzwerk";
+      const meldung = istTimeout
+        ? `Zeitüberschreitung nach ${ANFRAGE_TIMEOUT_MS / 1000}s.`
+        : "Verbindung zur API fehlgeschlagen (DNS/Netzwerk).";
+
+      letzterFehler = new Apifehler(meldung, 0, art, versuch);
+
+      // Netzwerk/Timeout → Retry mit exponential backoff
+      if (versuch < MAX_VERSUCHE) {
+        await warte(BACKOFF_BASIS_MS * 2 ** (versuch - 1));
+        continue;
+      }
+      throw letzterFehler;
     }
-    throw new Apifehler(detail, antwort.status);
+    clearTimeout(timeoutId);
+
+    // Rate-Limit: kein Retry, sofort weitergeben
+    if (antwort.status === 429) {
+      throw new Apifehler(
+        "Zu viele Anfragen. Bitte warte einen Moment.",
+        429,
+        "rate_limit",
+        versuch,
+      );
+    }
+
+    // 5xx Server-Fehler → Retry
+    if (antwort.status >= 500 && antwort.status < 600) {
+      letzterFehler = new Apifehler(
+        `Backend-Fehler (HTTP ${antwort.status}). Wird wiederholt …`,
+        antwort.status,
+        "server",
+        versuch,
+      );
+      if (versuch < MAX_VERSUCHE) {
+        await warte(BACKOFF_BASIS_MS * 2 ** (versuch - 1));
+        continue;
+      }
+      throw letzterFehler;
+    }
+
+    // 4xx Client-Fehler → sofort durchreichen (kein Retry sinnvoll)
+    if (!antwort.ok) {
+      let detail = `Anfrage abgelehnt (HTTP ${antwort.status}).`;
+      try {
+        const fehlerDaten = await antwort.json();
+        detail = fehlerDaten.detail ?? detail;
+      } catch {
+        // ignore
+      }
+      throw new Apifehler(detail, antwort.status, "client", versuch);
+    }
+
+    return antwort.json() as Promise<T>;
   }
 
-  return antwort.json() as Promise<T>;
+  // Sollte unerreichbar sein, aber TypeScript happy machen
+  throw letzterFehler ?? new Apifehler("Unbekannter Fehler", 0, "unbekannt");
 }
 
 // ─── Öffentliche API-Funktionen ───────────────────────────────────
@@ -287,15 +352,25 @@ export async function bildAnalysieren(url: string): Promise<BildErgebnis> {
 }
 
 /**
- * Prüft ob die API erreichbar ist.
+ * Prüft ob die API erreichbar ist. Macht bis zu 2 Versuche mit kurzem Backoff,
+ * damit ein DNS-Flake nicht die ganze UI als "offline" markiert.
  */
 export async function apiGesund(): Promise<boolean> {
-  try {
-    const antwort = await fetch(`${API_PFAD}/gesundheit`);
-    return antwort.ok;
-  } catch {
-    return false;
+  for (let versuch = 1; versuch <= 2; versuch++) {
+    const abbrecher = new AbortController();
+    const timeoutId = setTimeout(() => abbrecher.abort(), 8_000);
+    try {
+      const antwort = await fetch(`${API_PFAD}/gesundheit`, {
+        signal: abbrecher.signal,
+      });
+      clearTimeout(timeoutId);
+      if (antwort.ok) return true;
+    } catch {
+      clearTimeout(timeoutId);
+      if (versuch < 2) await warte(750);
+    }
   }
+  return false;
 }
 
 // ═══════════════════════════════════════════════════════════════════

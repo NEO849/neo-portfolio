@@ -1076,9 +1076,29 @@ export default function OsintDemoView() {
       setAusgabeZeilen(zeilen);
       setPhase("ausgabe");
     } catch (fehler) {
-      const meldung = fehler instanceof Apifehler
-        ? fehler.message
-        : "Verbindung zur API fehlgeschlagen";
+      // Senior-Elite Fehler-UX: differenzierte Meldung statt generisch.
+      let meldung: string;
+      if (fehler instanceof Apifehler) {
+        const versuche = fehler.versuche > 1 ? ` (${fehler.versuche} Versuche)` : "";
+        switch (fehler.art) {
+          case "netzwerk":
+            meldung = `Verbindung zur API instabil${versuche}. Bitte kurz warten und erneut versuchen.`;
+            break;
+          case "timeout":
+            meldung = `Server-Antwort dauert zu lange${versuche}. Bitte erneut versuchen.`;
+            break;
+          case "rate_limit":
+            meldung = "Zu viele Anfragen. Bitte einen Moment warten.";
+            break;
+          case "server":
+            meldung = `Backend liefert einen Fehler${versuche}. Wir untersuchen das.`;
+            break;
+          default:
+            meldung = fehler.message;
+        }
+      } else {
+        meldung = "Unerwarteter Fehler in der Eingabe.";
+      }
       setApiFehler(meldung);
       setPhase("eingabe");
     }
