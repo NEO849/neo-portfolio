@@ -14,11 +14,11 @@
     }
   ],
   "env": {
-    "VITE_OSINT_API_URL": "https://michael-fleps.duckdns.org"
+    "VITE_OSINT_API_URL": "https://api.cyp-hr.com"
   },
   "build": {
     "env": {
-      "VITE_OSINT_API_URL": "https://michael-fleps.duckdns.org"
+      "VITE_OSINT_API_URL": "https://api.cyp-hr.com"
     }
   }
 }
