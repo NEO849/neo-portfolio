@@ -225,9 +225,17 @@ export class Apifehler extends Error {
 
 // ─── Konfiguration: Retry & Timeout ───────────────────────────────
 
-const ANFRAGE_TIMEOUT_MS = 15_000;       // Pro-Versuch-Hardlimit
-const MAX_VERSUCHE = 3;                  // 1 initial + 2 Retries
-const BACKOFF_BASIS_MS = 500;            // 500ms → 1000ms → 2000ms
+const ANFRAGE_TIMEOUT_DEFAULT_MS = 15_000;   // Schnelle Endpoints (Email/Domain/Telefon/Bild)
+const ANFRAGE_TIMEOUT_LANG_MS = 75_000;      // Vollscan / Orchestrator (600+ Plattformen parallel)
+const MAX_VERSUCHE = 3;                      // 1 initial + 2 Retries
+const BACKOFF_BASIS_MS = 500;                // 500ms → 1000ms → 2000ms
+
+// Endpoints die deutlich länger laufen — bekommen großzügiges Timeout.
+const LANGE_ENDPOINTS = new Set([
+  "/benutzername",   // 600+ Plattform-Pings, ~20–30s typisch
+  "/orchestrator",   // alle Module parallel + Graph-Aufbau
+  "/email-recon",    // 7 Quellen parallel, kann auch >15s ziehen
+]);
 
 function warte(ms: number): Promise<void> {
   return new Promise((res) => setTimeout(res, ms));
@@ -236,11 +244,15 @@ function warte(ms: number): Promise<void> {
 // ─── Hilfsfunktion: Fetch mit Retry + Fehlerklassifikation ────────
 
 async function apiFetch<T>(endpunkt: string, koerper: unknown): Promise<T> {
+  const timeoutMs = LANGE_ENDPOINTS.has(endpunkt)
+    ? ANFRAGE_TIMEOUT_LANG_MS
+    : ANFRAGE_TIMEOUT_DEFAULT_MS;
+
   let letzterFehler: Apifehler | null = null;
 
   for (let versuch = 1; versuch <= MAX_VERSUCHE; versuch++) {
     const abbrecher = new AbortController();
-    const timeoutId = setTimeout(() => abbrecher.abort(), ANFRAGE_TIMEOUT_MS);
+    const timeoutId = setTimeout(() => abbrecher.abort(), timeoutMs);
 
     let antwort: Response;
     try {
@@ -256,7 +268,7 @@ async function apiFetch<T>(endpunkt: string, koerper: unknown): Promise<T> {
       const istTimeout = (ursache as Error)?.name === "AbortError";
       const art: FehlerArt = istTimeout ? "timeout" : "netzwerk";
       const meldung = istTimeout
-        ? `Zeitüberschreitung nach ${ANFRAGE_TIMEOUT_MS / 1000}s.`
+        ? `Zeitüberschreitung nach ${timeoutMs / 1000}s.`
         : "Verbindung zur API fehlgeschlagen (DNS/Netzwerk).";
 
       letzterFehler = new Apifehler(meldung, 0, art, versuch);
