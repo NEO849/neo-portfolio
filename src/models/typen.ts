@@ -71,6 +71,8 @@ export interface MemoryTierModel {
   readonly lifecycle: string;
   readonly anzahl?: string;
   readonly farbeRgb: string;        // "99, 102, 241" Format
+  /** Optionale Klartext-Erklärung für Aufklapp-Detail. */
+  readonly bedeutung?: string;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -96,6 +98,8 @@ export interface AutoWorkflowModel {
   readonly output: string;
   readonly farbeRgb: string;
   readonly kritisch?: boolean;
+  /** Optionale Klartext-Erklärung für Aufklapp-Detail (was macht das konkret?). */
+  readonly details?: string;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -128,4 +132,6 @@ export interface HardGateModel {
   readonly nummer: number;
   readonly titel: string;
   readonly check: string;
+  /** Optionales konkretes Beispiel für Aufklapp-Detail. */
+  readonly beispiel?: string;
 }

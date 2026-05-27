@@ -1,9 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════
-// VIEW: Labor — Senior-Elite Architektur-Manifest
+// VIEW: Labor — Werkstatt-Ansicht
 //
-// Single Source of Truth liest aus models/daten.ts. Keine Daten-Duplikate
-// zur SecurityView. Fünf Acts unter einem Tab-System, vorgelagerte
-// Prinzipien-Galerie als ruhiger Einstieg.
+// Single Source of Truth: liest alle Daten aus models/daten.ts.
+// Konsistent zu SecurityView (Tab-System, GlassTabs, InfoKarte mit
+// Aufklapp-Pattern) und ZeugnisseView (Tab-Layout für längere Labels).
+//
+// Tabs werden gleichmäßig über die Breite verteilt (scrollable=false),
+// damit auf jedem Viewport jedes Label sichtbar bleibt.
 // ═══════════════════════════════════════════════════════════════════
 
 import { useState } from "react";
@@ -27,10 +30,10 @@ import { GlassTabs } from "../bausteine/GlassTabs";
 type LaborTab = "memory" | "mcps" | "workflows" | "commands" | "gates";
 
 const TABS: { id: LaborTab; label: string }[] = [
-  { id: "memory",    label: "Memory v2" },
-  { id: "mcps",      label: "MCP-Arsenal" },
+  { id: "memory",    label: "Memory" },
+  { id: "mcps",      label: "MCPs" },
   { id: "workflows", label: "Workflows" },
-  { id: "commands",  label: "Commands & Skills" },
+  { id: "commands",  label: "Commands" },
   { id: "gates",     label: "Hard-Gates" },
 ];
 
@@ -42,8 +45,8 @@ export default function LaborView() {
   return (
     <section id="labor" className="py-16 px-6 max-w-6xl mx-auto">
       <AbschnittsTitel
-        prefix="> labor_senior_elite"
-        untertitel="Was hier zu sehen ist, ist nicht eine Liste von Tools — es ist ein zusammenhängendes System. Selbst-lernendes Memory, 25 MCPs mit Decision-Matrix, 12 systemd-Workflows, 11 Custom-Skills, 11 Slash-Commands und 12 Hard-Gates. Vor jedem Submit. Nach jedem Erfolg. Kontinuierlich."
+        prefix="> labor"
+        untertitel="Die Werkzeuge, Workflows und Sicherheitsregeln hinter meinem täglichen Security-Arbeitsablauf — vieles selbst gebaut, der Rest sorgfältig integriert. Diese Seite erklärt, wie die einzelnen Bausteine ineinandergreifen. Sie ist gleichzeitig Dokumentation für mich selbst und ein Beleg dafür, dass solide Security-Arbeit weniger über einzelne Tools entscheidet als über die Disziplin, mit der sie eingesetzt werden."
         klassen="mb-8"
       />
 
@@ -72,7 +75,7 @@ export default function LaborView() {
         ))}
       </motion.div>
 
-      {/* ── Elite-Prinzipien (6 Karten in 2 Reihen) ─────────────── */}
+      {/* ── Leitprinzipien (6 Karten in 2 Reihen) ─────────────────── */}
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -82,8 +85,7 @@ export default function LaborView() {
       >
         <h3 className="font-display text-sm font-bold text-white/70 mb-3 flex items-center gap-2 uppercase tracking-[0.18em]">
           <span className="text-akzent-400">◆</span>
-          Elite-Prinzipien
-          <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">was junior von senior trennt</span>
+          Leitprinzipien
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
           {ELITE_PRINZIPIEN.map((prinzip, i) => (
@@ -113,15 +115,16 @@ export default function LaborView() {
         </div>
       </motion.div>
 
-      {/* ── Tab-Navigation ───────────────────────────────────────── */}
+      {/* ── Tab-Navigation (gleichmäßig über volle Breite verteilt) ─ */}
       <GlassTabs
         tabs={TABS}
         activeId={aktiverTab}
         onTabChange={(id) => setAktiverTab(id as LaborTab)}
         layoutId="labor-tab-bg"
-        ariaLabel="Senior-Elite Architektur Navigation"
-        buttonClassName="min-w-[90px] px-3 text-[11px] sm:text-sm"
-        className="mb-8"
+        ariaLabel="Werkstatt-Bereiche"
+        scrollable={false}
+        buttonClassName="min-w-0 px-1.5 sm:px-4 text-[11px] sm:text-sm"
+        className="mb-8 w-full"
       />
 
       {/* ── Tab-Inhalt ────────────────────────────────────────────── */}
@@ -133,13 +136,11 @@ export default function LaborView() {
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.28, ease: EASE }}
         >
-
           {aktiverTab === "memory"    && <MemoryAct />}
           {aktiverTab === "mcps"      && <McpAct />}
           {aktiverTab === "workflows" && <WorkflowsAct />}
           {aktiverTab === "commands"  && <CommandsAct />}
           {aktiverTab === "gates"     && <GatesAct />}
-
         </motion.div>
       </AnimatePresence>
     </section>
@@ -147,79 +148,126 @@ export default function LaborView() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// ACT 1 — Memory v2 (5-Tier-Architektur)
+// ACT 1 — Memory v2 (5-Tier-Architektur, Karten aufklappbar)
 // ═══════════════════════════════════════════════════════════════════
 
 function MemoryAct() {
+  const [offenerTier, setOffenerTier] = useState<string | null>(null);
+
   return (
     <div className="space-y-6">
       <header>
-        <p className="font-mono text-xs text-white/60 mb-2">
-          5-tier · MemGPT-inspired · A-MEM linking · hook-driven · git-versioned
-        </p>
+        <h3 className="font-display text-lg font-bold text-white mb-1.5">
+          Selbst-lernendes Memory-System
+        </h3>
         <p className="text-sm text-white/55 leading-relaxed max-w-3xl">
-          Selbst-lernendes Memory-System. Drei Lifecycle-Hooks fangen User-Korrekturen ein,
-          schreiben Session-Digests und zeigen Inbox-Banner. Confidence-Decay nach Submit-Resolution.
-          A-MEM Auto-Linker erzeugt bidirektionale <span className="font-mono text-akzent-400">[[wiki-links]]</span> via gewichteter Jaccard-Similarity.
-          Daily-Cron 04:00 macht read-only Health-Check + Auto-Commit.
+          Damit Claude Code zwischen Sessions wirklich „dazulernt" und nicht jedes Mal bei null anfängt,
+          habe ich ein gestaffeltes Gedächtnis aufgebaut. Inspiriert von MemGPT (NeurIPS 2023), Generative
+          Agents (Park et al.) und A-MEM (NeurIPS 2025). Drei Hooks fangen automatisch User-Korrekturen
+          und Session-Verläufe ein. Eine Inbox sammelt neue Beobachtungen — beförderte Memory entsteht
+          nur, wenn ich Eintrag-für-Eintrag manuell entscheide. Eine tägliche Self-Healing-Routine prüft
+          Konsistenz und committet alles in Git.
+        </p>
+        <p className="text-[11px] text-white/35 font-mono mt-2">
+          Klicke eine Karte an, um zu sehen, welche Rolle der Tier im Gesamtsystem spielt.
         </p>
       </header>
 
       <div className="space-y-2">
-        {MEMORY_TIERS.map((tier, i) => (
-          <motion.div
-            key={tier.tier}
-            initial={{ opacity: 0, x: -14 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-30px" }}
-            transition={{ delay: i * 0.08, duration: 0.4, ease: EASE }}
-          >
-            <InfoKarte
-              lichtfarbe={tier.farbeRgb}
-              mitHoverAnimation={false}
-              klassen="p-4"
-              stil={{ borderLeft: `2px solid rgb(${tier.farbeRgb})` }}
+        {MEMORY_TIERS.map((tier, i) => {
+          const offen = offenerTier === tier.tier;
+          return (
+            <motion.div
+              key={tier.tier}
+              initial={{ opacity: 0, x: -14 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-30px" }}
+              transition={{ delay: i * 0.08, duration: 0.4, ease: EASE }}
             >
-              <div className="flex items-start gap-4">
-                <div
-                  className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] px-2 py-1 rounded-md flex-shrink-0 mt-0.5"
-                  style={{
-                    color: `rgb(${tier.farbeRgb})`,
-                    backgroundColor: `rgba(${tier.farbeRgb}, 0.08)`,
-                    border: `1px solid rgba(${tier.farbeRgb}, 0.22)`,
-                  }}
+              <InfoKarte
+                lichtfarbe={tier.farbeRgb}
+                mitHoverAnimation={false}
+                klassen="p-0"
+                stil={{ borderLeft: `2px solid rgb(${tier.farbeRgb})` }}
+              >
+                <button
+                  onClick={() => setOffenerTier(offen ? null : tier.tier)}
+                  aria-expanded={offen}
+                  className="w-full text-left p-4 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset rounded-xl"
+                  style={{ ['--tw-ring-color' as string]: `rgba(${tier.farbeRgb}, 0.4)` }}
                 >
-                  {tier.tier}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1.5">
-                    <span className="font-mono text-[12px] text-white/85">{tier.ort}</span>
-                    {tier.anzahl && (
-                      <span className="font-mono text-[10px] text-white/30">{tier.anzahl}</span>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
-                    <div className="flex gap-2 text-[11px]">
-                      <span className="text-white/30 w-16 flex-shrink-0">Loaded</span>
-                      <span className="text-white/65">{tier.loaded}</span>
+                  <div className="flex items-start gap-4">
+                    <div
+                      className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] px-2 py-1 rounded-md flex-shrink-0 mt-0.5"
+                      style={{
+                        color: `rgb(${tier.farbeRgb})`,
+                        backgroundColor: `rgba(${tier.farbeRgb}, 0.08)`,
+                        border: `1px solid rgba(${tier.farbeRgb}, 0.22)`,
+                      }}
+                    >
+                      {tier.tier}
                     </div>
-                    <div className="flex gap-2 text-[11px]">
-                      <span className="text-white/30 w-16 flex-shrink-0">Lifecycle</span>
-                      <span className="text-white/65">{tier.lifecycle}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1.5">
+                        <span className="font-mono text-[12px] text-white/85">{tier.ort}</span>
+                        {tier.anzahl && (
+                          <span className="font-mono text-[10px] text-white/30">{tier.anzahl}</span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
+                        <div className="flex gap-2 text-[11px]">
+                          <span className="text-white/30 w-20 flex-shrink-0">geladen</span>
+                          <span className="text-white/65">{tier.loaded}</span>
+                        </div>
+                        <div className="flex gap-2 text-[11px]">
+                          <span className="text-white/30 w-20 flex-shrink-0">Lifecycle</span>
+                          <span className="text-white/65">{tier.lifecycle}</span>
+                        </div>
+                      </div>
                     </div>
+                    <motion.span
+                      animate={{ rotate: offen ? 45 : 0 }}
+                      transition={{ duration: 0.18 }}
+                      className="text-lg flex-shrink-0 font-light leading-none mt-1"
+                      style={{ color: `rgb(${tier.farbeRgb})`, opacity: offen ? 0.9 : 0.5 }}
+                      aria-hidden="true"
+                    >
+                      +
+                    </motion.span>
                   </div>
-                </div>
-              </div>
-            </InfoKarte>
-          </motion.div>
-        ))}
+                </button>
+                <AnimatePresence>
+                  {offen && tier.bedeutung && (
+                    <motion.div
+                      key="detail"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.22 }}
+                      className="overflow-hidden"
+                    >
+                      <div
+                        className="px-4 pb-4 border-t pt-3"
+                        style={{ borderColor: `rgba(${tier.farbeRgb}, 0.12)` }}
+                      >
+                        <p className="text-[12px] text-white/65 leading-relaxed">
+                          {tier.bedeutung}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </InfoKarte>
+            </motion.div>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 pt-2">
         {[
-          { titel: "3 Lifecycle-Hooks",   bsp: "surprise_catcher · session_reflect · session_start_banner", rgb: "129, 140, 248" },
-          { titel: "A-MEM Auto-Linker",   bsp: "Jaccard-Similarity → bidirektionale [[wiki-links]]",         rgb: "167, 139, 250" },
-          { titel: "Confidence-Decay",    bsp: "/memory-outcome propagiert Submit-Resolution zurück",         rgb: "34, 197, 94" },
+          { titel: "Drei Lifecycle-Hooks",   bsp: "User-Korrekturen einfangen · Session-Digests schreiben · Inbox-Banner zeigen", rgb: "129, 140, 248" },
+          { titel: "A-MEM Auto-Linker",      bsp: "Erkennt verwandte Memories und schlägt bidirektionale Verlinkung vor",        rgb: "167, 139, 250" },
+          { titel: "Confidence-Decay",       bsp: "Submit-Outcome aktualisiert die Vertrauens-Werte zitierter Memories",          rgb: "34, 197, 94" },
         ].map((meta, i) => (
           <motion.div
             key={meta.titel}
@@ -231,7 +279,7 @@ function MemoryAct() {
             <InfoKarte lichtfarbe={meta.rgb} klassen="p-3">
               <div className="font-mono text-[10px] text-white/30 mb-1 uppercase tracking-wider">Mechanik</div>
               <div className="text-[12px] text-white font-medium mb-1">{meta.titel}</div>
-              <div className="text-[10.5px] text-white/45 font-mono leading-relaxed">{meta.bsp}</div>
+              <div className="text-[10.5px] text-white/55 leading-relaxed">{meta.bsp}</div>
             </InfoKarte>
           </motion.div>
         ))}
@@ -251,14 +299,18 @@ function McpAct() {
   return (
     <div className="space-y-5">
       <header>
-        <p className="font-mono text-xs text-white/60 mb-2">
-          25 connected MCP-Server · 2 Eigenbau · decision-matrix vor jedem Bash-Aufruf
-        </p>
+        <h3 className="font-display text-lg font-bold text-white mb-1.5">
+          MCP-Server — was wann womit
+        </h3>
         <p className="text-sm text-white/55 leading-relaxed max-w-3xl">
-          Vor jeder Aufgabe: erst Decision-Matrix prüfen welches MCP fitst — nicht planlos Bash.
-          IP-Recon → <span className="font-mono text-cyber-400">censys</span>. CVE-Lookup → <span className="font-mono text-cyber-400">shodan</span> (FREE).
-          Pattern-Recall → <span className="font-mono text-cyber-400">exa</span> (neural).
-          Cross-Target → <span className="font-mono text-cyber-400">memory-graph</span>. Multi-Step-Hypothesen → <span className="font-mono text-cyber-400">sequential-thinking</span>.
+          MCP-Server sind die Brücke zwischen Claude und allem anderen — APIs, Browser, Datenbanken,
+          Dateisystemen. Ich habe 25 davon eingebunden, zwei selbst gebaut (Censys-Platform-API und
+          die Caido-Bridge). Wichtiger als die reine Anzahl ist die Entscheidungslogik:
+          welches MCP passt für welche Aufgabe besser. Statt blind Bash-Befehle zu schreiben, prüfe
+          ich erst, ob ein spezialisiertes MCP die Aufgabe sauberer löst.
+        </p>
+        <p className="text-[11px] text-white/35 font-mono mt-2">
+          Wähle eine Kategorie. Die Tools darin sind nach Häufigkeit der Nutzung sortiert.
         </p>
       </header>
 
@@ -271,9 +323,7 @@ function McpAct() {
               key={kat.kategorie}
               onClick={() => setAktiveKategorie(kat.kategorie)}
               className={`group flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${
-                aktiv
-                  ? "text-white"
-                  : "text-white/45 hover:text-white/80"
+                aktiv ? "text-white" : "text-white/45 hover:text-white/80"
               }`}
               style={{
                 background: aktiv ? `rgba(${kat.farbeRgb}, 0.14)` : "rgba(255,255,255,0.025)",
@@ -284,10 +334,7 @@ function McpAct() {
               <span>{kat.kategorie}</span>
               <span
                 className="font-mono text-[10px] px-1.5 py-0.5 rounded-md tabular-nums"
-                style={{
-                  background: `rgba(${kat.farbeRgb}, 0.12)`,
-                  color: `rgb(${kat.farbeRgb})`,
-                }}
+                style={{ background: `rgba(${kat.farbeRgb}, 0.12)`, color: `rgb(${kat.farbeRgb})` }}
               >
                 {kat.mcps.length}
               </span>
@@ -334,11 +381,11 @@ function McpAct() {
                               border: "1px solid rgba(34,197,94,0.25)",
                             }}
                           >
-                            Eigenbau
+                            selbst gebaut
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] text-white/45 mt-0.5 leading-snug">{mcp.rolle}</p>
+                      <p className="text-[11px] text-white/55 mt-0.5 leading-snug">{mcp.rolle}</p>
                     </div>
                   </div>
                 </InfoKarte>
@@ -352,22 +399,28 @@ function McpAct() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// ACT 3 — Auto-Workflows (systemd Timers + Services)
+// ACT 3 — Auto-Workflows (Timers + Services, aufklappbar)
 // ═══════════════════════════════════════════════════════════════════
 
 function WorkflowsAct() {
+  const [offenerWorkflow, setOffenerWorkflow] = useState<string | null>(null);
   const timers   = AUTO_WORKFLOWS.filter(w => w.typ === "timer");
   const services = AUTO_WORKFLOWS.filter(w => w.typ === "service");
 
   return (
     <div className="space-y-8">
       <header>
-        <p className="font-mono text-xs text-white/60 mb-2">
-          systemd · self-healing · audit-logged · token-rotation · anomaly-watcher
-        </p>
+        <h3 className="font-display text-lg font-bold text-white mb-1.5">
+          Automatisierte Abläufe
+        </h3>
         <p className="text-sm text-white/55 leading-relaxed max-w-3xl">
-          12 Auto-Workflows. Backups · Hacktivity-Stream-Polling · Token-Rotation · Caido-Pipeline-Watcher · Voice-Bridge · Anomaly-Detection.
-          Jede Aktion audit-getaggt. Bei Bedarf in &lt;1s wiederherstellbar via Git oder 3-Tier-Backup.
+          Sachen, die ich nicht jeden Tag manuell anstoßen will, laufen als systemd-Timer (zeitgesteuert)
+          oder -Service (dauerhaft). Backups jede Nacht, Token-Rotation jede Woche, Hacktivity-Polling
+          jede Stunde — und dauerhaft die Mailbox-Bridges zwischen Mac, iPhone und Server. Jede Aktion
+          wird auditiert, der Anomaly-Watcher schlägt bei verdächtigen Mustern Alarm.
+        </p>
+        <p className="text-[11px] text-white/35 font-mono mt-2">
+          Klicke einen Ablauf an, um zu sehen, was er konkret tut.
         </p>
       </header>
 
@@ -375,12 +428,18 @@ function WorkflowsAct() {
       <section>
         <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
           <span className="text-akzent-400">⟳</span>
-          Periodic Timers
+          Zeitgesteuerte Abläufe
           <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">{timers.length} aktiv</span>
         </h4>
         <div className="space-y-1.5">
           {timers.map((wf, i) => (
-            <WorkflowRow key={wf.name} workflow={wf} delay={i * 0.05} />
+            <WorkflowRow
+              key={wf.name}
+              workflow={wf}
+              delay={i * 0.05}
+              offen={offenerWorkflow === wf.name}
+              onToggle={() => setOffenerWorkflow(offenerWorkflow === wf.name ? null : wf.name)}
+            />
           ))}
         </div>
       </section>
@@ -389,12 +448,18 @@ function WorkflowsAct() {
       <section>
         <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
           <span className="text-cyber-400">●</span>
-          Continuous Services
+          Dauerhaft laufende Dienste
           <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">{services.length} laufen</span>
         </h4>
         <div className="space-y-1.5">
           {services.map((wf, i) => (
-            <WorkflowRow key={wf.name} workflow={wf} delay={i * 0.04} />
+            <WorkflowRow
+              key={wf.name}
+              workflow={wf}
+              delay={i * 0.04}
+              offen={offenerWorkflow === wf.name}
+              onToggle={() => setOffenerWorkflow(offenerWorkflow === wf.name ? null : wf.name)}
+            />
           ))}
         </div>
       </section>
@@ -402,7 +467,14 @@ function WorkflowsAct() {
   );
 }
 
-function WorkflowRow({ workflow, delay }: { workflow: typeof AUTO_WORKFLOWS[number]; delay: number }) {
+interface WorkflowRowProps {
+  workflow: typeof AUTO_WORKFLOWS[number];
+  delay: number;
+  offen: boolean;
+  onToggle: () => void;
+}
+
+function WorkflowRow({ workflow, delay, offen, onToggle }: WorkflowRowProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
@@ -413,44 +485,83 @@ function WorkflowRow({ workflow, delay }: { workflow: typeof AUTO_WORKFLOWS[numb
       <InfoKarte
         lichtfarbe={workflow.farbeRgb}
         mitHoverAnimation={false}
-        klassen="p-3"
+        klassen="p-0"
         stil={{
           borderLeft: workflow.kritisch
             ? `2px solid rgb(${workflow.farbeRgb})`
             : `1px solid rgba(${workflow.farbeRgb}, 0.18)`,
         }}
       >
-        <div className="flex items-center gap-3">
-          <span
-            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-            style={{
-              backgroundColor: `rgb(${workflow.farbeRgb})`,
-              boxShadow: workflow.kritisch ? `0 0 8px rgba(${workflow.farbeRgb}, 0.6)` : undefined,
-            }}
-          />
-          <span className="font-mono text-[12px] text-white/85 flex-1 truncate">{workflow.name}</span>
-          <span
-            className="font-mono text-[10px] px-2 py-0.5 rounded-full tabular-nums whitespace-nowrap flex-shrink-0"
-            style={{
-              background: `rgba(${workflow.farbeRgb}, 0.10)`,
-              color: `rgb(${workflow.farbeRgb})`,
-              border: `1px solid rgba(${workflow.farbeRgb}, 0.20)`,
-            }}
-          >
-            {workflow.cadence}
-          </span>
-          <span className="text-[11px] text-white/45 hidden md:inline truncate max-w-[280px]">
-            → {workflow.output}
-          </span>
-        </div>
-        <p className="text-[10.5px] text-white/40 mt-1 md:hidden">→ {workflow.output}</p>
+        <button
+          onClick={onToggle}
+          aria-expanded={offen}
+          className="w-full text-left p-3 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset rounded-xl"
+          style={{ ['--tw-ring-color' as string]: `rgba(${workflow.farbeRgb}, 0.4)` }}
+        >
+          <div className="flex items-center gap-3">
+            <span
+              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+              style={{
+                backgroundColor: `rgb(${workflow.farbeRgb})`,
+                boxShadow: workflow.kritisch ? `0 0 8px rgba(${workflow.farbeRgb}, 0.6)` : undefined,
+              }}
+            />
+            <span className="font-mono text-[12px] text-white/85 flex-1 truncate">{workflow.name}</span>
+            <span
+              className="font-mono text-[10px] px-2 py-0.5 rounded-full tabular-nums whitespace-nowrap flex-shrink-0"
+              style={{
+                background: `rgba(${workflow.farbeRgb}, 0.10)`,
+                color: `rgb(${workflow.farbeRgb})`,
+                border: `1px solid rgba(${workflow.farbeRgb}, 0.20)`,
+              }}
+            >
+              {workflow.cadence}
+            </span>
+            <span className="text-[11px] text-white/45 hidden md:inline truncate max-w-[260px]">
+              → {workflow.output}
+            </span>
+            {workflow.details && (
+              <motion.span
+                animate={{ rotate: offen ? 45 : 0 }}
+                transition={{ duration: 0.18 }}
+                className="text-base flex-shrink-0 font-light leading-none ml-1"
+                style={{ color: `rgb(${workflow.farbeRgb})`, opacity: offen ? 0.9 : 0.4 }}
+                aria-hidden="true"
+              >
+                +
+              </motion.span>
+            )}
+          </div>
+          <p className="text-[10.5px] text-white/40 mt-1 md:hidden">→ {workflow.output}</p>
+        </button>
+        <AnimatePresence>
+          {offen && workflow.details && (
+            <motion.div
+              key="detail"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.22 }}
+              className="overflow-hidden"
+            >
+              <div
+                className="px-3 pb-3 border-t pt-2.5"
+                style={{ borderColor: `rgba(${workflow.farbeRgb}, 0.12)` }}
+              >
+                <p className="text-[12px] text-white/65 leading-relaxed">
+                  {workflow.details}
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </InfoKarte>
     </motion.div>
   );
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// ACT 4 — Commands & Skills (11 + 11)
+// ACT 4 — Slash-Commands + Custom Skills (11 + 11)
 // ═══════════════════════════════════════════════════════════════════
 
 function CommandsAct() {
@@ -462,13 +573,16 @@ function CommandsAct() {
   return (
     <div className="space-y-8">
       <header>
-        <p className="font-mono text-xs text-white/60 mb-2">
-          22 selbst geschriebene Erweiterungen · 11 Slash-Commands · 11 Skills
-        </p>
+        <h3 className="font-display text-lg font-bold text-white mb-1.5">
+          Eigene Erweiterungen für Claude Code
+        </h3>
         <p className="text-sm text-white/55 leading-relaxed max-w-3xl">
-          Was Claude Code aus-der-Box nicht kann, wird hier ergänzt. Submit-Gate erzwingt 12 Hard-Gates vor jedem Submit.
-          Memory-System lernt via Hooks. Master-Skills orchestrieren Multi-Subagent-Wellen. Bug-Bounty-Lifecycle ist
-          End-zu-End automatisiert von Programm-Analyse bis Submit.
+          Aus der Box kann Claude Code viel — aber nicht alles, was ich für meinen Bug-Bounty-Workflow
+          brauche. Deshalb 22 selbst geschriebene Erweiterungen: 11 Slash-Commands (kurze Befehle wie
+          <span className="font-mono text-akzent-400"> /submit-gate</span>) und 11 Skills (komplette
+          mehrstufige Workflows wie <span className="font-mono text-cyber-400">/research</span>).
+          Zwei davon sind harte Regeln und müssen vor jedem neuen Target bzw. jedem Submit gelaufen
+          sein — ohne sie verlasse ich mich auf Disziplin allein, und Disziplin lässt sich austricksen.
         </p>
       </header>
 
@@ -477,15 +591,14 @@ function CommandsAct() {
         <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
           <span className="text-akzent-400">/</span>
           Slash-Commands
-          <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">11 Commands</span>
+          <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">11 Befehle</span>
         </h4>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Submit-Pipeline (Hard-Rules) */}
           <div>
             <div className="flex items-center gap-2 mb-2.5">
               <AbzeichenStatus variante="aktiv" text="SUBMIT-PIPELINE" mitPuls />
-              <span className="text-[10px] text-white/35 font-mono">Pflicht bei jedem Submit</span>
+              <span className="text-[10px] text-white/35 font-mono">Pflicht vor jedem Submit</span>
             </div>
             <div className="space-y-1.5">
               {submitCmds.map((cmd, i) => (
@@ -494,11 +607,10 @@ function CommandsAct() {
             </div>
           </div>
 
-          {/* Memory-Pflege */}
           <div>
             <div className="flex items-center gap-2 mb-2.5">
               <AbzeichenStatus variante="akzent" text="MEMORY-PFLEGE" />
-              <span className="text-[10px] text-white/35 font-mono">Self-Improving System</span>
+              <span className="text-[10px] text-white/35 font-mono">Selbst-lernendes System</span>
             </div>
             <div className="space-y-1.5">
               {memoryCmds.map((cmd, i) => (
@@ -513,16 +625,15 @@ function CommandsAct() {
       <section>
         <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
           <span className="text-cyber-400">✦</span>
-          Custom Skills
+          Skills
           <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">11 Skills</span>
         </h4>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Master Skills */}
           <div>
             <div className="flex items-center gap-2 mb-2.5">
               <AbzeichenStatus variante="cyber" text="MASTER-SKILLS" />
-              <span className="text-[10px] text-white/35 font-mono">Multi-Subagent Orchestrierung</span>
+              <span className="text-[10px] text-white/35 font-mono">orchestrieren mehrere Subagenten</span>
             </div>
             <div className="space-y-1.5">
               {masterSkills.map((skill, i) => (
@@ -531,11 +642,10 @@ function CommandsAct() {
             </div>
           </div>
 
-          {/* BB-Lifecycle */}
           <div>
             <div className="flex items-center gap-2 mb-2.5">
-              <AbzeichenStatus variante="akzent" text="BB-LIFECYCLE" />
-              <span className="text-[10px] text-white/35 font-mono">Phase 1 → Phase 10</span>
+              <AbzeichenStatus variante="akzent" text="BUG-BOUNTY-LIFECYCLE" />
+              <span className="text-[10px] text-white/35 font-mono">Phase 1 bis 10</span>
             </div>
             <div className="space-y-1.5">
               {bbSkills.map((skill, i) => (
@@ -564,14 +674,14 @@ function CommandRow({ cmd, delay }: { cmd: typeof SLASH_COMMANDS[number]; delay:
         klassen="p-3"
         stil={cmd.hardRule ? { borderLeft: `2px solid rgb(${rgb})` } : undefined}
       >
-        <div className="flex items-baseline gap-2 mb-1">
+        <div className="flex items-baseline gap-2 mb-1 flex-wrap">
           <span className="font-mono text-[12px] font-semibold" style={{ color: `rgb(${rgb})` }}>{cmd.cmd}</span>
           {cmd.hardRule && (
             <span
               className="font-mono text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider"
               style={{ background: `rgba(${rgb}, 0.10)`, color: `rgb(${rgb})`, border: `1px solid rgba(${rgb}, 0.30)` }}
             >
-              Hard-Rule
+              harte Regel
             </span>
           )}
         </div>
@@ -602,20 +712,27 @@ function SkillRow({ skill, delay }: { skill: typeof CUSTOM_SKILLS[number]; delay
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// ACT 5 — Hard-Gates + Devil's Advocate
+// ACT 5 — Hard-Gates (aufklappbar) + Devil's Advocate
 // ═══════════════════════════════════════════════════════════════════
 
 function GatesAct() {
+  const [offenesGate, setOffenesGate] = useState<number | null>(null);
+
   return (
     <div className="space-y-10">
       <header>
-        <p className="font-mono text-xs text-white/60 mb-2">
-          12 hard-gates · 5 DA-patterns · whitelist · blacklist · senior-elite discipline
-        </p>
+        <h3 className="font-display text-lg font-bold text-white mb-1.5">
+          Schutzregeln vor jedem Submit
+        </h3>
         <p className="text-sm text-white/55 leading-relaxed max-w-3xl">
-          Discipline schlägt Volume. Kein Submit ohne alle 12 Gates ✅. Kein Submit ohne Devil's-Advocate-Pass.
-          Whitelist (Tier S/A/B) und Blacklist sind aus 14+ realen Closure-Patterns destilliert — jede Lesson
-          aus der echten Praxis dokumentiert in 161 Memory-Files.
+          Diese 12 Schutzregeln und 5 Devil's-Advocate-Muster sind keine Theorie — sie stammen aus
+          14 Closes innerhalb von zwei Wochen, von denen 6 im Nachhinein vorhersagbar waren. Daraus
+          wurde eine Pflicht-Checkliste: jede Regel muss vor dem Einreichen eines Reports konkret
+          beantwortet sein. Die Disziplin schlägt das Volumen — lieber einen sauber abgesicherten
+          Report einreichen als drei mit guter Geschichte und schwacher Beweisführung.
+        </p>
+        <p className="text-[11px] text-white/35 font-mono mt-2">
+          Klicke eine Regel an, um den Grund und ein Beispiel aus echten Fällen zu sehen.
         </p>
       </header>
 
@@ -623,31 +740,69 @@ function GatesAct() {
       <section>
         <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
           <span className="text-signal-rot">🛡</span>
-          12 Hard-Gates
-          <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">vor jedem Submit · ✅ alle oder ❌ Submit verweigert</span>
+          Die 12 Schutzregeln
+          <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">alle ✓ oder kein Submit</span>
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
-          {HARD_GATES.map((gate, i) => (
-            <motion.div
-              key={gate.nummer}
-              initial={{ opacity: 0, x: -8 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-20px" }}
-              transition={{ delay: i * 0.025, duration: 0.3, ease: EASE }}
-            >
-              <InfoKarte lichtfarbe="239, 68, 68" mitHoverAnimation={false} klassen="p-2.5">
-                <div className="flex items-start gap-3">
-                  <div className="font-mono text-[11px] text-signal-rot font-bold w-5 text-center flex-shrink-0 tabular-nums">
-                    {String(gate.nummer).padStart(2, "0")}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-mono text-[12px] text-white/90 font-medium">{gate.titel}</div>
-                    <p className="text-[10.5px] text-white/45 mt-0.5 leading-snug">{gate.check}</p>
-                  </div>
-                </div>
-              </InfoKarte>
-            </motion.div>
-          ))}
+          {HARD_GATES.map((gate, i) => {
+            const offen = offenesGate === gate.nummer;
+            return (
+              <motion.div
+                key={gate.nummer}
+                initial={{ opacity: 0, x: -8 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-20px" }}
+                transition={{ delay: i * 0.025, duration: 0.3, ease: EASE }}
+              >
+                <InfoKarte lichtfarbe="239, 68, 68" mitHoverAnimation={false} klassen="p-0">
+                  <button
+                    onClick={() => setOffenesGate(offen ? null : gate.nummer)}
+                    aria-expanded={offen}
+                    className="w-full text-left p-2.5 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-signal-rot/40 rounded-xl"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="font-mono text-[11px] text-signal-rot font-bold w-5 text-center flex-shrink-0 tabular-nums pt-0.5">
+                        {String(gate.nummer).padStart(2, "0")}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-mono text-[12px] text-white/90 font-medium">{gate.titel}</div>
+                        <p className="text-[10.5px] text-white/45 mt-0.5 leading-snug">{gate.check}</p>
+                      </div>
+                      {gate.beispiel && (
+                        <motion.span
+                          animate={{ rotate: offen ? 45 : 0 }}
+                          transition={{ duration: 0.18 }}
+                          className="text-signal-rot text-base flex-shrink-0 font-light leading-none ml-1"
+                          style={{ opacity: offen ? 0.9 : 0.45 }}
+                          aria-hidden="true"
+                        >
+                          +
+                        </motion.span>
+                      )}
+                    </div>
+                  </button>
+                  <AnimatePresence>
+                    {offen && gate.beispiel && (
+                      <motion.div
+                        key="detail"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.22 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-2.5 pb-2.5 border-t border-signal-rot/10 pt-2">
+                          <p className="text-[11px] text-white/65 leading-relaxed">
+                            {gate.beispiel}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </InfoKarte>
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 
@@ -655,9 +810,14 @@ function GatesAct() {
       <section>
         <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
           <span className="text-akzent-400">◈</span>
-          Devil's Advocate Patterns
-          <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">5 Anti-Patterns · DA-Pass Pflicht</span>
+          Devil's-Advocate-Muster
+          <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">5 Anti-Muster</span>
         </h4>
+        <p className="text-[12px] text-white/45 mb-4 max-w-3xl">
+          Ein „Anwalt des Teufels"-Durchgang vor jedem Submit: typische Selbsttäuschungen bewusst
+          provozieren, um sie nicht zu übersehen. Wenn der Durchgang null Korrekturen findet, war
+          er zu mild und muss noch einmal laufen.
+        </p>
         <div className="space-y-2">
           {DA_PATTERNS.map((pattern, i) => (
             <motion.div
@@ -683,11 +843,11 @@ function GatesAct() {
                 </div>
                 <div className="space-y-1.5 ml-1">
                   <div className="flex gap-2 text-[11.5px]">
-                    <span className="text-signal-rot/80 w-14 flex-shrink-0 font-mono uppercase text-[10px] tracking-wider pt-0.5">Problem</span>
+                    <span className="text-signal-rot/80 w-16 flex-shrink-0 font-mono uppercase text-[10px] tracking-wider pt-0.5">Falle</span>
                     <span className="text-white/65 leading-relaxed">{pattern.problem}</span>
                   </div>
                   <div className="flex gap-2 text-[11.5px]">
-                    <span className="text-signal-gruen/80 w-14 flex-shrink-0 font-mono uppercase text-[10px] tracking-wider pt-0.5">Lesson</span>
+                    <span className="text-signal-gruen/80 w-16 flex-shrink-0 font-mono uppercase text-[10px] tracking-wider pt-0.5">Regel</span>
                     <span className="text-white/85 leading-relaxed">{pattern.lesson}</span>
                   </div>
                 </div>

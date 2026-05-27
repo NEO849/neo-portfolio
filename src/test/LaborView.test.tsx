@@ -21,30 +21,32 @@ function renderLabor() {
 describe('LaborView — Render-Smoke-Tests', () => {
   it('rendert ohne Crash', () => {
     renderLabor();
-    expect(screen.getByText(/labor_senior_elite/i)).toBeInTheDocument();
+    // AbschnittsTitel rendert Prefix mit '>' das als entity escaped wird —
+    // also nach reinem "labor" suchen (case-insensitive)
+    expect(screen.getByText(/^labor$/i)).toBeInTheDocument();
   });
 
   it('zeigt alle 5 Tab-Labels in der Tabnavigation', () => {
     renderLabor();
-    expect(screen.getByRole('tab', { name: 'Memory v2' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'MCP-Arsenal' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Memory' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'MCPs' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Workflows' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Commands & Skills' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Commands' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Hard-Gates' })).toBeInTheDocument();
   });
 
-  it('hat genau einen aktiven Tab (Default: Memory v2)', () => {
+  it('hat genau einen aktiven Tab (Default: Memory)', () => {
     renderLabor();
     const aktive = screen.getAllByRole('tab').filter(
       (el) => el.getAttribute('aria-selected') === 'true'
     );
     expect(aktive).toHaveLength(1);
-    expect(aktive[0]).toHaveTextContent('Memory v2');
+    expect(aktive[0]).toHaveTextContent('Memory');
   });
 
   it('Memory-Act zeigt alle 5 Tier-Namen (Core/Deep/Archival/Recall/Staging)', () => {
     renderLabor();
-    // Default-Tab ist Memory v2 — alle Tiers sollten sichtbar sein
+    // Default-Tab ist Memory — alle Tiers sollten sichtbar sein
     expect(screen.getByText('Core')).toBeInTheDocument();
     expect(screen.getByText('Deep')).toBeInTheDocument();
     expect(screen.getByText('Archival')).toBeInTheDocument();
@@ -52,8 +54,17 @@ describe('LaborView — Render-Smoke-Tests', () => {
     expect(screen.getByText('Staging')).toBeInTheDocument();
   });
 
-  it('Elite-Prinzipien-Section ist sichtbar', () => {
+  it('Leitprinzipien-Section ist sichtbar', () => {
     renderLabor();
-    expect(screen.getByText(/elite-prinzipien/i)).toBeInTheDocument();
+    expect(screen.getByText(/leitprinzipien/i)).toBeInTheDocument();
+  });
+
+  it('Memory-Tier-Karten haben Aufklapp-Button (aria-expanded)', () => {
+    renderLabor();
+    // Jeder Tier hat einen Button mit aria-expanded="false" (default zu)
+    const buttons = screen.getAllByRole('button').filter(
+      (el) => el.getAttribute('aria-expanded') === 'false'
+    );
+    expect(buttons.length).toBeGreaterThanOrEqual(5); // mindestens die 5 Memory-Tiers
   });
 });
