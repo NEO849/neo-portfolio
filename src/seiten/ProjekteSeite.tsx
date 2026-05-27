@@ -4,18 +4,26 @@
 
 import { motion } from "framer-motion";
 import { SEITEN_EINGANG } from "../bewegung/varianten";
+import { SeitenMeta } from "../bausteine/SeitenMeta";
 import ProjekteView from "../views/ProjekteView";
 
 export default function ProjekteSeite() {
   return (
-    <motion.div
-      variants={SEITEN_EINGANG}
-      initial="versteckt"
-      animate="sichtbar"
-      exit="verlassen"
-      className="pt-16"
-    >
-      <ProjekteView />
-    </motion.div>
+    <>
+      <SeitenMeta
+        titel="Projekte"
+        beschreibung="Neo Dev Stack · NeoRecon Bug-Bounty Pipeline · claude-bus Mac↔Server↔iPhone · Voice-Bridge · bb_recon OSINT-Toolkit · ONE iOS · Sports Almanach · Z Almanach · OSINT Toolkit."
+        pfad="/projekte"
+      />
+      <motion.div
+        variants={SEITEN_EINGANG}
+        initial="versteckt"
+        animate="sichtbar"
+        exit="verlassen"
+        className="pt-16"
+      >
+        <ProjekteView />
+      </motion.div>
+    </>
   );
 }

@@ -5,17 +5,25 @@
 
 import { motion } from "framer-motion";
 import { SEITEN_EINGANG } from "../bewegung/varianten";
+import { SeitenMeta } from "../bausteine/SeitenMeta";
 import HeroView from "../views/HeroView";
 
 export default function StartSeite() {
   return (
-    <motion.div
-      variants={SEITEN_EINGANG}
-      initial="versteckt"
-      animate="sichtbar"
-      exit="verlassen"
-    >
-      <HeroView />
-    </motion.div>
+    <>
+      <SeitenMeta
+        titel="Security Researcher & iOS Developer"
+        beschreibung="Michael Fleps — Bug-Bounty-Researcher (HackerOne · Intigriti · YesWeHack), iOS-Entwickler und Linux-Specialist aus Nürnberg. AI-augmentierte Security-Pipeline, Custom OSINT-Toolkit, eigene MCP-Server."
+        pfad="/"
+      />
+      <motion.div
+        variants={SEITEN_EINGANG}
+        initial="versteckt"
+        animate="sichtbar"
+        exit="verlassen"
+      >
+        <HeroView />
+      </motion.div>
+    </>
   );
 }

@@ -5,6 +5,7 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { type ReactNode } from "react";
+import { HelmetProvider } from "react-helmet-async";
 import { PortfolioAnbieter } from "../zustaende/portfolioZustand";
 
 interface AnbieterProps {
@@ -13,8 +14,10 @@ interface AnbieterProps {
 
 export function Anbieter({ children }: AnbieterProps) {
   return (
-    <PortfolioAnbieter>
-      {children}
-    </PortfolioAnbieter>
+    <HelmetProvider>
+      <PortfolioAnbieter>
+        {children}
+      </PortfolioAnbieter>
+    </HelmetProvider>
   );
 }
