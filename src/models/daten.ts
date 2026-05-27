@@ -38,7 +38,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "Self-Improving Memory System v2 – Adaptive Knowledge Base",
     kurzbeschreibung: "Selbst-lernendes 5-Tier-Memory-System mit Hooks, Confidence-Decay und A-MEM-Linking – Theorie-fundiert auf MemGPT, Park et al. Generative Agents und A-MEM (NeurIPS 2025)",
-    langbeschreibung: "Eigenentwickeltes Memory-System für Claude Code, das aus jeder Session lernt. 5-Tier-Architektur (Core / Deep / Archival / Recall / Staging) verhindert Token-Bloat und Context-Loss. Drei UserPromptSubmit/SessionStart/SessionEnd-Hooks erfassen automatisch User-Korrekturen und Bestätigungen ('Surprise-Capture' nach Reflexion-Paper), schreiben Session-Digests und zeigen einen smarten Banner bei pending Inbox-Items. Frontmatter v2 trägt importance/confidence/last_verified-Felder; /memory-outcome propagiert Submit-Resolutions als Confidence-Updates zurück auf zitierte Memories (STALE-Pattern). /memory-link generiert bidirektionale Wiki-Links via gewichtete Jaccard-Similarity (A-MEM, NeurIPS 2025). /memory-synthesize crystallisiert Cluster ähnlicher Memories zu Meta-Rules (ExpeL-Pattern). Citation-Discipline als Pro-Rule: jede non-triviale Empfehlung muss [[wiki-link]] enthalten. Daily-Cron (04:00) macht read-only Health-Check + auto-commit. Aktuell 161 Memory-Files, 12 Memory-Scripts, alle vollständig versioniert via Git.",
+    langbeschreibung: "Eigenentwickeltes Memory-System für Claude Code, das aus jeder Session lernt. 5-Tier-Architektur (Core / Deep / Archival / Recall / Staging) verhindert Token-Bloat und Context-Loss. Drei UserPromptSubmit/SessionStart/SessionEnd-Hooks erfassen automatisch User-Korrekturen und Bestätigungen ('Surprise-Capture' nach Reflexion-Paper), schreiben Session-Digests und zeigen einen smarten Banner bei pending Inbox-Items. Frontmatter v2 trägt importance/confidence/last_verified-Felder; /memory-outcome propagiert Submit-Resolutions als Confidence-Updates zurück auf zitierte Memories (STALE-Pattern). /memory-link generiert bidirektionale Wiki-Links via gewichtete Jaccard-Similarity (A-MEM, NeurIPS 2025). /memory-synthesize crystallisiert Cluster ähnlicher Memories zu Meta-Rules (ExpeL-Pattern). Citation-Discipline als Pro-Rule: jede non-triviale Empfehlung muss [[wiki-link]] enthalten. Daily-Cron (04:00) macht read-only Health-Check + auto-commit. Inzwischen über 150 Memory-Lessons + 12 Backend-Scripts, alle vollständig versioniert via Git.",
     kategorie: "tooling",
     technologien: ["Python", "Claude Code Hooks", "Markdown YAML Frontmatter", "Git", "Bash Cron", "A-MEM Algorithm", "Jaccard Similarity"],
     highlights: [
@@ -49,7 +49,7 @@ export const PROJEKTE: ProjektModel[] = [
       "Active-Recall via /memory-quiz: catched dead/unclear/stale Memories",
       "Pattern-Crystallization via /memory-synthesize: N kleine Lessons → 1 Master-Rule (ExpeL)",
       "Citation-Discipline + read-only Auto-Cron + Git-Versionierung (Bad edit? git checkout HEAD --)",
-      "161 Memory-Files · 11 Slash-Commands · 12 Backend-Scripts · 100% lokal",
+      "3 Lifecycle-Hooks · 11 Slash-Commands · 12 Backend-Scripts · 100% lokal",
     ],
     zeitraum: "2025 – heute",
     status: "aktiv",
@@ -290,7 +290,7 @@ export const SYSTEM_STATS: SecurityStatModel[] = [
   { label: "Pentest-Agents",     wert: "32",  icon: "🤖" },
   { label: "Custom Skills",      wert: "11",  icon: "✦" },
   { label: "Slash-Commands",     wert: "11",  icon: "/" },
-  { label: "Memory-Files",       wert: "161", icon: "🧠" },
+  { label: "Lifecycle-Hooks",    wert: "3",   icon: "⊕" },
   { label: "Memory-Tiers",       wert: "5",   icon: "◆" },
   { label: "systemd Workflows",  wert: "12",  icon: "⟳" },
   { label: "OSINT-Quellen",      wert: "30+", icon: "🛰" },
