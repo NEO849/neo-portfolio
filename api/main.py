@@ -14,8 +14,23 @@ from slowapi.middleware import SlowAPIMiddleware
 
 from routen.osint_routen import router as osint_router
 
+# ─── Rate-Limit-Key: echte Client-IP statt 127.0.0.1 ─────────────────
+# Cloudflare-Tunnel setzt cf-connecting-ip, nginx setzt x-forwarded-for.
+# Ohne diese Anpassung würden alle Anfragen als 127.0.0.1 zählen.
+VERTRAUTE_PROXY_HEADER = ("cf-connecting-ip", "x-forwarded-for")
+
+
+def echte_client_ip(request: Request) -> str:
+    for header in VERTRAUTE_PROXY_HEADER:
+        wert = request.headers.get(header)
+        if wert:
+            # x-forwarded-for kann eine Liste sein: "client, proxy1, proxy2"
+            return wert.split(",")[0].strip()
+    return get_remote_address(request)
+
+
 # ─── Rate-Limiter ────────────────────────────────────────────────────
-limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
+limiter = Limiter(key_func=echte_client_ip, default_limits=["60/minute"])
 
 # ─── App ─────────────────────────────────────────────────────────────
 app = FastAPI(
@@ -95,6 +110,37 @@ class FlexibleCORSMiddleware(BaseHTTPMiddleware):
 
 
 app.add_middleware(FlexibleCORSMiddleware)
+
+
+# ─── Security-Header-Middleware ───────────────────────────────────────
+# Wird immer angewendet, unabhängig vom Reverse-Proxy. Senior-Elite-Default,
+# damit Cloudflare-Tunnel (kein nginx davor) und nginx-Setup gleich gehärtet sind.
+class SicherheitsHeaderMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: StarletteRequest, call_next):
+        antwort = await call_next(request)
+        antwort.headers.setdefault(
+            "Strict-Transport-Security",
+            "max-age=63072000; includeSubDomains",
+        )
+        antwort.headers.setdefault("X-Content-Type-Options", "nosniff")
+        antwort.headers.setdefault("X-Frame-Options", "DENY")
+        antwort.headers.setdefault(
+            "Referrer-Policy", "strict-origin-when-cross-origin"
+        )
+        antwort.headers.setdefault(
+            "Permissions-Policy", "geolocation=(), microphone=(), camera=()"
+        )
+        # API liefert nur JSON — strikte CSP gegen MIME-Confusion-Angriffe
+        antwort.headers.setdefault(
+            "Content-Security-Policy",
+            "default-src 'none'; frame-ancestors 'none'",
+        )
+        # Server-Identität verstecken (kein FastAPI/uvicorn-Banner)
+        antwort.headers["Server"] = "OSINT-API"
+        return antwort
+
+
+app.add_middleware(SicherheitsHeaderMiddleware)
 
 # ─── Routen ──────────────────────────────────────────────────────────
 app.include_router(osint_router, prefix="/api/v1")
