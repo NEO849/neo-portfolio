@@ -81,7 +81,7 @@ export default function LaborView() {
         className="mb-12"
       >
         <h3 className="font-display text-sm font-bold text-white/70 mb-3 flex items-center gap-2 uppercase tracking-[0.18em]">
-          <span className="text-akzent-400">◆</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-akzent-400 flex-shrink-0" aria-hidden="true" />
           Leitprinzipien
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -165,7 +165,7 @@ function MemoryAct() {
           Konsistenz und committet alles in Git.
         </p>
         <p className="text-[11px] text-white/35 font-mono mt-2">
-          Klicke eine Karte an, um zu sehen, welche Rolle der Tier im Gesamtsystem spielt.
+          Klicke eine Karte an, um zu sehen, welche Rolle diese Schicht im Gesamtsystem spielt.
         </p>
       </header>
 
@@ -285,7 +285,7 @@ function MemoryAct() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// ACT 2 — MCP-Arsenal (25 MCPs in 5 Kategorien)
+// ACT 2 — MCP-Arsenal (22 MCPs in 4 Kategorien)
 // ═══════════════════════════════════════════════════════════════════
 
 function McpAct() {
@@ -300,7 +300,7 @@ function McpAct() {
         </h3>
         <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
           MCP-Server sind die Brücke zwischen Claude und allem anderen — APIs, Browser, Datenbanken,
-          Dateisystemen. Ich habe 25 davon eingebunden, zwei selbst gebaut (Censys-Platform-API und
+          Dateisystemen. Ich habe 22 davon eingebunden, zwei selbst gebaut (Censys-Platform-API und
           die Caido-Bridge). Wichtiger als die reine Anzahl ist die Entscheidungslogik:
           welches MCP passt für welche Aufgabe besser. Statt blind Bash-Befehle zu schreiben, prüfe
           ich erst, ob ein spezialisiertes MCP die Aufgabe sauberer löst.
@@ -310,7 +310,7 @@ function McpAct() {
         </p>
       </header>
 
-      {/* Kategorie-Pills */}
+      {/* Kategorie-Pills — farbiger Dot statt Emoji, konsistent zu Memory-Tiers */}
       <div className="flex flex-wrap gap-1.5">
         {MCP_KATEGORIEN.map((kat) => {
           const aktiv = kat.kategorie === aktiveKategorie;
@@ -326,7 +326,11 @@ function McpAct() {
                 border: `1px solid ${aktiv ? `rgba(${kat.farbeRgb}, 0.35)` : "rgba(255,255,255,0.06)"}`,
               }}
             >
-              <span className="text-sm" aria-hidden="true">{kat.icon}</span>
+              <span
+                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                style={{ backgroundColor: `rgb(${kat.farbeRgb})` }}
+                aria-hidden="true"
+              />
               <span>{kat.kategorie}</span>
               <span
                 className="font-mono text-[10px] px-1.5 py-0.5 rounded-md tabular-nums"
@@ -349,7 +353,7 @@ function McpAct() {
           transition={{ duration: 0.25, ease: EASE }}
           className="space-y-3"
         >
-          <p className="text-[12px] text-white/50 italic">{aktive.beschreibung}</p>
+          <p className="text-[12px] text-white/60 leading-relaxed">{aktive.beschreibung}</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {aktive.mcps.map((mcp, i) => (
@@ -410,7 +414,7 @@ function WorkflowsAct() {
           Automatisierte Abläufe
         </h3>
         <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
-          Sachen, die ich nicht jeden Tag manuell anstoßen will, laufen als systemd-Timer (zeitgesteuert)
+          Aufgaben, die ich nicht jeden Tag manuell anstoßen will, laufen als systemd-Timer (zeitgesteuert)
           oder -Service (dauerhaft). Backups jede Nacht, Token-Rotation jede Woche, Hacktivity-Polling
           jede Stunde — und dauerhaft die Mailbox-Bridges zwischen Mac, iPhone und Server. Jede Aktion
           wird auditiert, der Anomaly-Watcher schlägt bei verdächtigen Mustern Alarm.
@@ -420,10 +424,10 @@ function WorkflowsAct() {
         </p>
       </header>
 
-      {/* Timers */}
+      {/* Timers — alle in Akzent-Indigo, Section-Header mit farbigem Dot */}
       <section>
         <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
-          <span className="text-akzent-400">⟳</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-akzent-400 flex-shrink-0" aria-hidden="true" />
           Zeitgesteuerte Abläufe
           <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">{timers.length} aktiv</span>
         </h4>
@@ -440,10 +444,10 @@ function WorkflowsAct() {
         </div>
       </section>
 
-      {/* Services */}
+      {/* Services — alle in Cyber-Cyan, Section-Header mit farbigem Dot */}
       <section>
         <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
-          <span className="text-cyber-400">●</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" aria-hidden="true" />
           Dauerhaft laufende Dienste
           <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">{services.length} laufen</span>
         </h4>
@@ -478,15 +482,12 @@ function WorkflowRow({ workflow, delay, offen, onToggle }: WorkflowRowProps) {
       viewport={{ once: true, margin: "-20px" }}
       transition={{ delay, duration: 0.35, ease: EASE }}
     >
+      {/* Konsistenz: KEIN borderLeft mehr — alle Cards identisch.
+          Kritische Workflows werden durch ein Glow am Dot markiert. */}
       <InfoKarte
         lichtfarbe={workflow.farbeRgb}
         mitHoverAnimation={false}
         klassen="p-0"
-        stil={{
-          borderLeft: workflow.kritisch
-            ? `2px solid rgb(${workflow.farbeRgb})`
-            : `1px solid rgba(${workflow.farbeRgb}, 0.18)`,
-        }}
       >
         <button
           onClick={onToggle}
@@ -499,8 +500,9 @@ function WorkflowRow({ workflow, delay, offen, onToggle }: WorkflowRowProps) {
               className="w-1.5 h-1.5 rounded-full flex-shrink-0"
               style={{
                 backgroundColor: `rgb(${workflow.farbeRgb})`,
-                boxShadow: workflow.kritisch ? `0 0 8px rgba(${workflow.farbeRgb}, 0.6)` : undefined,
+                boxShadow: workflow.kritisch ? `0 0 8px rgba(${workflow.farbeRgb}, 0.7)` : undefined,
               }}
+              aria-label={workflow.kritisch ? "kritisch" : undefined}
             />
             <span className="font-mono text-[12px] text-white/85 flex-1 truncate">{workflow.name}</span>
             <span
@@ -582,10 +584,10 @@ function CommandsAct() {
         </p>
       </header>
 
-      {/* Slash-Commands */}
+      {/* Slash-Commands — Section-Header mit farbigem Dot statt Glyph */}
       <section>
         <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
-          <span className="text-akzent-400">/</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-akzent-400 flex-shrink-0" aria-hidden="true" />
           Slash-Commands
           <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">11 Befehle</span>
         </h4>
@@ -593,7 +595,7 @@ function CommandsAct() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2.5">
-              <AbzeichenStatus variante="aktiv" text="SUBMIT-PIPELINE" mitPuls />
+              <AbzeichenStatus variante="aktiv" text="SUBMIT-PIPELINE" />
               <span className="text-[10px] text-white/35 font-mono">Pflicht vor jedem Submit</span>
             </div>
             <div className="space-y-1.5">
@@ -617,10 +619,10 @@ function CommandsAct() {
         </div>
       </section>
 
-      {/* Custom Skills */}
+      {/* Custom Skills — Section-Header mit farbigem Dot statt Glyph */}
       <section>
         <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
-          <span className="text-cyber-400">✦</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" aria-hidden="true" />
           Skills
           <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">11 Skills</span>
         </h4>
@@ -656,7 +658,10 @@ function CommandsAct() {
 }
 
 function CommandRow({ cmd, delay }: { cmd: typeof SLASH_COMMANDS[number]; delay: number }) {
-  const rgb = cmd.hardRule ? "239, 68, 68" : "99, 102, 241";
+  // Konsistenz: alle Slash-Cards in derselben Akzent-Farbe. 'Harte Regel'
+  // wird durch das Badge markiert, nicht durch einen extra Strich oder
+  // eine andere Card-Farbe — visuelle Ruhe.
+  const rgb = "99, 102, 241";
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
@@ -668,14 +673,17 @@ function CommandRow({ cmd, delay }: { cmd: typeof SLASH_COMMANDS[number]; delay:
         lichtfarbe={rgb}
         mitHoverAnimation={false}
         klassen="p-3"
-        stil={cmd.hardRule ? { borderLeft: `2px solid rgb(${rgb})` } : undefined}
       >
         <div className="flex items-baseline gap-2 mb-1 flex-wrap">
           <span className="font-mono text-[12px] font-semibold" style={{ color: `rgb(${rgb})` }}>{cmd.cmd}</span>
           {cmd.hardRule && (
             <span
               className="font-mono text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider"
-              style={{ background: `rgba(${rgb}, 0.10)`, color: `rgb(${rgb})`, border: `1px solid rgba(${rgb}, 0.30)` }}
+              style={{
+                background: "rgba(239, 68, 68, 0.10)",
+                color: "rgb(239, 68, 68)",
+                border: "1px solid rgba(239, 68, 68, 0.30)",
+              }}
             >
               harte Regel
             </span>

@@ -494,11 +494,14 @@ export const MEMORY_TIERS: MemoryTierModel[] = [
   },
 ];
 
-// MCP-Arsenal — 25 verbundene MCPs in 5 Kategorien
+// MCP-Arsenal — 22 verbundene MCPs in 4 fokussierten Kategorien.
+// Jede Kategorie hat eine Farbe als visuelles Anker — kein Emoji,
+// stattdessen ein farbiger Dot (konsistent zu Memory-Tier-Pills
+// und zu den Section-Headings im Workflow-Tab).
 export const MCP_KATEGORIEN: McpKategorieModel[] = [
   {
     kategorie: "Recon & Intel",
-    icon: "🛰",
+    icon: "",
     farbeRgb: "34, 211, 238",
     beschreibung: "Asset-Discovery, CVE-Lookup, Pattern-Recall — vor jeder Hunt-Phase",
     mcps: [
@@ -512,7 +515,7 @@ export const MCP_KATEGORIEN: McpKategorieModel[] = [
   },
   {
     kategorie: "Reasoning & Memory",
-    icon: "🧠",
+    icon: "",
     farbeRgb: "167, 139, 250",
     beschreibung: "Multi-Step-Hypothesen, Cross-Target-Pattern, Code-Suche",
     mcps: [
@@ -525,7 +528,7 @@ export const MCP_KATEGORIEN: McpKategorieModel[] = [
   },
   {
     kategorie: "Web · App · Mobile",
-    icon: "🌐",
+    icon: "",
     farbeRgb: "99, 102, 241",
     beschreibung: "Live-Browser, Caido-Bridge, APK-Decompile",
     mcps: [
@@ -539,7 +542,7 @@ export const MCP_KATEGORIEN: McpKategorieModel[] = [
   },
   {
     kategorie: "Cloud · Dev · Docs",
-    icon: "☁️",
+    icon: "",
     farbeRgb: "34, 197, 94",
     beschreibung: "Library-Docs aktuell halten, Cross-Device Sync",
     mcps: [
@@ -553,14 +556,20 @@ export const MCP_KATEGORIEN: McpKategorieModel[] = [
 ];
 
 // Auto-Workflows (systemd Timers + Services)
+//
+// Farben: bewusst nur ZWEI, abgeleitet vom Typ — Timer = akzent (Indigo),
+// Service = cyber (Cyan). Kritische Workflows werden über ein optionales
+// 'kritisch'-Flag markiert (im View als subtiler Dot), nicht über
+// eine dritte Farbe — das hält die Auflistung visuell ruhig und
+// konsistent zur restlichen Webseite (SecurityView / ZeugnisseView).
 export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
-  // ─── Timers (laufen nach Zeitplan) ────────────────────────────────────
+  // ─── Timers (laufen nach Zeitplan) — alle in Akzent-Indigo ───────────
   {
     name: "claude-backup.timer",
     typ: "timer",
     cadence: "täglich 04:15",
     output: "Git-Repository + rsync-Snapshot",
-    farbeRgb: "99, 102, 241",
+    farbeRgb: "129, 140, 248",
     details: "Sichert das Memory-Verzeichnis, alle Bug-Bounty-Notizen und die DATEV-Reports jede Nacht. Drei-Tier-Backup: Git-Repo, lokaler Snapshot, externer Sync. Bei Datenverlust ist alles in unter einer Minute wiederherstellbar.",
   },
   {
@@ -568,7 +577,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "timer",
     cadence: "Montag 04:30",
     output: "neuer Bearer-Token für iPhone-Endpunkt",
-    farbeRgb: "245, 158, 11",
+    farbeRgb: "129, 140, 248",
     details: "Wöchentliche Rotation des Authentifizierungs-Tokens für den iPhone-Endpunkt. Begrenzt das Schadenspotenzial, falls ein Token versehentlich offengelegt würde, auf maximal eine Woche.",
   },
   {
@@ -576,7 +585,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "timer",
     cadence: "stündlich (+ Zufalls-Offset)",
     output: "Sofort-Alarm bei Score ≥ 75",
-    farbeRgb: "34, 211, 238",
+    farbeRgb: "129, 140, 248",
     kritisch: true,
     details: "Pollt HackerOne-Disclosure-Reports und gleicht sie mit meinen aktiven Targets ab. Wenn ein neuer Report meinen Target-Stack betrifft oder ein bekanntes Pattern bestätigt, kommt sofort eine Benachrichtigung. First-Mover-Vorteil bei neuen Vulnerability-Klassen.",
   },
@@ -585,16 +594,16 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "timer",
     cadence: "täglich 18:00",
     output: "Tageszusammenfassung als Markdown",
-    farbeRgb: "34, 211, 238",
+    farbeRgb: "129, 140, 248",
     details: "Sammelt alle Findings, die unter dem Sofort-Alarm-Schwellenwert lagen, und liefert sie um 18 Uhr als kompakte Tageszusammenfassung. Verhindert Alarm-Müdigkeit, ohne Informationen zu verlieren.",
   },
-  // ─── Services (laufen dauerhaft) ──────────────────────────────────────
+  // ─── Services (laufen dauerhaft) — alle in Cyber-Cyan ────────────────
   {
     name: "claude-bus.service",
     typ: "service",
     cadence: "dauerhaft",
     output: "Mac ↔ Server Mailbox (Tailscale)",
-    farbeRgb: "129, 140, 248",
+    farbeRgb: "34, 211, 238",
     details: "FastMCP-Server, über den Claude Desktop auf dem Mac asynchron mit Claude Code auf dem Server kommuniziert. Tailscale-geschützt, Bearer-authentifiziert, jeder Tool-Aufruf wird auditiert.",
   },
   {
@@ -602,7 +611,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "dauerhaft",
     output: "iPhone ↔ Server Mailbox (Cloudflare)",
-    farbeRgb: "167, 139, 250",
+    farbeRgb: "34, 211, 238",
     details: "Zweite Mailbox-Instanz speziell für die Claude.ai-iPhone-App. OAuth-2.1-Worker auf Cloudflare davor, strenge Pfad-Allowlist auf der Server-Seite — Mobile darf lesen, schreiben nur in den Handoff-Ordner, kein Shell-Zugriff.",
   },
   {
@@ -610,7 +619,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "dauerhaft",
     output: "Alarm bei Off-Hours / Burst / abgelehnten Zugriffen",
-    farbeRgb: "239, 68, 68",
+    farbeRgb: "34, 211, 238",
     kritisch: true,
     details: "Beobachtet das Audit-Log der beiden Mailbox-Services live. Bei verdächtigen Mustern — Aktivität nachts, viele Anfragen in kurzer Zeit, abgelehnte Pfade — kommt sofort ein Alarm. Frühwarnsystem für kompromittierte Tokens.",
   },
@@ -619,7 +628,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "Datei-Watcher",
     output: "HAR-Analyse → Markdown-Befund",
-    farbeRgb: "34, 197, 94",
+    farbeRgb: "34, 211, 238",
     details: "Überwacht den Handoff-Ordner. Sobald ich aus Caido eine HTTP-Session als HAR-Datei exportiere, läuft sie durch zehn Pattern-Detektoren (Auth, IDOR, SSRF, CORS …) und ich bekomme einen strukturierten Befund-Report inklusive Counter-Pattern-Check gegen mein Memory.",
   },
   {
@@ -643,7 +652,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "dauerhaft",
     output: "Cloudflare-Tunnel zu m.cyp-hr.com",
-    farbeRgb: "245, 158, 11",
+    farbeRgb: "34, 211, 238",
     details: "Erzeugt einen sicheren Tunnel von Cloudflare zum Server, ohne dass ich einen Port nach außen öffnen muss. TLS automatisch erneuert, WAF + DDoS-Schutz am Edge — der iPhone-Endpunkt + Voice-UI sind nur über diesen Tunnel erreichbar.",
   },
   {
@@ -651,7 +660,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "Docker",
     output: "Vektor-Datenbank für semantische Code-Suche",
-    farbeRgb: "167, 139, 250",
+    farbeRgb: "34, 211, 238",
     details: "Milvus-Standalone-Container, in dem die Embeddings meiner indexierten Codebases liegen. Ollama erzeugt die Embeddings lokal, claude-context legt sie hier ab — dadurch funktioniert semantische Code-Suche (etwa: 'zeig mir alle Stellen wo API-Keys verarbeitet werden') komplett ohne externe APIs.",
   },
 ];
