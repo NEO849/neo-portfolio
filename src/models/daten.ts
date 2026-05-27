@@ -286,14 +286,14 @@ export const SECURITY_STATS: SecurityStatModel[] = [
 // ═══════════════════════════════════════════════════════
 
 export const SYSTEM_STATS: SecurityStatModel[] = [
-  { label: "MCP-Server",         wert: "25",  icon: "⚡" },
+  { label: "MCP-Server",         wert: "22",  icon: "⚡" },
   { label: "Pentest-Agents",     wert: "32",  icon: "🤖" },
   { label: "Custom Skills",      wert: "11",  icon: "✦" },
   { label: "Slash-Commands",     wert: "11",  icon: "/" },
   { label: "Memory-Files",       wert: "161", icon: "🧠" },
+  { label: "Memory-Tiers",       wert: "5",   icon: "◆" },
   { label: "systemd Workflows",  wert: "12",  icon: "⟳" },
   { label: "OSINT-Quellen",      wert: "30+", icon: "🛰" },
-  { label: "Hard-Gates",         wert: "12",  icon: "🛡" },
 ];
 
 export const TOOLS_STACK = [
@@ -485,7 +485,7 @@ export const MEMORY_TIERS: MemoryTierModel[] = [
   },
   {
     tier: "Staging",
-    ort: "inbox/{pending,surprises,contradictions}.md",
+    ort: "inbox/pending · surprises · contradictions",
     loaded: "nur über /memory-review",
     lifecycle: "Sammelplatz, niemals direkt produktiv",
     anzahl: "von Hooks gefüttert",
@@ -546,21 +546,8 @@ export const MCP_KATEGORIEN: McpKategorieModel[] = [
       { name: "Cloudflare Dev Platform", rolle: "D1, R2, KV, Workers, Hyperdrive" },
       { name: "Firebase",                rolle: "Crashlytics, Auth, Hosting, Firestore" },
       { name: "Context7",                rolle: "Library-Docs aktuell (statt Training-Data)" },
-      { name: "Google Drive · Calendar · Gmail", rolle: "Workflow-Integration" },
       { name: "claude-bus",              rolle: "Mac↔Server Tier-1 (Tailscale)", eigenbau: true },
       { name: "claude-bus-mobile",       rolle: "iPhone↔Server Tier-2 (Cloudflare + OAuth)", eigenbau: true },
-    ],
-  },
-  {
-    kategorie: "Workflow-Helper",
-    icon: "⚙",
-    farbeRgb: "245, 158, 11",
-    beschreibung: "Submit-Timing, Berechnungen, Transcripts",
-    mcps: [
-      { name: "time",                  rolle: "Submit-Timing, Timezone-Math, US-Holiday-Awareness" },
-      { name: "Wolfram Alpha",         rolle: "Berechnungen + Wolfram-Language" },
-      { name: "youtube",               rolle: "Transcript-Extract" },
-      { name: "sequential-thinking",   rolle: "Strukturierte Hypothesen-Branching" },
     ],
   },
 ];

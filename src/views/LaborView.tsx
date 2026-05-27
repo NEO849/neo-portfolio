@@ -17,8 +17,6 @@ import {
   AUTO_WORKFLOWS,
   SLASH_COMMANDS,
   CUSTOM_SKILLS,
-  HARD_GATES,
-  DA_PATTERNS,
   ELITE_PRINZIPIEN,
   SYSTEM_STATS,
 } from "../models/daten";
@@ -27,14 +25,13 @@ import { InfoKarte } from "../bausteine/InfoKarte";
 import { AbzeichenStatus } from "../bausteine/AbzeichenStatus";
 import { GlassTabs } from "../bausteine/GlassTabs";
 
-type LaborTab = "memory" | "mcps" | "workflows" | "commands" | "gates";
+type LaborTab = "memory" | "mcps" | "workflows" | "commands";
 
 const TABS: { id: LaborTab; label: string }[] = [
   { id: "memory",    label: "Memory" },
   { id: "mcps",      label: "MCPs" },
   { id: "workflows", label: "Workflows" },
   { id: "commands",  label: "Commands" },
-  { id: "gates",     label: "Hard-Gates" },
 ];
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
@@ -108,7 +105,7 @@ export default function LaborView() {
                   />
                   <span className="font-display text-[13px] font-bold text-white leading-tight">{prinzip.titel}</span>
                 </div>
-                <p className="text-[11.5px] text-white/55 leading-relaxed">{prinzip.beschreibung}</p>
+                <p className="text-[11.5px] text-white/60 leading-relaxed">{prinzip.beschreibung}</p>
               </InfoKarte>
             </motion.div>
           ))}
@@ -140,7 +137,6 @@ export default function LaborView() {
           {aktiverTab === "mcps"      && <McpAct />}
           {aktiverTab === "workflows" && <WorkflowsAct />}
           {aktiverTab === "commands"  && <CommandsAct />}
-          {aktiverTab === "gates"     && <GatesAct />}
         </motion.div>
       </AnimatePresence>
     </section>
@@ -160,7 +156,7 @@ function MemoryAct() {
         <h3 className="font-display text-lg font-bold text-white mb-1.5">
           Selbst-lernendes Memory-System
         </h3>
-        <p className="text-sm text-white/55 leading-relaxed max-w-3xl">
+        <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
           Damit Claude Code zwischen Sessions wirklich „dazulernt" und nicht jedes Mal bei null anfängt,
           habe ich ein gestaffeltes Gedächtnis aufgebaut. Inspiriert von MemGPT (NeurIPS 2023), Generative
           Agents (Park et al.) und A-MEM (NeurIPS 2025). Drei Hooks fangen automatisch User-Korrekturen
@@ -209,19 +205,19 @@ function MemoryAct() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1.5">
-                        <span className="font-mono text-[12px] text-white/85">{tier.ort}</span>
+                        <span className="font-mono text-[12px] text-white/85 break-all min-w-0">{tier.ort}</span>
                         {tier.anzahl && (
-                          <span className="font-mono text-[10px] text-white/30">{tier.anzahl}</span>
+                          <span className="font-mono text-[10px] text-white/30 flex-shrink-0">{tier.anzahl}</span>
                         )}
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
                         <div className="flex gap-2 text-[11px]">
                           <span className="text-white/30 w-20 flex-shrink-0">geladen</span>
-                          <span className="text-white/65">{tier.loaded}</span>
+                          <span className="text-white/70">{tier.loaded}</span>
                         </div>
                         <div className="flex gap-2 text-[11px]">
                           <span className="text-white/30 w-20 flex-shrink-0">Lifecycle</span>
-                          <span className="text-white/65">{tier.lifecycle}</span>
+                          <span className="text-white/70">{tier.lifecycle}</span>
                         </div>
                       </div>
                     </div>
@@ -250,7 +246,7 @@ function MemoryAct() {
                         className="px-4 pb-4 border-t pt-3"
                         style={{ borderColor: `rgba(${tier.farbeRgb}, 0.12)` }}
                       >
-                        <p className="text-[12px] text-white/65 leading-relaxed">
+                        <p className="text-[12px] text-white/70 leading-relaxed">
                           {tier.bedeutung}
                         </p>
                       </div>
@@ -279,7 +275,7 @@ function MemoryAct() {
             <InfoKarte lichtfarbe={meta.rgb} klassen="p-3">
               <div className="font-mono text-[10px] text-white/30 mb-1 uppercase tracking-wider">Mechanik</div>
               <div className="text-[12px] text-white font-medium mb-1">{meta.titel}</div>
-              <div className="text-[10.5px] text-white/55 leading-relaxed">{meta.bsp}</div>
+              <div className="text-[10.5px] text-white/60 leading-relaxed">{meta.bsp}</div>
             </InfoKarte>
           </motion.div>
         ))}
@@ -302,7 +298,7 @@ function McpAct() {
         <h3 className="font-display text-lg font-bold text-white mb-1.5">
           MCP-Server — was wann womit
         </h3>
-        <p className="text-sm text-white/55 leading-relaxed max-w-3xl">
+        <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
           MCP-Server sind die Brücke zwischen Claude und allem anderen — APIs, Browser, Datenbanken,
           Dateisystemen. Ich habe 25 davon eingebunden, zwei selbst gebaut (Censys-Platform-API und
           die Caido-Bridge). Wichtiger als die reine Anzahl ist die Entscheidungslogik:
@@ -323,7 +319,7 @@ function McpAct() {
               key={kat.kategorie}
               onClick={() => setAktiveKategorie(kat.kategorie)}
               className={`group flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${
-                aktiv ? "text-white" : "text-white/45 hover:text-white/80"
+                aktiv ? "text-white" : "text-white/40 hover:text-white/80"
               }`}
               style={{
                 background: aktiv ? `rgba(${kat.farbeRgb}, 0.14)` : "rgba(255,255,255,0.025)",
@@ -385,7 +381,7 @@ function McpAct() {
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] text-white/55 mt-0.5 leading-snug">{mcp.rolle}</p>
+                      <p className="text-[11px] text-white/60 mt-0.5 leading-snug">{mcp.rolle}</p>
                     </div>
                   </div>
                 </InfoKarte>
@@ -413,7 +409,7 @@ function WorkflowsAct() {
         <h3 className="font-display text-lg font-bold text-white mb-1.5">
           Automatisierte Abläufe
         </h3>
-        <p className="text-sm text-white/55 leading-relaxed max-w-3xl">
+        <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
           Sachen, die ich nicht jeden Tag manuell anstoßen will, laufen als systemd-Timer (zeitgesteuert)
           oder -Service (dauerhaft). Backups jede Nacht, Token-Rotation jede Woche, Hacktivity-Polling
           jede Stunde — und dauerhaft die Mailbox-Bridges zwischen Mac, iPhone und Server. Jede Aktion
@@ -517,7 +513,7 @@ function WorkflowRow({ workflow, delay, offen, onToggle }: WorkflowRowProps) {
             >
               {workflow.cadence}
             </span>
-            <span className="text-[11px] text-white/45 hidden md:inline truncate max-w-[260px]">
+            <span className="text-[11px] text-white/40 hidden md:inline truncate max-w-[260px]">
               → {workflow.output}
             </span>
             {workflow.details && (
@@ -548,7 +544,7 @@ function WorkflowRow({ workflow, delay, offen, onToggle }: WorkflowRowProps) {
                 className="px-3 pb-3 border-t pt-2.5"
                 style={{ borderColor: `rgba(${workflow.farbeRgb}, 0.12)` }}
               >
-                <p className="text-[12px] text-white/65 leading-relaxed">
+                <p className="text-[12px] text-white/70 leading-relaxed">
                   {workflow.details}
                 </p>
               </div>
@@ -576,7 +572,7 @@ function CommandsAct() {
         <h3 className="font-display text-lg font-bold text-white mb-1.5">
           Eigene Erweiterungen für Claude Code
         </h3>
-        <p className="text-sm text-white/55 leading-relaxed max-w-3xl">
+        <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
           Aus der Box kann Claude Code viel — aber nicht alles, was ich für meinen Bug-Bounty-Workflow
           brauche. Deshalb 22 selbst geschriebene Erweiterungen: 11 Slash-Commands (kurze Befehle wie
           <span className="font-mono text-akzent-400"> /submit-gate</span>) und 11 Skills (komplette
@@ -685,7 +681,7 @@ function CommandRow({ cmd, delay }: { cmd: typeof SLASH_COMMANDS[number]; delay:
             </span>
           )}
         </div>
-        <p className="text-[11px] text-white/55 leading-snug">{cmd.purpose}</p>
+        <p className="text-[11px] text-white/60 leading-snug">{cmd.purpose}</p>
       </InfoKarte>
     </motion.div>
   );
@@ -705,157 +701,9 @@ function SkillRow({ skill, delay }: { skill: typeof CUSTOM_SKILLS[number]; delay
           <span className="font-mono text-[12px] font-semibold" style={{ color: `rgb(${rgb})` }}>{skill.name}</span>
           <span className="font-mono text-[10px] text-white/35">{skill.trigger}</span>
         </div>
-        <p className="text-[11px] text-white/55 leading-snug">{skill.purpose}</p>
+        <p className="text-[11px] text-white/60 leading-snug">{skill.purpose}</p>
       </InfoKarte>
     </motion.div>
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// ACT 5 — Hard-Gates (aufklappbar) + Devil's Advocate
-// ═══════════════════════════════════════════════════════════════════
-
-function GatesAct() {
-  const [offenesGate, setOffenesGate] = useState<number | null>(null);
-
-  return (
-    <div className="space-y-10">
-      <header>
-        <h3 className="font-display text-lg font-bold text-white mb-1.5">
-          Schutzregeln vor jedem Submit
-        </h3>
-        <p className="text-sm text-white/55 leading-relaxed max-w-3xl">
-          Diese 12 Schutzregeln und 5 Devil's-Advocate-Muster sind keine Theorie — sie stammen aus
-          14 Closes innerhalb von zwei Wochen, von denen 6 im Nachhinein vorhersagbar waren. Daraus
-          wurde eine Pflicht-Checkliste: jede Regel muss vor dem Einreichen eines Reports konkret
-          beantwortet sein. Die Disziplin schlägt das Volumen — lieber einen sauber abgesicherten
-          Report einreichen als drei mit guter Geschichte und schwacher Beweisführung.
-        </p>
-        <p className="text-[11px] text-white/35 font-mono mt-2">
-          Klicke eine Regel an, um den Grund und ein Beispiel aus echten Fällen zu sehen.
-        </p>
-      </header>
-
-      {/* 12 Hard-Gates */}
-      <section>
-        <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
-          <span className="text-signal-rot">🛡</span>
-          Die 12 Schutzregeln
-          <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">alle ✓ oder kein Submit</span>
-        </h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
-          {HARD_GATES.map((gate, i) => {
-            const offen = offenesGate === gate.nummer;
-            return (
-              <motion.div
-                key={gate.nummer}
-                initial={{ opacity: 0, x: -8 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-20px" }}
-                transition={{ delay: i * 0.025, duration: 0.3, ease: EASE }}
-              >
-                <InfoKarte lichtfarbe="239, 68, 68" mitHoverAnimation={false} klassen="p-0">
-                  <button
-                    onClick={() => setOffenesGate(offen ? null : gate.nummer)}
-                    aria-expanded={offen}
-                    className="w-full text-left p-2.5 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-signal-rot/40 rounded-xl"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="font-mono text-[11px] text-signal-rot font-bold w-5 text-center flex-shrink-0 tabular-nums pt-0.5">
-                        {String(gate.nummer).padStart(2, "0")}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-mono text-[12px] text-white/90 font-medium">{gate.titel}</div>
-                        <p className="text-[10.5px] text-white/45 mt-0.5 leading-snug">{gate.check}</p>
-                      </div>
-                      {gate.beispiel && (
-                        <motion.span
-                          animate={{ rotate: offen ? 45 : 0 }}
-                          transition={{ duration: 0.18 }}
-                          className="text-signal-rot text-base flex-shrink-0 font-light leading-none ml-1"
-                          style={{ opacity: offen ? 0.9 : 0.45 }}
-                          aria-hidden="true"
-                        >
-                          +
-                        </motion.span>
-                      )}
-                    </div>
-                  </button>
-                  <AnimatePresence>
-                    {offen && gate.beispiel && (
-                      <motion.div
-                        key="detail"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.22 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-2.5 pb-2.5 border-t border-signal-rot/10 pt-2">
-                          <p className="text-[11px] text-white/65 leading-relaxed">
-                            {gate.beispiel}
-                          </p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </InfoKarte>
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Devil's Advocate Patterns */}
-      <section>
-        <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
-          <span className="text-akzent-400">◈</span>
-          Devil's-Advocate-Muster
-          <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">5 Anti-Muster</span>
-        </h4>
-        <p className="text-[12px] text-white/45 mb-4 max-w-3xl">
-          Ein „Anwalt des Teufels"-Durchgang vor jedem Submit: typische Selbsttäuschungen bewusst
-          provozieren, um sie nicht zu übersehen. Wenn der Durchgang null Korrekturen findet, war
-          er zu mild und muss noch einmal laufen.
-        </p>
-        <div className="space-y-2">
-          {DA_PATTERNS.map((pattern, i) => (
-            <motion.div
-              key={pattern.titel}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-20px" }}
-              transition={{ delay: i * 0.07, duration: 0.4, ease: EASE }}
-            >
-              <InfoKarte lichtfarbe="167, 139, 250" mitHoverAnimation={false} klassen="p-4">
-                <div className="flex items-baseline gap-3 mb-2 flex-wrap">
-                  <span
-                    className="font-mono text-[10px] tabular-nums font-bold tracking-wider px-1.5 py-0.5 rounded-md"
-                    style={{
-                      color: "rgb(167, 139, 250)",
-                      background: "rgba(167, 139, 250, 0.10)",
-                      border: "1px solid rgba(167, 139, 250, 0.22)",
-                    }}
-                  >
-                    DA-{String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="font-display text-[13px] font-bold text-white">{pattern.titel}</span>
-                </div>
-                <div className="space-y-1.5 ml-1">
-                  <div className="flex gap-2 text-[11.5px]">
-                    <span className="text-signal-rot/80 w-16 flex-shrink-0 font-mono uppercase text-[10px] tracking-wider pt-0.5">Falle</span>
-                    <span className="text-white/65 leading-relaxed">{pattern.problem}</span>
-                  </div>
-                  <div className="flex gap-2 text-[11.5px]">
-                    <span className="text-signal-gruen/80 w-16 flex-shrink-0 font-mono uppercase text-[10px] tracking-wider pt-0.5">Regel</span>
-                    <span className="text-white/85 leading-relaxed">{pattern.lesson}</span>
-                  </div>
-                </div>
-              </InfoKarte>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-}

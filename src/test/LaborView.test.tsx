@@ -26,13 +26,12 @@ describe('LaborView — Render-Smoke-Tests', () => {
     expect(screen.getByText(/^labor$/i)).toBeInTheDocument();
   });
 
-  it('zeigt alle 5 Tab-Labels in der Tabnavigation', () => {
+  it('zeigt alle 4 Tab-Labels in der Tabnavigation', () => {
     renderLabor();
     expect(screen.getByRole('tab', { name: 'Memory' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'MCPs' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Workflows' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Commands' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Hard-Gates' })).toBeInTheDocument();
   });
 
   it('hat genau einen aktiven Tab (Default: Memory)', () => {

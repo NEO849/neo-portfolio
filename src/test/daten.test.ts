@@ -70,13 +70,13 @@ describe('daten.ts — Senior-Elite Invarianten', () => {
   });
 
   describe('MCP-Arsenal', () => {
-    it('hat 5 Kategorien', () => {
-      expect(MCP_KATEGORIEN).toHaveLength(5);
+    it('hat 4 fokussierte Kategorien (Recon · Reasoning · Web/App/Mobile · Cloud/Dev)', () => {
+      expect(MCP_KATEGORIEN).toHaveLength(4);
     });
 
-    it('Summe aller MCPs ist ≥ 25 (Stand 2026-05-24)', () => {
+    it('Summe aller MCPs ist ≥ 20 (Stand 2026-05-27)', () => {
       const total = MCP_KATEGORIEN.reduce((sum, k) => sum + k.mcps.length, 0);
-      expect(total).toBeGreaterThanOrEqual(25);
+      expect(total).toBeGreaterThanOrEqual(20);
     });
 
     it('Eigenbau-MCPs sind als solche markiert (mind. 2: censys + caido)', () => {
@@ -158,13 +158,13 @@ describe('daten.ts — Senior-Elite Invarianten', () => {
       expect(findStat('Custom Skills')).toBe(String(CUSTOM_SKILLS.length));
       // Auto-Workflows sind 12 — Stat muss "12" sagen
       expect(findStat('systemd Workflows')).toBe(String(AUTO_WORKFLOWS.length));
-      // Hard-Gates sind 12 — Stat muss "12" sagen
-      expect(findStat('Hard-Gates')).toBe(String(HARD_GATES.length));
+      // Memory-Tiers sind 5 — Stat muss "5" sagen
+      expect(findStat('Memory-Tiers')).toBe(String(MEMORY_TIERS.length));
     });
   });
 
   describe('Elite-Prinzipien', () => {
-    it('genau 6 Prinzipien (Junior-vs-Senior-Dimensionen)', () => {
+    it('genau 6 Leitprinzipien', () => {
       expect(ELITE_PRINZIPIEN).toHaveLength(6);
     });
   });
