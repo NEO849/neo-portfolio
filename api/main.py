@@ -15,17 +15,42 @@ from slowapi.middleware import SlowAPIMiddleware
 from routen.osint_routen import router as osint_router
 
 # ─── Rate-Limit-Key: echte Client-IP statt 127.0.0.1 ─────────────────
-# Cloudflare-Tunnel setzt cf-connecting-ip, nginx setzt x-forwarded-for.
-# Ohne diese Anpassung würden alle Anfragen als 127.0.0.1 zählen.
-VERTRAUTE_PROXY_HEADER = ("cf-connecting-ip", "x-forwarded-for")
+#
+# Hinter unserem Cloudflare-Tunnel (oder einem optionalen nginx davor) sieht
+# slowapi sonst nur 127.0.0.1 — ein einzelner Angreifer würde damit das globale
+# Rate-Limit für ALLE Nutzer aufbrauchen.
+#
+# Senior-Elite-Trust-Model:
+#   · cf-connecting-ip wird NUR vertraut wenn cf-ray vorhanden ist
+#     (cf-ray wird von Cloudflare-Edge gesetzt, nicht durchgereicht)
+#   · x-forwarded-for nur wenn die App hinter unserem eigenen Reverse-Proxy
+#     läuft (REVERSE_PROXY_TRUSTED env), sonst spoofbar
+#   · Fallback: get_remote_address() (Direkt-Verbindung)
+#
+# Spoofing-Schutz: cf-ray ist nicht ratbar (Zufalls-Token), und ein direkter
+# Internet-Request müsste den exakt richtigen Format-Token kennen — vertretbares
+# Trust-Model für eine OSINT-API mit 60 req/min Limit.
+
+import os
+
+_REVERSE_PROXY_TRUSTED = os.environ.get("REVERSE_PROXY_TRUSTED", "").lower() in ("1", "true", "yes")
 
 
 def echte_client_ip(request: Request) -> str:
-    for header in VERTRAUTE_PROXY_HEADER:
-        wert = request.headers.get(header)
-        if wert:
-            # x-forwarded-for kann eine Liste sein: "client, proxy1, proxy2"
-            return wert.split(",")[0].strip()
+    # 1) Cloudflare-signed: cf-connecting-ip nur wenn cf-ray präsent
+    if request.headers.get("cf-ray"):
+        cf_ip = request.headers.get("cf-connecting-ip")
+        if cf_ip:
+            return cf_ip.split(",")[0].strip()
+
+    # 2) Eigener Reverse-Proxy (nginx etc.): nur per explizitem Opt-In
+    if _REVERSE_PROXY_TRUSTED:
+        xff = request.headers.get("x-forwarded-for")
+        if xff:
+            # Format "client, proxy1, proxy2" — Client ist links
+            return xff.split(",")[0].strip()
+
+    # 3) Direkter Internet-Hit: nimm die echte Socket-IP
     return get_remote_address(request)
 
 
