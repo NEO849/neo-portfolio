@@ -10,3 +10,12 @@ __pycache__/
 api/__pycache__/
 api/**/__pycache__/
 .env
+
+# TypeScript inkrementeller Build-Cache — wird bei jedem Build neu geschrieben
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
