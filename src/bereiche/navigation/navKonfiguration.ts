@@ -8,6 +8,7 @@ export const NAV_EINTRAEGE: NavEintrag[] = [
   { pfad: "/ueber-mich",    label: "Über mich" },
   { pfad: "/projekte",      label: "Projekte" },
   { pfad: "/security",      label: "Security" },
+  { pfad: "/labor",         label: "Labor" },
   { pfad: "/osint-tools",   label: "OSINT Tools" },
   { pfad: "/zeugnisse",     label: "Zeugnisse" },
   { pfad: "/kontakt",       label: "Kontakt" },

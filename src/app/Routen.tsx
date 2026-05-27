@@ -15,6 +15,7 @@ const StartSeite      = lazy(() => import("../seiten/StartSeite"));
 const UeberMichSeite  = lazy(() => import("../seiten/UeberMichSeite"));
 const ProjekteSeite   = lazy(() => import("../seiten/ProjekteSeite"));
 const SecuritySeite   = lazy(() => import("../seiten/SecuritySeite"));
+const LaborSeite      = lazy(() => import("../seiten/LaborSeite"));
 const OsintToolSeite  = lazy(() => import("../seiten/OsintToolSeite"));
 const ZeugnisseSeite  = lazy(() => import("../seiten/ZeugnisseSeite"));
 const KontaktSeite    = lazy(() => import("../seiten/KontaktSeite"));
@@ -69,6 +70,7 @@ export function Routen() {
           <Route path="/ueber-mich"    element={<UeberMichSeite />} />
           <Route path="/projekte"      element={<ProjekteSeite />} />
           <Route path="/security"      element={<SecuritySeite />} />
+          <Route path="/labor"         element={<LaborSeite />} />
           <Route path="/osint-tools"   element={<OsintToolSeite />} />
           <Route path="/zeugnisse"     element={<ZeugnisseSeite />} />
           <Route path="/kontakt"       element={<KontaktSeite />} />

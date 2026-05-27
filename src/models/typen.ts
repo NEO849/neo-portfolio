@@ -59,3 +59,73 @@ export interface ScoringKategorie {
   readonly score: number;
   readonly grund: string;
 }
+
+// ═══════════════════════════════════════════════════════
+// SENIOR-ELITE: Selbst-lernendes Memory-System v2 (5-Tier)
+// ═══════════════════════════════════════════════════════
+
+export interface MemoryTierModel {
+  readonly tier: string;
+  readonly ort: string;
+  readonly loaded: string;
+  readonly lifecycle: string;
+  readonly anzahl?: string;
+  readonly farbeRgb: string;        // "99, 102, 241" Format
+}
+
+// ═══════════════════════════════════════════════════════
+// SENIOR-ELITE: MCP-Arsenal (25 MCPs in 5 Kategorien)
+// ═══════════════════════════════════════════════════════
+
+export interface McpKategorieModel {
+  readonly kategorie: string;
+  readonly icon: string;
+  readonly farbeRgb: string;
+  readonly mcps: ReadonlyArray<{ name: string; rolle: string; eigenbau?: boolean }>;
+  readonly beschreibung: string;
+}
+
+// ═══════════════════════════════════════════════════════
+// SENIOR-ELITE: Auto-Workflows (systemd Timers + Services)
+// ═══════════════════════════════════════════════════════
+
+export interface AutoWorkflowModel {
+  readonly name: string;
+  readonly typ: "timer" | "service";
+  readonly cadence: string;
+  readonly output: string;
+  readonly farbeRgb: string;
+  readonly kritisch?: boolean;
+}
+
+// ═══════════════════════════════════════════════════════
+// SENIOR-ELITE: Custom Slash-Commands (11)
+// ═══════════════════════════════════════════════════════
+
+export interface SlashCommandModel {
+  readonly cmd: string;
+  readonly purpose: string;
+  readonly gruppe: "submit-pipeline" | "memory-pflege";
+  readonly hardRule?: boolean;
+}
+
+// ═══════════════════════════════════════════════════════
+// SENIOR-ELITE: Custom Skills (11)
+// ═══════════════════════════════════════════════════════
+
+export interface CustomSkillModel {
+  readonly name: string;
+  readonly trigger: string;
+  readonly purpose: string;
+  readonly gruppe: "bb-lifecycle" | "master-skill";
+}
+
+// ═══════════════════════════════════════════════════════
+// SENIOR-ELITE: Submit-Hard-Gates (12 Gates)
+// ═══════════════════════════════════════════════════════
+
+export interface HardGateModel {
+  readonly nummer: number;
+  readonly titel: string;
+  readonly check: string;
+}

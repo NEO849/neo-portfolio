@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { PERSOENLICH } from "../models/daten";
+import { Link } from "react-router-dom";
+import { PERSOENLICH, SYSTEM_STATS } from "../models/daten";
 import { KartenLicht } from "../bewegung/KartenLicht";
 
 // ═══════════════════════════════════════════════════════
@@ -204,6 +205,39 @@ export default function HeroView() {
               KI ist für mich seit 2022 kein Trend-Tool, sondern ein durchdachter Workflow-Partner – mit spezialisierten Rollen, klaren Verantwortlichkeiten und eigener Automatisierung. Ich nutze das gezielt für Entwicklung, Security-Analysen und strukturierte Entscheidungen. Das Ergebnis sind keine beeindruckenden Demos, sondern Lösungen, die im Alltag wirklich funktionieren.
             </p>
           </KartenLicht>
+        </motion.div>
+
+        {/* Senior-Elite-Stats — kompakte Inline-Zeile, vier wichtigste Markers */}
+        <motion.div
+          variants={einblend(1.2)}
+          initial="versteckt"
+          animate="sichtbar"
+          className="max-w-2xl mx-auto mt-6 flex items-center justify-center gap-3 sm:gap-5 flex-wrap text-white/45"
+        >
+          {SYSTEM_STATS.slice(0, 4).map((stat, i) => (
+            <div key={stat.label} className="flex items-center gap-1.5">
+              {i > 0 && <span className="text-white/15 select-none">·</span>}
+              <span className="font-display text-sm font-bold tabular-nums text-akzent-400">{stat.wert}</span>
+              <span className="text-[11px] font-mono tracking-wide">{stat.label}</span>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Link zur Labor-Seite — diskret aber klar */}
+        <motion.div
+          variants={einblend(1.35)}
+          initial="versteckt"
+          animate="sichtbar"
+          className="mt-4 flex justify-center"
+        >
+          <Link
+            to="/labor"
+            className="group inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-mono tracking-wide text-white/45 hover:text-white/85 transition-colors duration-300 border border-white/[0.06] hover:border-akzent-400/30 backdrop-blur-sm bg-white/[0.015]"
+          >
+            <span>Architektur im Detail</span>
+            <span className="text-akzent-400 transition-transform duration-300 group-hover:translate-x-0.5">→</span>
+            <span className="text-white/30 group-hover:text-akzent-400/70 transition-colors">/labor</span>
+          </Link>
         </motion.div>
 
       </div>
