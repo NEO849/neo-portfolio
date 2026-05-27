@@ -310,20 +310,30 @@ function McpAct() {
         </p>
       </header>
 
-      {/* Kategorie-Pills — farbiger Dot statt Emoji, konsistent zu Memory-Tiers */}
-      <div className="flex flex-wrap gap-1.5">
+      {/*
+        Kategorie-Chips als sauberes Grid:
+          · sehr schmal (<400px) → 1 Spalte (kein horizontaler Overflow)
+          · Mobile/Tablet         → 2×2 Grid (gleichmäßige Breiten)
+          · ab md (≥768px)        → 4 Spalten in einer Reihe
+        Jeder Chip füllt seine Grid-Cell voll aus (w-full), Dot links,
+        Label flex-1 in der Mitte, Badge rechts (ml-auto). Damit sind
+        Höhe, Breite und Innen-Alignment über alle vier Chips identisch.
+        min-w-0 + truncate verhindert Overflow bei langen Labels.
+      */}
+      <div className="grid grid-cols-1 [@media(min-width:400px)]:grid-cols-2 md:grid-cols-4 gap-2">
         {MCP_KATEGORIEN.map((kat) => {
           const aktiv = kat.kategorie === aktiveKategorie;
           return (
             <button
               key={kat.kategorie}
               onClick={() => setAktiveKategorie(kat.kategorie)}
-              className={`group flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${
+              className={`group flex items-center gap-2 w-full min-w-0 px-3 py-2 rounded-full text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-1 ${
                 aktiv ? "text-white" : "text-white/40 hover:text-white/80"
               }`}
               style={{
                 background: aktiv ? `rgba(${kat.farbeRgb}, 0.14)` : "rgba(255,255,255,0.025)",
                 border: `1px solid ${aktiv ? `rgba(${kat.farbeRgb}, 0.35)` : "rgba(255,255,255,0.06)"}`,
+                ['--tw-ring-color' as string]: `rgba(${kat.farbeRgb}, 0.4)`,
               }}
             >
               <span
@@ -331,9 +341,9 @@ function McpAct() {
                 style={{ backgroundColor: `rgb(${kat.farbeRgb})` }}
                 aria-hidden="true"
               />
-              <span>{kat.kategorie}</span>
+              <span className="truncate min-w-0 flex-1 text-left">{kat.kategorie}</span>
               <span
-                className="font-mono text-[10px] px-1.5 py-0.5 rounded-md tabular-nums"
+                className="font-mono text-[10px] px-1.5 py-0.5 rounded-md tabular-nums flex-shrink-0 ml-auto"
                 style={{ background: `rgba(${kat.farbeRgb}, 0.12)`, color: `rgb(${kat.farbeRgb})` }}
               >
                 {kat.mcps.length}
