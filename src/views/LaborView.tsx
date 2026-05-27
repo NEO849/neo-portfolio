@@ -327,7 +327,7 @@ function McpAct() {
             <button
               key={kat.kategorie}
               onClick={() => setAktiveKategorie(kat.kategorie)}
-              className={`group flex items-center gap-2 w-full min-w-0 px-3 py-2 rounded-full text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-1 ${
+              className={`group flex items-center gap-2 w-full min-w-0 px-3 py-2 rounded-xl text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-1 ${
                 aktiv ? "text-white" : "text-white/40 hover:text-white/80"
               }`}
               style={{
