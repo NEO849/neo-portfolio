@@ -164,7 +164,7 @@ function MemoryAct() {
           nur, wenn ich Eintrag-für-Eintrag manuell entscheide. Eine tägliche Self-Healing-Routine prüft
           Konsistenz und committet alles in Git.
         </p>
-        <p className="text-[11px] text-white/35 font-mono mt-2">
+        <p className="text-[11px] text-white/45 font-mono mt-2">
           Klicke eine Karte an, um zu sehen, welche Rolle diese Schicht im Gesamtsystem spielt.
         </p>
       </header>
@@ -204,21 +204,34 @@ function MemoryAct() {
                       {tier.tier}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1.5">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-2">
                         <span className="font-mono text-[12px] text-white/85 break-all min-w-0">{tier.ort}</span>
                         {tier.anzahl && (
-                          <span className="font-mono text-[10px] text-white/30 flex-shrink-0">{tier.anzahl}</span>
+                          <span
+                            className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border leading-none flex-shrink-0"
+                            style={{
+                              color: `rgb(${tier.farbeRgb})`,
+                              backgroundColor: `rgba(${tier.farbeRgb}, 0.1)`,
+                              borderColor: `rgba(${tier.farbeRgb}, 0.25)`,
+                            }}
+                          >
+                            {tier.anzahl}
+                          </span>
                         )}
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
-                        <div className="flex gap-2 text-[11px]">
-                          <span className="text-white/30 w-20 flex-shrink-0">geladen</span>
-                          <span className="text-white/70">{tier.loaded}</span>
-                        </div>
-                        <div className="flex gap-2 text-[11px]">
-                          <span className="text-white/30 w-20 flex-shrink-0">Lifecycle</span>
-                          <span className="text-white/70">{tier.lifecycle}</span>
-                        </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        <span
+                          className="font-mono text-[10px] px-2 py-1 rounded-md border text-white/75 leading-snug"
+                          style={{ backgroundColor: `rgba(${tier.farbeRgb}, 0.08)`, borderColor: `rgba(${tier.farbeRgb}, 0.2)` }}
+                        >
+                          <span className="text-white/45 mr-1.5">geladen</span>{tier.loaded}
+                        </span>
+                        <span
+                          className="font-mono text-[10px] px-2 py-1 rounded-md border text-white/75 leading-snug"
+                          style={{ backgroundColor: `rgba(${tier.farbeRgb}, 0.08)`, borderColor: `rgba(${tier.farbeRgb}, 0.2)` }}
+                        >
+                          <span className="text-white/45 mr-1.5">Lifecycle</span>{tier.lifecycle}
+                        </span>
                       </div>
                     </div>
                     <motion.span
@@ -273,7 +286,16 @@ function MemoryAct() {
             transition={{ delay: i * 0.08 + 0.2, duration: 0.4, ease: EASE }}
           >
             <InfoKarte lichtfarbe={meta.rgb} klassen="p-3">
-              <div className="font-mono text-[10px] text-white/30 mb-1 uppercase tracking-wider">Mechanik</div>
+              <span
+                className="inline-block font-mono text-[9px] px-1.5 py-0.5 rounded-md border uppercase tracking-wider leading-none mb-2"
+                style={{
+                  color: `rgb(${meta.rgb})`,
+                  backgroundColor: `rgba(${meta.rgb}, 0.1)`,
+                  borderColor: `rgba(${meta.rgb}, 0.25)`,
+                }}
+              >
+                Mechanik
+              </span>
               <div className="text-[12px] text-white font-medium mb-1">{meta.titel}</div>
               <div className="text-[10.5px] text-white/60 leading-relaxed">{meta.bsp}</div>
             </InfoKarte>
@@ -311,47 +333,22 @@ function McpAct() {
       </header>
 
       {/*
-        Kategorie-Chips als sauberes Grid:
-          · sehr schmal (<400px) → 1 Spalte (kein horizontaler Overflow)
-          · Mobile/Tablet         → 2×2 Grid (gleichmäßige Breiten)
-          · ab md (≥768px)        → 4 Spalten in einer Reihe
-        Jeder Chip füllt seine Grid-Cell voll aus (w-full), Dot links,
-        Label flex-1 in der Mitte, Badge rechts (ml-auto). Damit sind
-        Höhe, Breite und Innen-Alignment über alle vier Chips identisch.
-        min-w-0 + truncate verhindert Overflow bei langen Labels.
+        Kategorie-Auswahl als verschachtelte horizontale Tab-Leiste:
+        dieselbe GlassTabs-Komponente wie die Haupt-Tableiste (eigener
+        layoutId), damit die zweite Ebene exakt konsistent zur ersten
+        wirkt. scrollable=true → auf schmalen Viewports horizontal
+        scrollbar statt Labels abzuschneiden, auf Desktop füllen die
+        vier Tabs die Breite gleichmäßig (flex-1).
       */}
-      <div className="grid grid-cols-1 [@media(min-width:400px)]:grid-cols-2 md:grid-cols-4 gap-2">
-        {MCP_KATEGORIEN.map((kat) => {
-          const aktiv = kat.kategorie === aktiveKategorie;
-          return (
-            <button
-              key={kat.kategorie}
-              onClick={() => setAktiveKategorie(kat.kategorie)}
-              className={`group flex items-center gap-2 w-full min-w-0 px-3 py-2 rounded-xl text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-1 ${
-                aktiv ? "text-white" : "text-white/40 hover:text-white/80"
-              }`}
-              style={{
-                background: aktiv ? `rgba(${kat.farbeRgb}, 0.14)` : "rgba(255,255,255,0.025)",
-                border: `1px solid ${aktiv ? `rgba(${kat.farbeRgb}, 0.35)` : "rgba(255,255,255,0.06)"}`,
-                ['--tw-ring-color' as string]: `rgba(${kat.farbeRgb}, 0.4)`,
-              }}
-            >
-              <span
-                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                style={{ backgroundColor: `rgb(${kat.farbeRgb})` }}
-                aria-hidden="true"
-              />
-              <span className="truncate min-w-0 flex-1 text-left">{kat.kategorie}</span>
-              <span
-                className="font-mono text-[10px] px-1.5 py-0.5 rounded-md tabular-nums flex-shrink-0 ml-auto"
-                style={{ background: `rgba(${kat.farbeRgb}, 0.12)`, color: `rgb(${kat.farbeRgb})` }}
-              >
-                {kat.mcps.length}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      <GlassTabs
+        tabs={MCP_KATEGORIEN.map((kat) => ({ id: kat.kategorie, label: kat.kategorie }))}
+        activeId={aktiveKategorie}
+        onTabChange={(id) => setAktiveKategorie(id)}
+        layoutId="labor-mcp-tab-bg"
+        ariaLabel="MCP-Kategorien"
+        buttonClassName="min-w-[116px] px-3 text-[12px] sm:text-[13px]"
+        className="w-full"
+      />
 
       {/* Aktive Kategorie-Details */}
       <AnimatePresence mode="wait">
@@ -363,7 +360,19 @@ function McpAct() {
           transition={{ duration: 0.25, ease: EASE }}
           className="space-y-3"
         >
-          <p className="text-[12px] text-white/60 leading-relaxed">{aktive.beschreibung}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className="font-mono text-[10px] px-1.5 py-0.5 rounded-md border leading-none flex-shrink-0"
+              style={{
+                color: `rgb(${aktive.farbeRgb})`,
+                backgroundColor: `rgba(${aktive.farbeRgb}, 0.1)`,
+                borderColor: `rgba(${aktive.farbeRgb}, 0.25)`,
+              }}
+            >
+              {aktive.mcps.length} Server
+            </span>
+            <p className="text-[12px] text-white/60 leading-relaxed min-w-0">{aktive.beschreibung}</p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {aktive.mcps.map((mcp, i) => (
@@ -384,7 +393,7 @@ function McpAct() {
                         <span className="font-mono text-[12px] text-white font-medium">{mcp.name}</span>
                         {mcp.eigenbau && (
                           <span
-                            className="font-mono text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider"
+                            className="font-mono text-[9px] px-1.5 py-0.5 rounded-md uppercase tracking-wider leading-none"
                             style={{
                               background: "rgba(34,197,94,0.10)",
                               color: "rgb(34,197,94)",
@@ -429,9 +438,6 @@ function WorkflowsAct() {
           jede Stunde — und dauerhaft die Mailbox-Bridges zwischen Mac, iPhone und Server. Jede Aktion
           wird auditiert, der Anomaly-Watcher schlägt bei verdächtigen Mustern Alarm.
         </p>
-        <p className="text-[11px] text-white/35 font-mono mt-2">
-          Klicke einen Ablauf an, um zu sehen, was er konkret tut.
-        </p>
       </header>
 
       {/* Timers — alle in Akzent-Indigo, Section-Header mit farbigem Dot */}
@@ -439,7 +445,7 @@ function WorkflowsAct() {
         <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
           <span className="w-1.5 h-1.5 rounded-full bg-akzent-400 flex-shrink-0" aria-hidden="true" />
           Zeitgesteuerte Abläufe
-          <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">{timers.length} aktiv</span>
+          <span className="ml-auto font-mono text-[10px] text-white/45 normal-case tracking-normal">{timers.length} aktiv</span>
         </h4>
         <div className="space-y-1.5">
           {timers.map((wf, i) => (
@@ -459,7 +465,7 @@ function WorkflowsAct() {
         <h4 className="font-display text-sm font-bold text-white/80 mb-3 flex items-center gap-2 uppercase tracking-[0.16em]">
           <span className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" aria-hidden="true" />
           Dauerhaft laufende Dienste
-          <span className="ml-auto font-mono text-[10px] text-white/30 normal-case tracking-normal">{services.length} laufen</span>
+          <span className="ml-auto font-mono text-[10px] text-white/45 normal-case tracking-normal">{services.length} laufen</span>
         </h4>
         <div className="space-y-1.5">
           {services.map((wf, i) => (
@@ -505,42 +511,56 @@ function WorkflowRow({ workflow, delay, offen, onToggle }: WorkflowRowProps) {
           className="w-full text-left p-3 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset rounded-xl"
           style={{ ['--tw-ring-color' as string]: `rgba(${workflow.farbeRgb}, 0.4)` }}
         >
-          <div className="flex items-center gap-3">
+          {/*
+            CSS-Grid statt Flex: [Name+Output | Cadence-Badge | Icon-Slot].
+            Die Icon-Spalte hat konstante Breite (w-5) und sitzt ganz rechts.
+            Dadurch liegt die rechte Kante der Cadence-Badge in JEDER Zeile auf
+            derselben X-Position (die 1fr-Namensspalte fängt die variable
+            Badge-Breite ab) — saubere, ruhige rechte Badge-Spalte ohne
+            margin-Hacks und ohne fixe Badge-Breite.
+          */}
+          <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3">
+            {/* Spalte 1 — Dot + Name + Output (als Unterzeile) */}
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span
+                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                style={{
+                  backgroundColor: `rgb(${workflow.farbeRgb})`,
+                  boxShadow: workflow.kritisch ? `0 0 8px rgba(${workflow.farbeRgb}, 0.7)` : undefined,
+                }}
+                aria-label={workflow.kritisch ? "kritisch" : undefined}
+              />
+              <div className="min-w-0">
+                <div className="font-mono text-[12px] text-white/85 truncate">{workflow.name}</div>
+                <div className="text-[11px] text-white/50 truncate mt-0.5">→ {workflow.output}</div>
+              </div>
+            </div>
+            {/* Spalte 2 — Cadence-Badge (Chip-Pattern, rechte Kante bündig) */}
             <span
-              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+              className="font-mono text-[10px] px-1.5 py-0.5 rounded-md tabular-nums whitespace-nowrap leading-none flex-shrink-0"
               style={{
-                backgroundColor: `rgb(${workflow.farbeRgb})`,
-                boxShadow: workflow.kritisch ? `0 0 8px rgba(${workflow.farbeRgb}, 0.7)` : undefined,
-              }}
-              aria-label={workflow.kritisch ? "kritisch" : undefined}
-            />
-            <span className="font-mono text-[12px] text-white/85 flex-1 truncate">{workflow.name}</span>
-            <span
-              className="font-mono text-[10px] px-2 py-0.5 rounded-full tabular-nums whitespace-nowrap flex-shrink-0"
-              style={{
-                background: `rgba(${workflow.farbeRgb}, 0.10)`,
+                background: `rgba(${workflow.farbeRgb}, 0.1)`,
                 color: `rgb(${workflow.farbeRgb})`,
-                border: `1px solid rgba(${workflow.farbeRgb}, 0.20)`,
+                border: `1px solid rgba(${workflow.farbeRgb}, 0.25)`,
               }}
             >
               {workflow.cadence}
             </span>
-            <span className="text-[11px] text-white/40 hidden md:inline truncate max-w-[260px]">
-              → {workflow.output}
-            </span>
-            {workflow.details && (
-              <motion.span
-                animate={{ rotate: offen ? 45 : 0 }}
-                transition={{ duration: 0.18 }}
-                className="text-base flex-shrink-0 font-light leading-none ml-1"
-                style={{ color: `rgb(${workflow.farbeRgb})`, opacity: offen ? 0.9 : 0.4 }}
-                aria-hidden="true"
-              >
-                +
-              </motion.span>
-            )}
+            {/* Spalte 3 — Icon-Slot mit konstanter Breite (stabile rechte Kante) */}
+            <div className="w-5 flex justify-center flex-shrink-0">
+              {workflow.details && (
+                <motion.span
+                  animate={{ rotate: offen ? 45 : 0 }}
+                  transition={{ duration: 0.18 }}
+                  className="text-base font-light leading-none"
+                  style={{ color: `rgb(${workflow.farbeRgb})`, opacity: offen ? 0.9 : 0.4 }}
+                  aria-hidden="true"
+                >
+                  +
+                </motion.span>
+              )}
+            </div>
           </div>
-          <p className="text-[10.5px] text-white/40 mt-1 md:hidden">→ {workflow.output}</p>
         </button>
         <AnimatePresence>
           {offen && workflow.details && (
@@ -668,9 +688,10 @@ function CommandsAct() {
 }
 
 function CommandRow({ cmd, delay }: { cmd: typeof SLASH_COMMANDS[number]; delay: number }) {
-  // Konsistenz: alle Slash-Cards in derselben Akzent-Farbe. 'Harte Regel'
-  // wird durch das Badge markiert, nicht durch einen extra Strich oder
-  // eine andere Card-Farbe — visuelle Ruhe.
+  // Konsistenz: gleiche Karten-Anatomie wie die MCP-Karten (Dot + Name +
+  // Beschreibung). Alle Slash-Cards in Akzent-Indigo. Der Pflicht-Charakter
+  // der Submit-Pipeline steht bereits im Sektions-Eyebrow — kein lautes
+  // rotes Badge pro Zeile, das aus dem Farbschema fällt.
   const rgb = "99, 102, 241";
   return (
     <motion.div
@@ -679,27 +700,18 @@ function CommandRow({ cmd, delay }: { cmd: typeof SLASH_COMMANDS[number]; delay:
       viewport={{ once: true, margin: "-20px" }}
       transition={{ delay, duration: 0.32, ease: EASE }}
     >
-      <InfoKarte
-        lichtfarbe={rgb}
-        mitHoverAnimation={false}
-        klassen="p-3"
-      >
-        <div className="flex items-baseline gap-2 mb-1 flex-wrap">
-          <span className="font-mono text-[12px] font-semibold" style={{ color: `rgb(${rgb})` }}>{cmd.cmd}</span>
-          {cmd.hardRule && (
-            <span
-              className="font-mono text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider"
-              style={{
-                background: "rgba(239, 68, 68, 0.10)",
-                color: "rgb(239, 68, 68)",
-                border: "1px solid rgba(239, 68, 68, 0.30)",
-              }}
-            >
-              harte Regel
-            </span>
-          )}
+      <InfoKarte lichtfarbe={rgb} mitHoverAnimation={false} klassen="p-3">
+        <div className="flex items-start gap-2.5">
+          <span
+            className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5"
+            style={{ backgroundColor: `rgb(${rgb})` }}
+            aria-hidden="true"
+          />
+          <div className="flex-1 min-w-0">
+            <span className="font-mono text-[12px] font-semibold block mb-1" style={{ color: `rgb(${rgb})` }}>{cmd.cmd}</span>
+            <p className="text-[11px] text-white/60 leading-snug">{cmd.purpose}</p>
+          </div>
         </div>
-        <p className="text-[11px] text-white/60 leading-snug">{cmd.purpose}</p>
       </InfoKarte>
     </motion.div>
   );
@@ -715,11 +727,22 @@ function SkillRow({ skill, delay }: { skill: typeof CUSTOM_SKILLS[number]; delay
       transition={{ delay, duration: 0.32, ease: EASE }}
     >
       <InfoKarte lichtfarbe={rgb} mitHoverAnimation={false} klassen="p-3">
-        <div className="flex items-baseline gap-2 mb-1 flex-wrap">
-          <span className="font-mono text-[12px] font-semibold" style={{ color: `rgb(${rgb})` }}>{skill.name}</span>
-          <span className="font-mono text-[10px] text-white/35">{skill.trigger}</span>
+        <div className="flex items-start gap-2.5">
+          <span
+            className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5"
+            style={{ backgroundColor: `rgb(${rgb})` }}
+            aria-hidden="true"
+          />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-baseline gap-2 flex-wrap mb-1">
+              <span className="font-mono text-[12px] font-semibold" style={{ color: `rgb(${rgb})` }}>{skill.name}</span>
+              <span className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border text-white/55 leading-none bg-white/[0.05] border-white/[0.12]">
+                {skill.trigger}
+              </span>
+            </div>
+            <p className="text-[11px] text-white/60 leading-snug">{skill.purpose}</p>
+          </div>
         </div>
-        <p className="text-[11px] text-white/60 leading-snug">{skill.purpose}</p>
       </InfoKarte>
     </motion.div>
   );

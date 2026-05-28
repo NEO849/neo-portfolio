@@ -668,7 +668,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
 // Custom Slash-Commands (11 — selbst geschrieben)
 export const SLASH_COMMANDS: SlashCommandModel[] = [
   // Submit + Target Pipeline
-  { cmd: "/submit-gate",   purpose: "5-Phasen Final-Review: 10 Hard-Gates · Devil's-Advocate · Hacktivity-Check · Reputation-Status · Verdict ✅/⚠️/❌", gruppe: "submit-pipeline", hardRule: true },
+  { cmd: "/submit-gate",   purpose: "5-Phasen Final-Review: 10 Hard-Gates · Devil's-Advocate · Hacktivity-Check · Reputation-Status · Verdict: freigeben / prüfen / stoppen", gruppe: "submit-pipeline", hardRule: true },
   { cmd: "/new-target",    purpose: "7-Phasen-Onboarding: Memory-Gates · Ordner · Recon · Graph-Entity · Cross-Ref · Caido-Pre-Flight",                  gruppe: "submit-pipeline", hardRule: true },
   // Memory-Pflege (Self-Improving System)
   { cmd: "/memory-review",          purpose: "Interaktives Triage der Inbox (pending · surprises · contradictions) — Promote/Reject pro Item", gruppe: "memory-pflege" },
