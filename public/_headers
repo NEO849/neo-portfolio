@@ -1,0 +1,40 @@
+# Cloudflare Pages — Senior-Hardened Security Headers
+# Docs: https://developers.cloudflare.com/pages/configuration/headers/
+#
+# Geltungs-Reihenfolge: spezifischere Pfade ÜBERSCHREIBEN allgemeinere — daher
+# /assets/* und /api/* nach /* definieren.
+
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), document-domain=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), navigation-override=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(self), xr-spatial-tracking=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  X-DNS-Prefetch-Control: off
+  X-Permitted-Cross-Domain-Policies: none
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://api.cyp-hr.com https://michael-fleps.duckdns.org; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests
+  ! X-XSS-Protection
+  ! Server
+
+# Built assets (hashed filenames) → langer immutable Cache
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Statische Public-Files (Favicon, Logo, etc.) → 1 Tag mit Revalidation
+/favicon.ico
+  Cache-Control: public, max-age=86400, must-revalidate
+/robots.txt
+  Cache-Control: public, max-age=86400, must-revalidate
+/sitemap.xml
+  Cache-Control: public, max-age=86400, must-revalidate
+
+# HTML-Routes → kein Cache, immer revalidieren (sonst veralten SPA-Builds)
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# API-Routes → niemals cachen, eigene CORS-Logic in der Function
+/api/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex

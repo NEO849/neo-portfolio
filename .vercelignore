@@ -5,3 +5,11 @@ api/osint-api.service
 api/routen/
 api/werkzeuge/
 api/__pycache__/
+
+# Cloudflare-Pages-spezifische Files — Vercel würde sie ignorieren oder
+# falsch interpretieren. Explizit ausschließen für Defense-in-Depth.
+functions/
+wrangler.toml
+.dev.vars
+.dev.vars.example
+.wrangler/

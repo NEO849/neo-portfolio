@@ -1,0 +1,9 @@
+# Lokale Dev-Variablen für `wrangler pages dev` — Datei selbst (.dev.vars) ist gitignored.
+# Kopiere diese Datei zu `.dev.vars` und fülle echte Werte ein:
+#
+#   cp .dev.vars.example .dev.vars
+#
+# Diese Variablen sind dann via `env.RESEND_API_KEY` in functions/api/*.ts lesbar.
+
+RESEND_API_KEY=re_xxx_replace_me
+ALLOWED_ORIGINS=http://localhost:8788,https://www.f3-data-solutions.com
