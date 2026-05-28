@@ -1,0 +1,25 @@
+# Cloudflare Pages — Wrangler Configuration
+# Docs: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+#
+# Aktiviert das `pages_build_output_dir`-Feld → Wrangler weiß, dass dies ein
+# Pages-Projekt ist und findet die Build-Artefakte automatisch.
+
+name = "f3-portfolio"
+compatibility_date = "2026-05-27"
+compatibility_flags = ["nodejs_compat_v2"]
+pages_build_output_dir = "./dist"
+
+# ── Lokale Entwicklung ────────────────────────────────────────────────
+# Wert für `RESEND_API_KEY` kommt aus .dev.vars (gitignored).
+# Für Produktion: ENV-Vars im Cloudflare-Pages-Dashboard hinterlegen.
+[vars]
+ALLOWED_ORIGINS = "https://www.f3-data-solutions.com"
+
+# ── Preview-Environment ──────────────────────────────────────────────
+# Auf Preview-Branches dürfen *.pages.dev-Subdomains auch CORS-rufen.
+[env.preview.vars]
+ALLOWED_ORIGINS = "https://www.f3-data-solutions.com,*.pages.dev"
+
+# Hinweis: Cloudflare Pages liest secrets NICHT aus wrangler.toml.
+# `RESEND_API_KEY` wird im Pages-Dashboard als Production-/Preview-Secret gesetzt
+# (Settings → Environment variables → "Encrypt").

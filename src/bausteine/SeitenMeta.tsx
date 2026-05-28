@@ -16,7 +16,7 @@
 import { Helmet } from "react-helmet-async";
 
 const SITE_NAME = "Michael Fleps";
-const SITE_BASIS_URL = "https://michael-fleps.vercel.app";
+const SITE_BASIS_URL = "https://www.f3-data-solutions.com";
 const DEFAULT_OG_IMAGE = "/profilbild.jpg";
 
 interface SeitenMetaProps {

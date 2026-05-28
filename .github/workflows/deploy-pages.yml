@@ -1,0 +1,91 @@
+# Deploy zu Cloudflare Pages — Senior-Pipeline
+#
+# Verhalten:
+#   - Push auf `main`  → Production-Deploy (www.f3-data-solutions.com)
+#   - Push auf andere Branches → Preview-Deploy (*.pages.dev)
+#   - Pull-Request → Preview-Deploy + Comment mit Preview-URL
+#
+# Pre-Deploy-Gates (in dieser Reihenfolge):
+#   1. Checkout (persist-credentials: false)
+#   2. Setup Node 20 + npm-Cache
+#   3. npm ci (deterministisches Install)
+#   4. Typecheck (tsc --noEmit) — FAIL → kein Deploy
+#   5. Build (vite build) — FAIL → kein Deploy
+#   6. Deploy via wrangler-action
+
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Minimaler Permission-Scope für den Runner-Token (GitHub-internes Token).
+# Wir brauchen nur Lesezugriff auf den Repo-Inhalt + PR-Kommentar-Schreibrecht.
+permissions:
+  contents: read
+  deployments: write
+  pull-requests: write
+
+# Verhindert parallel laufende Deploys auf demselben Ref (Race-Conditions).
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_OSINT_API_URL: ${{ vars.VITE_OSINT_API_URL || 'https://api.cyp-hr.com' }}
+
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=f3-portfolio --branch=${{ github.head_ref || github.ref_name }} --commit-dirty=true
+          packageManager: npm
+
+      - name: Comment Preview-URL on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const url = `${{ steps.deploy.outputs.deployment-url }}`;
+            const body = `### Cloudflare Pages Preview deployed\n\n${url}\n\n_Production branch: \`main\` → \`www.f3-data-solutions.com\`_`;
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });

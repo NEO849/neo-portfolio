@@ -1,1 +1,18 @@
-/* /index.html 200
+# Cloudflare Pages — Redirects + SPA-Rewrite
+# Docs: https://developers.cloudflare.com/pages/configuration/redirects/
+#
+# Pages-Functions (functions/api/*) matchen IMMER vor _redirects — daher kein
+# explizites api-Exclude nötig. Letzte Regel ist die SPA-Fallback-Rewrite.
+
+# (Apex → www wird auf DNS-Ebene via Cloudflare Bulk Redirect Rule gelöst,
+#  NICHT hier — vermeidet doppelten 301-Hop und ist CDN-effizienter.)
+
+# Standard-Aliase auf Hauptansicht
+/home   /   301
+/start  /   301
+
+# Alte Vercel-Pfad-Reste auffangen (Defense-in-Depth, falls Crawler darauf landen)
+/_vercel/*  /  301
+
+# SPA-Fallback — MUSS letzte Regel sein
+/*  /index.html  200
