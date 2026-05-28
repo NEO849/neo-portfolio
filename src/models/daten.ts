@@ -92,9 +92,9 @@ export const PROJEKTE: ProjektModel[] = [
     status: "aktiv",
   },
   {
-    titel: "bb_recon – Senior-Elite Bug-Bounty OSINT-Toolkit",
+    titel: "bb_recon – Senior-Elite Research OSINT-Toolkit",
     kurzbeschreibung: "Asynchrones CLI mit 30+ keyless OSINT-Quellen, Tor-optional, Target-aware – 510 Findings in 1s bei IP-Recon",
-    langbeschreibung: "Selbst entwickeltes Python-CLI für autorisierte Bug-Bounty Target-Recon. asyncio.gather orchestriert massive Parallelität — 510 Findings in 1 Sekunde beim IP-Test. Aggregiert 30+ kostenlose, keyless OSINT-Quellen in einem konsistenten JSON+Markdown+Terminal-Output: Breach-Daten (XposedOrNot, HIBP, LeakCheck), DNS (Cloudflare DoH, HackerTarget, crt.sh), Subdomain (CommonCrawl-CDX Wildcard, Wayback-CDX, hostsearch), IP (RIPEstat ASN/Prefix/Neighbours, ip-api Batch+Threat-Flags, Shodan InternetDB), Historisch (Wayback, Arquivo.pt, CommonCrawl), Identity (Gravatar, GitHub-Search, PGP keys.openpgp.org), Tor (DDG-Onion, Ahmia, archive.is-Onion), Username (WhatsMyName 600+ Plattformen), Image (SauceNAO + 13 Aggregatoren). Graceful degradation: ein Modul-Fail blockiert andere nicht. Confidence-Score HIGH/MEDIUM/LOW/UNVERIFIED pro Finding. Smart Dedup merged Findings aus mehreren Quellen. --tor Flag routet über SOCKS5 127.0.0.1:9150 für anonyme Recherche.",
+    langbeschreibung: "Selbst entwickeltes Python-CLI für autorisierte Security-Research Target-Recon. asyncio.gather orchestriert massive Parallelität — 510 Findings in 1 Sekunde beim IP-Test. Aggregiert 30+ kostenlose, keyless OSINT-Quellen in einem konsistenten JSON+Markdown+Terminal-Output: Breach-Daten (XposedOrNot, HIBP, LeakCheck), DNS (Cloudflare DoH, HackerTarget, crt.sh), Subdomain (CommonCrawl-CDX Wildcard, Wayback-CDX, hostsearch), IP (RIPEstat ASN/Prefix/Neighbours, ip-api Batch+Threat-Flags, Shodan InternetDB), Historisch (Wayback, Arquivo.pt, CommonCrawl), Identity (Gravatar, GitHub-Search, PGP keys.openpgp.org), Tor (DDG-Onion, Ahmia, archive.is-Onion), Username (WhatsMyName 600+ Plattformen), Image (SauceNAO + 13 Aggregatoren). Graceful degradation: ein Modul-Fail blockiert andere nicht. Confidence-Score HIGH/MEDIUM/LOW/UNVERIFIED pro Finding. Smart Dedup merged Findings aus mehreren Quellen. --tor Flag routet über SOCKS5 127.0.0.1:9150 für anonyme Recherche.",
     kategorie: "security",
     technologien: ["Python asyncio", "httpx[socks]", "aiosqlite", "dnspython", "rich", "Tor SOCKS5", "CommonCrawl CDX", "Wayback Machine"],
     highlights: [
@@ -110,15 +110,15 @@ export const PROJEKTE: ProjektModel[] = [
     status: "aktiv",
   },
   {
-    titel: "NeoRecon – Bug Bounty Exploit Engine",
+    titel: "NeoRecon – Research Exploit Engine",
     kurzbeschreibung: "7-Schritt Master-Pipeline: Automatisiertes Recon → Scoring → Live-Probe → Review-Plan",
-    langbeschreibung: "Vollständiges, selbst gebautes Offensive Security Framework auf einem gehärteten VPS. Die Master-Pipeline (run_master_pipeline.sh) orchestriert 7 Phasen mit Lockfile-Schutz, --resume-from, --skip-Flags und --dry-run. Engine 01 nutzt einen Single-Pass awk-Algorithmus der 500.000 URLs in 15 Sekunden durch 12 gewichtete Sicherheits-Kategorien scored. Der Asset-Splitter klassifiziert Alive-URLs automatisch in 8 Tier-Klassen nach Bounty-Potential. Die Build-Kette erzeugt Focus5-Cards mit konkreten Prüfschritten pro Kandidat. Zusätzlich: 13 spezialisierte Tools auf dem VPS (GraphQL-Suite mit 5 Tools, SSTImap, Dependency Confusion Checker, OSINT-Tools), Custom Nuclei-Templates und eine vollständige 4-Phasen-Dokumentation.",
+    langbeschreibung: "Vollständiges, selbst gebautes Offensive Security Framework auf einem gehärteten VPS. Die Master-Pipeline (run_master_pipeline.sh) orchestriert 7 Phasen mit Lockfile-Schutz, --resume-from, --skip-Flags und --dry-run. Engine 01 nutzt einen Single-Pass awk-Algorithmus der 500.000 URLs in 15 Sekunden durch 12 gewichtete Sicherheits-Kategorien scored. Der Asset-Splitter klassifiziert Alive-URLs automatisch in 8 Tier-Klassen nach Research-Potential. Die Build-Kette erzeugt Focus5-Cards mit konkreten Prüfschritten pro Kandidat. Zusätzlich: 13 spezialisierte Tools auf dem VPS (GraphQL-Suite mit 5 Tools, SSTImap, Dependency Confusion Checker, OSINT-Tools), Custom Nuclei-Templates und eine vollständige 4-Phasen-Dokumentation.",
     kategorie: "security",
     technologien: ["Bash", "awk", "httpx", "Subfinder", "Amass", "ParamSpider", "gf", "Nuclei", "dalfox", "sqlmap", "GraphQL", "Brave Search API"],
     highlights: [
       "Master-Pipeline: 7 Schritte mit --skip-Flags, --resume-from, --dry-run, Lockfile-Schutz",
       "Engine 01: Single-Pass awk-Scoring – 500k URLs in 15 Sek, 12 Kategorien, Bonus-System",
-      "Asset-Split: Automatische Klassifizierung in 8 Tier-Klassen nach Bounty-Potential",
+      "Asset-Split: Automatische Klassifizierung in 8 Tier-Klassen nach Research-Potential",
       "Build-Kette: Shortlists → Hunt-Sheet → Top-Candidates → Playbook → Focus5-Cards",
       "GraphQL-Suite: 5 Tools (graphw00f, graphql-cop, clairvoyance, GraphQLer, MCP-Server)",
       "Brave Search API Dorking: 24 Kategorien (Configs, Backups, Admin-Panels, Tokens, S3, Swagger u.a.)",
@@ -328,7 +328,7 @@ export const TOOLS_STACK = [
 export const SKILLS: SkillModel[] = [
   { name: "Web Application Security",  level: 3, kategorie: "security" },
   { name: "OWASP Top 10",              level: 4, kategorie: "security" },
-  { name: "Bug Bounty Hunting",        level: 3, kategorie: "security" },
+  { name: "Vulnerability Research",    level: 3, kategorie: "security" },
   { name: "OSINT / Reconnaissance",    level: 4, kategorie: "security" },
   { name: "OAuth / Auth Flow Testing", level: 3, kategorie: "security" },
   { name: "API Security (REST/GraphQL)", level: 3, kategorie: "security" },
@@ -401,7 +401,7 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
   },
   {
     jahr: "2025–heute",
-    titel: "Security Research & Bug Bounty",
+    titel: "Security Research",
     beschreibung: "Aktiver Researcher auf HackerOne (cypherneo) und Intigriti. 9 eingereichte Reports – bestätigte Findings: OAuth CSRF, GraphQL Request Batching, Open Redirect (return_to). Eigene Recon-Pipeline mit 30+ Skripten, awk-Scoring-Engine (500.000 URLs in 15 Sekunden, 12 Kategorien) und Caido-Proxy-Integration.",
     kategorie: "security",
   },
@@ -463,7 +463,7 @@ export const MEMORY_TIERS: MemoryTierModel[] = [
     lifecycle: "abgeschlossene Themen",
     anzahl: "1 Datei",
     farbeRgb: "34, 211, 238",
-    bedeutung: "Themen, die ich nicht in jeder Session brauche — z.B. abgeschlossene Bug-Bounty-Targets oder alte iOS-Notizen. Wird nur geladen wenn ich explizit darauf zeige. Spart ca. 875 Tokens pro Session.",
+    bedeutung: "Themen, die ich nicht in jeder Session brauche — z.B. abgeschlossene Research-Targets oder alte iOS-Notizen. Wird nur geladen wenn ich explizit darauf zeige. Spart ca. 875 Tokens pro Session.",
   },
   {
     tier: "Archival",
@@ -570,7 +570,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     cadence: "täglich 04:15",
     output: "Git-Repository + rsync-Snapshot",
     farbeRgb: "129, 140, 248",
-    details: "Sichert das Memory-Verzeichnis, alle Bug-Bounty-Notizen und die DATEV-Reports jede Nacht. Drei-Tier-Backup: Git-Repo, lokaler Snapshot, externer Sync. Bei Datenverlust ist alles in unter einer Minute wiederherstellbar.",
+    details: "Sichert das Memory-Verzeichnis, alle Research-Notizen und die DATEV-Reports jede Nacht. Drei-Tier-Backup: Git-Repo, lokaler Snapshot, externer Sync. Bei Datenverlust ist alles in unter einer Minute wiederherstellbar.",
   },
   {
     name: "claude-bus-mobile-rotate.timer",
@@ -690,8 +690,8 @@ export const CUSTOM_SKILLS: CustomSkillModel[] = [
   { name: "authrecon",             trigger: "/authrecon",           purpose: "Authenticated Recon via Mac-Chrome (eingeloggt) + SSH-Reverse-Tunnel + CDP vom VPS",      gruppe: "master-skill" },
   { name: "caido-tunnel",          trigger: "/caido-tunnel",        purpose: "Mac→VPS Caido-Bridge live: 2 Mac-Befehle + VPS-Verify + 9-Mode-Fehlermatrix",            gruppe: "master-skill" },
   { name: "projekt-indexieren",    trigger: "/projekt-indexieren",  purpose: "Codebase semantisch indexieren via Ollama+Milvus (lokal)",                                gruppe: "master-skill" },
-  // Bug-Bounty Lifecycle (Phase 1–10)
-  { name: "bounty-analyse-1",         trigger: "bounty analysieren",  purpose: "Voll-Analyse BB-Programm: Scope · OOS · Bounty-Range · EV-Math · Konkurrenzniveau",     gruppe: "bb-lifecycle" },
+  // Research Lifecycle (Phase 1–10)
+  { name: "bounty-analyse-1",         trigger: "bounty analysieren",  purpose: "Voll-Analyse Programm: Scope · OOS · Reward-Range · EV-Math · Konkurrenzniveau",         gruppe: "bb-lifecycle" },
   { name: "bounty-target-setup-0",    trigger: "neues Ziel erstellen", purpose: "Ordnerstruktur + Startdateien unter ~/bugbounty/targets/<name>/",                       gruppe: "bb-lifecycle" },
   { name: "bounty-dateien-befüllen-2",trigger: "target befüllen",      purpose: "scope.md · scope_seeds · OOS · request_identity aus rohem Brief",                       gruppe: "bb-lifecycle" },
   { name: "bounty-priorisierung-1",   trigger: "priorisierung",        purpose: "Hypothesengetriebene Re-Priorisierung (max 45% ohne Server-Confirm)",                   gruppe: "bb-lifecycle" },

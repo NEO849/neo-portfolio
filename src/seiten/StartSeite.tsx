@@ -13,7 +13,7 @@ export default function StartSeite() {
     <>
       <SeitenMeta
         titel="Security Researcher & iOS Developer"
-        beschreibung="Michael Fleps — Bug-Bounty-Researcher (HackerOne · Intigriti · YesWeHack), iOS-Entwickler und Linux-Specialist aus Nürnberg. AI-augmentierte Security-Pipeline, Custom OSINT-Toolkit, eigene MCP-Server."
+        beschreibung="Michael Fleps — Security-Researcher (HackerOne · Intigriti · YesWeHack), iOS-Entwickler und Linux-Specialist aus Nürnberg. AI-augmentierte Security-Pipeline, Custom OSINT-Toolkit, eigene MCP-Server."
         pfad="/"
       />
       <motion.div

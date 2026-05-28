@@ -315,7 +315,7 @@ export default function SecurityView() {
                   <span className="text-signal-rot text-base">◎</span>
                   Asset-Klassifizierung
                 </h3>
-                <p className="text-white/40 text-xs mb-5">Automatische Priorisierung nach Bounty-Potential</p>
+                <p className="text-white/40 text-xs mb-5">Automatische Priorisierung nach Research-Potential</p>
                 <div className="space-y-2">
                   {ASSET_TIERS.map((tier, index) => {
                     const tierLicht = tier.tier === "Tier 1" ? "239, 68, 68" : tier.tier === "Tier 2" ? "234, 179, 8" : "255, 255, 255";

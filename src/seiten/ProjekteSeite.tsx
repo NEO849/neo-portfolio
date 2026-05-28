@@ -12,7 +12,7 @@ export default function ProjekteSeite() {
     <>
       <SeitenMeta
         titel="Projekte"
-        beschreibung="Neo Dev Stack · NeoRecon Bug-Bounty Pipeline · claude-bus Mac↔Server↔iPhone · Voice-Bridge · bb_recon OSINT-Toolkit · ONE iOS · Sports Almanach · Z Almanach · OSINT Toolkit."
+        beschreibung="Neo Dev Stack · NeoRecon Research Pipeline · claude-bus Mac↔Server↔iPhone · Voice-Bridge · bb_recon OSINT-Toolkit · ONE iOS · Sports Almanach · Z Almanach · OSINT Toolkit."
         pfad="/projekte"
       />
       <motion.div

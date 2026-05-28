@@ -12,7 +12,7 @@ export default function SecuritySeite() {
     <>
       <SeitenMeta
         titel="Security Research"
-        beschreibung="7-Schritt Master-Pipeline · 12 Scoring-Kategorien · 13 Custom-Tools · 30+ Pipeline-Skripte · 12 Hard-Gates vor jedem Submit. Bug-Bounty-Workflow vom DNS-Query bis zum validierten Report."
+        beschreibung="7-Schritt Master-Pipeline · 12 Scoring-Kategorien · 13 Custom-Tools · 30+ Pipeline-Skripte · 12 Hard-Gates vor jedem Submit. Research-Workflow vom DNS-Query bis zum validierten Report."
         pfad="/security"
       />
       <motion.div

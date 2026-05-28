@@ -626,7 +626,7 @@ function CommandsAct() {
           Eigene Erweiterungen für Claude Code
         </h3>
         <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
-          Aus der Box kann Claude Code viel — aber nicht alles, was ich für meinen Bug-Bounty-Workflow
+          Aus der Box kann Claude Code viel — aber nicht alles, was ich für meinen Research-Workflow
           brauche. Deshalb 22 selbst geschriebene Erweiterungen: 11 Slash-Commands (kurze Befehle wie
           <span className="font-mono text-akzent-400"> /submit-gate</span>) und 11 Skills (komplette
           mehrstufige Workflows wie <span className="font-mono text-cyber-400">/research</span>).
@@ -693,7 +693,7 @@ function CommandsAct() {
 
           <div>
             <div className="flex items-center gap-2 mb-2.5">
-              <AbzeichenStatus variante="akzent" text="BUG-BOUNTY-LIFECYCLE" />
+              <AbzeichenStatus variante="akzent" text="RESEARCH-LIFECYCLE" />
               <span className="text-[10px] text-white/35 font-mono">Phase 1 bis 10</span>
             </div>
             <div className="space-y-1.5">

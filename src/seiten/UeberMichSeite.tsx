@@ -12,7 +12,7 @@ export default function UeberMichSeite() {
     <>
       <SeitenMeta
         titel="Über mich"
-        beschreibung="15 Jahre Systemverständnis aus der Elektronik, moderne Software-Architektur und offensive Security Research. Werdegang von Elektroinstallateur über iOS-Entwicklung bis Bug-Bounty-Researcher."
+        beschreibung="15 Jahre Systemverständnis aus der Elektronik, moderne Software-Architektur und offensive Security Research. Werdegang von Elektroinstallateur über iOS-Entwicklung bis Security-Researcher."
         pfad="/ueber-mich"
       />
       <motion.div
