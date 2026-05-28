@@ -1,0 +1,16 @@
+# robots.txt für https://www.f3-data-solutions.com/
+# Stand: 2026-05-28
+
+User-agent: *
+Allow: /
+
+# API-Endpunkte sind keine indexierbaren Seiten
+Disallow: /api/
+
+# Vercel-Reste falls noch irgendwo verlinkt
+Disallow: /_vercel/
+
+# AI-Crawler explizit erlaubt (kein Block) — Portfolio darf gefunden werden
+# (Falls später Block gewünscht: GPTBot/CCBot/Google-Extended hier disallow)
+
+Sitemap: https://www.f3-data-solutions.com/sitemap.xml
