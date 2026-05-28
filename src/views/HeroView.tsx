@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import { PERSOENLICH, SYSTEM_STATS } from "../models/daten";
 import { KartenLicht } from "../bewegung/KartenLicht";
 
@@ -221,23 +220,6 @@ export default function HeroView() {
               <span className="text-[11px] font-mono tracking-wide">{stat.label}</span>
             </div>
           ))}
-        </motion.div>
-
-        {/* Link zur Labor-Seite — diskret aber klar */}
-        <motion.div
-          variants={einblend(1.35)}
-          initial="versteckt"
-          animate="sichtbar"
-          className="mt-4 flex justify-center"
-        >
-          <Link
-            to="/labor"
-            className="group inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-mono tracking-wide text-white/45 hover:text-white/85 transition-colors duration-300 border border-white/[0.06] hover:border-akzent-400/30 backdrop-blur-sm bg-white/[0.015]"
-          >
-            <span>Architektur im Detail</span>
-            <span className="text-akzent-400 transition-transform duration-300 group-hover:translate-x-0.5">→</span>
-            <span className="text-white/30 group-hover:text-akzent-400/70 transition-colors">/labor</span>
-          </Link>
         </motion.div>
 
       </div>
