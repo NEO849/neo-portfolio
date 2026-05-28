@@ -310,6 +310,17 @@ function MemoryAct() {
 // ACT 2 — MCP-Arsenal (22 MCPs in 4 Kategorien)
 // ═══════════════════════════════════════════════════════════════════
 
+// Kurz-Labels für die MCP-Kategorie-Tabs auf Mobile (< md). Damit passen
+// alle vier Tabs ohne Scroll/Abschneiden in die Screen-Breite; ab md wird
+// das volle Label gezeigt. Nur Darstellung — die Auswahl-Logik nutzt
+// weiterhin kat.kategorie als id.
+const MCP_KURZ: Record<string, string> = {
+  "Recon & Intel":      "Recon",
+  "Reasoning & Memory": "Reasoning",
+  "Web · App · Mobile": "Web/App",
+  "Cloud · Dev · Docs": "Cloud",
+};
+
 function McpAct() {
   const [aktiveKategorie, setAktiveKategorie] = useState<string>(MCP_KATEGORIEN[0].kategorie);
   const aktive = MCP_KATEGORIEN.find(k => k.kategorie === aktiveKategorie) ?? MCP_KATEGORIEN[0];
@@ -334,19 +345,29 @@ function McpAct() {
 
       {/*
         Kategorie-Auswahl als verschachtelte horizontale Tab-Leiste:
-        dieselbe GlassTabs-Komponente wie die Haupt-Tableiste (eigener
-        layoutId), damit die zweite Ebene exakt konsistent zur ersten
-        wirkt. scrollable=true → auf schmalen Viewports horizontal
-        scrollbar statt Labels abzuschneiden, auf Desktop füllen die
-        vier Tabs die Breite gleichmäßig (flex-1).
+        dieselbe GlassTabs-Komponente + buttonClassName wie die
+        Haupt-Tableiste (eigener layoutId), damit beide Ebenen exakt
+        konsistent wirken. scrollable=false → die vier Tabs teilen sich
+        die Breite gleichmäßig (flex-1, min-w-0) und sind als 4er-Segment
+        immer vollständig sichtbar — kein horizontaler Overflow, kein
+        Scrollen. Auf Mobile (< md) kurze Labels, ab md das volle Label.
       */}
       <GlassTabs
-        tabs={MCP_KATEGORIEN.map((kat) => ({ id: kat.kategorie, label: kat.kategorie }))}
+        tabs={MCP_KATEGORIEN.map((kat) => ({
+          id: kat.kategorie,
+          label: (
+            <>
+              <span className="md:hidden">{MCP_KURZ[kat.kategorie] ?? kat.kategorie}</span>
+              <span className="hidden md:inline">{kat.kategorie}</span>
+            </>
+          ),
+        }))}
         activeId={aktiveKategorie}
         onTabChange={(id) => setAktiveKategorie(id)}
         layoutId="labor-mcp-tab-bg"
         ariaLabel="MCP-Kategorien"
-        buttonClassName="min-w-[116px] px-3 text-[12px] sm:text-[13px]"
+        scrollable={false}
+        buttonClassName="min-w-0 px-1.5 sm:px-4 text-[11px] sm:text-sm"
         className="w-full"
       />
 

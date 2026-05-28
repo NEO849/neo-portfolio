@@ -17,12 +17,13 @@
 //   · ARIA: role=tablist / role=tab / aria-selected / roving tabindex
 // ═══════════════════════════════════════════════════════════════════
 
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import { motion } from "framer-motion";
 
 export interface GlassTab {
   readonly id: string;
-  readonly label: string;
+  /** String oder responsives JSX (z.B. kurzes Mobile- + langes Desktop-Label). */
+  readonly label: ReactNode;
 }
 
 interface GlassTabsProps {
