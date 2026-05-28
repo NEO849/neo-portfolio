@@ -78,19 +78,29 @@ app.add_middleware(SlowAPIMiddleware)
 # ─── CORS ─────────────────────────────────────────────────────────────
 # Erlaubte Origins: lokale Entwicklung + Vercel-Deployments
 ERLAUBTE_ORIGINS = [
-    "http://localhost:5173",                    # Vite Dev Server
-    "http://localhost:3000",                    # Fallback
-    "https://michael-fleps.duckdns.org",        # API-Domain selbst (für /docs)
-    "https://michael-fleps.vercel.app",         # Vercel Production
-    "https://neo-portfolio.vercel.app",         # Vercel Alt
-    "https://neo-portfolio-neo849.vercel.app",  # Vercel Alias
+    "http://localhost:5173",                       # Vite Dev Server
+    "http://localhost:3000",                       # Fallback
+    "https://michael-fleps.duckdns.org",           # API-Domain selbst (für /docs)
+    "https://www.f3-data-solutions.com",           # Cloudflare-Pages Production (Custom-Domain)
+    "https://f3-data-solutions.com",               # Apex (301 → www, defensiv)
+    "https://f3-portfolio.pages.dev",              # Cloudflare-Pages Production-Deployment
+    "https://michael-fleps.vercel.app",            # Vercel Legacy (Migration CF-Pages)
+    "https://neo-portfolio.vercel.app",            # Vercel Legacy
+    "https://neo-portfolio-neo849.vercel.app",     # Vercel Legacy
 ]
 
-# Alle Vercel-Preview-URLs dynamisch erlauben
-# (FastAPI CORS unterstützt keine Wildcards — wir prüfen manuell im Middleware)
+# Preview-Deployments dynamisch erlauben (Wildcard-Subdomains).
+# Prefix-Match (startswith): Vercel-Preview-URLs.
 ERLAUBTE_ORIGIN_PRAEFIXE = [
     "https://neo-portfolio-",   # Vercel Preview Deployments (alt)
-    "https://michael-fleps-",  # Vercel Preview Deployments (neu)
+    "https://michael-fleps-",   # Vercel Preview Deployments (neu)
+]
+
+# Suffix-Match (endswith): projekt-gebundene Cloudflare-Pages-Previews
+# (z.B. https://<deploy-hash>.f3-portfolio.pages.dev). Bewusst NICHT
+# ".pages.dev" allein — das würde jede fremde Pages-Site erlauben.
+ERLAUBTE_ORIGIN_SUFFIXE = [
+    ".f3-portfolio.pages.dev",
 ]
 
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -104,10 +114,11 @@ class FlexibleCORSMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: StarletteRequest, call_next):
         origin = request.headers.get("origin", "")
 
-        # Origin prüfen: exakte Liste oder Prefix-Match
+        # Origin prüfen: exakte Liste, Prefix-Match oder Suffix-Match
         erlaubt = (
             origin in ERLAUBTE_ORIGINS
             or any(origin.startswith(p) for p in ERLAUBTE_ORIGIN_PRAEFIXE)
+            or any(origin.endswith(s) for s in ERLAUBTE_ORIGIN_SUFFIXE)
         )
 
         if request.method == "OPTIONS" and erlaubt:
