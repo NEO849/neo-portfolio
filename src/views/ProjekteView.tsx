@@ -153,7 +153,7 @@ export default function ProjekteView() {
     <section id="projekte" className="py-16 px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
         prefix="> projekte"
-        untertitel="Von nativer Android-App bis zur KI-augmentierten Security-Pipeline – gebaut mit echtem Anspruch an Architektur und Wartbarkeit."
+        untertitel="Von nativer App-Entwicklung bis zur KI-augmentierten Security-Pipeline – gebaut mit echtem Anspruch an Architektur und Wartbarkeit."
         klassen="mb-8"
       />
 
