@@ -93,7 +93,7 @@ function ImpressumInhalt() {
     <div className="space-y-6">
       <Abschnitt titel="Angaben gemäß § 5 DDG">
         <Zeile label="Name" wert="Michael Fleps" />
-        <Zeile label="Unternehmen" wert="FREE DATA solution's" />
+        <Zeile label="Unternehmen" wert="FREE DATA Solutions" />
       </Abschnitt>
 
       <Abschnitt titel="Ladungsfähige Anschrift">
@@ -104,7 +104,7 @@ function ImpressumInhalt() {
 
       <Abschnitt titel="Kontakt">
         <Zeile label="E-Mail" wert="michael_fleps@aol.com" link="mailto:michael_fleps@aol.com" />
-        <Zeile label="Telefon" wert="+49 15678 309580" link="tel:+4915678309580" />
+        <Zeile label="Telefon" wert="+49 172 572 5081" link="tel:+491725725081" />
       </Abschnitt>
 
       <Abschnitt titel="Steuerliche Angaben">

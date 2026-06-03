@@ -419,17 +419,69 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
 
 export const PERSOENLICH = {
   name: "Michael Fleps",
+  firma: "FREE DATA Solutions",
   standort: "Nürnberg, Bayern",
-  titel: "Security Researcher & iOS Developer",
-  untertitel: "iOS Development • Security Research • Linux & Server Administration",
-  kurzvorstellung: "15 Jahre Systemverständnis aus der Elektronik, moderne Software-Architektur und offensive Security Research – ich verbinde praktische Tiefe mit analytischem Denken und baue Anwendungen, die echte Probleme lösen.",
+  titel: "AI-Automation & Integration Engineer",
+  untertitel: "KI-Automation & Integration • Linux/Infrastruktur • Security",
+  firmaTagline: "Produktive KI-Systeme, gehärtete Infrastruktur, Security mit Angreifer-Blick — selbst gebaut und betrieben.",
+  kurzvorstellung: "Ich baue und betreibe produktive KI-Systeme, die Arbeit abnehmen – von Workflow-Automation über LLM-Integration bis zur gehärteten Infrastruktur, auf der das läuft. Kein Proof-of-Concept, sondern Lösungen, die im Alltag zuverlässig funktionieren.",
   email: "michael_fleps@aol.com",
-  telefon: "015678 309580",
+  telefon: "+49 172 572 5081",
+  telefonLink: "+491725725081",
   adresse: "Nürnberg, Bayern",
   github: "https://github.com/NEO849",
   hackerone: "https://hackerone.com/luicypher_neo",
   intigriti: "https://app.intigriti.com/researcher/profile/cypherneo",
 };
+
+// ═══════════════════════════════════════════════════════
+// LEISTUNGEN — kundenorientiert (Was Sie davon haben)
+// Treibt die Leistungen-Sektion auf der Startseite.
+// ═══════════════════════════════════════════════════════
+
+export interface LeistungModel {
+  readonly titel: string;
+  readonly nutzen: string;
+  readonly leistungen: readonly string[];
+  readonly ergebnis: string;
+  readonly farbeRgb: string;
+}
+
+export const LEISTUNGEN: LeistungModel[] = [
+  {
+    titel: "KI-Automation & Integration",
+    nutzen: "Wiederkehrende Abläufe übernehmen KI-Agenten – sauber an Ihre Systeme angebunden.",
+    leistungen: [
+      "Workflow-Automation (n8n, API- & Tool-Integration)",
+      "LLM-Integration & Agenten mit Guardrails",
+      "Self-Hosted Modelle (Ollama) + RAG auf Ihrer Wissensbasis – datensparsam, on-prem",
+    ],
+    ergebnis: "Weniger manuelle Arbeit, schnellere Prozesse, weniger Fehler.",
+    farbeRgb: "99, 102, 241",
+  },
+  {
+    titel: "Linux & Infrastruktur",
+    nutzen: "Server, die nicht nur eingerichtet, sondern verlässlich betrieben werden.",
+    leistungen: [
+      "Gehärtete Linux-/Docker-Setups (UFW, Fail2ban, SSH)",
+      "Cloudflare-Tunnel, Reverse-Proxy, 3-Tier-Backup, Monitoring",
+      "Automatisierung in Bash/Python, CI/CD, reproduzierbare Toolchains",
+    ],
+    ergebnis: "Infrastruktur, die läuft, abgesichert ist und sich wartet.",
+    farbeRgb: "34, 197, 94",
+  },
+  {
+    titel: "Security-Reviews",
+    nutzen: "Schwachstellen finden, bevor es jemand anderes tut.",
+    leistungen: [
+      "Web-/API-Prüfung aus echter Angreifer-Perspektive",
+      "Reproduzierbare Findings statt Scanner-Output",
+      "Klare Handlungsempfehlung + Re-Test nach dem Fix",
+    ],
+    ergebnis: "Belastbare Sicherheit – nachvollziehbar dokumentiert.",
+    farbeRgb: "34, 211, 238",
+  },
+];
 
 // ═══════════════════════════════════════════════════════════════════
 // SENIOR-ELITE LABOR — Daten für die /labor-Seite

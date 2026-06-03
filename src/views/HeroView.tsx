@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { PERSOENLICH, SYSTEM_STATS } from "../models/daten";
 import { KartenLicht } from "../bewegung/KartenLicht";
 
@@ -160,9 +161,27 @@ export default function HeroView() {
 
         {/* Kurzvorstellung */}
         <motion.p variants={einblend(0.75)} initial="versteckt" animate="sichtbar"
-          className="text-base md:text-lg text-white/85 max-w-xl mx-auto leading-relaxed mb-10">
+          className="text-base md:text-lg text-white/85 max-w-xl mx-auto leading-relaxed mb-7">
           {PERSOENLICH.kurzvorstellung}
         </motion.p>
+
+        {/* Call-to-Action */}
+        <motion.div variants={einblend(0.85)} initial="versteckt" animate="sichtbar"
+          className="flex flex-wrap items-center justify-center gap-3 mb-12">
+          <Link
+            to="/kontakt"
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-medium text-white transition-transform duration-200 hover:scale-[1.03]"
+            style={{ background: "linear-gradient(135deg, #6366f1, #06b6d4)", boxShadow: "0 8px 30px rgba(99,102,241,0.3)" }}
+          >
+            Kostenloses Erstgespräch <span aria-hidden>→</span>
+          </Link>
+          <a
+            href="#leistungen"
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-medium text-white/85 border border-white/15 hover:border-akzent-400/50 hover:text-white transition-colors duration-200"
+          >
+            Leistungen ansehen
+          </a>
+        </motion.div>
 
         {/* Portfolio-Überblick */}
         <motion.div
@@ -180,7 +199,7 @@ export default function HeroView() {
         >
           <KartenLicht lichtfarbe="99, 102, 241" intensitaet={0.1} radius={300}>
             <p className="px-6 py-5 text-sm text-white/70 leading-relaxed text-left">
-              Diese Seite bündelt meine Projekte, Skills und mein technisches Setup – von iOS-Entwicklung über Web-Anwendungen bis hin zu Security Research. Datenschutz und digitale Sicherheit sind heute wichtiger denn je. Deshalb möchte ich meinen Teil dazu beitragen, das Internet ein Stück sicherer zu machen. Im Rahmen legitimer Bug-Bounty-Programme teste ich Webseiten, Anwendungen und Apps mit selbstgebauten Tools und Pipelines auf Schwachstellen. Mein OSINT Tool hilft zusätzlich dabei, öffentlich sichtbare Daten besser einzuordnen und einen ersten Überblick zu gewinnen – kostenlos und zugänglich.
+              Für Unternehmen und Teams automatisiere ich wiederkehrende Abläufe mit KI-Agenten und sauberen API-Integrationen, binde Self-Hosted-Modelle datensparsam an und betreibe die gehärtete Infrastruktur, auf der das läuft. Mein Anspruch ist nicht die beeindruckende Demo, sondern das System, das im Alltag zuverlässig arbeitet – wartbar, abgesichert und nachvollziehbar dokumentiert.
             </p>
           </KartenLicht>
         </motion.div>
@@ -201,7 +220,7 @@ export default function HeroView() {
         >
           <KartenLicht lichtfarbe="99, 102, 241" intensitaet={0.08} radius={300}>
             <p className="px-6 py-5 text-sm text-white/70 leading-relaxed text-left">
-              KI ist für mich seit 2022 kein Trend-Tool, sondern ein durchdachter Workflow-Partner – mit spezialisierten Rollen, klaren Verantwortlichkeiten und eigener Automatisierung. Ich nutze das gezielt für Entwicklung, Security-Analysen und strukturierte Entscheidungen. Das Ergebnis sind keine beeindruckenden Demos, sondern Lösungen, die im Alltag wirklich funktionieren.
+              KI ist für mich seit 2022 kein Trend, sondern täglicher Arbeits-Partner – mit klar definierten Rollen, Guardrails und eigener Automatisierung. Dazu eine Security-Praxis aus echter Angreifer-Perspektive: Ich baue Systeme so, wie ich sie auch prüfen würde. Sie bekommen Tempo durch KI und Verlässlichkeit durch Erfahrung – aus einer Hand.
             </p>
           </KartenLicht>
         </motion.div>

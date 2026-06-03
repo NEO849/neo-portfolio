@@ -43,7 +43,7 @@ export function HauptNavigation() {
             className="font-mono text-sm tracking-widest transition-colors duration-200 group"
           >
             <span className="text-white/65 group-hover:text-white/85">FREE DATA </span>
-            <span className="text-akzent-400 group-hover:text-akzent-300 transition-colors">solution's</span>
+            <span className="text-akzent-400 group-hover:text-akzent-300 transition-colors">Solutions</span>
           </Link>
 
           {/* Desktop-Navigation */}

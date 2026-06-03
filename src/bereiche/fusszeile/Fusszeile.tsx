@@ -9,9 +9,7 @@ import { PERSOENLICH } from "../../models/daten";
 import { NAV_EINTRAEGE } from "../navigation/navKonfiguration";
 
 const SOZIALE_LINKS = [
-  { url: PERSOENLICH.github,    label: "GitHub",     kurz: "NEO849" },
-  { url: PERSOENLICH.hackerone, label: "HackerOne",  kurz: "luicypher_neo" },
-  { url: PERSOENLICH.intigriti, label: "Intigriti",  kurz: "cypherneo" },
+  { url: PERSOENLICH.github, label: "GitHub", kurz: "NEO849" },
 ];
 
 export function Fusszeile() {
@@ -23,11 +21,11 @@ export function Fusszeile() {
           {/* Marke */}
           <div>
             <p className="font-mono text-sm text-white/75 mb-1">
-              FREE DATA <span className="text-akzent-400">solution's</span>
+              FREE DATA <span className="text-akzent-400">Solutions</span>
             </p>
             <p className="text-xs text-white/70 leading-relaxed max-w-xs">
-              Fullstack Security Engineer. iOS Development,<br />
-              Security Research, Linux & Server Administration.
+              KI-Automation & Integration · Linux/Infrastruktur · Security.<br />
+              Produktive Systeme, selbst gebaut und betrieben.
             </p>
           </div>
 
