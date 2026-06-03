@@ -9,7 +9,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Anbieter } from "./app/Anbieter";
 import App from "./app/App";
-import "./styles/global.css";
+import "./gestaltung/global.css";
 
 const wurzelElement = document.getElementById("root");
 if (!wurzelElement) throw new Error("Root-Element nicht gefunden");

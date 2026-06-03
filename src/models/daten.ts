@@ -629,7 +629,7 @@ export const MCP_KATEGORIEN: McpKategorieModel[] = [
 // Service = cyber (Cyan). Kritische Workflows werden über ein optionales
 // 'kritisch'-Flag markiert (im View als subtiler Dot), nicht über
 // eine dritte Farbe — das hält die Auflistung visuell ruhig und
-// konsistent zur restlichen Webseite (SecurityView / ZeugnisseView).
+// konsistent zur restlichen Webseite (SecurityView / LaborView).
 export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
   // ─── Timers (laufen nach Zeitplan) — alle in Akzent-Indigo ───────────
   {

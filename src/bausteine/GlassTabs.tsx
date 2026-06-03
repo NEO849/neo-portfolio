@@ -6,7 +6,7 @@
 //   · overflow-x-auto — scrollt wenn Summe der Buttons > Container
 //   · min-w-[80px] px-4 text-sm — kurze Labels passen nativ rein
 //
-// scrollable=false (ZeugnisseView, lange Labels):
+// scrollable=false (LaborView, lange Labels):
 //   · overflow-hidden am Container — kein Scroll möglich
 //   · min-w-0 am Button — Flex teilt Breite exakt gleich auf (1/n)
 //   · overflow-hidden am Button — Clip-Sicherheit wenn Text zu breit

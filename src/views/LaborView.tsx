@@ -3,7 +3,7 @@
 //
 // Single Source of Truth: liest alle Daten aus models/daten.ts.
 // Konsistent zu SecurityView (Tab-System, GlassTabs, InfoKarte mit
-// Aufklapp-Pattern) und ZeugnisseView (Tab-Layout für längere Labels).
+// Aufklapp-Pattern, Tab-Layout für längere Labels).
 //
 // Tabs werden gleichmäßig über die Breite verteilt (scrollable=false),
 // damit auf jedem Viewport jedes Label sichtbar bleibt.
