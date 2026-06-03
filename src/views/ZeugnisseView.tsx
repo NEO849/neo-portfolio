@@ -74,8 +74,8 @@ const DOKUMENTE: DokumentEintrag[] = [
   {
     titel: "Lebenslauf",
     aussteller: "Michael Fleps",
-    jahr: "2025",
-    beschreibung: "Vollständiger tabellarischer Lebenslauf mit Berufserfahrung, Ausbildung, IT-Qualifikationen und persönlichen Stärken.",
+    jahr: "2026",
+    beschreibung: "Aktueller Lebenslauf: KI-Automation & Integration, Linux/Infrastruktur und Security – mit Berufserfahrung, Ausbildung und Kompetenzen.",
     pdfPfad: "/Michael_Fleps_Lebenslauf.pdf",
     vorschauBild: "/lebenslauf_vorschau.jpg",
     kategorie: "lebenslauf",
