@@ -374,8 +374,15 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
   {
     jahr: "2014–2018",
     titel: "Teamführung & interdisziplinäre Praxis",
-    beschreibung: "Mehrjährige Verantwortung für Gruppenkoordination, strukturierte Abläufe und Qualitätssicherung in einem interdisziplinären Team. Kommunikation auf Augenhöhe, Konfliktlösung und ruhiges Handeln in anspruchsvollen Situationen – Qualitäten, die meine Arbeitsweise bis heute prägen.",
+    beschreibung: "Arbeitstherapie mit schwer erziehbaren Jugendlichen an der Fachklinik Kompass Hof (Mindelheim), eingebunden in ein interdisziplinäres Team: Aufnahmegespräche, Reha-Dokumentation und gemeinsame Projektarbeit mit den Klienten. Zugleich Qualitätsmanagement- und Sicherheitsbeauftragter für den Arbeitsschutz. Kommunikation auf Augenhöhe, Konfliktlösung und ruhiges Handeln in anspruchsvollen Situationen – Qualitäten, die meine Arbeitsweise bis heute prägen.",
     kategorie: "teamarbeit",
+    modulTitel: "Aufgaben & Verantwortung",
+    module: [
+      { name: "Arbeitstherapie · Jugendliche",   skills: ["Schwer erziehbare Jugendliche", "Aufnahmegespräche", "Projekte mit Klienten", "Gruppensitzungen"] },
+      { name: "Reha-Dokumentation",              skills: ["KTL-Leistungen protokolliert", "Berichte für die Rentenversicherung"] },
+      { name: "Qualität & Arbeitssicherheit",    skills: ["Qualitätsmanagement-Beauftragter (QMB)", "Sicherheitsbeauftragter", "Arbeitsschutz"] },
+      { name: "Weiterbildung",                   skills: ["Gruppenführung & -dynamik", "Konfliktlösung", "Psychologische Grundlagen"] },
+    ],
   },
   {
     jahr: "2020–heute",

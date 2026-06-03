@@ -66,13 +66,15 @@ describe('daten.ts — Senior-Elite Invarianten', () => {
       }
     });
 
-    it('die BERUF-Station zeigt Projekt-Referenzen als Chips', () => {
-      const beruf = ZEITSTRAHL.find((e) => e.kategorie === 'beruf');
-      expect(beruf).toBeDefined();
-      expect(beruf?.module?.length ?? 0).toBeGreaterThan(0);
-      // jedes Projekt-Modul trägt mindestens einen Chip
-      for (const modul of beruf?.module ?? []) {
-        expect(modul.skills.length).toBeGreaterThan(0);
+    it('die ersten beiden Stationen (Beruf + Praxis) zeigen Sektionen mit Chips', () => {
+      for (const kat of ['beruf', 'teamarbeit'] as const) {
+        const station = ZEITSTRAHL.find((e) => e.kategorie === kat);
+        expect(station).toBeDefined();
+        expect(station?.modulTitel).toBeTruthy();
+        expect(station?.module?.length ?? 0).toBeGreaterThan(0);
+        for (const modul of station?.module ?? []) {
+          expect(modul.skills.length).toBeGreaterThan(0);
+        }
       }
     });
   });
