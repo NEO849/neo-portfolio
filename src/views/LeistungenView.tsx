@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { LEISTUNGEN } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
-import { KnopfSekundaer } from "../bausteine/KnopfSekundaer";
 import { KURVEN } from "../bewegung/varianten";
 import { zahlwort, grossErsterBuchstabe } from "../hilfsmittel/formatierung";
 
@@ -77,16 +76,6 @@ export default function LeistungenView() {
           </motion.div>
         ))}
       </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.45, delay: 0.1, ease: KURVEN.expressiv }}
-        className="mt-8 flex justify-center"
-      >
-        <KnopfSekundaer zuRoute="/kontakt">Projekt besprechen →</KnopfSekundaer>
-      </motion.div>
     </section>
   );
 }
