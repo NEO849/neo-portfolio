@@ -79,6 +79,7 @@ export const PROJEKTE: ProjektModel[] = [
     kategorie: "tooling",
     technologien: ["whisper.cpp", "FastAPI", "ffmpeg", "Cloudflare Tunnel", "tmux", "Web Audio API", "AnalyserNode", "MediaRecorder", "systemd-hardening", "PWA"],
     highlights: [
+      "Nie wieder am Server tippen: Anweisungen einfach einsprechen – die Bridge tippt sie als Text in die laufende Sitzung",
       "0€ Speech-to-Text: lokales whisper.cpp ggml-small.bin (488 MB, mehrsprachig)",
       "Apple-Niveau UI: SF-Pro Typografie, cubic-bezier transitions, Audio-Visualizer im Mic-Orb",
       "Smart Target Resolver: findet automatisch die richtige Claude-tmux-Session",

@@ -1,46 +1,52 @@
 // ═══════════════════════════════════════════════════════════════════
-// MODEL: voice-bridge Demo
+// MODEL: voice-bridge Demo (1:1-Nachbau, vollständig simuliert)
 //
-// Daten und Typen für die interaktive, vollständig SIMULIERTE Demo der
-// echten voice-bridge. Es wird nichts aufgenommen, gesendet oder
-// gespeichert — der Besucher wählt einen Satz, löst die Aufnahme-Geste
-// aus und sieht denselben Ablauf (Orb-Zustände, Pegel, Transkription)
-// wie im echten Tool.
+// Typen + Mock-Daten für den getreuen Klon der echten voice-bridge.
+// Es gibt KEIN Backend, KEINEN Mikrofon-Zugriff und KEINE Speicherung —
+// alle Zustände (Aufnahme, Transkription, Sessions, Queue, History,
+// Einstellungen) werden rein im Browser simuliert.
 // ═══════════════════════════════════════════════════════════════════
 
-/** Zustände der Aufnahme-Maschine — exakt wie im echten Daemon. */
+/** Zustände der Aufnahme-Maschine. */
 export type AufnahmeZustand = "bereit" | "aufnahme" | "verarbeitung";
 
 /** Sprachwahl des Segment-Schalters. */
 export type DemoSprache = "de" | "en" | "auto";
 
-/** Eine Nachricht im Sitzungsverlauf. */
-export interface DemoNachricht {
+/** Wie ein Transkript in der Ziel-Sitzung gelandet ist. */
+export type InjektionStatus = "sent" | "queued" | "skipped";
+
+/** Modus der Status-Anzeige oben (Punkt + Text). */
+export type IndikatorModus = "idle" | "busy" | "rec" | "dead";
+
+/** Ein einzelnes Transkript (Karte + History-Eintrag). */
+export interface DemoTranskript {
   readonly id: string;
   readonly text: string;
-  readonly zeit: string;
-  /** true für die gerade frisch transkribierte Nachricht (Tipp-Animation). */
-  readonly frischTranskribiert?: boolean;
+  readonly gruppe: string;       // "Heute" | "Gestern" | "Diese Woche" | "Älter"
+  readonly anzeigeZeit: string;  // "14:32" oder "Gestern 18:40"
+  readonly status: InjektionStatus;
+  readonly ziel: string;         // Ziel-Sitzung (target)
+  readonly dauerMs: number;      // simulierte Server-Dauer
+  readonly sprache: string;      // "de" | "en"
+  readonly bytesKb: number;
+  readonly auditId: string;
+  readonly frisch?: boolean;     // true für die gerade transkribierte Karte
 }
 
-/** Eine wählbare Claude-Sitzung in der Seitenleiste. */
+/** Eine tmux-/Claude-Sitzung im Picker. */
 export interface DemoSitzung {
   readonly id: string;
-  readonly name: string;
-  readonly kontext: string;
-  readonly datumsGruppe: string;
-  readonly verlauf: readonly DemoNachricht[];
+  readonly name: string;          // z.B. "claude:bugbounty"
+  readonly istClaude: boolean;
+  readonly beschaeftigt: boolean; // false = Bereit (idle), true = Busy
 }
 
-/** Simulierte Verarbeitungsdauer (Orb im Busy-Zustand), in Millisekunden. */
+// ─── Timing ───────────────────────────────────────────────────────
 export const VERARBEITUNG_DAUER_MS = 1300;
-
-/** Maximale Aufnahmedauer, bevor automatisch gestoppt wird (Anti-Hänger). */
 export const AUFNAHME_MAX_MS = 9000;
 
-// ─── Sätze pro Sprache ────────────────────────────────────────────
-// Werden bei jedem Druck reihum durchgewählt — der Besucher muss nichts
-// auswählen, einfach drücken und der nächste Satz wird transkribiert.
+// ─── Sätze pro Sprache (reihum bei jedem Druck) ───────────────────
 const SAETZE_DE: readonly string[] = [
   "Starte die Recon-Pipeline für das neue Target und fasse die Top-Funde zusammen.",
   "Zeig mir die offenen Findings, sortiert nach erwartetem Wert.",
@@ -48,53 +54,59 @@ const SAETZE_DE: readonly string[] = [
   "Prüf die SSH- und Firewall-Konfiguration und schlag konkrete Härtungen vor.",
   "Merk dir: morgen nach dem Deploy den Cloudflare-Cache purgen.",
 ];
-
 const SAETZE_EN: readonly string[] = [
   "Start the recon pipeline for the new target and summarise the top findings.",
   "Show me the open findings, sorted by expected value.",
   "Turn the confirmed evidence into a clean report draft.",
   "Review the SSH and firewall configuration and suggest concrete hardening steps.",
 ];
-
-/**
- * Sätze je Sprache. "auto" steht für Auto-Erkennung und liefert hier
- * dieselben deutschen Sätze (erkannte Sprache des Nutzers).
- */
 export const DEMO_SAETZE: Record<DemoSprache, readonly string[]> = {
   de: SAETZE_DE,
   en: SAETZE_EN,
   auto: SAETZE_DE,
 };
 
-// ─── Vorbelegte Sitzungen (Seitenleiste) ──────────────────────────
+// ─── Sitzungen (eine ist beschäftigt → demonstriert die Queue) ────
 export const DEMO_SITZUNGEN: readonly DemoSitzung[] = [
+  { id: "bugbounty",    name: "claude:bugbounty",    istClaude: true,  beschaeftigt: false },
+  { id: "portfolio",    name: "claude:portfolio",    istClaude: true,  beschaeftigt: false },
+  { id: "voice-bridge", name: "claude:voice-bridge", istClaude: true,  beschaeftigt: true  },
+  { id: "logs",         name: "tail-logs",           istClaude: false, beschaeftigt: false },
+];
+
+/** Default-Sitzung (wie "resolved_default" im echten Tool). */
+export const DEMO_DEFAULT_ZIEL = "claude:bugbounty";
+
+// ─── Vorbelegte History (gruppiert) ───────────────────────────────
+export const DEMO_HISTORY: readonly DemoTranskript[] = [
   {
-    id: "bugbounty",
-    name: "claude · bugbounty",
-    kontext: "Recon & Findings",
-    datumsGruppe: "Heute",
-    verlauf: [
-      { id: "bb-1", text: "Welche Subdomains sind seit gestern neu dazugekommen?", zeit: "09:14" },
-      { id: "bb-2", text: "Exportier die Top-10-Kandidaten als Hunt-Sheet.",       zeit: "09:21" },
-    ],
+    id: "h1", text: "Welche Subdomains sind seit gestern neu dazugekommen?",
+    gruppe: "Heute", anzeigeZeit: "09:14", status: "sent", ziel: "claude:bugbounty",
+    dauerMs: 612, sprache: "de", bytesKb: 78, auditId: "a1f4c2",
   },
   {
-    id: "portfolio",
-    name: "claude · portfolio",
-    kontext: "Web-Projekt",
-    datumsGruppe: "Heute",
-    verlauf: [
-      { id: "pf-1", text: "Deploy die Änderung und prüf danach die Security-Header.", zeit: "11:02" },
-    ],
+    id: "h2", text: "Exportier die Top-10-Kandidaten als Hunt-Sheet.",
+    gruppe: "Heute", anzeigeZeit: "09:21", status: "sent", ziel: "claude:bugbounty",
+    dauerMs: 540, sprache: "de", bytesKb: 64, auditId: "b7e9d1",
   },
   {
-    id: "voice-bridge",
-    name: "claude · voice-bridge",
-    kontext: "Daemon-Tuning",
-    datumsGruppe: "Gestern",
-    verlauf: [
-      { id: "vb-1", text: "Setz das Whisper-Modell auf small und miss die Latenz.", zeit: "18:40" },
-      { id: "vb-2", text: "Räum die tmpfs-Audios nach jeder Aufnahme zuverlässig auf.", zeit: "18:47" },
-    ],
+    id: "h3", text: "Deploy die Änderung und prüf danach die Security-Header.",
+    gruppe: "Heute", anzeigeZeit: "11:02", status: "queued", ziel: "claude:voice-bridge",
+    dauerMs: 705, sprache: "de", bytesKb: 88, auditId: "c3a0f8",
+  },
+  {
+    id: "h4", text: "Setz das Whisper-Modell auf small und miss die Latenz.",
+    gruppe: "Gestern", anzeigeZeit: "Gestern 18:40", status: "sent", ziel: "claude:voice-bridge",
+    dauerMs: 668, sprache: "de", bytesKb: 95, auditId: "d9b1e4",
+  },
+  {
+    id: "h5", text: "Just a quick note: rotate the API token next week.",
+    gruppe: "Gestern", anzeigeZeit: "Gestern 21:07", status: "skipped", ziel: "claude:portfolio",
+    dauerMs: 489, sprache: "en", bytesKb: 52, auditId: "e2c7a0",
+  },
+  {
+    id: "h6", text: "Räum die tmpfs-Audios nach jeder Aufnahme zuverlässig auf.",
+    gruppe: "Diese Woche", anzeigeZeit: "01. Jun 17:23", status: "sent", ziel: "claude:voice-bridge",
+    dauerMs: 723, sprache: "de", bytesKb: 101, auditId: "f0d5b3",
   },
 ];

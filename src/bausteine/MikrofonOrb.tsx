@@ -1,19 +1,30 @@
 // ═══════════════════════════════════════════════════════════════════
 // BAUSTEIN: MikrofonOrb
-// Der zentrale Aufnahme-Knopf der voice-bridge-Demo — drei Zustände
-// in den Originalfarben des echten Tools:
-//   bereit        → ruhiges Atmen, Akzent-Blau (#0a84ff)
-//   aufnahme      → rotes Glühen + pulsierender Ring (#ff453a)
-//   verarbeitung  → blauer Busy-Puls
+// 1:1-Nachbau des echten voice-bridge-Orbs — drei Zustände mit den
+// Original-Radialverläufen, Halo-Ringen und dem Mikrofon-Icon. Während
+// der Aufnahme legen sich die Audio-Balken über den Orb.
 // ═══════════════════════════════════════════════════════════════════
 
 import { motion } from "framer-motion";
 import type { AufnahmeZustand } from "../models/voiceDemo";
 import { useBewegungErlaubt } from "../bewegung/hooks/useBewegungErlaubt";
+import { AudioPegel } from "./AudioPegel";
 
-const AKZENT = "#0a84ff";
-const REC = "#ff453a";
-
+const VERLAUF: Record<AufnahmeZustand, string> = {
+  bereit: "radial-gradient(circle at 35% 30%, #2a2c33 0%, #14151a 65%, #0a0b0e 100%)",
+  aufnahme: "radial-gradient(circle at 35% 30%, #6a1814 0%, #3a0c0a 65%, #1a0504 100%)",
+  verarbeitung: "radial-gradient(circle at 35% 30%, #0e3060 0%, #061a36 65%, #03101f 100%)",
+};
+const GLUEHEN: Record<AufnahmeZustand, string> = {
+  bereit: "inset 0 1px 0 rgba(255,255,255,0.05), 0 8px 24px rgba(0,0,0,0.4)",
+  aufnahme: "inset 0 1px 0 rgba(255,255,255,0.05), 0 0 60px rgba(255,69,58,0.45)",
+  verarbeitung: "inset 0 1px 0 rgba(255,255,255,0.05), 0 0 50px rgba(10,132,255,0.4)",
+};
+const ICON_FARBE: Record<AufnahmeZustand, string> = {
+  bereit: "#c6c8ce",
+  aufnahme: "#ffffff",
+  verarbeitung: "#9ec5ff",
+};
 const BESCHRIFTUNG: Record<AufnahmeZustand, string> = {
   bereit: "Aufnahme starten",
   aufnahme: "Aufnahme stoppen",
@@ -29,79 +40,97 @@ export function MikrofonOrb({ zustand, onClick }: MikrofonOrbProps) {
   const bewegung = useBewegungErlaubt();
   const istAufnahme = zustand === "aufnahme";
   const istVerarbeitung = zustand === "verarbeitung";
-  const farbe = istAufnahme ? REC : AKZENT;
 
-  // Atem-/Puls-Animation des Glühens — bei reduzierter Bewegung statisch.
-  const glühenAnimation = !bewegung
-    ? { opacity: 0.5, scale: 1 }
-    : istAufnahme
-      ? { opacity: [0.5, 0.9, 0.5], scale: [1, 1.18, 1] }
+  const orbAnimation =
+    !bewegung
+      ? {}
       : istVerarbeitung
-        ? { opacity: [0.35, 0.7, 0.35], scale: [1, 1.1, 1] }
-        : { opacity: [0.3, 0.5, 0.3], scale: [1, 1.06, 1] };
-
-  const glühenDauer = istAufnahme ? 1.1 : istVerarbeitung ? 0.9 : 3.2;
+        ? { scale: [1, 1.025, 1] }
+        : zustand === "bereit"
+          ? { scale: [1, 1.015, 1] }
+          : {};
+  const orbDauer = istVerarbeitung ? 1.4 : 4;
 
   return (
-    <div className="relative flex items-center justify-center w-[150px] h-[150px]">
-      {/* Weiches Außen-Glühen */}
-      <motion.span
-        aria-hidden
-        className="absolute rounded-full"
-        style={{
-          width: 130,
-          height: 130,
-          background: `radial-gradient(circle, ${farbe}55 0%, ${farbe}00 70%)`,
-        }}
-        animate={glühenAnimation}
-        transition={{ duration: glühenDauer, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      {/* Pulsierender Ring nur während der Aufnahme */}
-      {istAufnahme && bewegung && (
+    <div className="relative" style={{ width: 260, height: 260 }}>
+      {/* Halo-Ringe */}
+      {bewegung && istAufnahme && (
+        <>
+          <HaloRing farbe="#ff453a" dauer={1.6} verzoegerung={0} />
+          <HaloRing farbe="#ff453a" dauer={1.6} verzoegerung={0.5} />
+        </>
+      )}
+      {bewegung && istVerarbeitung && (
+        <HaloRing farbe="#0a84ff" dauer={2.4} verzoegerung={0} />
+      )}
+      {bewegung && zustand === "bereit" && (
         <motion.span
           aria-hidden
           className="absolute rounded-full border"
-          style={{ width: 104, height: 104, borderColor: `${REC}99` }}
-          initial={{ opacity: 0.7, scale: 1 }}
-          animate={{ opacity: 0, scale: 1.5 }}
-          transition={{ duration: 1.1, repeat: Infinity, ease: "easeOut" }}
+          style={{ inset: 0, borderColor: "rgba(255,255,255,0.08)" }}
+          animate={{ scale: [1, 1.04, 1], opacity: [0.4, 0.15, 0.4] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         />
       )}
 
+      {/* Orb */}
       <motion.button
         type="button"
         onClick={onClick}
         aria-label={BESCHRIFTUNG[zustand]}
         aria-pressed={istAufnahme}
-        whileTap={{ scale: 0.94 }}
-        className="relative flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        whileTap={{ scale: 0.95 }}
+        animate={orbAnimation}
+        transition={{ duration: orbDauer, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute grid place-items-center rounded-full border focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
         style={{
-          width: 96,
-          height: 96,
-          background: `linear-gradient(160deg, ${farbe} 0%, ${farbe}cc 100%)`,
-          boxShadow: `0 8px 30px ${farbe}66, inset 0 1px 0 rgba(255,255,255,0.25)`,
+          inset: 30,
+          background: VERLAUF[zustand],
+          borderColor: "rgba(255,255,255,0.13)",
+          boxShadow: GLUEHEN[zustand],
         }}
       >
-        <MikrofonSymbol />
+        <svg width="64" height="64" viewBox="0 0 32 32" aria-hidden style={{ color: ICON_FARBE[zustand] }}>
+          <path d="M16 4a5 5 0 015 5v8a5 5 0 11-10 0V9a5 5 0 015-5z" fill={ICON_FARBE[zustand]} />
+          <path
+            d="M9 17a7 7 0 0014 0M16 24v4M11 28h10"
+            stroke="currentColor"
+            strokeWidth="2"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </motion.button>
+
+      {/* Audio-Balken-Overlay (nur während der Aufnahme) */}
+      <div
+        className="absolute grid place-items-center pointer-events-none transition-opacity duration-200"
+        style={{ inset: 80, opacity: istAufnahme ? 1 : 0 }}
+      >
+        <AudioPegel aktiv={istAufnahme} />
+      </div>
     </div>
   );
 }
 
-function MikrofonSymbol() {
+function HaloRing({
+  farbe,
+  dauer,
+  verzoegerung,
+}: {
+  farbe: string;
+  dauer: number;
+  verzoegerung: number;
+}) {
   return (
-    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M12 15a3.5 3.5 0 0 0 3.5-3.5V6a3.5 3.5 0 1 0-7 0v5.5A3.5 3.5 0 0 0 12 15Z"
-        fill="white"
-      />
-      <path
-        d="M6 11.5a6 6 0 0 0 12 0M12 18.5V21"
-        stroke="white"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-    </svg>
+    <motion.span
+      aria-hidden
+      className="absolute rounded-full border-2"
+      style={{ inset: 0, borderColor: farbe }}
+      initial={{ scale: 0.85, opacity: 0 }}
+      animate={{ scale: [0.85, 1.6], opacity: [0, 0.9, 0] }}
+      transition={{ duration: dauer, repeat: Infinity, ease: "easeOut", delay: verzoegerung }}
+    />
   );
 }
