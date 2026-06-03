@@ -20,13 +20,14 @@ Kalibrierung (GRUNDREGEL-5): Ein ✅ heißt „Kontrolle vorhanden und belegt", 
 | A03 | Injection | ✅ | React escaped JSX-Output by default; **kein** `dangerouslySetInnerHTML` im aktiven Code. Function interpoliert keine Eingabe in Befehle/Queries — Nutzereingaben gehen nur als JSON-Felder an Resend. Eingabe-Validierung als Allowlist an der Grenze (`hilfsmittel/validierung.ts`, Längen-/Format-Limits in der Function). |
 | A04 | Insecure Design | ✅ | MCVM-Schichtung mit einseitiger Abhängigkeit (`View→ViewModel→Dienste→Model`). Typisiertes Fehler-Management (`Apifehler`, `FehlerArt`) mit Retry/Backoff/Timeout. Honeypot-Feld (`website`) + Body-Size-Cap als Missbrauchs-Design. |
 | A05 | Security Misconfiguration | ✅ | 9 Härtungs-Header live (`securityheaders.com A+`): strikte CSP, `X-Frame-Options: DENY`, `frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`, restriktive `Permissions-Policy`, COOP/CORP `same-origin`, `Server`-Header entfernt. `/api/*` → `no-store` + `noindex`. |
-| A06 | Vulnerable & Outdated Components | ⚠️ | Schlanker Stack, Versionen im Lockfile fixiert (React 19, Vite, framer-motion, react-helmet-async). **Rest-Risiko:** kein automatisierter `npm audit`/Dependabot im CI — siehe Empfehlung unten. |
+| A06 | Vulnerable & Outdated Components | ✅ | Schlanker Stack, Versionen im Lockfile fixiert (React 19, Vite, framer-motion, react-helmet-async). CI erzwingt `npm audit --omit=dev --audit-level=high` (Production-Deps), Dependabot hält npm + GitHub-Actions wöchentlich aktuell (`.github/dependabot.yml`). Prod-Deps: 0 Vulnerabilities. |
 | A07 | Identification & Authentication Failures | ✅ | Nicht anwendbar — keine Authentifizierung, keine Sessions, keine Cookies (kein `localStorage` für Geheimnisse). |
 | A08 | Software & Data Integrity Failures | ✅ | Build-Assets mit Hash-Dateinamen + `immutable`-Cache. Deploy nur über GitHub-Actions-Pipeline (Typecheck→Build→Wrangler) von `main`. Keine ungeprüften dynamischen Script-Quellen (`script-src 'self'`). |
 | A09 | Security Logging & Monitoring Failures | ⚠️ | Function loggt mit `crypto.randomUUID()`-Trace-IDs (Audit-Korrelation, im E-Mail-Footer). **Rest-Risiko:** keine zentrale Alarmierung/Aggregation — für eine statische Portfolio-Seite akzeptiert. |
 | A10 | Server-Side Request Forgery (SSRF) | ✅ | Function ruft genau eine fest verdrahtete URL (`api.resend.com`) — keine nutzergesteuerten Ziel-URLs. Kein serverseitiges Nachladen aus Eingaben. |
 
-**Ergebnis:** 8 × ✅, 2 × ⚠️ (Rest-Risiken bewusst akzeptiert, keine offene Lücke).
+**Ergebnis:** 9 × ✅, 1 × ⚠️ (A09 zentrale Alarmierung — für eine statische
+Portfolio-Seite bewusst akzeptiert, keine offene Lücke).
 
 ---
 
@@ -55,8 +56,8 @@ Kalibrierung (GRUNDREGEL-5): Ein ✅ heißt „Kontrolle vorhanden und belegt", 
 
 ## Empfehlungen (offen, nicht blockierend)
 
-- [ ] `npm audit --production` als CI-Schritt + Dependabot aktivieren (A06).
-- [ ] Branch-Protection für `main` (Status-Checks müssen grün sein).
+- [x] `npm audit` als CI-Gate (Prod-Deps, high+) + Dependabot aktiviert (A06). ✅ 2026-06-03
+- [ ] Branch-Protection für `main` — siehe `docs/branch-protection.md` (eine Workflow-Entscheidung offen).
 - [ ] DNSSEC für `f3-data-solutions.com` aktivieren.
 - [ ] CSP weiter verschärfen, falls Google-Fonts lokal gehostet werden
       (dann `style-src 'unsafe-inline'` entfernbar).
