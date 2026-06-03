@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ZEITSTRAHL } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
@@ -27,6 +27,7 @@ const KATEGORIE_CFG: Record<ZeitstrahlKat, {
 
 export default function UeberMichView() {
   const [activeIdx, setActiveIdx] = useState(0);
+  const [offenerIndex, setOffenerIndex] = useState<number | null>(null);
   const entryRefs = useRef<(HTMLDivElement | null)[]>([]);
   const prefersReducedMotion = useReducedMotion() === true;
 
@@ -124,6 +125,7 @@ export default function UeberMichView() {
           {ZEITSTRAHL.map((eintrag, index) => {
             const cfg = KATEGORIE_CFG[eintrag.kategorie as ZeitstrahlKat] ?? KATEGORIE_CFG.beruf;
             const isActive = activeIdx === index;
+            const offen = offenerIndex === index;
             return (
               <motion.div
                 key={index}
@@ -216,38 +218,64 @@ export default function UeberMichView() {
                   </p>
 
                   {eintrag.module && (
-                    <div className="mt-3">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-mono text-[10px] text-white/25 uppercase tracking-widest">{eintrag.modulTitel ?? "Module & Schwerpunkte"}</span>
-                        <div className="h-px flex-1 bg-white/[0.04]" />
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                        {eintrag.module.map((mod) => (
-                          <div
-                            key={mod.name}
-                            className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-2.5"
-                            style={{ boxShadow: `0 2px 14px rgba(${cfg.lichtfarbe}, 0.05)` }}
+                    <div className="mt-3.5">
+                      {/* Klickbare Titelzeile schaltet die Schwerpunkte auf/zu */}
+                      <button
+                        type="button"
+                        onClick={() => setOffenerIndex(offen ? null : index)}
+                        aria-expanded={offen}
+                        className="group w-full flex items-center gap-2 focus-visible:outline-none"
+                      >
+                        <span className="font-mono text-[10px] uppercase tracking-widest text-white/30 group-hover:text-white/55 transition-colors">
+                          {eintrag.modulTitel ?? "Schwerpunkte"}
+                        </span>
+                        <div className="h-px flex-1 bg-white/[0.06] group-hover:bg-white/[0.1] transition-colors" />
+                        <motion.span
+                          animate={{ rotate: offen ? 45 : 0 }}
+                          transition={{ duration: 0.18 }}
+                          className="text-base font-light leading-none"
+                          style={{ color: cfg.akzentFarbe, opacity: offen ? 0.9 : 0.5 }}
+                          aria-hidden="true"
+                        >
+                          +
+                        </motion.span>
+                      </button>
+
+                      <AnimatePresence initial={false}>
+                        {offen && (
+                          <motion.div
+                            key="module"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.24, ease: "easeInOut" }}
+                            className="overflow-hidden"
                           >
-                            <p className="font-mono text-[10px] font-semibold mb-1.5 text-white/45 tracking-wide">
-                              {mod.name}
-                            </p>
-                            <div className="flex flex-wrap gap-1">
-                              {mod.skills.map((skill) => (
-                                <span
-                                  key={skill}
-                                  className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border text-white/65 leading-none"
-                                  style={{
-                                    backgroundColor: `rgba(${cfg.lichtfarbe}, 0.07)`,
-                                    borderColor: `rgba(${cfg.lichtfarbe}, 0.22)`,
-                                  }}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-2.5">
+                              {eintrag.module.map((mod) => (
+                                <div
+                                  key={mod.name}
+                                  className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5"
                                 >
-                                  {skill}
-                                </span>
+                                  <p className="font-mono text-[10px] font-semibold mb-1.5 text-white/45 tracking-wide">
+                                    {mod.name}
+                                  </p>
+                                  <div className="flex flex-wrap gap-1">
+                                    {mod.skills.map((skill) => (
+                                      <span
+                                        key={skill}
+                                        className="font-mono text-[10px] px-1.5 py-0.5 rounded-md border border-white/10 bg-white/[0.04] text-white/55 leading-snug transition-colors hover:text-white/75 hover:bg-white/[0.07]"
+                                      >
+                                        {skill}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
                               ))}
                             </div>
-                          </div>
-                        ))}
-                      </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   )}
                 </InfoKarte>
