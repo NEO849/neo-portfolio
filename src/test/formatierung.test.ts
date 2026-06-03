@@ -13,6 +13,8 @@ import {
   zuSlug,
   aktuellesJahr,
   klassen,
+  zahlwort,
+  grossErsterBuchstabe,
 } from "../hilfsmittel/formatierung";
 
 describe("formatierung.ts — reine Hilfsfunktionen", () => {
@@ -72,6 +74,34 @@ describe("formatierung.ts — reine Hilfsfunktionen", () => {
 
     it("liefert leeren String wenn alles falsy ist", () => {
       expect(klassen(undefined, false, null)).toBe("");
+    });
+  });
+
+  describe("zahlwort", () => {
+    it("liefert das deutsche Wort für kleine Zahlen", () => {
+      expect(zahlwort(0)).toBe("null");
+      expect(zahlwort(3)).toBe("drei");
+      expect(zahlwort(4)).toBe("vier");
+      expect(zahlwort(12)).toBe("zwölf");
+    });
+
+    it("fällt außerhalb 0–12 auf die Ziffer zurück", () => {
+      expect(zahlwort(13)).toBe("13");
+      expect(zahlwort(99)).toBe("99");
+    });
+  });
+
+  describe("grossErsterBuchstabe", () => {
+    it("macht den ersten Buchstaben groß", () => {
+      expect(grossErsterBuchstabe("vier")).toBe("Vier");
+    });
+
+    it("lässt bereits großen Anfang unverändert", () => {
+      expect(grossErsterBuchstabe("Vier")).toBe("Vier");
+    });
+
+    it("verträgt den leeren String", () => {
+      expect(grossErsterBuchstabe("")).toBe("");
     });
   });
 });

@@ -37,3 +37,24 @@ export function klassen(...teile: (string | undefined | null | false)[]): string
 export function warte(millisekunden: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, millisekunden));
 }
+
+// Deutsche Grundzahlwörter 0–12 — für Fließtext, der eine Anzahl aus den
+// Daten ableitet (Single Source of Truth statt hartkodierter Zahl).
+const ZAHLWOERTER: readonly string[] = [
+  "null", "eins", "zwei", "drei", "vier", "fünf", "sechs",
+  "sieben", "acht", "neun", "zehn", "elf", "zwölf",
+];
+
+/**
+ * Wandelt eine kleine Zahl in ihr deutsches Wort (0–12, kleingeschrieben).
+ * Außerhalb des Bereichs wird die Ziffer als String zurückgegeben.
+ */
+export function zahlwort(zahl: number): string {
+  return ZAHLWOERTER[zahl] ?? String(zahl);
+}
+
+/** Macht den ersten Buchstaben groß (z.B. für Satzanfang). */
+export function grossErsterBuchstabe(text: string): string {
+  if (text.length === 0) return text;
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}

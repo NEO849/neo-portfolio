@@ -4,6 +4,7 @@ import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
 import { KnopfSekundaer } from "../bausteine/KnopfSekundaer";
 import { KURVEN } from "../bewegung/varianten";
+import { zahlwort, grossErsterBuchstabe } from "../hilfsmittel/formatierung";
 
 // ═══════════════════════════════════════════════════════════════════
 // VIEW: Leistungen — "Was ich für Sie tue"
@@ -11,12 +12,19 @@ import { KURVEN } from "../bewegung/varianten";
 // Animations-Kurven, Scroll-Reveal mit gestaffeltem Delay.
 // ═══════════════════════════════════════════════════════════════════
 
+// Anzahl der Schwerpunkte direkt aus den Daten ableiten — so können Untertitel
+// und Karten nie auseinanderlaufen (Single Source of Truth).
+const LEISTUNGEN_UNTERTITEL =
+  `${grossErsterBuchstabe(zahlwort(LEISTUNGEN.length))} Schwerpunkte – jeweils ` +
+  `darauf ausgerichtet, was dabei für Sie herauskommt. Keine Werkzeug-Show, ` +
+  `sondern Systeme und Sicherheit, die im Alltag tragen.`;
+
 export default function LeistungenView() {
   return (
     <section id="leistungen" className="py-16 px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
         prefix="> leistungen"
-        untertitel="Drei Schwerpunkte – jeweils darauf ausgerichtet, was dabei für Sie herauskommt. Keine Werkzeug-Show, sondern Systeme und Sicherheit, die im Alltag tragen."
+        untertitel={LEISTUNGEN_UNTERTITEL}
         klassen="mb-8"
       />
 
