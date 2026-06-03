@@ -20,7 +20,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "Neo Dev Stack – AI-Augmented Security Workstation",
     kurzbeschreibung: "Eine selbst gebaute, KI-gesteuerte Arbeitsumgebung, die wiederkehrende Sicherheits- und Recherche-Aufgaben automatisiert: spezialisierte KI-Agenten, kostenlose lokale KI-Modelle und über 80 Werkzeuge greifen nahtlos ineinander.",
-    langbeschreibung: "Mein selbst gebauter Arbeitsplatz für Security- und Recherche-Arbeit: spezialisierte KI-Agenten, lokale Modelle und über 80 Werkzeuge greifen ineinander, statt ständig zwischen einzelnen Tools zu wechseln. Wiederkehrende Schritte – von der ersten Recherche bis zum fertigen Report – laufen so weitgehend automatisch und bleiben jederzeit reproduzierbar.",
+    langbeschreibung: "Der Gewinn liegt im Zusammenspiel: Ein Auftrag läuft durchgehend an einem Ort – von der ersten Recherche über die Analyse bis zum fertigen Report –, statt zwischen Dutzenden Programmen zu springen. Jeder Schritt bleibt dabei nachvollziehbar dokumentiert und lässt sich jederzeit identisch wiederholen.",
     kategorie: "tooling",
     technologien: ["Claude Code", "MCP Protocol", "Ollama", "Milvus", "Docker", "tmux", "Python", "Bash", "Chrome DevTools", "Firecrawl", "Censys", "Shodan"],
     highlights: [
@@ -38,7 +38,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "Self-Improving Memory System v2 – Adaptive Knowledge Base",
     kurzbeschreibung: "Ein lernendes Gedächtnis für KI-Assistenten: Es merkt sich aus jeder Sitzung das Wichtige, sortiert Veraltetes automatisch aus und wird dadurch mit der Zeit spürbar zuverlässiger – statt jedes Mal bei null zu beginnen.",
-    langbeschreibung: "Ein Gedächtnis für meinen KI-Assistenten, das aus jeder Sitzung dazulernt und Veraltetes von selbst aussortiert. Dadurch muss ich Dinge nicht wiederholt erklären, und die Antworten werden mit der Zeit verlässlicher – statt bei jedem Start wieder bei null zu beginnen.",
+    langbeschreibung: "Damit nichts Falsches hängen bleibt, landet jede neue Beobachtung zuerst in einer Eingangsablage und wird erst nach kurzer Prüfung dauerhaft übernommen. So entsteht ein verlässliches Wissen, das ich nicht bei jedem Projekt neu aufbauen muss.",
     kategorie: "tooling",
     technologien: ["Python", "Claude Code Hooks", "Markdown YAML Frontmatter", "Git", "Bash Cron", "A-MEM Algorithm", "Jaccard Similarity"],
     highlights: [
@@ -57,7 +57,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "claude-bus – Mac↔Server↔iPhone Mailbox-Bridge",
     kurzbeschreibung: "Eine sichere Brücke zwischen meinen Geräten – Mac, Server und iPhone: Aufgaben und Ergebnisse wandern verschlüsselt hin und her, mit strengen Zugriffsgrenzen und durchgehender Überwachung.",
-    langbeschreibung: "Eine sichere Brücke, über die Mac, Server und iPhone Aufgaben und Ergebnisse austauschen. So stoße ich eine Aufgabe unterwegs an und führe sie am Rechner weiter – verschlüsselt, mit eng begrenzten Zugriffsrechten und einer Überwachung, die ungewöhnliche Zugriffe sofort meldet.",
+    langbeschreibung: "In der Praxis heißt das: Ich starte eine Aufgabe unterwegs am iPhone und führe sie nahtlos am Rechner weiter. Das mobile Gerät darf dabei bewusst nur das Nötigste – Komfort geht so nicht auf Kosten der Sicherheit.",
     kategorie: "tooling",
     technologien: ["FastMCP", "Streamable HTTP", "Tailscale WireGuard", "Cloudflare Tunnel", "Cloudflare Workers", "OAuth 2.1", "PKCE", "SQLite", "systemd", "Python"],
     highlights: [
@@ -75,7 +75,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "voice-bridge – Lokaler Whisper-Voice-Daemon mit Apple-UI",
     kurzbeschreibung: "Sprachsteuerung fürs Smartphone: Eingesprochene Aufgaben werden direkt auf dem eigenen Server – ohne Cloud-Kosten – in Text umgewandelt und landen sofort in der Arbeitssitzung. Mit einer Oberfläche auf Apple-Niveau.",
-    langbeschreibung: "Statt Anweisungen am Server einzutippen, spreche ich sie einfach ein – die Stimme wird in Sekunden zu Text und landet direkt in der laufenden Claude-Sitzung. Die Spracherkennung läuft komplett auf eigener Hardware, also ganz ohne laufende Cloud-Kosten, und die Bedienung ist freihändig vom Handy aus auf Apple-Niveau gebaut.",
+    langbeschreibung: "Der eigentliche Gewinn: Gedanken werden zum Befehl, ohne die Hände an der Tastatur – gerade bei langen oder umständlichen Anweisungen oft schneller als Tippen. Und weil alles auf eigener Hardware verarbeitet wird, bleiben die Inhalte vollständig privat.",
     kategorie: "tooling",
     technologien: ["whisper.cpp", "FastAPI", "ffmpeg", "Cloudflare Tunnel", "tmux", "Web Audio API", "AnalyserNode", "MediaRecorder", "systemd-hardening", "PWA"],
     highlights: [
@@ -94,7 +94,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "bb_recon – Senior-Elite Research OSINT-Toolkit",
     kurzbeschreibung: "Ein Recherche-Werkzeug, das öffentlich verfügbare Informationen zu einem Ziel aus über 30 Quellen in Sekunden zusammenträgt und übersichtlich aufbereitet – komplett ohne kostenpflichtige Schnittstellen.",
-    langbeschreibung: "Trägt in Sekunden zusammen, was öffentlich über ein Ziel auffindbar ist – aus über 30 Quellen und ganz ohne kostenpflichtige Zugänge. Das spart bei jeder Recherche das mühsame Zusammensuchen und liefert ein sauber sortiertes Gesamtbild statt verstreuter Einzelfunde.",
+    langbeschreibung: "Alle Quellen laufen parallel; fällt eine aus, stört das die anderen nicht. Am Ende steht ein sauber sortiertes Gesamtbild mit einer Verlässlichkeits-Einstufung pro Fund – statt einer Handvoll verstreuter Einzeltreffer.",
     kategorie: "security",
     technologien: ["Python asyncio", "httpx[socks]", "aiosqlite", "dnspython", "rich", "Tor SOCKS5", "CommonCrawl CDX", "Wayback Machine"],
     highlights: [
@@ -112,7 +112,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "NeoRecon – Research Exploit Engine",
     kurzbeschreibung: "Eine durchgängige Pipeline für autorisierte Sicherheits-Recherche: Sie sammelt Angriffsflächen, bewertet sie automatisch und liefert am Ende eine konkrete, priorisierte Prüf-Liste – aus Hunderttausenden Adressen in Sekunden.",
-    langbeschreibung: "Nimmt die Fleißarbeit der Sicherheits-Recherche ab: sammelt Angriffsflächen, bewertet sie automatisch und liefert am Ende eine priorisierte Liste, was sich zuerst zu prüfen lohnt. So fließt die Zeit in die eigentliche Analyse statt ins Sortieren riesiger Datenmengen.",
+    langbeschreibung: "So fließt die Zeit in die eigentliche Analyse statt ins Sortieren riesiger Datenmengen. Jeder Lauf ist wiederholbar und an jeder Stelle nachvollziehbar, was wie bewertet wurde.",
     kategorie: "security",
     technologien: ["Bash", "awk", "httpx", "Subfinder", "Amass", "ParamSpider", "gf", "Nuclei", "dalfox", "sqlmap", "GraphQL", "Brave Search API"],
     highlights: [
@@ -131,7 +131,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "Exploit Dashboard – Vulnerability Testing Interface",
     kurzbeschreibung: "Ein Browser-Dashboard, das Sicherheitstests übersichtlich und nachvollziehbar macht: priorisierte Ziele, Wiederhol-Tests per Klick und eine visuelle Darstellung verketteter Angriffspfade.",
-    langbeschreibung: "Macht manuelle Sicherheitstests übersichtlich: priorisierte Ziele an einem Ort, Tests per Klick wiederholen und verkettete Angriffspfade als Diagramm sehen. Das ersetzt verstreute Terminal-Ausgaben durch ein klares, nachvollziehbares Bild – direkt an die eigene Recon-Pipeline angebunden.",
+    langbeschreibung: "Es hängt direkt an meiner Recon-Pipeline, sodass die spannendsten Ziele schon vorsortiert ankommen. Was sonst in verstreuten Terminal-Ausgaben untergeht, wird hier zu einem klaren, vergleichbaren Bild.",
     kategorie: "tooling",
     technologien: ["Node.js", "Express", "JavaScript", "Caido", "Axios", "vis-network", "HTML5"],
     highlights: [
@@ -149,7 +149,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "ONE – Multi-Agent AI Chat",
     kurzbeschreibung: "Eine iOS-App, die mehrere KI-Modelle – Claude, GPT und Gemini – in einer einzigen, aufgeräumten Oberfläche vereint.",
-    langbeschreibung: "Vereint mehrere KI-Modelle – Claude, GPT und Gemini – in einer aufgeräumten iOS-App, damit man fürs Vergleichen nicht ständig die App wechselt. Sauber aufgebaut, mit sicher auf dem Gerät abgelegten Schlüsseln und geräteübergreifender Synchronisation.",
+    langbeschreibung: "So lässt sich für jede Frage das passende Modell wählen, ohne die App zu wechseln. Unter der Oberfläche sorgt eine saubere Architektur dafür, dass Zugangsschlüssel sicher auf dem Gerät bleiben und der Stand über alle Geräte synchron ist.",
     kategorie: "development",
     technologien: ["SwiftUI", "MVVM", "Combine", "Firestore", "Keychain", "REST API"],
     highlights: [
@@ -165,7 +165,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "Sports Almanach – Smart Betting App",
     kurzbeschreibung: "Eine iOS-App rund um Sportwetten mit Spielgeld: Ein selbst entwickelter Algorithmus errechnet Quoten aus historischen Ergebnissen und dem Austragungsort – dazu Team- und Spielervergleiche und ein Sportkalender.",
-    langbeschreibung: "Eine Sportwetten-App mit reinem Spielgeld: Ein selbst entwickelter Algorithmus errechnet Quoten aus historischen Ergebnissen und dem Heim-/Auswärtsvorteil, dazu kommen Team- und Spielervergleiche und ein Spielkalender. So werden aus rohen Statistiken verständliche Entscheidungshilfen – ganz ohne echtes Geld.",
+    langbeschreibung: "Aus nüchternen Zahlen werden so greifbare Einschätzungen – und weil ausschließlich mit virtuellem Guthaben getippt wird, ganz ohne finanzielles Risiko. Je mehr Ergebnisse einfließen, desto treffsicherer werden die berechneten Quoten.",
     kategorie: "development",
     technologien: ["Swift", "SwiftUI", "MVVM", "Firebase Auth", "Firestore", "Charts", "Repository Pattern"],
     highlights: [
@@ -183,7 +183,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "Z Almanach – Dragon Ball Z Kompendium",
     kurzbeschreibung: "Eine Android-App als Nachschlagewerk zum Dragon-Ball-Z-Universum: Charaktere, Verwandlungsstufen und Fraktionen im Retro-Arcade-Look – die Daten werden automatisch ins Deutsche übersetzt.",
-    langbeschreibung: "Ein Nachschlagewerk zum Dragon-Ball-Z-Universum im Retro-Arcade-Look: Charaktere, Verwandlungen und Fraktionen auf einen Blick. Die Inhalte stammen aus einer spanischen Datenquelle und werden automatisch ins Deutsche übersetzt, bevor sie übersichtlich dargestellt werden.",
+    langbeschreibung: "Das Besondere steckt in der Datenpipeline: Die Inhalte stammen aus einer rein spanischsprachigen Quelle und werden im Hintergrund automatisch übersetzt, bevor sie erscheinen. So ist das ganze Universum auf Deutsch durchsuchbar, ohne dass jemand manuell nachhelfen müsste.",
     kategorie: "development",
     technologien: ["Kotlin", "Android SDK", "REST API", "RecyclerView", "SharedPreferences", "Repository Pattern", "ViewHolder Pattern", "XML Layouts"],
     highlights: [
@@ -200,7 +200,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "OSINT Toolkit – Modulares Analyse-Framework",
     kurzbeschreibung: "Ein modulares Recherche-Tool mit sieben Bausteinen – E-Mail, Benutzername, Telefon, Domain, Bildersuche und mehr –, das öffentliche Online-Spuren strukturiert auswertet und als Report ausgibt.",
-    langbeschreibung: "Bündelt sieben Recherche-Bausteine – E-Mail, Benutzername, Telefon, Domain, Bildersuche und mehr – unter einer einzigen Bedienung. Statt einzelne Tools nacheinander zu starten, läuft die Auswertung an einem Ort und landet am Ende sauber als fertiger Report.",
+    langbeschreibung: "Statt sieben Programme nacheinander zu bedienen, laufen alle Bausteine über eine Oberfläche zusammen. Jede Analyse wird am Ende automatisch dokumentiert – als Text- und JSON-Datei, direkt weiterverwendbar.",
     kategorie: "security",
     technologien: ["Python", "holehe", "sherlock", "phoneinfoga", "LeakCheck API", "NumVerify API", "EXIF", "Selenium"],
     highlights: [
