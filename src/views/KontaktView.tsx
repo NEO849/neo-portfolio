@@ -31,6 +31,13 @@ const KONTAKT_EINTRAEGE = [
     label: "GitHub",
     wert: "NEO849",
   },
+  {
+    href: "/Michael_Fleps_Lebenslauf.pdf",
+    extern: true,
+    icon: "📄",
+    label: "Lebenslauf",
+    wert: "PDF ansehen",
+  },
 ];
 
 // ─── iOS-Keyboard: fokussiertes Feld weich scrollen ──────────────

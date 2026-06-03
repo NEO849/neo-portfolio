@@ -17,7 +17,6 @@ const ProjekteSeite   = lazy(() => import("../seiten/ProjekteSeite"));
 const SecuritySeite   = lazy(() => import("../seiten/SecuritySeite"));
 const LaborSeite      = lazy(() => import("../seiten/LaborSeite"));
 const OsintToolSeite  = lazy(() => import("../seiten/OsintToolSeite"));
-const ZeugnisseSeite  = lazy(() => import("../seiten/ZeugnisseSeite"));
 const KontaktSeite    = lazy(() => import("../seiten/KontaktSeite"));
 
 // Fallback während eine Seite geladen wird
@@ -72,7 +71,6 @@ export function Routen() {
           <Route path="/security"      element={<SecuritySeite />} />
           <Route path="/labor"         element={<LaborSeite />} />
           <Route path="/osint-tools"   element={<OsintToolSeite />} />
-          <Route path="/zeugnisse"     element={<ZeugnisseSeite />} />
           <Route path="/kontakt"       element={<KontaktSeite />} />
           <Route path="*"              element={<NichtGefundenSeite />} />
         </Routes>

@@ -10,6 +10,5 @@ export const NAV_EINTRAEGE: NavEintrag[] = [
   { pfad: "/security",      label: "Security" },
   { pfad: "/labor",         label: "Labor" },
   { pfad: "/osint-tools",   label: "OSINT Tools" },
-  { pfad: "/zeugnisse",     label: "Zeugnisse" },
   { pfad: "/kontakt",       label: "Kontakt" },
 ];
