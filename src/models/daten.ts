@@ -364,9 +364,9 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
     modulTitel: "Projekte & Referenzen",
     module: [
       { name: "Wohnbaugenossenschaft", skills: ["Projektleitung", "2 Wohnblöcke", "12 + 9 Wohnungen", "Komplett-Installation", "Inbetriebnahme"] },
-      { name: "Pharma-Serverfarm",     skills: ["Aufbau", "Strukturierte Verkabelung", "Patchen", "LWL-Spleißen"] },
-      { name: "DECT-Großsystem · Freistaat Bayern", skills: ["Projektleitung", "Bayerns größtes DECT-System", "München"] },
-      { name: "Telekom-Rollouts",      skills: ["Siemens", "Deutsche Telekom", "E.ON Energie", "Telefonanlagen"] },
+      { name: "Pharmaunternehmen",     skills: ["Serverfarmen", "Planung & Verkabelung", "Patchen", "Spleißen"] },
+      { name: "DECT-Großsysteme",      skills: ["Projektleitung", "Bayerns größtes DECT-System", "Funkzellen-Planung", "Basisstationen", "Freistaat Bayern · München"] },
+      { name: "Vernetzte Infrastruktur", skills: ["Deutsche Telekom", "Siemens", "E.ON Energie", "Schwachstrom"] },
     ],
   },
   {

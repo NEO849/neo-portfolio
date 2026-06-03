@@ -264,7 +264,7 @@ export default function UeberMichView() {
                                     {mod.skills.map((skill) => (
                                       <span
                                         key={skill}
-                                        className="font-mono text-[10px] px-1.5 py-0.5 rounded-md border border-white/10 bg-white/[0.04] text-white/55 leading-snug transition-colors hover:text-white/75 hover:bg-white/[0.07]"
+                                        className="font-mono text-[10px] px-1.5 py-0.5 rounded-md border border-white/[0.14] bg-white/[0.05] text-white/70 leading-snug transition-colors hover:text-white/90 hover:bg-white/[0.08]"
                                       >
                                         {skill}
                                       </span>
