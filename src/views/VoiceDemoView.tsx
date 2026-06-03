@@ -63,26 +63,8 @@ export default function VoiceDemoView() {
       <AbschnittsTitel
         prefix="> voice-bridge · demo"
         untertitel="Originalgetreuer, interaktiver Klon der echten Oberfläche — alle Funktionen simuliert. Drück aufs Mikro (oder die Leertaste). Es wird nichts aufgenommen, gesendet oder gespeichert."
-        klassen="mb-5"
+        klassen="mb-8"
       />
-
-      {/* Der eigentliche Nutzen — kurz und greifbar */}
-      <div
-        className="mb-7 flex items-start gap-3 rounded-2xl px-4 py-3.5"
-        style={{ background: "rgba(10,132,255,0.08)", border: "1px solid rgba(10,132,255,0.22)" }}
-      >
-        <span className="mt-0.5 grid place-items-center shrink-0 w-7 h-7 rounded-full" style={{ background: "rgba(10,132,255,0.16)" }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ea3ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M12 15a3.5 3.5 0 0 0 3.5-3.5V6a3.5 3.5 0 1 0-7 0v5.5A3.5 3.5 0 0 0 12 15Z" />
-            <path d="M6 11.5a6 6 0 0 0 12 0M12 18.5V21" />
-          </svg>
-        </span>
-        <p className="text-sm leading-relaxed text-white/75">
-          <b className="text-white">Der Clou: nie wieder tippen.</b> Statt Anweisungen am Server einzutippen,
-          sprichst du sie einfach aus — die Bridge wandelt deine Stimme in Sekunden in Text um und legt ihn
-          direkt in die laufende Claude-Sitzung. Freihändig vom Handy aus, schneller gedacht als getippt.
-        </p>
-      </div>
 
       <motion.div
         className="relative"
@@ -91,8 +73,6 @@ export default function VoiceDemoView() {
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         onAnimationComplete={() => { if (schliesst) navigate("/projekte"); }}
       >
-        <SchliessenKnopf onSchliessen={() => setSchliesst(true)} />
-
         {/* Geräte-Rahmen */}
         <div
           className="overflow-hidden rounded-3xl border grid grid-cols-1 md:grid-cols-[260px_1fr]"
@@ -102,7 +82,7 @@ export default function VoiceDemoView() {
           }}
         >
           <Seitenleiste steuerung={steuerung} />
-          <Hauptbereich steuerung={steuerung} />
+          <Hauptbereich steuerung={steuerung} onSchliessen={() => setSchliesst(true)} />
         </div>
 
         {/* mobile Overlay für die Seitenleiste */}
@@ -257,7 +237,7 @@ function StatusPille({ status }: { status: InjektionStatus }) {
 }
 
 // ─── Hauptbereich (Topbar + Bühne + Controls) ─────────────────────
-function Hauptbereich({ steuerung }: { steuerung: VoiceDemoSteuerung }) {
+function Hauptbereich({ steuerung, onSchliessen }: { steuerung: VoiceDemoSteuerung; onSchliessen: () => void }) {
   return (
     <div className="flex flex-col min-w-0">
       {/* Topbar */}
@@ -288,6 +268,7 @@ function Hauptbereich({ steuerung }: { steuerung: VoiceDemoSteuerung }) {
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="9" cy="9" r="2.5" /><path d="M9 1.5v2M9 14.5v2M3.7 3.7l1.4 1.4M12.9 12.9l1.4 1.4M1.5 9h2M14.5 9h2M3.7 14.3l1.4-1.4M12.9 5.1l1.4-1.4" strokeLinecap="round" /></svg>
         </button>
+        <SchliessenKnopf onSchliessen={onSchliessen} />
       </div>
 
       <Buehne steuerung={steuerung} />

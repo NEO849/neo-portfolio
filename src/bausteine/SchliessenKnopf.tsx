@@ -1,8 +1,8 @@
 // ═══════════════════════════════════════════════════════════════════
 // BAUSTEIN: SchliessenKnopf
-// Kleines „×" oben rechts. Beim Klick dreht es sich vertikal (rotateX)
-// und löst das Schließen aus — das eigentliche Wegklappen der Demo
-// übernimmt die View (vertikaler Flip + Navigation).
+// Quadratischer „×"-Knopf in der Topbar des Klons. Beim Klick dreht er
+// sich vertikal (rotateX) und löst das Schließen aus — das eigentliche
+// Wegklappen der Demo übernimmt die View (vertikaler Flip + Navigation).
 // ═══════════════════════════════════════════════════════════════════
 
 import { useState } from "react";
@@ -23,19 +23,14 @@ export function SchliessenKnopf({ onSchliessen }: SchliessenKnopfProps) {
         setGedreht(true);
         onSchliessen();
       }}
-      whileHover={{ scale: 1.08 }}
-      whileTap={{ scale: 0.9 }}
+      whileHover={{ scale: 1.06 }}
+      whileTap={{ scale: 0.92 }}
       animate={{ rotateX: gedreht ? 360 : 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      style={{ transformPerspective: 600 }}
-      className="absolute -top-3 -right-3 z-20 grid place-items-center w-9 h-9 rounded-full border text-white/70 hover:text-white"
+      style={{ transformPerspective: 600, border: "1px solid rgba(255,255,255,0.13)", background: "#1c1d22" }}
+      className="grid place-items-center w-9 h-9 rounded-[10px] text-white/65 hover:text-white"
     >
-      <span
-        className="absolute inset-0 rounded-full"
-        style={{ background: "#15161a", border: "1px solid rgba(255,255,255,0.13)" }}
-        aria-hidden
-      />
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="relative" aria-hidden>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
         <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
     </motion.button>

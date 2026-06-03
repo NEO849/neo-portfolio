@@ -20,7 +20,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "Neo Dev Stack – AI-Augmented Security Workstation",
     kurzbeschreibung: "Eine selbst gebaute, KI-gesteuerte Arbeitsumgebung, die wiederkehrende Sicherheits- und Recherche-Aufgaben automatisiert: spezialisierte KI-Agenten, kostenlose lokale KI-Modelle und über 80 Werkzeuge greifen nahtlos ineinander.",
-    langbeschreibung: "Im Kern arbeiten 32 spezialisierte Pentest-Agents (Recon, Web, Cloud, Mobile, Forensics, Exploit-Chaining) direkt in Claude Code und greifen über 25 MCP-Server auf Censys (Eigenbau, Platform-API v3), Shodan, Exa Neural Search, GitHub, Firecrawl, Chrome DevTools, Sequential-Thinking, Memory-Graph, findings-db und eine lokale Vektordatenbank (Milvus v2.6.14) zu. Die LLM-Inferenz liefert Ollama lokal (nomic-embed-text), eine eigene Status-Line zeigt jederzeit Reputation-Status und offene Submits, und ein PreToolUse-Hook warnt automatisch vor HackerOne-Aggregator-Fallen. Den Alltag automatisieren 11 selbst geschriebene Skills (research, live-intel-pipeline, authrecon, caido-tunnel, bounty-*) und 11 Slash-Commands (/submit-gate, /new-target, /memory-*) – von der ersten Recon bis zum fertigen Report.",
+    langbeschreibung: "Mein selbst gebauter Arbeitsplatz für Security- und Recherche-Arbeit: spezialisierte KI-Agenten, lokale Modelle und über 80 Werkzeuge greifen ineinander, statt ständig zwischen einzelnen Tools zu wechseln. Wiederkehrende Schritte – von der ersten Recherche bis zum fertigen Report – laufen so weitgehend automatisch und bleiben jederzeit reproduzierbar.",
     kategorie: "tooling",
     technologien: ["Claude Code", "MCP Protocol", "Ollama", "Milvus", "Docker", "tmux", "Python", "Bash", "Chrome DevTools", "Firecrawl", "Censys", "Shodan"],
     highlights: [
@@ -38,7 +38,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "Self-Improving Memory System v2 – Adaptive Knowledge Base",
     kurzbeschreibung: "Ein lernendes Gedächtnis für KI-Assistenten: Es merkt sich aus jeder Sitzung das Wichtige, sortiert Veraltetes automatisch aus und wird dadurch mit der Zeit spürbar zuverlässiger – statt jedes Mal bei null zu beginnen.",
-    langbeschreibung: "Eine 5-Tier-Architektur (Core / Deep / Archival / Recall / Staging) hält den Kontext schlank und verhindert Token-Bloat. Drei Hooks (UserPromptSubmit / SessionStart / SessionEnd) erfassen automatisch Korrekturen und Bestätigungen ('Surprise-Capture' nach dem Reflexion-Paper), schreiben Session-Digests und blenden bei offenen Inbox-Items einen smarten Banner ein. Ein Frontmatter v2 mit importance/confidence/last_verified macht den Wert jeder Notiz messbar: /memory-outcome propagiert das Ergebnis eines Reports als Confidence-Update auf alle zitierten Memories zurück, /memory-link verknüpft Verwandtes über gewichtete Jaccard-Similarity zu bidirektionalen Wiki-Links (A-MEM, NeurIPS 2025), und /memory-synthesize verdichtet ähnliche Lektionen zu Meta-Regeln (ExpeL-Pattern). Eine Pro-Regel erzwingt Zitier-Disziplin – jede nicht-triviale Empfehlung trägt einen [[Wiki-Link]] zur Quelle. Ein täglicher Cron (04:00) macht einen read-only Health-Check samt Auto-Commit; inzwischen über 150 Lektionen und 12 Backend-Skripte, alle versioniert via Git.",
+    langbeschreibung: "Ein Gedächtnis für meinen KI-Assistenten, das aus jeder Sitzung dazulernt und Veraltetes von selbst aussortiert. Dadurch muss ich Dinge nicht wiederholt erklären, und die Antworten werden mit der Zeit verlässlicher – statt bei jedem Start wieder bei null zu beginnen.",
     kategorie: "tooling",
     technologien: ["Python", "Claude Code Hooks", "Markdown YAML Frontmatter", "Git", "Bash Cron", "A-MEM Algorithm", "Jaccard Similarity"],
     highlights: [
@@ -57,7 +57,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "claude-bus – Mac↔Server↔iPhone Mailbox-Bridge",
     kurzbeschreibung: "Eine sichere Brücke zwischen meinen Geräten – Mac, Server und iPhone: Aufgaben und Ergebnisse wandern verschlüsselt hin und her, mit strengen Zugriffsgrenzen und durchgehender Überwachung.",
-    langbeschreibung: "Zwei Ebenen verbinden Claude Desktop (Mac), Claude Code (Linux-VPS) und die Claude.ai-App auf dem iPhone. Tier-1 läuft als FastMCP-Streamable-HTTP-Server auf dem VPS, erreichbar nur über ein Tailscale-WireGuard-Netz und per Bearer-Token authentifiziert. Tier-2 fürs iPhone geht über einen Cloudflare-Tunnel mit einem selbst gebauten OAuth-2.1-Worker (492 Zeilen: PKCE-S256 verpflichtend, constant-time Secret-Vergleich, Redirect-URI-Allowlist, KV-Storage für gehashte Tokens mit 1 h Access-TTL und 30-Tage-Refresh-Rotation). Das mobile Tier ist bewusst eng geschnürt – es darf nur an einen Empfänger senden (claude_bus), nur nach /root/handoff/ schreiben und hat keinen Shell-Zugriff. Ein Anomaly-Watcher überwacht das Audit-Log live auf auffällige Muster (Off-Hours, Bursts, abgelehnte Zugriffe, neue Pfade) und alarmiert in Echtzeit; die Token rotieren wöchentlich per systemd-Timer. Eine feste Topic-Konvention (task/result/note/ask/alert/briefing) trennt die Rollen sauber: Desktop für GUI, Caido und DevTools, Code für Backend, Pipelines und Memory.",
+    langbeschreibung: "Eine sichere Brücke, über die Mac, Server und iPhone Aufgaben und Ergebnisse austauschen. So stoße ich eine Aufgabe unterwegs an und führe sie am Rechner weiter – verschlüsselt, mit eng begrenzten Zugriffsrechten und einer Überwachung, die ungewöhnliche Zugriffe sofort meldet.",
     kategorie: "tooling",
     technologien: ["FastMCP", "Streamable HTTP", "Tailscale WireGuard", "Cloudflare Tunnel", "Cloudflare Workers", "OAuth 2.1", "PKCE", "SQLite", "systemd", "Python"],
     highlights: [
@@ -75,11 +75,10 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "voice-bridge – Lokaler Whisper-Voice-Daemon mit Apple-UI",
     kurzbeschreibung: "Sprachsteuerung fürs Smartphone: Eingesprochene Aufgaben werden direkt auf dem eigenen Server – ohne Cloud-Kosten – in Text umgewandelt und landen sofort in der Arbeitssitzung. Mit einer Oberfläche auf Apple-Niveau.",
-    langbeschreibung: "Der Browser auf iPhone oder Mac nimmt die Stimme via MediaRecorder auf und schickt sie über einen Cloudflare-Tunnel (Bearer-Auth, TLS) an einen FastAPI-Daemon auf dem VPS. Dort konvertiert ffmpeg das Audio und übergibt es an einen lokalen whisper.cpp-Server (ggml-small.bin, 488 MB, mehrsprachig, ~10–15 s für eine 5–15-s-Aufnahme) – die Spracherkennung läuft also komplett auf eigener Hardware, ganz ohne API-Kosten. Das Transkript landet per tmux-Buffer direkt in der richtigen Claude-Sitzung; ein Smart Target Resolver findet sie automatisch (env TMUX_TARGET → laufender 'claude'-Prozess → dauerhafte Queue als Fallback, falls tmux gerade weg ist). Die Oberfläche (v3) ist auf Apple-Niveau gebaut: Sidebar-History nach Datum, ein 260px-Mic-Orb mit drei Zuständen (ruhiges Atmen / rotes Aufnahme-Glühen / blauer Busy-Puls), ein Audio-Visualizer aus 7 Balken (AnalyserNode), Session-Picker und Sprachwahl (DE/EN/auto). Sicherheit ist eingebaut: Audio liegt nur im RAM (/dev/shm/voice/, tmpfs) und wird garantiert per finally aufgeräumt, ein gleitendes Rate-Limit (10 Anfragen/60 s) bremst Missbrauch, und systemd härtet den Dienst (ProtectSystem, NoNewPrivileges, MemoryMax, CPUQuota). Als PWA installierbar, Aufnahme per Leertaste.",
+    langbeschreibung: "Statt Anweisungen am Server einzutippen, spreche ich sie einfach ein – die Stimme wird in Sekunden zu Text und landet direkt in der laufenden Claude-Sitzung. Die Spracherkennung läuft komplett auf eigener Hardware, also ganz ohne laufende Cloud-Kosten, und die Bedienung ist freihändig vom Handy aus auf Apple-Niveau gebaut.",
     kategorie: "tooling",
     technologien: ["whisper.cpp", "FastAPI", "ffmpeg", "Cloudflare Tunnel", "tmux", "Web Audio API", "AnalyserNode", "MediaRecorder", "systemd-hardening", "PWA"],
     highlights: [
-      "Nie wieder am Server tippen: Anweisungen einfach einsprechen – die Bridge tippt sie als Text in die laufende Sitzung",
       "0€ Speech-to-Text: lokales whisper.cpp ggml-small.bin (488 MB, mehrsprachig)",
       "Apple-Niveau UI: SF-Pro Typografie, cubic-bezier transitions, Audio-Visualizer im Mic-Orb",
       "Smart Target Resolver: findet automatisch die richtige Claude-tmux-Session",
@@ -95,7 +94,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "bb_recon – Senior-Elite Research OSINT-Toolkit",
     kurzbeschreibung: "Ein Recherche-Werkzeug, das öffentlich verfügbare Informationen zu einem Ziel aus über 30 Quellen in Sekunden zusammenträgt und übersichtlich aufbereitet – komplett ohne kostenpflichtige Schnittstellen.",
-    langbeschreibung: "asyncio.gather orchestriert massive Parallelität – im IP-Test 510 Findings in einer einzigen Sekunde. Gebündelt werden über 30 kostenlose, schlüssellose OSINT-Quellen in einem einheitlichen Output (JSON, Markdown und Terminal): Breach-Daten (XposedOrNot, HIBP, LeakCheck), DNS (Cloudflare DoH, HackerTarget, crt.sh), Subdomains (CommonCrawl-CDX, Wayback-CDX, hostsearch), IP-Intelligence (RIPEstat ASN/Prefix/Neighbours, ip-api mit Threat-Flags, Shodan InternetDB), Historie (Wayback, Arquivo.pt, CommonCrawl), Identität (Gravatar, GitHub-Suche, PGP-Keyserver), Tor (DDG-Onion, Ahmia, archive.is), Usernamen (WhatsMyName über 600+ Plattformen) und Bilder (SauceNAO + 13 Aggregatoren). Fällt eine Quelle aus, laufen die anderen ungestört weiter (graceful degradation); jeder Treffer bekommt einen Confidence-Score (HIGH/MEDIUM/LOW/UNVERIFIED), und ein Smart-Dedup führt Mehrfach-Funde zusammen. Mit dem --tor-Flag läuft die ganze Recherche anonym über SOCKS5 (127.0.0.1:9150).",
+    langbeschreibung: "Trägt in Sekunden zusammen, was öffentlich über ein Ziel auffindbar ist – aus über 30 Quellen und ganz ohne kostenpflichtige Zugänge. Das spart bei jeder Recherche das mühsame Zusammensuchen und liefert ein sauber sortiertes Gesamtbild statt verstreuter Einzelfunde.",
     kategorie: "security",
     technologien: ["Python asyncio", "httpx[socks]", "aiosqlite", "dnspython", "rich", "Tor SOCKS5", "CommonCrawl CDX", "Wayback Machine"],
     highlights: [
@@ -113,7 +112,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "NeoRecon – Research Exploit Engine",
     kurzbeschreibung: "Eine durchgängige Pipeline für autorisierte Sicherheits-Recherche: Sie sammelt Angriffsflächen, bewertet sie automatisch und liefert am Ende eine konkrete, priorisierte Prüf-Liste – aus Hunderttausenden Adressen in Sekunden.",
-    langbeschreibung: "Die Master-Pipeline (run_master_pipeline.sh) führt durch 7 Phasen – abgesichert mit Lockfile, --resume-from, --skip-Flags und --dry-run. Ihr Herzstück, Engine 01, bewertet in einem einzigen awk-Durchlauf 500.000 URLs in 15 Sekunden anhand von 12 gewichteten Sicherheits-Kategorien. Ein Asset-Splitter sortiert die erreichbaren URLs automatisch in 8 Tier-Klassen nach Research-Potenzial, und die Build-Kette erzeugt daraus Focus5-Cards mit konkreten Prüfschritten pro Kandidat. Dazu kommen 13 spezialisierte Tools auf dem VPS (eine GraphQL-Suite mit 5 Werkzeugen, SSTImap, ein Dependency-Confusion-Checker, OSINT-Tools), eigene Nuclei-Templates und eine durchgängige 4-Phasen-Dokumentation.",
+    langbeschreibung: "Nimmt die Fleißarbeit der Sicherheits-Recherche ab: sammelt Angriffsflächen, bewertet sie automatisch und liefert am Ende eine priorisierte Liste, was sich zuerst zu prüfen lohnt. So fließt die Zeit in die eigentliche Analyse statt ins Sortieren riesiger Datenmengen.",
     kategorie: "security",
     technologien: ["Bash", "awk", "httpx", "Subfinder", "Amass", "ParamSpider", "gf", "Nuclei", "dalfox", "sqlmap", "GraphQL", "Brave Search API"],
     highlights: [
@@ -132,7 +131,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "Exploit Dashboard – Vulnerability Testing Interface",
     kurzbeschreibung: "Ein Browser-Dashboard, das Sicherheitstests übersichtlich und nachvollziehbar macht: priorisierte Ziele, Wiederhol-Tests per Klick und eine visuelle Darstellung verketteter Angriffspfade.",
-    langbeschreibung: "Direkt an die Recon-Pipeline angedockt, liest das Backend (Node.js + Express) die bewerteten URL-Listen aus engine_01_extract_and_rank.sh und stellt drei Kern-Funktionen bereit: Replay schickt HTTP-Anfragen live durch den Caido-Proxy (127.0.0.1:8080) und erfasst Status und Response-Länge; Diff prüft mehrere Payload-Varianten und protokolliert Abweichungen; Advanced Diff legt zuerst eine saubere Baseline an und markiert dann jede Statuscode-Änderung sowie Content-Length-Abweichungen über 50 Byte. Das Frontend ordnet Funde nach Typ (OAUTH, ADMIN, AUTH, API, JS, GENERIC), zeichnet verkettete Angriffspfade als interaktives Flussdiagramm (vis-network) und merkt sich interessante Ziele in einem Favoriten-System pro Target (localStorage).",
+    langbeschreibung: "Macht manuelle Sicherheitstests übersichtlich: priorisierte Ziele an einem Ort, Tests per Klick wiederholen und verkettete Angriffspfade als Diagramm sehen. Das ersetzt verstreute Terminal-Ausgaben durch ein klares, nachvollziehbares Bild – direkt an die eigene Recon-Pipeline angebunden.",
     kategorie: "tooling",
     technologien: ["Node.js", "Express", "JavaScript", "Caido", "Axios", "vis-network", "HTML5"],
     highlights: [
@@ -150,7 +149,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "ONE – Multi-Agent AI Chat",
     kurzbeschreibung: "Eine iOS-App, die mehrere KI-Modelle – Claude, GPT und Gemini – in einer einzigen, aufgeräumten Oberfläche vereint.",
-    langbeschreibung: "Unter der Oberfläche sorgt eine saubere MVVM-Architektur mit Repository Pattern für eine klar getrennte Datenschicht. Die API-Schlüssel der Anbieter liegen sicher in der iOS-Keychain, Firestore synchronisiert den Stand geräteübergreifend, und Combine hält die Datenströme reaktiv – samt durchdachtem UI/UX mit Dark Mode.",
+    langbeschreibung: "Vereint mehrere KI-Modelle – Claude, GPT und Gemini – in einer aufgeräumten iOS-App, damit man fürs Vergleichen nicht ständig die App wechselt. Sauber aufgebaut, mit sicher auf dem Gerät abgelegten Schlüsseln und geräteübergreifender Synchronisation.",
     kategorie: "development",
     technologien: ["SwiftUI", "MVVM", "Combine", "Firestore", "Keychain", "REST API"],
     highlights: [
@@ -166,7 +165,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "Sports Almanach – Smart Betting App",
     kurzbeschreibung: "Eine iOS-App rund um Sportwetten mit Spielgeld: Ein selbst entwickelter Algorithmus errechnet Quoten aus historischen Ergebnissen und dem Austragungsort – dazu Team- und Spielervergleiche und ein Sportkalender.",
-    langbeschreibung: "Hinter dem Quoten-Algorithmus steckt eine saubere MVVM-Architektur mit Repository- und Service-Layer, in der sich echte und Mock-API nahtlos austauschen lassen. Auf dieser Basis wird die App zur kompletten Sport-Zentrale: Nutzer tippen mit virtuellem Spielgeld auf Events und verfolgen ihren Kontostand in Echtzeit, Firebase Auth sichert die Anmeldung, Firestore synchronisiert alle Wettverläufe. Dazu kommen umfangreiche Spieler- und Teamprofile mit direkten Vergleichen nach Form, Saison und Heim-/Auswärtsstatistik, Formkurven und Trends als Swift Charts sowie ein zentraler Sport-Kalender mit persönlichen Favoriten.",
+    langbeschreibung: "Eine Sportwetten-App mit reinem Spielgeld: Ein selbst entwickelter Algorithmus errechnet Quoten aus historischen Ergebnissen und dem Heim-/Auswärtsvorteil, dazu kommen Team- und Spielervergleiche und ein Spielkalender. So werden aus rohen Statistiken verständliche Entscheidungshilfen – ganz ohne echtes Geld.",
     kategorie: "development",
     technologien: ["Swift", "SwiftUI", "MVVM", "Firebase Auth", "Firestore", "Charts", "Repository Pattern"],
     highlights: [
@@ -184,7 +183,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "Z Almanach – Dragon Ball Z Kompendium",
     kurzbeschreibung: "Eine Android-App als Nachschlagewerk zum Dragon-Ball-Z-Universum: Charaktere, Verwandlungsstufen und Fraktionen im Retro-Arcade-Look – die Daten werden automatisch ins Deutsche übersetzt.",
-    langbeschreibung: "In der App steckt das ganze Dragon-Ball-Z-Universum bis ins Detail: alle Transformationsstufen (Super-Saiyajin 1–4, Ultra Instinct, Legendary Super Saiyan u.v.m.), Fraktionen, Planeten und die zentralen Charaktere von Son Goku über Vegeta und Gohan bis Frieza und Cell. Das Design zitiert den Old-School-Arcade-Look der Street-Fighter-Ära – markante Rahmen, kraftvolle Typografie, kontrastreiche Farben. Die Inhalte stammen aus einer spanischsprachigen Dragon-Ball-API, die eine zweite API automatisch ins Deutsche übersetzt und strukturiert bereitstellt. Technisch sauber getrennt über das Repository Pattern, mit eigenen RecyclerView-Adaptern (ViewHolder Pattern) für flüssige Listen und SharedPreferences für persistente Einstellungen.",
+    langbeschreibung: "Ein Nachschlagewerk zum Dragon-Ball-Z-Universum im Retro-Arcade-Look: Charaktere, Verwandlungen und Fraktionen auf einen Blick. Die Inhalte stammen aus einer spanischen Datenquelle und werden automatisch ins Deutsche übersetzt, bevor sie übersichtlich dargestellt werden.",
     kategorie: "development",
     technologien: ["Kotlin", "Android SDK", "REST API", "RecyclerView", "SharedPreferences", "Repository Pattern", "ViewHolder Pattern", "XML Layouts"],
     highlights: [
@@ -201,7 +200,7 @@ export const PROJEKTE: ProjektModel[] = [
   {
     titel: "OSINT Toolkit – Modulares Analyse-Framework",
     kurzbeschreibung: "Ein modulares Recherche-Tool mit sieben Bausteinen – E-Mail, Benutzername, Telefon, Domain, Bildersuche und mehr –, das öffentliche Online-Spuren strukturiert auswertet und als Report ausgibt.",
-    langbeschreibung: "Bedienbar über ein interaktives Terminal-Menü oder direkt per CLI, steckt die Tiefe in den einzelnen Bausteinen: E-Mail-Analyse (holehe + LeakCheck), Username-Suche (sherlock, nach Plattform gruppiert), Telefon-Analyse (phoneinfoga + NumVerify + LeakCheck), Domain/DNS/WHOIS sowie eine Reverse-Image-Search mit Varianten-Erzeugung, EXIF-Auswertung, Browser-Automation und eigener HTML-Report-Engine. Darunter liegt eine saubere core/-Schicht (Runner, Validator, Formatter, Parser, Export-Helper), die jeden Lauf automatisch als TXT und JSON pro Modul ablegt.",
+    langbeschreibung: "Bündelt sieben Recherche-Bausteine – E-Mail, Benutzername, Telefon, Domain, Bildersuche und mehr – unter einer einzigen Bedienung. Statt einzelne Tools nacheinander zu starten, läuft die Auswertung an einem Ort und landet am Ende sauber als fertiger Report.",
     kategorie: "security",
     technologien: ["Python", "holehe", "sherlock", "phoneinfoga", "LeakCheck API", "NumVerify API", "EXIF", "Selenium"],
     highlights: [
