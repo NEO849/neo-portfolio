@@ -43,7 +43,7 @@ export default function LaborView() {
     <section id="labor" className="py-16 px-6 max-w-6xl mx-auto">
       <AbschnittsTitel
         prefix="> labor"
-        untertitel="Die Werkzeuge, Workflows und Sicherheitsregeln hinter meinem täglichen Security-Arbeitsablauf — vieles selbst gebaut, der Rest sorgfältig integriert. Diese Seite erklärt, wie die einzelnen Bausteine ineinandergreifen. Sie ist gleichzeitig Dokumentation für mich selbst und ein Beleg dafür, dass solide Security-Arbeit weniger über einzelne Tools entscheidet als über die Disziplin, mit der sie eingesetzt werden."
+        untertitel="Die Werkzeuge, Workflows und Regeln hinter meiner täglichen Security-Arbeit – vieles selbst gebaut, der Rest bewusst integriert. Entscheidend ist nicht die Zahl der Tools, sondern wie diszipliniert sie zusammenspielen."
         klassen="mb-8"
       />
 
@@ -157,12 +157,11 @@ function MemoryAct() {
           Selbst-lernendes Memory-System
         </h3>
         <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
-          Damit Claude Code zwischen Sessions wirklich „dazulernt" und nicht jedes Mal bei null anfängt,
-          habe ich ein gestaffeltes Gedächtnis aufgebaut. Inspiriert von MemGPT (NeurIPS 2023), Generative
-          Agents (Park et al.) und A-MEM (NeurIPS 2025). Drei Hooks fangen automatisch User-Korrekturen
-          und Session-Verläufe ein. Eine Inbox sammelt neue Beobachtungen — beförderte Memory entsteht
-          nur, wenn ich Eintrag-für-Eintrag manuell entscheide. Eine tägliche Self-Healing-Routine prüft
-          Konsistenz und committet alles in Git.
+          Damit der KI-Assistent zwischen Sitzungen dazulernt statt jedes Mal von vorn zu beginnen, habe
+          ich ihm ein gestaffeltes Gedächtnis gegeben – angelehnt an Forschung wie MemGPT und A-MEM.
+          Drei Hooks erfassen Korrekturen und Verläufe automatisch; neue Beobachtungen werden erst nach
+          manueller Prüfung dauerhaft übernommen, und eine tägliche Routine hält alles konsistent und
+          sichert es in Git.
         </p>
         <p className="text-[11px] text-white/45 font-mono mt-2">
           Klicke eine Karte an, um zu sehen, welche Rolle diese Schicht im Gesamtsystem spielt.
@@ -274,7 +273,7 @@ function MemoryAct() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 pt-2">
         {[
-          { titel: "Drei Lifecycle-Hooks",   bsp: "User-Korrekturen einfangen · Session-Digests schreiben · Inbox-Banner zeigen", rgb: "129, 140, 248" },
+          { titel: "Drei Lifecycle-Hooks",   bsp: "Fangen Korrekturen ein, schreiben Session-Zusammenfassungen und melden offene Einträge.", rgb: "129, 140, 248" },
           { titel: "A-MEM Auto-Linker",      bsp: "Erkennt verwandte Memories und schlägt bidirektionale Verlinkung vor",        rgb: "167, 139, 250" },
           { titel: "Confidence-Decay",       bsp: "Submit-Outcome aktualisiert die Vertrauens-Werte zitierter Memories",          rgb: "34, 197, 94" },
         ].map((meta, i) => (
@@ -332,11 +331,10 @@ function McpAct() {
           MCP-Server — was wann womit
         </h3>
         <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
-          MCP-Server sind die Brücke zwischen Claude und allem anderen — APIs, Browser, Datenbanken,
-          Dateisystemen. Ich habe 22 davon eingebunden, zwei selbst gebaut (Censys-Platform-API und
-          die Caido-Bridge). Wichtiger als die reine Anzahl ist die Entscheidungslogik:
-          welches MCP passt für welche Aufgabe besser. Statt blind Bash-Befehle zu schreiben, prüfe
-          ich erst, ob ein spezialisiertes MCP die Aufgabe sauberer löst.
+          MCP-Server verbinden den KI-Assistenten mit allem anderen – APIs, Browser, Datenbanken,
+          Dateisystemen. 22 sind eingebunden, zwei davon selbst gebaut (die Censys-API und die
+          Caido-Bridge). Wichtiger als die Anzahl ist die Auswahl: Statt blind Befehle abzusetzen,
+          übernimmt für jede Aufgabe das Werkzeug, das sie am saubersten löst.
         </p>
         <p className="text-[11px] text-white/35 font-mono mt-2">
           Wähle eine Kategorie. Die Tools darin sind nach Häufigkeit der Nutzung sortiert.
@@ -454,10 +452,10 @@ function WorkflowsAct() {
           Automatisierte Abläufe
         </h3>
         <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
-          Aufgaben, die ich nicht jeden Tag manuell anstoßen will, laufen als systemd-Timer (zeitgesteuert)
-          oder -Service (dauerhaft). Backups jede Nacht, Token-Rotation jede Woche, Hacktivity-Polling
-          jede Stunde — und dauerhaft die Mailbox-Bridges zwischen Mac, iPhone und Server. Jede Aktion
-          wird auditiert, der Anomaly-Watcher schlägt bei verdächtigen Mustern Alarm.
+          Wiederkehrende Aufgaben laufen automatisch – zeitgesteuert als Timer oder dauerhaft als Dienst:
+          nächtliche Backups, wöchentliche Token-Rotation, stündliches Hacktivity-Polling und die ständigen
+          Bridges zwischen Mac, iPhone und Server. Jede Aktion wird protokolliert, ein Watcher meldet
+          ungewöhnliche Muster sofort.
         </p>
       </header>
 
@@ -626,12 +624,12 @@ function CommandsAct() {
           Eigene Erweiterungen für Claude Code
         </h3>
         <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
-          Aus der Box kann Claude Code viel — aber nicht alles, was ich für meinen Research-Workflow
-          brauche. Deshalb 22 selbst geschriebene Erweiterungen: 11 Slash-Commands (kurze Befehle wie
-          <span className="font-mono text-akzent-400"> /submit-gate</span>) und 11 Skills (komplette
-          mehrstufige Workflows wie <span className="font-mono text-cyber-400">/research</span>).
-          Zwei davon sind harte Regeln und müssen vor jedem neuen Target bzw. jedem Submit gelaufen
-          sein — ohne sie verlasse ich mich auf Disziplin allein, und Disziplin lässt sich austricksen.
+          Was Claude Code von Haus aus nicht abdeckt, habe ich selbst ergänzt: 22 eigene Erweiterungen –
+          11 kurze Slash-Commands wie
+          <span className="font-mono text-akzent-400"> /submit-gate</span> und 11 mehrstufige Skills wie
+          <span className="font-mono text-cyber-400"> /research</span>.
+          Zwei davon sind Pflicht vor jedem neuen Ziel bzw. jedem Submit – als feste Regel, die nicht
+          von der Tagesform abhängt.
         </p>
       </header>
 

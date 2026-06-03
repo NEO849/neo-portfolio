@@ -888,10 +888,10 @@ export const DA_PATTERNS: ReadonlyArray<{ titel: string; problem: string; lesson
 
 // Senior-Elite Hardening Highlights (für /labor Hero-Banner)
 export const ELITE_PRINZIPIEN: ReadonlyArray<{ titel: string; beschreibung: string; rgb: string }> = [
-  { titel: "Discipline > Volume",     beschreibung: "12 Hard-Gates vor jedem Submit. Tier-S/A-only Whitelist. 45% Confidence-Cap ohne Server-Confirm.",   rgb: "239, 68, 68" },
-  { titel: "Self-Improving",          beschreibung: "5-Tier Memory-System. 3 Lifecycle-Hooks. A-MEM Auto-Linker. Citation-Discipline als Pro-Rule.",      rgb: "129, 140, 248" },
-  { titel: "Multi-Modal Workflow",    beschreibung: "Mac (GUI) + Server (Backend) + iPhone (Mobile) — Tailscale-Trust + Cloudflare-OAuth-Worker.",        rgb: "34, 211, 238" },
-  { titel: "Cost-Optimized",          beschreibung: "Whisper lokal (0€ STT). Ollama+Milvus (0€ Embeddings). 30+ keyless OSINT-Quellen.",                  rgb: "34, 197, 94" },
-  { titel: "Anti-Fragile",            beschreibung: "set +e · Lockfiles · Graceful Degradation · Durable Queue · Token-Auto-Rotation · Anomaly-Watcher.", rgb: "245, 158, 11" },
-  { titel: "Continuous Learning",     beschreibung: "Active-Recall (Quiz). Outcome-Backprop. Pattern-Crystallization. Quartals-Refactor.",                  rgb: "167, 139, 250" },
+  { titel: "Disziplin vor Menge",   beschreibung: "Vor jedem Submit greifen zwölf feste Prüf-Gates – eingereicht wird nur, was sie alle besteht.",                rgb: "239, 68, 68" },
+  { titel: "Lernendes System",      beschreibung: "Ein fünfstufiges Gedächtnis mit automatischen Hooks sorgt dafür, dass jede Sitzung auf der vorherigen aufbaut.", rgb: "129, 140, 248" },
+  { titel: "Geräteübergreifend",    beschreibung: "Mac, Server und iPhone arbeiten zusammen – sicher verbunden über ein privates Netz und einen eigenen OAuth-Worker.", rgb: "34, 211, 238" },
+  { titel: "Kostenbewusst",         beschreibung: "Spracherkennung, Embeddings und die meisten OSINT-Quellen laufen lokal oder schlüssellos – ohne laufende API-Kosten.", rgb: "34, 197, 94" },
+  { titel: "Ausfallsicher",         beschreibung: "Lockfiles, Wiederholungslogik und eine dauerhafte Warteschlange fangen Fehler ab, bevor sie den Ablauf stoppen.",   rgb: "245, 158, 11" },
+  { titel: "Stetiges Lernen",       beschreibung: "Aktive Wiederholung, Ergebnis-Rückkopplung und regelmäßige Refactorings halten das Wissen aktuell.",              rgb: "167, 139, 250" },
 ];
