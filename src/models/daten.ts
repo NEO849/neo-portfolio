@@ -424,7 +424,7 @@ export const PERSOENLICH = {
   titel: "AI-Automation & Integration Engineer",
   untertitel: "KI-Automation & Integration • Linux/Infrastruktur • Security",
   firmaTagline: "Produktive KI-Systeme, gehärtete Infrastruktur, Security mit Angreifer-Blick — selbst gebaut und betrieben.",
-  kurzvorstellung: "Ich baue und betreibe produktive KI-Systeme, die Arbeit abnehmen – von Workflow-Automation über LLM-Integration bis zur gehärteten Infrastruktur, auf der das läuft. Kein Proof-of-Concept, sondern Lösungen, die im Alltag zuverlässig funktionieren.",
+  kurzvorstellung: "Ich baue Software und Automatisierung, die Arbeit abnimmt – und betreibe sie auf einer Infrastruktur, die ich selbst absichere und am Laufen halte. Vom KI-gestützten Workflow bis zum gehärteten Server: keine Demos, sondern Systeme, auf die im Alltag Verlass ist.",
   email: "michael_fleps@aol.com",
   telefon: "+49 172 572 5081",
   telefonLink: "+491725725081",
@@ -445,41 +445,45 @@ export interface LeistungModel {
   readonly leistungen: readonly string[];
   readonly ergebnis: string;
   readonly farbeRgb: string;
+  readonly akzentHex: string;
 }
 
 export const LEISTUNGEN: LeistungModel[] = [
   {
     titel: "KI-Automation & Integration",
-    nutzen: "Wiederkehrende Abläufe übernehmen KI-Agenten – sauber an Ihre Systeme angebunden.",
+    nutzen: "Wiederkehrende Aufgaben übernehmen Agenten und saubere Schnittstellen – angebunden an die Werkzeuge, die Sie ohnehin nutzen.",
     leistungen: [
-      "Workflow-Automation (n8n, API- & Tool-Integration)",
-      "LLM-Integration & Agenten mit Guardrails",
-      "Self-Hosted Modelle (Ollama) + RAG auf Ihrer Wissensbasis – datensparsam, on-prem",
+      "Workflow-Automation mit n8n, APIs und eigenen Skripten",
+      "Sprachmodelle & Agenten – mit klaren Grenzen und Kontrolle",
+      "Wissensbasis-Suche (RAG), auf Wunsch komplett auf Ihrem Server",
     ],
-    ergebnis: "Weniger manuelle Arbeit, schnellere Prozesse, weniger Fehler.",
+    ergebnis: "Weniger Handarbeit, schnellere Abläufe, weniger Fehler.",
     farbeRgb: "99, 102, 241",
+    akzentHex: "#818cf8",
   },
   {
     titel: "Linux & Infrastruktur",
-    nutzen: "Server, die nicht nur eingerichtet, sondern verlässlich betrieben werden.",
+    nutzen: "Server, die nicht nur eingerichtet, sondern verlässlich betrieben werden – abgesichert und wartbar.",
     leistungen: [
-      "Gehärtete Linux-/Docker-Setups (UFW, Fail2ban, SSH)",
-      "Cloudflare-Tunnel, Reverse-Proxy, 3-Tier-Backup, Monitoring",
-      "Automatisierung in Bash/Python, CI/CD, reproduzierbare Toolchains",
+      "Gehärtete Linux- und Docker-Umgebungen (Firewall, Fail2ban, SSH)",
+      "Reverse-Proxy, Verschlüsselung, Backups und Monitoring",
+      "Automatisierung und saubere, wiederholbare Deployments",
     ],
-    ergebnis: "Infrastruktur, die läuft, abgesichert ist und sich wartet.",
-    farbeRgb: "34, 197, 94",
+    ergebnis: "Eine Basis, die läuft – und die man nachts nicht im Kopf hat.",
+    farbeRgb: "56, 189, 248",
+    akzentHex: "#38bdf8",
   },
   {
     titel: "Security-Reviews",
-    nutzen: "Schwachstellen finden, bevor es jemand anderes tut.",
+    nutzen: "Ein Blick aus der Angreifer-Perspektive auf Ihre Anwendung – bevor es jemand anderes versucht.",
     leistungen: [
-      "Web-/API-Prüfung aus echter Angreifer-Perspektive",
-      "Reproduzierbare Findings statt Scanner-Output",
-      "Klare Handlungsempfehlung + Re-Test nach dem Fix",
+      "Prüfung von Web-Apps und APIs auf reale Schwachstellen",
+      "Nachvollziehbare Befunde statt anonymer Scanner-Listen",
+      "Konkrete Handlungsempfehlung und Nachkontrolle nach dem Fix",
     ],
-    ergebnis: "Belastbare Sicherheit – nachvollziehbar dokumentiert.",
-    farbeRgb: "34, 211, 238",
+    ergebnis: "Sicherheit, die man versteht und belegen kann.",
+    farbeRgb: "148, 163, 184",
+    akzentHex: "#94a3b8",
   },
 ];
 

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import { PERSOENLICH, SYSTEM_STATS } from "../models/daten";
 import { KartenLicht } from "../bewegung/KartenLicht";
 
@@ -165,23 +164,7 @@ export default function HeroView() {
           {PERSOENLICH.kurzvorstellung}
         </motion.p>
 
-        {/* Call-to-Action */}
-        <motion.div variants={einblend(0.85)} initial="versteckt" animate="sichtbar"
-          className="flex flex-wrap items-center justify-center gap-3 mb-12">
-          <Link
-            to="/kontakt"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-medium text-white transition-transform duration-200 hover:scale-[1.03]"
-            style={{ background: "linear-gradient(135deg, #6366f1, #06b6d4)", boxShadow: "0 8px 30px rgba(99,102,241,0.3)" }}
-          >
-            Kostenloses Erstgespräch <span aria-hidden>→</span>
-          </Link>
-          <a
-            href="#leistungen"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-medium text-white/85 border border-white/15 hover:border-akzent-400/50 hover:text-white transition-colors duration-200"
-          >
-            Leistungen ansehen
-          </a>
-        </motion.div>
+        <div className="mb-12" />
 
         {/* Portfolio-Überblick */}
         <motion.div
@@ -199,7 +182,7 @@ export default function HeroView() {
         >
           <KartenLicht lichtfarbe="99, 102, 241" intensitaet={0.1} radius={300}>
             <p className="px-6 py-5 text-sm text-white/70 leading-relaxed text-left">
-              Für Unternehmen und Teams automatisiere ich wiederkehrende Abläufe mit KI-Agenten und sauberen API-Integrationen, binde Self-Hosted-Modelle datensparsam an und betreibe die gehärtete Infrastruktur, auf der das läuft. Mein Anspruch ist nicht die beeindruckende Demo, sondern das System, das im Alltag zuverlässig arbeitet – wartbar, abgesichert und nachvollziehbar dokumentiert.
+              Für Unternehmen und Teams verbinde ich KI-Automation mit solider Technik: wiederkehrende Abläufe übernehmen Agenten und saubere Schnittstellen, sensible Daten bleiben auf Wunsch im eigenen Haus, und das Fundament – Server, Sicherheit, Backups – läuft stabil im Hintergrund. So entsteht spürbare Entlastung statt neuer Baustellen.
             </p>
           </KartenLicht>
         </motion.div>
@@ -220,7 +203,7 @@ export default function HeroView() {
         >
           <KartenLicht lichtfarbe="99, 102, 241" intensitaet={0.08} radius={300}>
             <p className="px-6 py-5 text-sm text-white/70 leading-relaxed text-left">
-              KI ist für mich seit 2022 kein Trend, sondern täglicher Arbeits-Partner – mit klar definierten Rollen, Guardrails und eigener Automatisierung. Dazu eine Security-Praxis aus echter Angreifer-Perspektive: Ich baue Systeme so, wie ich sie auch prüfen würde. Sie bekommen Tempo durch KI und Verlässlichkeit durch Erfahrung – aus einer Hand.
+              Was ich anbiete, betreibe ich selbst: einen produktiven KI- und Automatisierungs-Stack auf eigener, gehärteter Infrastruktur – seit Jahren live, abgesichert und sauber dokumentiert. Diesen Anspruch an Stabilität und Sicherheit bringe ich in jedes Projekt mit.
             </p>
           </KartenLicht>
         </motion.div>
