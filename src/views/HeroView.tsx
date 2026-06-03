@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { PERSOENLICH, SYSTEM_STATS } from "../models/daten";
+import { PERSOENLICH } from "../models/daten";
 import { KartenLicht } from "../bewegung/KartenLicht";
 
 // ═══════════════════════════════════════════════════════
@@ -206,22 +206,6 @@ export default function HeroView() {
               Was ich anbiete, betreibe ich selbst: einen produktiven KI- und Automatisierungs-Stack auf eigener, gehärteter Infrastruktur – seit Jahren live, abgesichert und sauber dokumentiert. Diesen Anspruch an Stabilität und Sicherheit bringe ich in jedes Projekt mit.
             </p>
           </KartenLicht>
-        </motion.div>
-
-        {/* Senior-Elite-Stats — kompakte Inline-Zeile, vier wichtigste Markers */}
-        <motion.div
-          variants={einblend(1.2)}
-          initial="versteckt"
-          animate="sichtbar"
-          className="max-w-2xl mx-auto mt-6 flex items-center justify-center gap-3 sm:gap-5 flex-wrap text-white/45"
-        >
-          {SYSTEM_STATS.slice(0, 4).map((stat, i) => (
-            <div key={stat.label} className="flex items-center gap-1.5">
-              {i > 0 && <span className="text-white/15 select-none">·</span>}
-              <span className="font-display text-sm font-bold tabular-nums text-akzent-400">{stat.wert}</span>
-              <span className="text-[11px] font-mono tracking-wide">{stat.label}</span>
-            </div>
-          ))}
         </motion.div>
 
       </div>
