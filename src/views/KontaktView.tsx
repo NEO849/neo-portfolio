@@ -9,7 +9,16 @@ import { STATISCHE_TEXTKARTE } from "../bewegung/varianten";
 const CYBER_RGB = "22, 211, 238";
 const CYBER_HEX = "#22d3ee";
 
-const KONTAKT_EINTRAEGE = [
+interface KontaktEintrag {
+  href: string;
+  extern: boolean;
+  download?: string;
+  icon: string;
+  label: string;
+  wert: string;
+}
+
+const KONTAKT_EINTRAEGE: KontaktEintrag[] = [
   {
     href: `mailto:${PERSOENLICH.email}`,
     extern: false,
@@ -33,10 +42,11 @@ const KONTAKT_EINTRAEGE = [
   },
   {
     href: "/Michael_Fleps_Lebenslauf.pdf",
-    extern: true,
+    extern: false,
+    download: "Michael_Fleps_Lebenslauf.pdf",
     icon: "📄",
     label: "Lebenslauf",
-    wert: "PDF ansehen",
+    wert: "Herunterladen (PDF)",
   },
 ];
 
@@ -404,6 +414,7 @@ export default function KontaktView() {
           >
             <a
               href={eintrag.href}
+              download={eintrag.download}
               target={eintrag.extern ? "_blank" : undefined}
               rel={eintrag.extern ? "noopener noreferrer" : undefined}
               className="block group"
@@ -433,7 +444,7 @@ export default function KontaktView() {
                     </div>
                   </div>
                   <div className="ml-auto pl-2 text-cyber-400/55 group-hover:text-cyber-400 transition-colors duration-200 text-sm flex-shrink-0">
-                    →
+                    {eintrag.download ? "↓" : "→"}
                   </div>
                 </div>
               </InfoKarte>
