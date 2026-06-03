@@ -490,7 +490,7 @@ export const LEISTUNGEN: LeistungModel[] = [
     nutzen: "Native iOS-Apps – von jemandem entwickelt, der Apps und APIs beruflich auch auf Schwachstellen prüft. So ist Sicherheit von Anfang an eingebaut, nicht nachträglich aufgesetzt.",
     leistungen: [
       "iOS-Entwicklung in Swift & SwiftUI, saubere MVVM-Architektur",
-      "Sichere Auth- und API-Anbindung – durchdacht aus der Prüfer-Perspektive",
+      "Auth- und API-Anbindung – Sicherheit von Anfang an mitgedacht",
       "Anbindung an KI-Funktionen und bestehende Backends",
     ],
     ergebnis: "Apps, die gut aussehen – und auch unter Druck halten.",
