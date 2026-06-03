@@ -8,12 +8,18 @@ export function istGueltigeEmail(wert: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(wert.trim());
 }
 
-/** Prüft ob ein String eine gültige Domain ist (z.B. example.com) */
+/**
+ * Prüft ob ein String eine gültige Domain ist (z.B. example.com,
+ * www.f3-data-solutions.com). Jedes Label darf Ziffern und Bindestriche
+ * enthalten — nur die TLD ist auf Buchstaben (≥2) beschränkt.
+ */
 export function istGueltigeDomain(wert: string): boolean {
   const bereinigt = wert.trim().toLowerCase()
     .replace(/^https?:\/\//, "")
     .replace(/\/.*$/, "");
-  return /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z]{2,})+$/.test(bereinigt);
+  // Ein oder mehrere Labels (je [a-z0-9] mit optionalen Binnen-Bindestrichen),
+  // jeweils mit Punkt, gefolgt von einer reinen Buchstaben-TLD.
+  return /^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/.test(bereinigt);
 }
 
 /** Extrahiert Domain aus URL oder gibt sie zurück */
