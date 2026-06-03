@@ -422,7 +422,7 @@ export const PERSOENLICH = {
   firma: "FREE DATA Solutions",
   standort: "Nürnberg, Bayern",
   titel: "AI-Automation & Integration Engineer",
-  untertitel: "KI-Automation & Integration • Linux/Infrastruktur • Security",
+  untertitel: "KI-Automation • App-Entwicklung • Infrastruktur • Security",
   firmaTagline: "Produktive KI-Systeme, gehärtete Infrastruktur, Security mit Angreifer-Blick — selbst gebaut und betrieben.",
   kurzvorstellung: "Ich baue Software und Automatisierung, die Arbeit abnimmt – und betreibe sie auf einer Infrastruktur, die ich selbst absichere und am Laufen halte. Vom KI-gestützten Workflow bis zum gehärteten Server: keine Demos, sondern Systeme, auf die im Alltag Verlass ist.",
   email: "michael_fleps@aol.com",
@@ -484,6 +484,18 @@ export const LEISTUNGEN: LeistungModel[] = [
     ergebnis: "Sicherheit, die man versteht und belegen kann.",
     farbeRgb: "148, 163, 184",
     akzentHex: "#94a3b8",
+  },
+  {
+    titel: "Sichere App-Entwicklung",
+    nutzen: "Native iOS-Apps – von jemandem entwickelt, der Apps und APIs beruflich auch auf Schwachstellen prüft. So ist Sicherheit von Anfang an eingebaut, nicht nachträglich aufgesetzt.",
+    leistungen: [
+      "iOS-Entwicklung in Swift & SwiftUI, saubere MVVM-Architektur",
+      "Sichere Auth- und API-Anbindung – ich kenne die Angriffsseite",
+      "Anbindung an KI-Funktionen und bestehende Backends",
+    ],
+    ergebnis: "Apps, die gut aussehen – und auch unter Druck halten.",
+    farbeRgb: "52, 211, 153",
+    akzentHex: "#34d399",
   },
 ];
 
