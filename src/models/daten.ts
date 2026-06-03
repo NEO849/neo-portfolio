@@ -361,8 +361,15 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
   {
     jahr: "1999–2014",
     titel: "Elektroinstallateur – Ausbildung & Berufspraxis",
-    beschreibung: "Gesellenbrief als Elektroinstallateur (HWK Niederbayern-Oberpfalz, 2003). Vierjährige Ausbildung bei Fa. Freise in Deggendorf, anschließend über ein Jahrzehnt Berufspraxis in Elektronik, Netzwerk-, Server-, Telefon- und Videoanlagen. Fundament in Fehleranalyse, technischer Dokumentation und Systemlogik.",
+    beschreibung: "Gesellenbrief als Elektroinstallateur (HWK Niederbayern-Oberpfalz, 2003). Vierjährige Ausbildung bei Fa. Freise in Deggendorf, anschließend über ein Jahrzehnt Berufspraxis in Elektronik, Netzwerk-, Server-, Telefon- und Videoanlagen – teils als Projektleiter, von der Großinstallation bis zur Inbetriebnahme. Fundament in Fehleranalyse, technischer Dokumentation und Systemlogik.",
     kategorie: "beruf",
+    modulTitel: "Projekte & Referenzen",
+    module: [
+      { name: "Wohnbaugenossenschaft · Projektleitung", skills: ["Projektleitung", "2 zusammenhängende Wohnblöcke", "12 + 9 Wohnungen", "Komplett-Installation", "Inbetriebnahme"] },
+      { name: "Pharma · Serverfarm-Aufbau",              skills: ["Serverfarm-Aufbau", "Strukturierte Verkabelung", "Patchen", "LWL-Spleißen"] },
+      { name: "DECT-Großsystem · Freistaat Bayern",      skills: ["Projektleitung", "Bayerns größtes DECT-System", "München", "Aufbau & Inbetriebnahme"] },
+      { name: "Telekommunikation · Großkunden-Rollouts", skills: ["Siemens", "Deutsche Telekom", "E.ON Energie", "Telefonanlagen", "Rollout-Umsetzung"] },
+    ],
   },
   {
     jahr: "2014–2018",

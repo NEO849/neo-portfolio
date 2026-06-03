@@ -9,6 +9,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   PROJEKTE,
+  ZEITSTRAHL,
   NAVIGATION,
   PIPELINE_SCHRITTE,
   SCORING_KATEGORIEN,
@@ -50,6 +51,28 @@ describe('daten.ts — Senior-Elite Invarianten', () => {
         expect(p.kategorie).toMatch(/^(security|development|tooling)$/);
         expect(p.technologien.length).toBeGreaterThan(0);
         expect(p.highlights.length).toBeGreaterThan(0);
+      }
+    });
+  });
+
+  describe('Zeitstrahl', () => {
+    it('jede Station mit Modulen hat befüllte Sektionen und Chips', () => {
+      for (const eintrag of ZEITSTRAHL) {
+        if (!eintrag.module) continue;
+        for (const modul of eintrag.module) {
+          expect(modul.name).toBeTruthy();
+          expect(modul.skills.length).toBeGreaterThan(0);
+        }
+      }
+    });
+
+    it('die BERUF-Station zeigt Projekt-Referenzen als Chips', () => {
+      const beruf = ZEITSTRAHL.find((e) => e.kategorie === 'beruf');
+      expect(beruf).toBeDefined();
+      expect(beruf?.module?.length ?? 0).toBeGreaterThan(0);
+      // jedes Projekt-Modul trägt mindestens einen Chip
+      for (const modul of beruf?.module ?? []) {
+        expect(modul.skills.length).toBeGreaterThan(0);
       }
     });
   });

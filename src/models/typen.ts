@@ -32,6 +32,8 @@ export interface ZeitstrahlModel {
   readonly beschreibung: string;
   readonly kategorie: "beruf" | "teamarbeit" | "infrastruktur" | "bildung" | "entwicklung" | "security" | "eigenbau";
   readonly module?: ReadonlyArray<ZeitstrahlModul>;
+  /** Überschrift über dem Modul-Block. Default: "Module & Schwerpunkte". */
+  readonly modulTitel?: string;
 }
 
 export interface SecurityStatModel {

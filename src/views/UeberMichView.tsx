@@ -218,7 +218,7 @@ export default function UeberMichView() {
                   {eintrag.module && (
                     <div className="mt-3">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-mono text-[10px] text-white/25 uppercase tracking-widest">Module & Schwerpunkte</span>
+                        <span className="font-mono text-[10px] text-white/25 uppercase tracking-widest">{eintrag.modulTitel ?? "Module & Schwerpunkte"}</span>
                         <div className="h-px flex-1 bg-white/[0.04]" />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
