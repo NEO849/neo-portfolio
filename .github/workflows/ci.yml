@@ -52,3 +52,31 @@ jobs:
           test -d dist/assets || (echo "::error::dist/assets missing"; exit 1)
           echo "✓ Build artifacts present"
           du -sh dist/
+
+  # Eigener Job, damit Audit-Signal vom Build-/Test-Signal getrennt sichtbar ist.
+  audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies (clean)
+        run: npm ci --no-audit --no-fund
+
+      # Harter Gate: NUR Production-Deps (das, was an Nutzer ausgeliefert wird).
+      # Bricht bei High/Critical — Dev-Tooling-Advisories blockieren das Deploy nicht.
+      - name: Audit production dependencies (fail on high/critical)
+        run: npm audit --omit=dev --audit-level=high
+
+      # Voller Audit inkl. Dev-Deps — nur informativ, blockiert nicht.
+      - name: Full audit (informational)
+        run: npm audit || true

@@ -1,0 +1,71 @@
+# Dependabot — automatische Dependency-Updates (OWASP A06)
+# Docs: https://docs.github.com/code-security/dependabot/dependabot-version-updates
+#
+# Strategie:
+#   · npm wöchentlich, gruppiert (weniger PR-Rauschen, kohärente Bumps)
+#   · GitHub-Actions wöchentlich (hält actions/checkout@v4 & Co. aktuell)
+#   · Security-Updates laufen zusätzlich automatisch (GitHub-Default, immer an)
+#
+# Jeder Dependabot-PR durchläuft die volle CI (Typecheck · Test · Build · Audit),
+# bevor er gemergt werden kann — kaputte Updates fallen vor dem Merge auf.
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    groups:
+      # Laufzeit-Kern (React-Ökosystem) — zusammen aktualisieren, da eng gekoppelt.
+      react-laufzeit:
+        applies-to: version-updates
+        patterns:
+          - "react"
+          - "react-dom"
+          - "react-router-dom"
+          - "react-helmet-async"
+          - "@types/react"
+          - "@types/react-dom"
+      # Build-/Test-Werkzeuge — nur Minor/Patch gruppieren, Major bewusst einzeln.
+      dev-werkzeuge:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+        patterns:
+          - "vite"
+          - "@vitejs/*"
+          - "vitest"
+          - "@testing-library/*"
+          - "typescript"
+          - "tailwindcss"
+          - "postcss"
+          - "autoprefixer"
+          - "jsdom"
+          - "@types/*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci(actions)"
+    groups:
+      actions-alle:
+        patterns:
+          - "*"
