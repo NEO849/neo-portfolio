@@ -112,7 +112,7 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
                 </ul>
               </div>
 
-              {(projekt.linkGithub || projekt.linkLive) && (
+              {(projekt.linkGithub || projekt.linkLive || projekt.linkDemo) && (
                 <div className="flex flex-wrap gap-2 pt-1">
                   {projekt.linkGithub && (
                     <KnopfSekundaer zuUrl={projekt.linkGithub} klassen="text-xs">
@@ -122,6 +122,11 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
                   {projekt.linkLive && (
                     <KnopfSekundaer zuUrl={projekt.linkLive} klassen="text-xs">
                       Live →
+                    </KnopfSekundaer>
+                  )}
+                  {projekt.linkDemo && (
+                    <KnopfSekundaer zuRoute={projekt.linkDemo} klassen="text-xs">
+                      Demo ansehen →
                     </KnopfSekundaer>
                   )}
                 </div>

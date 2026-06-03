@@ -87,7 +87,7 @@ export const PROJEKTE: ProjektModel[] = [
       "systemd-Hardening: ProtectSystem strict, NoNewPrivileges, MemoryMax, CPUQuota",
       "PWA Add-to-Home-Screen + Spacebar-Toggle + localStorage-Token-Persistierung",
     ],
-    linkLive: "https://m.cyp-hr.com/voice/ui",
+    linkDemo: "/voice-demo",
     zeitraum: "2025 – heute",
     status: "aktiv",
   },

@@ -53,6 +53,13 @@ describe('daten.ts — Senior-Elite Invarianten', () => {
         expect(p.highlights.length).toBeGreaterThan(0);
       }
     });
+
+    it('voice-bridge verlinkt die In-App-Demo statt eines Live-Endpunkts', () => {
+      const voice = PROJEKTE.find((p) => p.titel.includes('voice-bridge'));
+      expect(voice).toBeDefined();
+      expect(voice?.linkDemo).toBe('/voice-demo');
+      expect(voice?.linkLive).toBeUndefined();
+    });
   });
 
   describe('Zeitstrahl', () => {

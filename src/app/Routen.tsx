@@ -18,6 +18,7 @@ const SecuritySeite   = lazy(() => import("../seiten/SecuritySeite"));
 const LaborSeite      = lazy(() => import("../seiten/LaborSeite"));
 const OsintToolSeite  = lazy(() => import("../seiten/OsintToolSeite"));
 const KontaktSeite    = lazy(() => import("../seiten/KontaktSeite"));
+const VoiceDemoSeite  = lazy(() => import("../seiten/VoiceDemoSeite"));
 
 // Fallback während eine Seite geladen wird
 function SeitenLadeindikator() {
@@ -72,6 +73,7 @@ export function Routen() {
           <Route path="/labor"         element={<LaborSeite />} />
           <Route path="/osint-tools"   element={<OsintToolSeite />} />
           <Route path="/kontakt"       element={<KontaktSeite />} />
+          <Route path="/voice-demo"    element={<VoiceDemoSeite />} />
           <Route path="*"              element={<NichtGefundenSeite />} />
         </Routes>
       </Suspense>

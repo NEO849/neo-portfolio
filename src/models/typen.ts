@@ -11,6 +11,8 @@ export interface ProjektModel {
   readonly highlights: string[];
   readonly linkGithub?: string;
   readonly linkLive?: string;
+  /** Interne Route zu einer In-App-Demo (z.B. "/voice-demo"). */
+  readonly linkDemo?: string;
   readonly zeitraum: string;
   readonly status: "aktiv" | "abgeschlossen" | "in-entwicklung";
 }
