@@ -376,9 +376,9 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
     kategorie: "teamarbeit",
     modulTitel: "Aufgaben & Verantwortung",
     module: [
-      { name: "Arbeitstherapie",            skills: ["Schwer erziehbare Jugendliche", "Aufnahmegespräche", "Projektarbeit mit Klienten", "Gruppensitzungen"] },
+      { name: "Arbeitstherapie",            skills: ["Aufnahmegespräche", "Projektarbeit mit Klienten", "Gruppensitzungen"] },
       { name: "Reha-Dokumentation",         skills: ["KTL-Leistungen", "Berichte für die Rentenversicherung"] },
-      { name: "Qualität & Arbeitssicherheit", skills: ["QM-Beauftragter (QMB)", "Sicherheitsbeauftragter", "Arbeitsschutz"] },
+      { name: "Qualität & Arbeitssicherheit", skills: ["QM-Beauftragter (QMB)", "Sicherheitsbeauftragter"] },
       { name: "Weiterbildung",              skills: ["Gruppendynamik", "Konfliktlösung", "Psychologische Grundlagen"] },
     ],
   },
