@@ -46,6 +46,9 @@ export interface DemoSitzung {
 export const VERARBEITUNG_DAUER_MS = 1300;
 export const AUFNAHME_MAX_MS = 9000;
 
+/** Wie lange das fertige Ergebnis sichtbar bleibt, bevor wieder Idle gilt. */
+export const ERGEBNIS_ANZEIGE_MS = 4500;
+
 // ─── Sätze pro Sprache (reihum bei jedem Druck) ───────────────────
 const SAETZE_DE: readonly string[] = [
   "Starte die Recon-Pipeline für das neue Target und fasse die Top-Funde zusammen.",

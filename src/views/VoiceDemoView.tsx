@@ -59,11 +59,11 @@ export default function VoiceDemoView() {
   }, [steuerung]);
 
   return (
-    <section className="py-16 px-6 max-w-5xl mx-auto">
+    <section className="pt-6 pb-10 sm:py-16 px-4 sm:px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
         prefix="> voice-bridge · demo"
         untertitel="Originalgetreuer, interaktiver Klon der echten Oberfläche — alle Funktionen simuliert. Drück aufs Mikro (oder die Leertaste). Es wird nichts aufgenommen, gesendet oder gespeichert."
-        klassen="mb-8"
+        klassen="mb-5 sm:mb-8"
       />
 
       <motion.div
@@ -75,10 +75,10 @@ export default function VoiceDemoView() {
       >
         {/* Geräte-Rahmen */}
         <div
-          className="overflow-hidden rounded-3xl border grid grid-cols-1 md:grid-cols-[260px_1fr]"
+          className="overflow-hidden rounded-3xl border grid grid-cols-1 md:grid-cols-[260px_1fr] md:h-[580px]"
           style={{
             background: T.bg0, borderColor: T.lineStark,
-            boxShadow: "0 24px 60px rgba(0,0,0,0.55)", height: 580,
+            boxShadow: "0 24px 60px rgba(0,0,0,0.55)",
           }}
         >
           <Seitenleiste steuerung={steuerung} />
@@ -241,7 +241,7 @@ function Hauptbereich({ steuerung, onSchliessen }: { steuerung: VoiceDemoSteueru
   return (
     <div className="flex flex-col min-w-0">
       {/* Topbar */}
-      <div className="flex items-center gap-3.5 px-4 md:px-5 py-3 border-b" style={{ borderColor: T.line }}>
+      <div className="flex items-center gap-2 sm:gap-3.5 px-3 sm:px-5 py-2.5 sm:py-3 border-b" style={{ borderColor: T.line }}>
         <button
           type="button" aria-label="Menü" onClick={steuerung.seitenleisteUmschalten}
           className="md:hidden grid place-items-center w-8 h-8 rounded-lg" style={{ color: T.text }}
@@ -253,7 +253,7 @@ function Hauptbereich({ steuerung, onSchliessen }: { steuerung: VoiceDemoSteueru
         <select
           aria-label="Session" value={steuerung.aktiveSitzungId}
           onChange={(e) => steuerung.sitzungWaehlen(e.target.value)}
-          className="appearance-none rounded-xl px-3 py-1.5 text-[13px] cursor-pointer"
+          className="appearance-none rounded-xl px-2.5 sm:px-3 py-1.5 text-[12px] sm:text-[13px] cursor-pointer min-w-0 max-w-[42vw] sm:max-w-none truncate"
           style={{ background: T.bg2, border: `1px solid ${T.lineStark}`, color: T.text }}
         >
           {steuerung.sitzungen.map((s) => (
@@ -277,128 +277,77 @@ function Hauptbereich({ steuerung, onSchliessen }: { steuerung: VoiceDemoSteueru
   );
 }
 
-// ─── Bühne (Banner + Orb + Pill + Transkript) ─────────────────────
+// ─── Bühne (Orb + Status) ─────────────────────────────────────────
 function Buehne({ steuerung }: { steuerung: VoiceDemoSteuerung }) {
-  const { aufnahme, aktuellesTranskript, bannerAnzahl } = steuerung;
-
   return (
-    <section className="flex-1 min-h-0 flex flex-col items-center gap-4 px-4 pt-5 pb-2 overflow-y-auto">
-      {bannerAnzahl > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2.5 w-full max-w-[560px] px-3.5 py-2.5 rounded-xl text-[13px]"
-          style={{ background: "rgba(255,159,10,0.12)", border: "1px solid rgba(255,159,10,0.3)", color: T.warn }}
-        >
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5L1 14h14L8 1.5zm-.8 4.5h1.6v4H7.2V6zm0 5.2h1.6v1.6H7.2v-1.6z" /></svg>
-          <span><b style={{ color: T.text }}>{bannerAnzahl}</b> wartend</span>
-          <button
-            type="button" onClick={steuerung.drainen}
-            className="ml-auto px-2.5 py-1 rounded-lg" style={{ background: "rgba(255,159,10,0.18)", color: T.warn }}
-          >
-            drain
-          </button>
-        </motion.div>
-      )}
-
-      <MikrofonOrb zustand={aufnahme} onClick={steuerung.aufnahmeUmschalten} />
-
-      <PillBereich steuerung={steuerung} />
-
-      <div className="w-full max-w-[560px]">
-        {aktuellesTranskript ? (
-          <TranskriptKarte transkript={aktuellesTranskript} />
-        ) : (
-          <p className="text-center text-[13px] py-3" style={{ color: T.faint }}>
-            Transkript erscheint hier
-          </p>
-        )}
-      </div>
+    <section
+      className="flex-1 min-h-0 flex flex-col items-center justify-center px-4 py-2"
+      style={{ gap: "clamp(0.75rem, 3.5vw, 1.5rem)" }}
+    >
+      <MikrofonOrb zustand={steuerung.aufnahme} onClick={steuerung.aufnahmeUmschalten} />
+      <StatusZone steuerung={steuerung} />
     </section>
   );
 }
 
-function PillBereich({ steuerung }: { steuerung: VoiceDemoSteuerung }) {
+// Pill + kurze Anleitung im Idle, nach einer Aktion ein temporärer
+// Erfolgshinweis (blendet via ViewModel von selbst wieder aus). Kein
+// dauerhaftes Transkriptfeld — ruhiger, reduzierter Eindruck.
+function StatusZone({ steuerung }: { steuerung: VoiceDemoSteuerung }) {
   const { aufnahme, aktuellesTranskript, naechsterSatz } = steuerung;
 
-  let inhalt: { farbe: string; text: string; live?: boolean } | null = null;
-  if (aufnahme === "aufnahme") inhalt = { farbe: T.rec, text: "Aufnahme läuft", live: true };
-  else if (aufnahme === "verarbeitung") inhalt = { farbe: T.accent, text: "Transkribiere …", live: true };
-  else if (aktuellesTranskript) inhalt = { farbe: PILL[aktuellesTranskript.status].farbe, text: PILL[aktuellesTranskript.status].text };
+  let pill: { farbe: string; text: string; live?: boolean } | null = null;
+  if (aufnahme === "aufnahme") pill = { farbe: T.rec, text: "Aufnahme läuft", live: true };
+  else if (aufnahme === "verarbeitung") pill = { farbe: T.accent, text: "Transkribiere …", live: true };
+  else if (aktuellesTranskript) pill = { farbe: PILL[aktuellesTranskript.status].farbe, text: PILL[aktuellesTranskript.status].text };
 
   return (
-    <div className="min-h-[28px] flex flex-col items-center justify-center gap-1">
-      {inhalt ? (
+    <div className="w-full max-w-[440px] flex flex-col items-center justify-start gap-2 text-center" style={{ minHeight: 60 }}>
+      {pill ? (
         <motion.span
-          key={inhalt.text}
+          key={pill.text}
           initial={{ opacity: 0, y: 6, scale: 0.94 }} animate={{ opacity: 1, y: 0, scale: 1 }}
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[12.5px] font-semibold"
-          style={{ color: inhalt.farbe, background: `${inhalt.farbe}22`, border: `1px solid ${inhalt.farbe}44` }}
+          style={{ color: pill.farbe, background: `${pill.farbe}22`, border: `1px solid ${pill.farbe}44` }}
         >
           <motion.span
             className="rounded-full" style={{ width: 6, height: 6, background: "currentColor" }}
-            animate={inhalt.live ? { scale: [1, 1.45, 1] } : {}}
+            animate={pill.live ? { scale: [1, 1.45, 1] } : {}}
             transition={{ duration: 0.9, repeat: Infinity, ease: "easeInOut" }}
           />
-          {inhalt.text}
+          {pill.text}
         </motion.span>
       ) : (
-        <span className="text-[13px]" style={{ color: T.muted }}>tap &amp; sprechen, nochmal tap = senden</span>
+        <span className="text-[13px]" style={{ color: T.muted }}>Tippen zum Sprechen</span>
       )}
-      {aufnahme === "bereit" && (
-        <span className="text-[11px] text-center max-w-sm" style={{ color: "rgba(255,255,255,0.28)" }}>
-          Nächster Satz: „{naechsterSatz}"
-        </span>
-      )}
+
+      <AnimatePresence mode="wait">
+        {aufnahme === "bereit" && aktuellesTranskript ? (
+          <motion.p
+            key={aktuellesTranskript.id}
+            initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className="text-[12.5px] leading-snug px-3 line-clamp-2" style={{ color: T.soft }}
+          >
+            „<TippText text={aktuellesTranskript.text} animieren={aktuellesTranskript.frisch} />"
+          </motion.p>
+        ) : aufnahme === "bereit" ? (
+          <motion.span
+            key="hint"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="text-[11px] leading-snug px-3 line-clamp-1" style={{ color: "rgba(255,255,255,0.3)" }}
+          >
+            Nächster Satz: „{naechsterSatz}"
+          </motion.span>
+        ) : null}
+      </AnimatePresence>
     </div>
-  );
-}
-
-function TranskriptKarte({ transkript }: { transkript: DemoTranskript }) {
-  const [kopiert, setKopiert] = useState(false);
-  const farbe = PILL[transkript.status].farbe;
-
-  async function kopieren() {
-    try {
-      await navigator.clipboard.writeText(transkript.text);
-      setKopiert(true);
-      setTimeout(() => setKopiert(false), 1200);
-    } catch { /* Clipboard nicht verfügbar */ }
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl p-4 md:p-5"
-      style={{ background: T.bg2, border: `1px solid ${T.line}` }}
-    >
-      <p className="text-[15px] leading-relaxed" style={{ color: T.text }}>
-        <TippText text={transkript.text} animieren={transkript.frisch} />
-      </p>
-      <div className="mt-3 pt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11.5px] border-t" style={{ borderColor: T.line, color: T.muted }}>
-        <span className="inline-flex items-center px-2 py-px rounded-full text-[11px] font-semibold" style={{ color: farbe, background: `${farbe}22` }}>
-          {transkript.status}
-        </span>
-        <span>→ <b style={{ color: T.soft }}>{transkript.ziel}</b></span>
-        <span>{transkript.bytesKb} KB</span>
-        <span>server {transkript.dauerMs} ms</span>
-        <span>{transkript.sprache}</span>
-        <span style={{ color: T.faint }}>{transkript.auditId}</span>
-        <button
-          type="button" onClick={kopieren}
-          className="ml-auto px-2.5 py-1 rounded-lg hover:bg-white/5"
-          style={{ color: kopiert ? T.good : T.muted }}
-        >
-          {kopiert ? "kopiert ✓" : "copy"}
-        </button>
-      </div>
-    </motion.div>
   );
 }
 
 // ─── Controls (Sprache + auto-Enter) ──────────────────────────────
 function Steuerung({ steuerung }: { steuerung: VoiceDemoSteuerung }) {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2 px-4 py-3.5 border-t" style={{ borderColor: T.line }}>
+    <div className="flex flex-wrap items-center justify-center gap-2 px-4 py-3 sm:py-3.5 border-t" style={{ borderColor: T.line }}>
       <div className="inline-flex rounded-xl p-[3px] gap-0.5" style={{ background: T.bg2, border: `1px solid ${T.line}` }} role="radiogroup" aria-label="Sprache">
         {SPRACHEN.map((option) => {
           const aktiv = option === steuerung.sprache;

@@ -16,6 +16,7 @@ import {
   DEMO_DEFAULT_ZIEL,
   VERARBEITUNG_DAUER_MS,
   AUFNAHME_MAX_MS,
+  ERGEBNIS_ANZEIGE_MS,
   type AufnahmeZustand,
   type DemoSprache,
   type DemoSitzung,
@@ -88,6 +89,7 @@ export function useVoiceDemo(): VoiceDemoSteuerung {
   const sitzungRef = useRef(aktiveSitzungId);
   const verarbeitenTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const maxTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ergebnisTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const zaehler = useRef(0);
 
   useEffect(() => { spracheRef.current = sprache; }, [sprache]);
@@ -104,8 +106,10 @@ export function useVoiceDemo(): VoiceDemoSteuerung {
   const timerStoppen = useCallback(() => {
     if (verarbeitenTimer.current) clearTimeout(verarbeitenTimer.current);
     if (maxTimer.current) clearTimeout(maxTimer.current);
+    if (ergebnisTimer.current) clearTimeout(ergebnisTimer.current);
     verarbeitenTimer.current = null;
     maxTimer.current = null;
+    ergebnisTimer.current = null;
   }, []);
 
   useEffect(() => timerStoppen, [timerStoppen]);
@@ -154,6 +158,8 @@ export function useVoiceDemo(): VoiceDemoSteuerung {
       transkribieren();
       setAufnahme("bereit");
       verarbeitenTimer.current = null;
+      // Ergebnis nach kurzer Zeit wieder ausblenden → ruhiger Idle-Zustand.
+      ergebnisTimer.current = setTimeout(() => setAktuellesTranskript(null), ERGEBNIS_ANZEIGE_MS);
     }, VERARBEITUNG_DAUER_MS);
   }, [timerStoppen, transkribieren]);
 
@@ -164,6 +170,9 @@ export function useVoiceDemo(): VoiceDemoSteuerung {
         stoppenUndVerarbeiten();
         return "verarbeitung";
       }
+      // Neue Aufnahme startet: ein noch sichtbares Ergebnis sofort ausblenden.
+      if (ergebnisTimer.current) { clearTimeout(ergebnisTimer.current); ergebnisTimer.current = null; }
+      setAktuellesTranskript(null);
       maxTimer.current = setTimeout(stoppenUndVerarbeiten, AUFNAHME_MAX_MS);
       return "aufnahme";
     });

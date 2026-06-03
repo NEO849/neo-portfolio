@@ -2,13 +2,19 @@
 // BAUSTEIN: MikrofonOrb
 // 1:1-Nachbau des echten voice-bridge-Orbs — drei Zustände mit den
 // Original-Radialverläufen, Halo-Ringen und dem Mikrofon-Icon. Während
-// der Aufnahme legen sich die Audio-Balken über den Orb.
+// der Aufnahme legen sich die Audio-Balken über den Orb. Größe und Glow
+// skalieren responsiv (clamp), damit der Orb auf dem iPhone kompakter
+// sitzt, ohne die Proportionen oder Animationen zu verändern.
 // ═══════════════════════════════════════════════════════════════════
 
 import { motion } from "framer-motion";
 import type { AufnahmeZustand } from "../models/voiceDemo";
 import { useBewegungErlaubt } from "../bewegung/hooks/useBewegungErlaubt";
 import { AudioPegel } from "./AudioPegel";
+
+// Responsive Kantenlänge des Orb-Bereichs; Insets sind prozentual und
+// skalieren dadurch automatisch mit.
+const GROESSE = "clamp(176px, 50vw, 260px)";
 
 const VERLAUF: Record<AufnahmeZustand, string> = {
   bereit: "radial-gradient(circle at 35% 30%, #2a2c33 0%, #14151a 65%, #0a0b0e 100%)",
@@ -17,8 +23,8 @@ const VERLAUF: Record<AufnahmeZustand, string> = {
 };
 const GLUEHEN: Record<AufnahmeZustand, string> = {
   bereit: "inset 0 1px 0 rgba(255,255,255,0.05), 0 8px 24px rgba(0,0,0,0.4)",
-  aufnahme: "inset 0 1px 0 rgba(255,255,255,0.05), 0 0 60px rgba(255,69,58,0.45)",
-  verarbeitung: "inset 0 1px 0 rgba(255,255,255,0.05), 0 0 50px rgba(10,132,255,0.4)",
+  aufnahme: "inset 0 1px 0 rgba(255,255,255,0.05), 0 0 clamp(28px, 9vw, 60px) rgba(255,69,58,0.45)",
+  verarbeitung: "inset 0 1px 0 rgba(255,255,255,0.05), 0 0 clamp(24px, 8vw, 50px) rgba(10,132,255,0.4)",
 };
 const ICON_FARBE: Record<AufnahmeZustand, string> = {
   bereit: "#c6c8ce",
@@ -52,7 +58,7 @@ export function MikrofonOrb({ zustand, onClick }: MikrofonOrbProps) {
   const orbDauer = istVerarbeitung ? 1.4 : 4;
 
   return (
-    <div className="relative" style={{ width: 260, height: 260 }}>
+    <div className="relative" style={{ width: GROESSE, height: GROESSE }}>
       {/* Halo-Ringe */}
       {bewegung && istAufnahme && (
         <>
@@ -84,13 +90,13 @@ export function MikrofonOrb({ zustand, onClick }: MikrofonOrbProps) {
         transition={{ duration: orbDauer, repeat: Infinity, ease: "easeInOut" }}
         className="absolute grid place-items-center rounded-full border focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
         style={{
-          inset: 30,
+          inset: "11.5%",
           background: VERLAUF[zustand],
           borderColor: "rgba(255,255,255,0.13)",
           boxShadow: GLUEHEN[zustand],
         }}
       >
-        <svg width="64" height="64" viewBox="0 0 32 32" aria-hidden style={{ color: ICON_FARBE[zustand] }}>
+        <svg viewBox="0 0 32 32" aria-hidden style={{ width: "clamp(44px, 13vw, 64px)", height: "clamp(44px, 13vw, 64px)", color: ICON_FARBE[zustand] }}>
           <path d="M16 4a5 5 0 015 5v8a5 5 0 11-10 0V9a5 5 0 015-5z" fill={ICON_FARBE[zustand]} />
           <path
             d="M9 17a7 7 0 0014 0M16 24v4M11 28h10"
@@ -106,7 +112,7 @@ export function MikrofonOrb({ zustand, onClick }: MikrofonOrbProps) {
       {/* Audio-Balken-Overlay (nur während der Aufnahme) */}
       <div
         className="absolute grid place-items-center pointer-events-none transition-opacity duration-200"
-        style={{ inset: 80, opacity: istAufnahme ? 1 : 0 }}
+        style={{ inset: "30.8%", opacity: istAufnahme ? 1 : 0 }}
       >
         <AudioPegel aktiv={istAufnahme} />
       </div>

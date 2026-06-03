@@ -26,15 +26,17 @@ export function AudioPegel({ aktiv }: AudioPegelProps) {
   const bewegung = useBewegungErlaubt();
   const schwingt = aktiv && bewegung;
 
+  const hoehe = "clamp(48px, 14vw, 80px)";
+
   return (
-    <div className="flex items-center justify-center gap-[5px]" style={{ height: 80 }} aria-hidden>
+    <div className="flex items-center justify-center gap-[5px]" style={{ height: hoehe }} aria-hidden>
       {BALKEN.map((balken, index) => (
         <motion.span
           key={index}
           className="rounded-sm"
           style={{
             width: 4,
-            height: 80,
+            height: hoehe,
             transformOrigin: "center",
             background: "rgba(255,255,255,0.85)",
           }}
