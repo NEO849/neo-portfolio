@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ZEITSTRAHL } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
+import { TechTag } from "../bausteine/AbzeichenStatus";
 import { STATISCHE_TEXTKARTE } from "../bewegung/varianten";
 
 // ─── Kategorie-Konfiguration ──────────────────────────────────────
@@ -260,14 +261,9 @@ export default function UeberMichView() {
                                 <p className="font-mono text-[10px] font-semibold mb-1.5 text-white/45 tracking-wide">
                                   {mod.name}
                                 </p>
-                                <div className="flex flex-wrap gap-1">
+                                <div className="flex flex-wrap gap-1.5">
                                   {mod.skills.map((skill) => (
-                                    <span
-                                      key={skill}
-                                      className="font-mono text-[10px] px-1.5 py-0.5 rounded-md border border-white/[0.14] bg-white/[0.05] text-white/70 leading-snug transition-colors hover:text-white/90 hover:bg-white/[0.08]"
-                                    >
-                                      {skill}
-                                    </span>
+                                    <TechTag key={skill} name={skill} />
                                   ))}
                                 </div>
                               </div>
