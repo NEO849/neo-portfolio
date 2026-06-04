@@ -59,6 +59,7 @@ export function AbzeichenStatus({
 export function TechTag({ name, klassen = "" }: { name: string; klassen?: string }) {
   return (
     <span className={`
+      inline-block whitespace-nowrap
       px-2 py-0.5 text-xs font-mono rounded
       bg-white/5 text-white/40 border border-white/8
       hover:text-white/60 hover:bg-white/8 transition-colors

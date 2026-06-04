@@ -252,7 +252,7 @@ export default function UeberMichView() {
                           >
                             {eintrag.modulTitel ?? "Schwerpunkte"}
                           </p>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
                             {eintrag.module.map((mod) => (
                               <div
                                 key={mod.name}
