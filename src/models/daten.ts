@@ -90,7 +90,7 @@ export const PROJEKTE: ProjektModel[] = [
     status: "aktiv",
   },
   {
-    titel: "bb_recon – Senior-Elite Research OSINT-Toolkit",
+    titel: "bb_recon – Research OSINT-Toolkit",
     kurzbeschreibung: "Ein Recherche-Werkzeug, das öffentlich verfügbare Informationen zu einem Ziel aus über 30 Quellen in Sekunden zusammenträgt und übersichtlich aufbereitet – komplett ohne kostenpflichtige Schnittstellen.",
     langbeschreibung: "Alle Quellen laufen parallel; fällt eine aus, stört das die anderen nicht. Am Ende steht ein sauber sortiertes Gesamtbild mit einer Verlässlichkeits-Einstufung pro Fund – statt einer Handvoll verstreuter Einzeltreffer.",
     kategorie: "security",
