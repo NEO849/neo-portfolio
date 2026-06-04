@@ -372,7 +372,7 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
   {
     jahr: "2014–2018",
     titel: "Teamführung & interdisziplinäre Praxis",
-    beschreibung: "Arbeitstherapie mit schwer erziehbaren Jugendlichen an der Fachklinik Kompass Hof in Mindelheim, eingebunden in ein interdisziplinäres Team. Kommunikation auf Augenhöhe, Konfliktlösung und ruhiges Handeln in anspruchsvollen Situationen – Qualitäten, die meine Arbeitsweise bis heute prägen.",
+    beschreibung: "Als Teil eines interdisziplinären Teams begleitete ich schwer erziehbare Jugendliche in der Arbeitstherapie an der Fachklinik Kompass Hof in Mindelheim. Kommunikation auf Augenhöhe, Konfliktlösung und ruhiges Handeln in anspruchsvollen Situationen – Qualitäten, die meine Arbeitsweise bis heute prägen.",
     kategorie: "teamarbeit",
     modulTitel: "Aufgaben & Verantwortung",
     module: [
