@@ -40,14 +40,6 @@ const KONTAKT_EINTRAEGE: KontaktEintrag[] = [
     label: "GitHub",
     wert: "NEO849",
   },
-  {
-    href: "/Michael_Fleps_Lebenslauf.pdf",
-    extern: false,
-    download: "Michael_Fleps_Lebenslauf.pdf",
-    icon: "📄",
-    label: "Lebenslauf",
-    wert: "Herunterladen (PDF)",
-  },
 ];
 
 // ─── iOS-Keyboard: fokussiertes Feld weich scrollen ──────────────
