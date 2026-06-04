@@ -22,7 +22,8 @@ import {
 } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
-import { AbzeichenStatus } from "../bausteine/AbzeichenStatus";
+import { AbzeichenStatus, TechTag } from "../bausteine/AbzeichenStatus";
+import { AusklappKarte } from "../bausteine/AusklappKarte";
 import { GlassTabs } from "../bausteine/GlassTabs";
 
 type LaborTab = "memory" | "mcps" | "workflows" | "commands";
@@ -179,93 +180,43 @@ function MemoryAct() {
               viewport={{ once: true, margin: "-30px" }}
               transition={{ delay: i * 0.08, duration: 0.4, ease: EASE }}
             >
-              <InfoKarte
+              <AusklappKarte
                 lichtfarbe={tier.farbeRgb}
-                mitHoverAnimation={false}
-                klassen="p-0"
-                stil={{ borderLeft: `2px solid rgb(${tier.farbeRgb})` }}
-              >
-                <button
-                  onClick={() => setOffenerTier(offen ? null : tier.tier)}
-                  aria-expanded={offen}
-                  className="w-full text-left p-4 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset rounded-xl"
-                  style={{ ['--tw-ring-color' as string]: `rgba(${tier.farbeRgb}, 0.4)` }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div
-                      className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] px-2 py-1 rounded-md flex-shrink-0 mt-0.5"
-                      style={{
-                        color: `rgb(${tier.farbeRgb})`,
-                        backgroundColor: `rgba(${tier.farbeRgb}, 0.08)`,
-                        border: `1px solid rgba(${tier.farbeRgb}, 0.22)`,
-                      }}
-                    >
-                      {tier.tier}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-2">
-                        <span className="font-mono text-[12px] text-white/85 break-all min-w-0">{tier.ort}</span>
-                        {tier.anzahl && (
-                          <span
-                            className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border leading-none flex-shrink-0"
-                            style={{
-                              color: `rgb(${tier.farbeRgb})`,
-                              backgroundColor: `rgba(${tier.farbeRgb}, 0.1)`,
-                              borderColor: `rgba(${tier.farbeRgb}, 0.25)`,
-                            }}
-                          >
-                            {tier.anzahl}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        <span
-                          className="font-mono text-[10px] px-2 py-1 rounded-md border text-white/75 leading-snug"
-                          style={{ backgroundColor: `rgba(${tier.farbeRgb}, 0.08)`, borderColor: `rgba(${tier.farbeRgb}, 0.2)` }}
-                        >
-                          <span className="text-white/45 mr-1.5">geladen</span>{tier.loaded}
-                        </span>
-                        <span
-                          className="font-mono text-[10px] px-2 py-1 rounded-md border text-white/75 leading-snug"
-                          style={{ backgroundColor: `rgba(${tier.farbeRgb}, 0.08)`, borderColor: `rgba(${tier.farbeRgb}, 0.2)` }}
-                        >
-                          <span className="text-white/45 mr-1.5">Lifecycle</span>{tier.lifecycle}
-                        </span>
-                      </div>
-                    </div>
-                    <motion.span
-                      animate={{ rotate: offen ? 45 : 0 }}
-                      transition={{ duration: 0.18 }}
-                      className="text-lg flex-shrink-0 font-light leading-none mt-1"
-                      style={{ color: `rgb(${tier.farbeRgb})`, opacity: offen ? 0.9 : 0.5 }}
-                      aria-hidden="true"
-                    >
-                      +
-                    </motion.span>
-                  </div>
-                </button>
-                <AnimatePresence>
-                  {offen && tier.bedeutung && (
-                    <motion.div
-                      key="detail"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.22 }}
-                      className="overflow-hidden"
-                    >
-                      <div
-                        className="px-4 pb-4 border-t pt-3"
-                        style={{ borderColor: `rgba(${tier.farbeRgb}, 0.12)` }}
+                akzentFarbe={`rgb(${tier.farbeRgb})`}
+                offen={offen}
+                onUmschalten={() => setOffenerTier(offen ? null : tier.tier)}
+                kopf={
+                  <>
+                    <div className="flex items-center flex-wrap gap-2 mb-2.5">
+                      <span
+                        className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] px-2 py-1 rounded-md flex-shrink-0"
+                        style={{
+                          color: `rgb(${tier.farbeRgb})`,
+                          backgroundColor: `rgba(${tier.farbeRgb}, 0.08)`,
+                          border: `1px solid rgba(${tier.farbeRgb}, 0.22)`,
+                        }}
                       >
-                        <p className="text-[12px] text-white/70 leading-relaxed">
-                          {tier.bedeutung}
-                        </p>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </InfoKarte>
+                        {tier.tier}
+                      </span>
+                      <span className="font-mono text-[12px] text-white/85 break-all min-w-0">{tier.ort}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {tier.anzahl && <TechTag name={tier.anzahl} />}
+                      <TechTag name={`geladen · ${tier.loaded}`} />
+                    </div>
+                  </>
+                }
+                detail={
+                  <div className="space-y-2.5">
+                    {tier.bedeutung && (
+                      <p className="text-[13px] text-white/70 leading-relaxed">{tier.bedeutung}</p>
+                    )}
+                    <p className="font-mono text-[11px] text-white/45 leading-relaxed">
+                      <span className="text-white/30">Pflege ·</span> {tier.lifecycle}
+                    </p>
+                  </div>
+                }
+              />
             </motion.div>
           );
         })}
@@ -285,14 +236,7 @@ function MemoryAct() {
             transition={{ delay: i * 0.08 + 0.2, duration: 0.4, ease: EASE }}
           >
             <InfoKarte lichtfarbe={meta.rgb} klassen="p-3">
-              <span
-                className="inline-block font-mono text-[9px] px-1.5 py-0.5 rounded-md border uppercase tracking-wider leading-none mb-2"
-                style={{
-                  color: `rgb(${meta.rgb})`,
-                  backgroundColor: `rgba(${meta.rgb}, 0.1)`,
-                  borderColor: `rgba(${meta.rgb}, 0.25)`,
-                }}
-              >
+              <span className="inline-block font-mono text-[9px] px-1.5 py-0.5 rounded-md border border-white/8 bg-white/5 text-white/40 uppercase tracking-wider leading-none mb-2">
                 Mechanik
               </span>
               <div className="text-[12px] text-white font-medium mb-1">{meta.titel}</div>

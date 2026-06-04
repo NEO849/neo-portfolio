@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { PROJEKTE } from "../models/daten";
 import type { ProjektModel } from "../models/typen";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { AbzeichenStatus, TechTag } from "../bausteine/AbzeichenStatus";
-import { InfoKarte } from "../bausteine/InfoKarte";
+import { AusklappKarte } from "../bausteine/AusklappKarte";
 import { KnopfSekundaer } from "../bausteine/KnopfSekundaer";
 import { GlassTabs, type GlassTab } from "../bausteine/GlassTabs";
 
@@ -35,107 +35,82 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
   const cfg = KATEGORIE_KONFIGURATION[projekt.kategorie] ?? KATEGORIE_KONFIGURATION.development;
 
   return (
-    <InfoKarte
+    <AusklappKarte
       lichtfarbe={cfg.lichtfarbe}
-      akzentRand
       akzentFarbe={cfg.akzentFarbe}
-      mitHoverAnimation={!offen}
-    >
-      {/* Header – immer sichtbar */}
-      <button onClick={() => setOffen(!offen)} className="w-full text-left p-5 md:p-6">
-        <div className="flex items-start justify-between gap-4 mb-3">
-          <div className="min-w-0">
-            <div className="flex items-center flex-wrap gap-2 mb-2">
-              <AbzeichenStatus
-                variante={cfg.variante}
-                text={cfg.label}
-                mitPuls={projekt.status === "aktiv"}
-              />
-              <span className="text-xs text-white/45 font-mono">{projekt.zeitraum}</span>
-              {projekt.status === "aktiv" && (
-                <AbzeichenStatus variante="aktiv" text="aktiv" mitPuls />
-              )}
-              {projekt.status === "abgeschlossen" && (
-                <span className="text-[10px] font-mono text-white/30 border border-white/[0.08] rounded-full px-2 py-0.5">
-                  abgeschlossen
-                </span>
-              )}
-            </div>
-            <h3 className="font-display text-lg font-bold text-white leading-snug">{projekt.titel}</h3>
+      offen={offen}
+      onUmschalten={() => setOffen(!offen)}
+      kopf={
+        <>
+          <div className="flex items-center flex-wrap gap-2 mb-2">
+            <AbzeichenStatus
+              variante={cfg.variante}
+              text={cfg.label}
+              mitPuls={projekt.status === "aktiv"}
+            />
+            <span className="text-xs text-white/45 font-mono">{projekt.zeitraum}</span>
+            {projekt.status === "aktiv" && (
+              <AbzeichenStatus variante="aktiv" text="aktiv" mitPuls />
+            )}
+            {projekt.status === "abgeschlossen" && (
+              <span className="text-[10px] font-mono text-white/30 border border-white/[0.08] rounded-full px-2 py-0.5">
+                abgeschlossen
+              </span>
+            )}
           </div>
-          <motion.div
-            animate={{ rotate: offen ? 45 : 0 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="text-xl flex-shrink-0 leading-none mt-0.5 transition-colors duration-200"
-            style={{ color: cfg.akzentFarbe, opacity: offen ? 0.85 : 0.45 }}
-          >
-            +
-          </motion.div>
-        </div>
-        <p className="text-sm text-white/60 leading-relaxed">{projekt.kurzbeschreibung}</p>
-        <div className="flex flex-wrap gap-1.5 mt-3">
-          {projekt.technologien.map(tech => (
-            <TechTag key={tech} name={tech} />
-          ))}
-        </div>
-      </button>
+          <h3 className="font-display text-lg font-bold text-white leading-snug">{projekt.titel}</h3>
+          <p className="text-sm text-white/60 leading-relaxed mt-2">{projekt.kurzbeschreibung}</p>
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {projekt.technologien.map(tech => (
+              <TechTag key={tech} name={tech} />
+            ))}
+          </div>
+        </>
+      }
+      detail={
+        <div className="space-y-4">
+          <p className="text-sm text-white/70 leading-relaxed">{projekt.langbeschreibung}</p>
 
-      {/* Aufklappbarer Detail-Bereich */}
-      <AnimatePresence>
-        {offen && (
-          <motion.div
-            key="detail"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: "easeInOut" }}
-            className="overflow-hidden"
-          >
-            <div className="px-5 md:px-6 pb-5 md:pb-6 border-t border-white/[0.05] pt-4 space-y-4">
-              <p className="text-sm text-white/70 leading-relaxed">{projekt.langbeschreibung}</p>
+          <div>
+            <p className="font-mono text-[11px] tracking-widest mb-2.5"
+              style={{ color: `${cfg.akzentFarbe}99` }}>
+              HIGHLIGHTS
+            </p>
+            <ul className="space-y-1.5">
+              {projekt.highlights.map((highlight, index) => (
+                <li key={index} className="text-sm text-white/60 flex items-start gap-2">
+                  <span className="flex-shrink-0 mt-[3px] text-[10px]"
+                    style={{ color: cfg.akzentFarbe, opacity: 0.65 }}>
+                    ›
+                  </span>
+                  <span>{highlight}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-              <div>
-                <p className="font-mono text-[11px] tracking-widest mb-2.5"
-                  style={{ color: `${cfg.akzentFarbe}99` }}>
-                  HIGHLIGHTS
-                </p>
-                <ul className="space-y-1.5">
-                  {projekt.highlights.map((highlight, index) => (
-                    <li key={index} className="text-sm text-white/60 flex items-start gap-2">
-                      <span className="flex-shrink-0 mt-[3px] text-[10px]"
-                        style={{ color: cfg.akzentFarbe, opacity: 0.65 }}>
-                        ›
-                      </span>
-                      <span>{highlight}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {(projekt.linkGithub || projekt.linkLive || projekt.linkDemo) && (
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {projekt.linkGithub && (
-                    <KnopfSekundaer zuUrl={projekt.linkGithub} klassen="text-xs">
-                      GitHub →
-                    </KnopfSekundaer>
-                  )}
-                  {projekt.linkLive && (
-                    <KnopfSekundaer zuUrl={projekt.linkLive} klassen="text-xs">
-                      Live →
-                    </KnopfSekundaer>
-                  )}
-                  {projekt.linkDemo && (
-                    <KnopfSekundaer zuRoute={projekt.linkDemo} klassen="text-xs">
-                      Demo ansehen →
-                    </KnopfSekundaer>
-                  )}
-                </div>
+          {(projekt.linkGithub || projekt.linkLive || projekt.linkDemo) && (
+            <div className="flex flex-wrap gap-2 pt-1">
+              {projekt.linkGithub && (
+                <KnopfSekundaer zuUrl={projekt.linkGithub} klassen="text-xs">
+                  GitHub →
+                </KnopfSekundaer>
+              )}
+              {projekt.linkLive && (
+                <KnopfSekundaer zuUrl={projekt.linkLive} klassen="text-xs">
+                  Live →
+                </KnopfSekundaer>
+              )}
+              {projekt.linkDemo && (
+                <KnopfSekundaer zuRoute={projekt.linkDemo} klassen="text-xs">
+                  Demo ansehen →
+                </KnopfSekundaer>
               )}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </InfoKarte>
+          )}
+        </div>
+      }
+    />
   );
 }
 

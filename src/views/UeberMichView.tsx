@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ZEITSTRAHL } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
 import { TechTag } from "../bausteine/AbzeichenStatus";
+import { AusklappKarte } from "../bausteine/AusklappKarte";
 import { STATISCHE_TEXTKARTE } from "../bewegung/varianten";
 
 // ─── Kategorie-Konfiguration ──────────────────────────────────────
@@ -181,99 +182,65 @@ export default function UeberMichView() {
                   />
                 </div>
 
-                <InfoKarte
+                <AusklappKarte
                   lichtfarbe={cfg.lichtfarbe}
-                  akzentRand
                   akzentFarbe={cfg.akzentFarbe}
-                  mitHoverAnimation={!offen}
-                  klassen="relative overflow-hidden"
+                  offen={offen}
+                  onUmschalten={() => setOffenerIndex(offen ? null : index)}
                   stil={{
                     backgroundImage: `linear-gradient(135deg, rgba(${cfg.lichtfarbe}, 0.038) 0%, transparent 55%)`,
                   }}
-                >
-                  {/* Header – ganze Card klickbar (konsistent zu den Projekte-Cards) */}
-                  <button
-                    type="button"
-                    onClick={() => setOffenerIndex(offen ? null : index)}
-                    aria-expanded={offen}
-                    className="w-full text-left p-5 md:p-6 focus-visible:outline-none"
-                  >
-                    <div className="flex items-start justify-between gap-4 mb-2.5">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2.5 mb-2 flex-wrap">
-                          <span
-                            className="inline-flex items-center px-2 py-[3px] rounded-full text-[10px] font-mono font-semibold tracking-[0.13em] uppercase border"
-                            style={{
-                              borderColor: `${cfg.akzentFarbe}30`,
-                              color: cfg.akzentFarbe,
-                              backgroundColor: `${cfg.akzentFarbe}10`,
-                            }}
-                          >
-                            {cfg.label}
-                          </span>
-                          <span className="font-mono text-[11px] text-white/35">{eintrag.jahr}</span>
-                        </div>
-                        <h3 className="font-display text-lg font-bold text-white leading-snug">
-                          {eintrag.titel}
-                        </h3>
-                      </div>
-                      {eintrag.module && (
-                        <motion.div
-                          animate={{ rotate: offen ? 45 : 0 }}
-                          transition={{ duration: 0.2, ease: "easeInOut" }}
-                          className="text-xl flex-shrink-0 leading-none mt-0.5"
-                          style={{ color: cfg.akzentFarbe, opacity: offen ? 0.85 : 0.45 }}
-                          aria-hidden="true"
+                  kopf={
+                    <>
+                      <div className="flex items-center gap-2.5 mb-2 flex-wrap">
+                        <span
+                          className="inline-flex items-center px-2 py-[3px] rounded-full text-[10px] font-mono font-semibold tracking-[0.13em] uppercase border"
+                          style={{
+                            borderColor: `${cfg.akzentFarbe}30`,
+                            color: cfg.akzentFarbe,
+                            backgroundColor: `${cfg.akzentFarbe}10`,
+                          }}
                         >
-                          +
-                        </motion.div>
-                      )}
-                    </div>
-                    <p className="text-sm text-white/60 leading-relaxed">
-                      {eintrag.beschreibung}
-                    </p>
-                  </button>
-
-                  {/* Aufklappbarer Detail-Bereich: Schwerpunkte als Chips */}
-                  <AnimatePresence initial={false}>
-                    {offen && eintrag.module && (
-                      <motion.div
-                        key="detail"
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.28, ease: "easeInOut" }}
-                        className="overflow-hidden"
+                          {cfg.label}
+                        </span>
+                        <span className="font-mono text-[11px] text-white/35">{eintrag.jahr}</span>
+                      </div>
+                      <h3 className="font-display text-lg font-bold text-white leading-snug">
+                        {eintrag.titel}
+                      </h3>
+                      <p className="text-sm text-white/60 leading-relaxed mt-2">
+                        {eintrag.beschreibung}
+                      </p>
+                    </>
+                  }
+                  detail={
+                    <>
+                      <p
+                        className="font-mono text-[11px] tracking-widest uppercase mb-2.5"
+                        style={{ color: `${cfg.akzentFarbe}99` }}
                       >
-                        <div className="px-5 md:px-6 pb-5 md:pb-6 border-t border-white/[0.05] pt-4">
-                          <p
-                            className="font-mono text-[11px] tracking-widest uppercase mb-2.5"
-                            style={{ color: `${cfg.akzentFarbe}99` }}
+                        {eintrag.modulTitel ?? "Schwerpunkte"}
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+                        {(eintrag.module ?? []).map((mod) => (
+                          <div
+                            key={mod.name}
+                            className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5"
                           >
-                            {eintrag.modulTitel ?? "Schwerpunkte"}
-                          </p>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
-                            {eintrag.module.map((mod) => (
-                              <div
-                                key={mod.name}
-                                className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5"
-                              >
-                                <p className="font-mono text-[10px] font-semibold mb-1.5 text-white/45 tracking-wide">
-                                  {mod.name}
-                                </p>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {mod.skills.map((skill) => (
-                                    <TechTag key={skill} name={skill} />
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
+                            <p className="font-mono text-[10px] font-semibold mb-1.5 text-white/45 tracking-wide">
+                              {mod.name}
+                            </p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {mod.skills.map((skill) => (
+                                <TechTag key={skill} name={skill} />
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </InfoKarte>
+                        ))}
+                      </div>
+                    </>
+                  }
+                />
               </motion.div>
             );
           })}
