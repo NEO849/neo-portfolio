@@ -14,9 +14,9 @@ import { zahlwort, grossErsterBuchstabe } from "../hilfsmittel/formatierung";
 // Anzahl der Schwerpunkte direkt aus den Daten ableiten — so können Untertitel
 // und Karten nie auseinanderlaufen (Single Source of Truth).
 const LEISTUNGEN_UNTERTITEL =
-  `${grossErsterBuchstabe(zahlwort(LEISTUNGEN.length))} Schwerpunkte – jeweils ` +
-  `darauf ausgerichtet, was dabei für Sie herauskommt. Keine Werkzeug-Show, ` +
-  `sondern Systeme und Sicherheit, die im Alltag tragen.`;
+  `${grossErsterBuchstabe(zahlwort(LEISTUNGEN.length))} Schwerpunkte – Stabil, Sicher, ` +
+  `Effizient und Modular/Wartbar. Keine Werkzeug-Show, sondern Systeme und ` +
+  `Sicherheit, die im Alltag tragen.`;
 
 export default function LeistungenView() {
   return (
