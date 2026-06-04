@@ -184,100 +184,99 @@ export default function UeberMichView() {
                   lichtfarbe={cfg.lichtfarbe}
                   akzentRand
                   akzentFarbe={cfg.akzentFarbe}
-                  mitHoverAnimation={false}
-                  klassen="relative p-4 md:p-5 overflow-hidden"
+                  mitHoverAnimation={!offen}
+                  klassen="relative overflow-hidden"
                   stil={{
                     backgroundImage: `linear-gradient(135deg, rgba(${cfg.lichtfarbe}, 0.038) 0%, transparent 55%)`,
                   }}
                 >
-                  {/* Laufende Nummer */}
-                  <span className="absolute top-3 right-4 font-mono text-[10px] text-white/14 select-none tabular-nums">
-                    {String(index + 1).padStart(2, "0")} / {String(ZEITSTRAHL.length).padStart(2, "0")}
-                  </span>
-
-                  {/* Badge + Jahr */}
-                  <div className="flex items-center gap-2.5 mb-2.5 flex-wrap pr-12">
-                    <span
-                      className="inline-flex items-center px-2 py-[3px] rounded-full text-[10px] font-mono font-semibold tracking-[0.13em] uppercase border"
-                      style={{
-                        borderColor: `${cfg.akzentFarbe}30`,
-                        color: cfg.akzentFarbe,
-                        backgroundColor: `${cfg.akzentFarbe}10`,
-                      }}
-                    >
-                      {cfg.label}
-                    </span>
-                    <span className="font-mono text-[11px] text-white/35">{eintrag.jahr}</span>
-                  </div>
-
-                  <h3 className="font-display text-[15px] font-bold text-white/90 mb-1.5 leading-snug">
-                    {eintrag.titel}
-                  </h3>
-                  <p className="text-sm text-white/60 leading-relaxed">
-                    {eintrag.beschreibung}
-                  </p>
-
-                  {eintrag.module && (
-                    <div className="mt-3.5">
-                      {/* Klickbare Titelzeile schaltet die Schwerpunkte auf/zu */}
-                      <button
-                        type="button"
-                        onClick={() => setOffenerIndex(offen ? null : index)}
-                        aria-expanded={offen}
-                        className="group w-full flex items-center gap-2 focus-visible:outline-none"
-                      >
-                        <span className="font-mono text-[10px] uppercase tracking-widest text-white/30 group-hover:text-white/55 transition-colors">
-                          {eintrag.modulTitel ?? "Schwerpunkte"}
-                        </span>
-                        <div className="h-px flex-1 bg-white/[0.06] group-hover:bg-white/[0.1] transition-colors" />
-                        <motion.span
+                  {/* Header – ganze Card klickbar (konsistent zu den Projekte-Cards) */}
+                  <button
+                    type="button"
+                    onClick={() => setOffenerIndex(offen ? null : index)}
+                    aria-expanded={offen}
+                    className="w-full text-left p-5 md:p-6 focus-visible:outline-none"
+                  >
+                    <div className="flex items-start justify-between gap-4 mb-2.5">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2.5 mb-2 flex-wrap">
+                          <span
+                            className="inline-flex items-center px-2 py-[3px] rounded-full text-[10px] font-mono font-semibold tracking-[0.13em] uppercase border"
+                            style={{
+                              borderColor: `${cfg.akzentFarbe}30`,
+                              color: cfg.akzentFarbe,
+                              backgroundColor: `${cfg.akzentFarbe}10`,
+                            }}
+                          >
+                            {cfg.label}
+                          </span>
+                          <span className="font-mono text-[11px] text-white/35">{eintrag.jahr}</span>
+                        </div>
+                        <h3 className="font-display text-lg font-bold text-white leading-snug">
+                          {eintrag.titel}
+                        </h3>
+                      </div>
+                      {eintrag.module && (
+                        <motion.div
                           animate={{ rotate: offen ? 45 : 0 }}
-                          transition={{ duration: 0.18 }}
-                          className="text-base font-light leading-none"
-                          style={{ color: cfg.akzentFarbe, opacity: offen ? 0.9 : 0.5 }}
+                          transition={{ duration: 0.2, ease: "easeInOut" }}
+                          className="text-xl flex-shrink-0 leading-none mt-0.5"
+                          style={{ color: cfg.akzentFarbe, opacity: offen ? 0.85 : 0.45 }}
                           aria-hidden="true"
                         >
                           +
-                        </motion.span>
-                      </button>
-
-                      <AnimatePresence initial={false}>
-                        {offen && (
-                          <motion.div
-                            key="module"
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.24, ease: "easeInOut" }}
-                            className="overflow-hidden"
-                          >
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-2.5">
-                              {eintrag.module.map((mod) => (
-                                <div
-                                  key={mod.name}
-                                  className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5"
-                                >
-                                  <p className="font-mono text-[10px] font-semibold mb-1.5 text-white/45 tracking-wide">
-                                    {mod.name}
-                                  </p>
-                                  <div className="flex flex-wrap gap-1">
-                                    {mod.skills.map((skill) => (
-                                      <span
-                                        key={skill}
-                                        className="font-mono text-[10px] px-1.5 py-0.5 rounded-md border border-white/[0.14] bg-white/[0.05] text-white/70 leading-snug transition-colors hover:text-white/90 hover:bg-white/[0.08]"
-                                      >
-                                        {skill}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                        </motion.div>
+                      )}
                     </div>
-                  )}
+                    <p className="text-sm text-white/60 leading-relaxed">
+                      {eintrag.beschreibung}
+                    </p>
+                  </button>
+
+                  {/* Aufklappbarer Detail-Bereich: Schwerpunkte als Chips */}
+                  <AnimatePresence initial={false}>
+                    {offen && eintrag.module && (
+                      <motion.div
+                        key="detail"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.28, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-5 md:px-6 pb-5 md:pb-6 border-t border-white/[0.05] pt-4">
+                          <p
+                            className="font-mono text-[11px] tracking-widest uppercase mb-2.5"
+                            style={{ color: `${cfg.akzentFarbe}99` }}
+                          >
+                            {eintrag.modulTitel ?? "Schwerpunkte"}
+                          </p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                            {eintrag.module.map((mod) => (
+                              <div
+                                key={mod.name}
+                                className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5"
+                              >
+                                <p className="font-mono text-[10px] font-semibold mb-1.5 text-white/45 tracking-wide">
+                                  {mod.name}
+                                </p>
+                                <div className="flex flex-wrap gap-1">
+                                  {mod.skills.map((skill) => (
+                                    <span
+                                      key={skill}
+                                      className="font-mono text-[10px] px-1.5 py-0.5 rounded-md border border-white/[0.14] bg-white/[0.05] text-white/70 leading-snug transition-colors hover:text-white/90 hover:bg-white/[0.08]"
+                                    >
+                                      {skill}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </InfoKarte>
               </motion.div>
             );
