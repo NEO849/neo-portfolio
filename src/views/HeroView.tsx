@@ -16,6 +16,9 @@ function CodeRainCanvas() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Reduced-Motion respektieren: keine laufende Animation, Canvas bleibt ruhig/leer
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+
     let w = window.innerWidth;
     let h = window.innerHeight;
     canvas.width = w;
@@ -56,7 +59,23 @@ function CodeRainCanvas() {
     return () => { clearInterval(intervall); window.removeEventListener("resize", resize); };
   }, []);
 
-  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" style={{ opacity: 0.55 }} />;
+  // mask-image: blendet die Matrix-/Scanline-Animation zum unteren Hero-Rand hin
+  // weich aus (statt hart an der Section-Kante abgeschnitten). So entsteht ein
+  // nahtloser Übergang in den "Leistungen"-Abschnitt — keine harte Trennkante.
+  const ausblendMaske =
+    "linear-gradient(to bottom, #000 0%, #000 50%, rgba(0,0,0,0.4) 78%, transparent 96%)";
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        opacity: 0.55,
+        maskImage: ausblendMaske,
+        WebkitMaskImage: ausblendMaske,
+      }}
+    />
+  );
 }
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
