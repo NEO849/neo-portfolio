@@ -192,7 +192,6 @@ export const PROJEKTE: ProjektModel[] = [
       "Flüssige Listen auch bei sehr vielen Einträgen",
       "Merkt sich Einstellungen und Zustand zwischen App-Starts",
     ],
-    linkGithub: "https://github.com/NEO849/ZAlmanach",
     zeitraum: "2023",
     status: "abgeschlossen",
   },
