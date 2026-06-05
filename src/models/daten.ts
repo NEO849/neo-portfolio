@@ -156,7 +156,6 @@ export const PROJEKTE: ProjektModel[] = [
       "Saubere MVVM-Architektur mit klar getrennter Datenschicht",
       "Reaktive Oberfläche mit Combine und async/await"
     ],
-    linkGithub: "https://github.com/NEO849/ONE",
     zeitraum: "2024 – 2025",
     status: "aktiv",
   },
