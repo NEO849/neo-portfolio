@@ -65,11 +65,16 @@ export default function LeistungenView() {
                   ))}
                 </ul>
 
-                <div
-                  className="mt-auto pt-3 text-sm font-medium border-t border-white/[0.05]"
-                  style={{ color: l.akzentHex }}
-                >
-                  {l.ergebnis}
+                <div className="mt-auto pt-3 border-t border-white/[0.06]">
+                  <p
+                    className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] mb-1.5"
+                    style={{ color: l.akzentHex, opacity: 0.75 }}
+                  >
+                    Ergebnis
+                  </p>
+                  <p className="text-[13px] text-white/70 leading-relaxed">
+                    {l.ergebnis}
+                  </p>
                 </div>
               </div>
             </InfoKarte>
