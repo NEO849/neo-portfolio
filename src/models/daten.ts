@@ -177,6 +177,7 @@ export const PROJEKTE: ProjektModel[] = [
     linkGithub: "https://github.com/NEO849/Sports-Almanach",
     galerieSlug: "sports-almanach",
     bilder: [
+      { quelle: "/projekte/sports-almanach/sport_splash_0.webp",        titel: "Splash",           text: "Einstieg ins Sports-Almanach-Universum." },
       { quelle: "/projekte/sports-almanach/sport_login_1.webp",         titel: "Login",            text: "Sicherer Einstieg über Firebase Authentication." },
       { quelle: "/projekte/sports-almanach/sport_register_2.webp",      titel: "Registrierung",    text: "Konto anlegen mit Cloud-Synchronisation." },
       { quelle: "/projekte/sports-almanach/sport_home_3.webp",          titel: "Home",             text: "Kontostand und Übersicht in Echtzeit." },
@@ -206,6 +207,7 @@ export const PROJEKTE: ProjektModel[] = [
     linkGithub: "https://github.com/NEO849/ZAlmanach",
     galerieSlug: "z-almanach",
     bilder: [
+      { quelle: "/projekte/z-almanach/00-login.webp",     titel: "Login",     text: "Anmeldung im Retro-Arcade-Look." },
       { quelle: "/projekte/z-almanach/01-splash.webp",    titel: "Splash",    text: "Retro-Arcade-Einstieg ins DBZ-Universum." },
       { quelle: "/projekte/z-almanach/02-home.webp",      titel: "Home",      text: "Charaktere und Fraktionen im Überblick." },
       { quelle: "/projekte/z-almanach/03-explore.webp",   titel: "Explore",   text: "Das ganze Universum durchstöbern." },
