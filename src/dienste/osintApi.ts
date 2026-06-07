@@ -621,3 +621,80 @@ export async function orchestrator(
 export async function benutzernameVollscan(benutzername: string): Promise<BenutzerErgebnis> {
   return apiFetch<BenutzerErgebnis>("/benutzername", { benutzername, vollscan: true });
 }
+
+// ─── Typen: Subdomain-Recon ───────────────────────────────────────
+
+export interface SubdomainEintrag {
+  host: string;
+  quellen: string[];           // ["crt.sh", "wayback", "commoncrawl"]
+  aktiv: boolean | null;       // null = nicht aufgelöst
+  ip: string | null;
+}
+
+export interface SubdomainQuelleMeta {
+  ok: boolean;
+  anzahl?: number;
+  hinweis?: string;
+}
+
+export interface SubdomainErgebnis {
+  domain: string;
+  analysiert_am: string;
+  fehler?: string;
+  zusammenfassung?: {
+    gesamt_eindeutig: number;
+    angezeigt: number;
+    live_aufgeloest: number | null;
+    limit_erreicht: boolean;
+  };
+  quellen?: {
+    "crt.sh": SubdomainQuelleMeta;
+    wayback: SubdomainQuelleMeta;
+    commoncrawl: SubdomainQuelleMeta;
+  };
+  subdomains?: SubdomainEintrag[];
+}
+
+// ─── Typen: IP-Intel (RIPEstat) ───────────────────────────────────
+
+export interface IpIntelErgebnis {
+  ziel: string;
+  ip?: string;
+  eingabe_typ?: "ip" | "domain";
+  analysiert_am: string;
+  fehler?: string;
+  routing?: {
+    asns: Array<string | number>;
+    prefix: string | null;
+    prefix_inhaber: string | null;
+    announced: boolean | null;
+  };
+  as?: {
+    asn: string | number | null;
+    holder: string | null;
+    typ: string | null;
+    announced: boolean | null;
+  };
+  abuse_kontakte?: string[];
+  links?: { ripestat: string; bgp_he: string };
+  quelle?: string;
+}
+
+/**
+ * Subdomain-Recon — keyless, multi-source (crt.sh + Wayback + CommonCrawl).
+ * Mit aufloesen=true werden bis zu 75 Subdomains live A-Record-aufgelöst.
+ */
+export async function subdomainsFinden(
+  domain: string,
+  aufloesen = false,
+): Promise<SubdomainErgebnis> {
+  return apiFetch<SubdomainErgebnis>("/subdomains", { domain, aufloesen });
+}
+
+/**
+ * IP-Intel via RIPEstat (keyless) — Routing, AS-Holder, Prefix, Abuse-Kontakt.
+ * Akzeptiert IP-Adresse oder Domain.
+ */
+export async function ipIntelAbfragen(ziel: string): Promise<IpIntelErgebnis> {
+  return apiFetch<IpIntelErgebnis>("/ip-intel", { ziel });
+}

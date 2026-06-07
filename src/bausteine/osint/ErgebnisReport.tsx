@@ -1,0 +1,768 @@
+// ═══════════════════════════════════════════════════════════════════
+// BAUSTEIN: ErgebnisReport — interaktive Terminal-Report-Ansicht
+//
+// Wandelt die rohen OSINT-Backend-Daten in eine scannbare, interaktive
+// Darstellung um — im Terminal-Stil (Monospace, Cyber-Palette), aber
+// mit echtem Mehrwert: klickbare Quellen-Links, Copy-Buttons auf
+// Hashes/IPs, animierte Severity-Gauges, Avatare, Filter für lange
+// Listen. Die rohe ASCII-Ausgabe bleibt parallel erhalten (Raw-View).
+//
+// Isoliert von OsintDemoView, damit der Terminal-Kern stabil bleibt.
+// ═══════════════════════════════════════════════════════════════════
+
+import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import type {
+  DomainErgebnis, EmailErgebnis, EmailReconErgebnis, BenutzerErgebnis,
+  TelefonErgebnis, BildErgebnis, ShodanErgebnis, AggregatorErgebnis,
+  OrchestratorErgebnis, SubdomainErgebnis, IpIntelErgebnis,
+} from "../../dienste/osintApi";
+
+// ─── Palette (terminal-konform, aus dem Design-System) ──────────────
+
+const C = {
+  gruen:  "#22c55e",
+  gelb:   "#f59e0b",
+  rot:    "#ef4444",
+  cyber:  "#22d3ee",
+  akzent: "#818cf8",
+  lila:   "#c084fc",
+  orange: "#fb923c",
+};
+
+/** Mappt eine Risiko-/Severity-Stufe auf eine Farbe. */
+function stufeFarbe(stufe?: string): string {
+  switch ((stufe ?? "").toLowerCase()) {
+    case "kritisch": return C.rot;
+    case "hoch":     return C.rot;
+    case "mittel":   return C.gelb;
+    case "gering":   return C.cyber;
+    case "keines":   return C.gruen;
+    default:         return C.akzent;
+  }
+}
+
+// ─── Copy-Hook ──────────────────────────────────────────────────────
+
+function useKopieren(): [string | null, (wert: string, id: string) => void] {
+  const [kopiertId, setKopiertId] = useState<string | null>(null);
+  const kopieren = (wert: string, id: string) => {
+    const ok = () => { setKopiertId(id); setTimeout(() => setKopiertId(null), 1400); };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(wert).then(ok).catch(() => {});
+    } else {
+      const el = document.createElement("textarea");
+      el.value = wert; el.style.cssText = "position:absolute;left:-9999px";
+      document.body.appendChild(el); el.select();
+      try { document.execCommand("copy"); ok(); } catch { /* noop */ }
+      document.body.removeChild(el);
+    }
+  };
+  return [kopiertId, kopieren];
+}
+
+// ─── Primitive: Sektion ─────────────────────────────────────────────
+
+function Sektion({ titel, farbe = C.akzent, rechts, children }: {
+  titel: string; farbe?: string; rechts?: React.ReactNode; children: React.ReactNode;
+}) {
+  return (
+    <div className="mt-5 first:mt-0">
+      <div className="flex items-center gap-3 mb-2">
+        <span className="font-mono text-[10.5px] tracking-[0.22em] uppercase font-semibold"
+              style={{ color: farbe }}>{titel}</span>
+        <span className="h-px flex-1"
+              style={{ background: `linear-gradient(90deg, ${farbe}40, transparent)` }} />
+        {rechts}
+      </div>
+      <div className="pl-0.5">{children}</div>
+    </div>
+  );
+}
+
+// ─── Primitive: Feld (Key/Value, optional Copy/Link) ────────────────
+
+function Feld({ label, children, copy, href, copyId, kopiertId, onCopy }: {
+  label: string; children: React.ReactNode;
+  copy?: string; href?: string;
+  copyId?: string; kopiertId?: string | null; onCopy?: (w: string, id: string) => void;
+}) {
+  return (
+    <div className="flex items-baseline gap-2 py-[3px] font-mono text-[12.5px] group">
+      <span className="text-white/40 min-w-[96px] shrink-0">{label}</span>
+      <span className="text-white/85 break-all flex-1">
+        {href ? (
+          <a href={href} target="_blank" rel="noopener noreferrer"
+             className="text-cyber-400 hover:underline underline-offset-2">{children}</a>
+        ) : children}
+      </span>
+      {copy !== undefined && onCopy && (
+        <button onClick={() => onCopy(copy, copyId ?? label)}
+          className="shrink-0 text-[10px] px-1.5 py-0.5 rounded border border-white/10 text-white/40
+                     hover:text-white/80 hover:border-white/25 transition opacity-0 group-hover:opacity-100"
+          title="Kopieren">
+          {kopiertId === (copyId ?? label) ? "✓" : "copy"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ─── Primitive: Severity-Messleiste (animiert, segmentiert) ─────────
+
+function Messleiste({ wert, max, stufe }: { wert: number; max: number; stufe: string }) {
+  const farbe = stufeFarbe(stufe);
+  const segmente = 16;
+  const aktiv = max > 0 ? Math.round((wert / max) * segmente) : 0;
+  return (
+    <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex gap-[3px]">
+        {Array.from({ length: segmente }).map((_, i) => (
+          <motion.span key={i}
+            initial={{ opacity: 0, scaleY: 0.3 }} animate={{ opacity: 1, scaleY: 1 }}
+            transition={{ delay: i * 0.025, duration: 0.2 }}
+            className="w-[6px] h-4 rounded-[1px]"
+            style={{
+              background: i < aktiv ? farbe : "rgba(255,255,255,0.07)",
+              boxShadow: i < aktiv ? `0 0 6px ${farbe}55` : "none",
+            }} />
+        ))}
+      </div>
+      <span className="font-mono text-[12px] font-bold tracking-wide" style={{ color: farbe }}>
+        {stufe.toUpperCase()}
+      </span>
+      <span className="font-mono text-[11px] text-white/40">{wert}/{max}</span>
+    </div>
+  );
+}
+
+// ─── Primitive: Verdikt-Banner (Headline mit Gauge) ─────────────────
+
+function Verdikt({ titel, stufe, wert, max, hinweis }: {
+  titel: string; stufe: string; wert: number; max: number; hinweis?: string;
+}) {
+  const farbe = stufeFarbe(stufe);
+  return (
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      className="rounded-lg border p-3.5 mb-1"
+      style={{ borderColor: `${farbe}33`, background: `${farbe}0d` }}>
+      <div className="flex items-center justify-between gap-3 mb-2.5">
+        <span className="font-mono text-[11px] tracking-wider uppercase text-white/55">{titel}</span>
+        {hinweis && <span className="font-mono text-[10px] text-white/35">{hinweis}</span>}
+      </div>
+      <Messleiste wert={wert} max={max} stufe={stufe} />
+    </motion.div>
+  );
+}
+
+// ─── Primitive: Marke / Badge ───────────────────────────────────────
+
+function Marke({ text, farbe = C.akzent, gefuellt }: { text: string; farbe?: string; gefuellt?: boolean }) {
+  return (
+    <span className="inline-flex items-center px-2 py-0.5 rounded font-mono text-[10.5px] font-medium"
+      style={{
+        color: farbe,
+        border: `1px solid ${farbe}${gefuellt ? "55" : "33"}`,
+        background: gefuellt ? `${farbe}1a` : `${farbe}0a`,
+      }}>{text}</span>
+  );
+}
+
+// ─── Primitive: klickbarer Link-Chip ────────────────────────────────
+
+function LinkChip({ name, url, farbe = C.cyber }: { name: string; url: string; farbe?: string }) {
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer"
+      className="group inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md font-mono text-[11.5px] transition-all"
+      style={{ border: `1px solid ${farbe}26`, background: `${farbe}0a`, color: "rgba(255,255,255,0.78)" }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = `${farbe}66`; e.currentTarget.style.background = `${farbe}1a`; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = `${farbe}26`; e.currentTarget.style.background = `${farbe}0a`; }}>
+      <span>{name}</span>
+      <span className="opacity-0 group-hover:opacity-70 transition" style={{ color: farbe }}>↗</span>
+    </a>
+  );
+}
+
+// ─── Primitive: Link-Raster gruppiert nach Kategorie ────────────────
+
+function LinkRaster({ gruppen, farbe = C.cyber }: {
+  gruppen: Record<string, Array<{ name: string; url: string }>>; farbe?: string;
+}) {
+  return (
+    <div className="space-y-3">
+      {Object.entries(gruppen).map(([kat, links]) => (
+        <div key={kat}>
+          <div className="font-mono text-[10px] text-white/35 mb-1.5 tracking-wider">{kat} ({links.length})</div>
+          <div className="flex flex-wrap gap-1.5">
+            {links.map((l, i) => <LinkChip key={`${l.name}-${i}`} name={l.name} url={l.url} farbe={farbe} />)}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Primitive: Severity-Item-Liste ─────────────────────────────────
+
+function Item({ stufe, children }: { stufe?: "hoch" | "mittel" | "info" | "ok" | "neg"; children: React.ReactNode }) {
+  const farbe = stufe === "hoch" ? C.rot : stufe === "mittel" ? C.gelb
+    : stufe === "ok" ? C.gruen : stufe === "neg" ? "rgba(255,255,255,0.3)" : C.cyber;
+  return (
+    <div className="flex items-start gap-2.5 py-[3px] font-mono text-[12px]">
+      <span className="mt-[5px] w-1.5 h-1.5 rounded-full shrink-0"
+        style={{ background: farbe, boxShadow: `0 0 5px ${farbe}88` }} />
+      <span className="text-white/75 break-words flex-1">{children}</span>
+    </div>
+  );
+}
+
+// ─── Primitive: Aufklappbar ─────────────────────────────────────────
+
+function Aufklappbar({ label, kinderAnzahl, children }: {
+  label: string; kinderAnzahl: number; children: React.ReactNode;
+}) {
+  const [offen, setOffen] = useState(false);
+  if (kinderAnzahl <= 0) return null;
+  return (
+    <div>
+      {offen && <div className="mb-2">{children}</div>}
+      <button onClick={() => setOffen(!offen)}
+        className="font-mono text-[11px] text-white/45 hover:text-white/75 transition">
+        {offen ? "▲ weniger anzeigen" : `▼ ${label}`}
+      </button>
+    </div>
+  );
+}
+
+// ─── Primitive: Filter-Eingabe ──────────────────────────────────────
+
+function Filter({ wert, setWert, platzhalter }: { wert: string; setWert: (v: string) => void; platzhalter: string }) {
+  return (
+    <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder={platzhalter}
+      spellCheck={false} autoComplete="off"
+      className="terminal-eingabe font-mono text-[12px] py-1 w-40 max-w-full" />
+  );
+}
+
+const zeit = (iso?: string) => (iso ?? "").replace("T", " ").substring(0, 19);
+
+// ═══════════════════════════════════════════════════════════════════
+// MODUL-REPORTS
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── Telefon ────────────────────────────────────────────────────────
+
+function ReportTelefon({ t }: { t: TelefonErgebnis }) {
+  const [kid, copy] = useKopieren();
+  if (!t.gueltig || t.fehler) return <FehlerHinweis text={t.fehler ?? "Ungültige Nummer"} />;
+  return (
+    <div>
+      <Sektion titel="Format">
+        <Feld label="International" copy={t.format?.international} copyId="intl" kopiertId={kid} onCopy={copy}>{t.format?.international}</Feld>
+        <Feld label="National">{t.format?.national}</Feld>
+        <Feld label="E.164" copy={t.format?.e164} copyId="e164" kopiertId={kid} onCopy={copy}>{t.format?.e164}</Feld>
+      </Sektion>
+      <Sektion titel="Metadaten">
+        <Feld label="Land">{t.metadaten?.land_code} — {t.metadaten?.region}</Feld>
+        <Feld label="Typ">{t.metadaten?.leitungstyp}</Feld>
+        <Feld label="Carrier">{t.metadaten?.carrier || "—"}</Feld>
+        <Feld label="Zeitzone">{(t.metadaten?.zeitzonen ?? []).join(", ")}</Feld>
+      </Sektion>
+      {t.suchlinks?.nach_kategorie && (
+        <Sektion titel="Suchlinks" farbe={C.cyber} rechts={<span className="font-mono text-[10px] text-white/30">{t.suchlinks.gesamt} Quellen · klickbar</span>}>
+          <LinkRaster gruppen={t.suchlinks.nach_kategorie} />
+        </Sektion>
+      )}
+      {!!t.risiko?.details.length && (
+        <Sektion titel="Hinweise" farbe={C.gelb}>
+          {t.risiko.details.map((d, i) => <Item key={i} stufe="mittel">{d}</Item>)}
+        </Sektion>
+      )}
+      <FussZeile iso={t.analysiert_am} />
+    </div>
+  );
+}
+
+// ─── Bild ───────────────────────────────────────────────────────────
+
+function ReportBild({ b }: { b: BildErgebnis }) {
+  const [kid, copy] = useKopieren();
+  if (b.fehler) return <FehlerHinweis text={b.fehler} />;
+  const gps = b.exif?.gps;
+  return (
+    <div>
+      {gps && <Verdikt titel="Standort-Risiko" stufe="Hoch" wert={6} max={6} hinweis="GPS im Bild gefunden" />}
+      <Sektion titel="Bild-Info">
+        <Feld label="Format">{b.bild?.format}</Feld>
+        <Feld label="Auflösung">{b.bild?.breite} × {b.bild?.hoehe} px</Feld>
+        <Feld label="Größe">{b.bild?.groesse_kb} KB</Feld>
+      </Sektion>
+      <Sektion titel="Hashes" rechts={<span className="font-mono text-[10px] text-white/30">copy → reverse-DB</span>}>
+        <Feld label="MD5"    copy={b.hashes?.md5}   copyId="md5"   kopiertId={kid} onCopy={copy}>{b.hashes?.md5}</Feld>
+        <Feld label="SHA256" copy={b.hashes?.sha256} copyId="sha"  kopiertId={kid} onCopy={copy}>{b.hashes?.sha256}</Feld>
+        <Feld label="pHash"  copy={b.hashes?.phash}  copyId="ph"   kopiertId={kid} onCopy={copy}>{b.hashes?.phash}</Feld>
+      </Sektion>
+      {b.exif?.verfuegbar ? (
+        <Sektion titel="EXIF-Metadaten" farbe={C.gelb}>
+          {b.exif.kamera && <Feld label="Kamera">{b.exif.kamera}</Feld>}
+          {b.exif.aufnahmedatum && <Feld label="Datum">{b.exif.aufnahmedatum}</Feld>}
+          {b.exif.software && <Feld label="Software">{b.exif.software}</Feld>}
+          {b.exif.iso != null && <Feld label="ISO">{String(b.exif.iso)}</Feld>}
+          {b.exif.blende && <Feld label="Blende">f/{b.exif.blende}</Feld>}
+          {gps && <Feld label="GPS" href={gps.maps_link}>{gps.lat}, {gps.lon} — Maps öffnen ↗</Feld>}
+        </Sektion>
+      ) : <div className="font-mono text-[12px] text-white/40 mt-4">Keine EXIF-Metadaten vorhanden.</div>}
+      {!!b.sicherheits_hinweise?.length && (
+        <Sektion titel="Sicherheitsanalyse" farbe={C.gelb}>
+          {b.sicherheits_hinweise.map((h, i) => <Item key={i} stufe={h.stufe === "hoch" ? "hoch" : "info"}>{h.meldung}</Item>)}
+        </Sektion>
+      )}
+      {!!b.suchlinks?.length && (
+        <Sektion titel="Reverse-Image-Suche" farbe={C.gruen} rechts={<span className="font-mono text-[10px] text-white/30">{b.suchlinks.length} Engines · klickbar</span>}>
+          <div className="flex flex-wrap gap-1.5">
+            {b.suchlinks.map((l, i) => <LinkChip key={i} name={l.name} url={l.url} farbe={C.gruen} />)}
+          </div>
+        </Sektion>
+      )}
+      <FussZeile iso={b.analysiert_am} />
+    </div>
+  );
+}
+
+// ─── E-Mail Vollanalyse ─────────────────────────────────────────────
+
+function ReportEmail({ basis, recon }: { basis: EmailErgebnis; recon: EmailReconErgebnis | null }) {
+  const [kid, copy] = useKopieren();
+  if (!basis.gueltig) return <FehlerHinweis text={basis.fehler ?? "Ungültige Adresse"} />;
+  const risiko = recon?.risiko ?? basis.risiko;
+  const gravatar = recon?.gravatar;
+  return (
+    <div>
+      {risiko && <Verdikt titel="Exposure-Risiko" stufe={risiko.stufe} wert={risiko.punkte} max={12} hinweis={`${basis.adresse}`} />}
+
+      {gravatar?.gefunden && gravatar.avatar_url && (
+        <div className="flex items-center gap-3 mt-4 mb-1">
+          <img src={gravatar.avatar_url} alt="" loading="lazy"
+            className="w-12 h-12 rounded-lg border border-white/10 object-cover"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+          <div className="font-mono text-[12px]">
+            <div className="text-white/85">{gravatar.profil_daten?.anzeigename ?? "Gravatar-Profil"}</div>
+            {gravatar.profil_daten?.benutzername && <div className="text-white/45">@{gravatar.profil_daten.benutzername}</div>}
+          </div>
+        </div>
+      )}
+
+      <Sektion titel="Identität">
+        <Feld label="Domain">{basis.syntax?.domain}</Feld>
+        <Feld label="Lokalteil">{basis.syntax?.lokal_teil}</Feld>
+        <div className="flex gap-1.5 mt-1.5 flex-wrap">
+          <Marke text={basis.klassifikation?.zustellbar ? "zustellbar" : "nicht zustellbar"} farbe={basis.klassifikation?.zustellbar ? C.gruen : C.gelb} />
+          {basis.klassifikation?.wegwerf && <Marke text="wegwerf-adresse" farbe={C.gelb} gefuellt />}
+          {basis.domain?.hat_mx && <Marke text={`MX (${basis.domain.mx_records.length})`} farbe={C.cyber} />}
+          {basis.domain?.spf && <Marke text="SPF" farbe={C.akzent} />}
+          {basis.domain?.dmarc && <Marke text="DMARC" farbe={C.akzent} />}
+        </div>
+      </Sektion>
+
+      {/* Breaches: HIBP + XposedOrNot + LeakCheck */}
+      <Sektion titel="Datenlecks" farbe={C.rot}>
+        {recon?.hibp?.geprueft && recon.hibp.domain_betroffen ? (
+          <>
+            <Item stufe="hoch">HIBP: {recon.hibp.anzahl_breaches} Breach(es) für Domain</Item>
+            {(recon.hibp.breaches ?? []).slice(0, 5).map((b, i) => <Item key={i} stufe="info">{b.titel} ({b.datum})</Item>)}
+          </>
+        ) : recon?.hibp?.geprueft ? <Item stufe="ok">HIBP: keine bekannten Domain-Breaches</Item> : null}
+
+        {recon?.xposedornot?.geprueft && (recon.xposedornot.anzahl_breaches ?? 0) > 0 ? (
+          <>
+            <Item stufe="hoch">XposedOrNot: {recon.xposedornot.anzahl_breaches} Email-Breach(es)</Item>
+            {(recon.xposedornot.breaches ?? []).slice(0, 6).map((n, i) => <Item key={i} stufe="info">{n}</Item>)}
+            {!!recon.xposedornot.exposed_fields?.length && (
+              <div className="flex flex-wrap gap-1.5 mt-1.5 mb-1">
+                {recon.xposedornot.exposed_fields.map((f, i) => <Marke key={i} text={f.replace(/^data_/, "")} farbe={C.gelb} />)}
+              </div>
+            )}
+          </>
+        ) : recon?.xposedornot?.geprueft ? <Item stufe="ok">XposedOrNot: Email nicht in Breach-DBs</Item> : null}
+
+        {recon?.leakcheck?.geprueft && (recon.leakcheck.anzahl ?? 0) > 0 && (
+          <>
+            <Item stufe="mittel">LeakCheck: {recon.leakcheck.anzahl} weitere Quelle(n)</Item>
+            {(recon.leakcheck.sources ?? []).slice(0, 4).map((s, i) => <Item key={i} stufe="info">{s.name}{s.datum ? ` (${s.datum})` : ""}</Item>)}
+          </>
+        )}
+        {!recon && <Item stufe="neg">Tiefen-Recon nicht verfügbar</Item>}
+      </Sektion>
+
+      {/* Verknüpfte Identitäten */}
+      {(gravatar?.profil_daten?.verifizierte_konten?.length || recon?.github?.gefunden || recon?.pgp?.hat_pgp_key) && (
+        <Sektion titel="Verknüpfte Identitäten" farbe={C.lila}>
+          {recon?.github?.gefunden && (recon.github.nutzer ?? []).map((n, i) => (
+            <Feld key={`gh${i}`} label="GitHub" href={n.url}>@{n.login} ↗</Feld>
+          ))}
+          {(gravatar?.profil_daten?.verifizierte_konten ?? []).length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {gravatar!.profil_daten!.verifizierte_konten!.map((k, i) => (
+                <LinkChip key={i} name={`${k.name}${k.verifiziert ? " ✓" : ""}`} url={k.url} farbe={C.lila} />
+              ))}
+            </div>
+          )}
+          {recon?.pgp?.hat_pgp_key && <Item stufe="info">PGP: {recon.pgp.anzahl} öffentliche(r) Key(s) — sicherheitsaffin</Item>}
+        </Sektion>
+      )}
+
+      {/* Google-Pivots */}
+      {recon?.google?.google_konto_wahrscheinlich && recon.google.links && (
+        <Sektion titel="Google-Pivots" farbe={C.cyber}>
+          <div className="flex flex-wrap gap-1.5">
+            {Object.entries(recon.google.links).map(([k, url]) => (
+              <LinkChip key={k} name={k.replace(/_/g, " ")} url={url} farbe={C.cyber} />
+            ))}
+          </div>
+        </Sektion>
+      )}
+
+      {recon?.hashes && (
+        <Sektion titel="Hashes (Cross-Ref)">
+          <Feld label="MD5"  copy={recon.hashes.md5}  copyId="m" kopiertId={kid} onCopy={copy}>{recon.hashes.md5}</Feld>
+          <Feld label="SHA-1" copy={recon.hashes.sha1} copyId="s" kopiertId={kid} onCopy={copy}>{recon.hashes.sha1}</Feld>
+        </Sektion>
+      )}
+      <FussZeile iso={basis.analysiert_am} />
+    </div>
+  );
+}
+
+// ─── Username Vollscan ──────────────────────────────────────────────
+
+function ReportUsername({ b }: { b: BenutzerErgebnis }) {
+  const [filter, setFilter] = useState("");
+  if (b.fehler) return <FehlerHinweis text={b.fehler} />;
+  const s = b.zusammenfassung;
+  const kategorien = b.nach_kategorie ?? {};
+  const gefiltert = useMemo(() => {
+    const f = filter.trim().toLowerCase();
+    const out: Record<string, typeof kategorien[string]> = {};
+    for (const [kat, plats] of Object.entries(kategorien)) {
+      const treffer = f ? plats.filter(p => p.plattform.toLowerCase().includes(f) || kat.toLowerCase().includes(f)) : plats;
+      if (treffer.length) out[kat] = treffer;
+    }
+    return out;
+  }, [filter, kategorien]);
+
+  return (
+    <div>
+      {s && <Verdikt titel="Treffer-Rate" stufe={s.treffer_rate >= 50 ? "Hoch" : s.treffer_rate >= 20 ? "Mittel" : "Gering"} wert={s.gefunden} max={Math.max(s.geprueft, 1)} hinweis={`@${b.benutzername} · ${s.geprueft} Plattformen`} />}
+      {s && (
+        <div className="flex flex-wrap gap-1.5 mt-3 mb-1">
+          <Marke text={`${s.gefunden} gefunden`} farbe={C.gruen} gefuellt />
+          <Marke text={`${s.konfidenz_hoch ?? 0} hoch`} farbe={C.gruen} />
+          <Marke text={`${s.konfidenz_mittel ?? 0} mittel`} farbe={C.gelb} />
+          <Marke text={`${s.konfidenz_niedrig ?? 0} niedrig`} farbe={C.cyber} />
+          <Marke text={`${s.fehler} Fehler`} farbe={C.orange} />
+        </div>
+      )}
+      <Sektion titel="Verifizierte Profile" farbe={C.gruen}
+        rechts={<Filter wert={filter} setWert={setFilter} platzhalter="filter…" />}>
+        {Object.keys(gefiltert).length === 0 ? (
+          <div className="font-mono text-[12px] text-white/40 py-2">Keine Treffer{filter ? " für diesen Filter" : ""}.</div>
+        ) : Object.entries(gefiltert).map(([kat, plats]) => (
+          <div key={kat} className="mb-3">
+            <div className="font-mono text-[10px] text-white/35 mb-1.5 tracking-wider uppercase">{kat} ({plats.length})</div>
+            <div className="flex flex-wrap gap-1.5">
+              {plats.map((p, i) => {
+                const farbe = p.konfidenz === "hoch" ? C.gruen : p.konfidenz === "mittel" ? C.gelb : C.cyber;
+                return <LinkChip key={`${p.plattform}-${i}`} name={p.plattform} url={p.url} farbe={farbe} />;
+              })}
+            </div>
+          </div>
+        ))}
+      </Sektion>
+      <div className="font-mono text-[10px] text-white/30 mt-2">WhatsMyName-DB · Modus: {b.modus}</div>
+      <FussZeile iso={b.analysiert_am} />
+    </div>
+  );
+}
+
+// ─── Domain & Shodan ────────────────────────────────────────────────
+
+function ReportDomain({ domain, shodan }: { domain: DomainErgebnis; shodan: ShodanErgebnis | null }) {
+  const [kid, copy] = useKopieren();
+  const sv = domain.sicherheits_bewertung;
+  const ag = shodan?.aggregiert;
+  return (
+    <div>
+      <div className="grid sm:grid-cols-2 gap-2.5">
+        <Verdikt titel="HTTP-Sicherheit" stufe={sv.note === "Gut" ? "Keines" : sv.note === "Mittel" ? "Mittel" : "Hoch"} wert={sv.punkte} max={sv.max} hinweis={`${sv.prozent}%`} />
+        {shodan?.risiko && <Verdikt titel="Netzwerk-Exposure" stufe={shodan.risiko.stufe} wert={shodan.risiko.punkte} max={shodan.risiko.max} hinweis="Shodan InternetDB" />}
+      </div>
+
+      <Sektion titel="DNS-Records">
+        {domain.dns.a.slice(0, 4).map((ip, i) => (
+          <Feld key={i} label={i === 0 ? "A" : ""} copy={ip} copyId={`a${i}`} kopiertId={kid} onCopy={copy}>{ip}</Feld>
+        ))}
+        {domain.dns.aaaa[0] && <Feld label="AAAA">{domain.dns.aaaa[0]}</Feld>}
+        {domain.dns.mx.slice(0, 2).map((mx, i) => <Feld key={i} label={i === 0 ? "MX" : ""}>{mx}</Feld>)}
+        {domain.dns.ns.slice(0, 2).map((ns, i) => <Feld key={i} label={i === 0 ? "NS" : ""}>{ns}</Feld>)}
+        <div className="flex gap-1.5 mt-1.5 flex-wrap">
+          {domain.dns.spf && <Marke text="SPF" farbe={C.gruen} />}
+          {domain.dns.dmarc && <Marke text="DMARC" farbe={C.gruen} />}
+        </div>
+      </Sektion>
+
+      <Sektion titel="Provider / WHOIS">
+        <Feld label="ASN">{domain.asn}</Feld>
+        {domain.whois.registrar && <Feld label="Registrar">{String(domain.whois.registrar)}</Feld>}
+        {domain.whois.registriert_am && <Feld label="Erstellt">{domain.whois.registriert_am}</Feld>}
+        {domain.whois.ablauf_am && <Feld label="Ablauf">{domain.whois.ablauf_am}</Feld>}
+      </Sektion>
+
+      <Sektion titel="HTTP-Header-Audit">
+        <Feld label="Status">{domain.http.status ?? "—"} {domain.http.server ? `· ${domain.http.server}` : ""}</Feld>
+        {sv.details.map((d, i) => <Item key={i} stufe={d.ok ? "ok" : "neg"}>{d.check}</Item>)}
+      </Sektion>
+
+      {ag && (
+        <Sektion titel="Shodan: Ports & CVEs" farbe={C.rot}>
+          {ag.ports_anzahl === 0 ? <Item stufe="ok">Keine offenen Ports in der Shodan-DB</Item> : (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {ag.ports.map((p, i) => (
+                <Marke key={i} text={`${p.port}${p.service ? " " + p.service : ""}`} farbe={p.gefaehrlich ? C.rot : C.cyber} gefuellt={p.gefaehrlich} />
+              ))}
+            </div>
+          )}
+          {ag.vulns_anzahl > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {ag.vulns.slice(0, 12).map((v, i) => (
+                <LinkChip key={i} name={v} url={`https://nvd.nist.gov/vuln/detail/${v}`} farbe={C.rot} />
+              ))}
+            </div>
+          )}
+          {!!ag.tags.length && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {ag.tags.map((t, i) => <Marke key={i} text={t.tag} farbe={C.orange} />)}
+            </div>
+          )}
+        </Sektion>
+      )}
+      <FussZeile iso={domain.analysiert_am} />
+    </div>
+  );
+}
+
+// ─── Aggregator ─────────────────────────────────────────────────────
+
+function ReportAggregator({ a }: { a: AggregatorErgebnis }) {
+  if (a.fehler) return <FehlerHinweis text={a.fehler} />;
+  return (
+    <div>
+      <div className="flex flex-wrap gap-1.5 mb-1">
+        <Marke text={a.typ.toUpperCase()} farbe={C.akzent} gefuellt />
+        <Marke text={`${a.anzahl} Links`} farbe={C.cyber} />
+        <Marke text={`${Object.keys(a.nach_kategorie).length} Kategorien`} farbe={C.cyber} />
+      </div>
+      <Sektion titel="Kuratierte Quellen" farbe={C.cyber} rechts={<span className="font-mono text-[10px] text-white/30">alle klickbar</span>}>
+        <LinkRaster gruppen={a.nach_kategorie} />
+      </Sektion>
+      <FussZeile iso={a.analysiert_am} />
+    </div>
+  );
+}
+
+// ─── Orchestrator (Graph rendert der Parent) ────────────────────────
+
+function ReportOrchestrator({ o }: { o: OrchestratorErgebnis }) {
+  if (o.fehler) return <FehlerHinweis text={o.fehler} />;
+  const g = o.graph;
+  return (
+    <div>
+      <div className="flex flex-wrap gap-1.5 mb-1">
+        <Marke text={`Typ: ${o.typ}`} farbe={C.akzent} gefuellt />
+        <Marke text={`${g?.statistik.knoten_gesamt ?? 0} Knoten`} farbe={C.cyber} />
+        <Marke text={`${g?.statistik.kanten_gesamt ?? 0} Kanten`} farbe={C.cyber} />
+        <Marke text={`${o.zusammenfassung?.pivots_entdeckt ?? 0} Pivots`} farbe={C.lila} gefuellt />
+      </div>
+      {g && (
+        <Sektion titel="Knoten nach Typ" farbe={C.lila}>
+          <div className="flex flex-wrap gap-1.5">
+            {Object.entries(g.statistik.nach_typ).map(([typ, n]) => <Marke key={typ} text={`${typ}: ${n}`} farbe={C.akzent} />)}
+          </div>
+        </Sektion>
+      )}
+      <Sektion titel="Ausgeführte Module" farbe={C.gruen}>
+        <div className="flex flex-wrap gap-1.5">
+          {(o.zusammenfassung?.module_ausgefuehrt ?? []).map((m, i) => <Marke key={i} text={m} farbe={C.gruen} />)}
+        </div>
+      </Sektion>
+      <div className="font-mono text-[11px] text-white/35 mt-4">↓ Interaktiver Graph unterhalb des Terminals</div>
+      <FussZeile iso={o.analysiert_am} />
+    </div>
+  );
+}
+
+// ─── Subdomains ─────────────────────────────────────────────────────
+
+const QUELLE_FARBE: Record<string, string> = { "crt.sh": C.akzent, wayback: C.cyber, commoncrawl: C.lila };
+
+function ReportSubdomains({ s }: { s: SubdomainErgebnis }) {
+  const [filter, setFilter] = useState("");
+  const [kid, copy] = useKopieren();
+  if (s.fehler) return <FehlerHinweis text={s.fehler} />;
+  const z = s.zusammenfassung;
+  const subs = s.subdomains ?? [];
+  const gefiltert = filter.trim()
+    ? subs.filter(d => d.host.toLowerCase().includes(filter.trim().toLowerCase()))
+    : subs;
+  const sichtbar = gefiltert.slice(0, 40);
+  const rest = gefiltert.slice(40);
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-1.5 mb-1">
+        <Marke text={`${z?.gesamt_eindeutig ?? 0} eindeutig`} farbe={C.cyber} gefuellt />
+        {z?.live_aufgeloest != null && <Marke text={`${z.live_aufgeloest} live`} farbe={C.gruen} />}
+        {z?.limit_erreicht && <Marke text="Limit erreicht" farbe={C.gelb} />}
+      </div>
+
+      <Sektion titel="Quellen-Status">
+        <div className="flex flex-wrap gap-1.5">
+          {s.quellen && Object.entries(s.quellen).map(([name, meta]) => (
+            <Marke key={name} text={`${name}: ${meta.ok ? (meta.anzahl ?? 0) : (meta.hinweis ?? "fehler")}`}
+              farbe={meta.ok ? QUELLE_FARBE[name] ?? C.cyber : C.orange} />
+          ))}
+        </div>
+      </Sektion>
+
+      <Sektion titel="Subdomains" farbe={C.cyber}
+        rechts={
+          <div className="flex items-center gap-2">
+            <Filter wert={filter} setWert={setFilter} platzhalter="filter…" />
+            <button onClick={() => copy(subs.map(d => d.host).join("\n"), "all")}
+              className="font-mono text-[10px] px-1.5 py-0.5 rounded border border-white/10 text-white/45 hover:text-white/80 hover:border-white/25 transition">
+              {kid === "all" ? "✓ kopiert" : "copy alle"}
+            </button>
+          </div>
+        }>
+        {sichtbar.length === 0 ? (
+          <div className="font-mono text-[12px] text-white/40 py-2">Keine Subdomains{filter ? " für diesen Filter" : ""}.</div>
+        ) : (
+          <div className="space-y-1">
+            {sichtbar.map((d) => <SubZeile key={d.host} d={d} />)}
+          </div>
+        )}
+        {rest.length > 0 && (
+          <div className="mt-2">
+            <Aufklappbar label={`${rest.length} weitere anzeigen`} kinderAnzahl={rest.length}>
+              <div className="space-y-1">{rest.map((d) => <SubZeile key={d.host} d={d} />)}</div>
+            </Aufklappbar>
+          </div>
+        )}
+      </Sektion>
+      <FussZeile iso={s.analysiert_am} />
+    </div>
+  );
+}
+
+function SubZeile({ d }: { d: { host: string; quellen: string[]; aktiv: boolean | null; ip: string | null } }) {
+  return (
+    <div className="flex items-center gap-2 font-mono text-[12px] py-[2px]">
+      {d.aktiv != null && (
+        <span className="w-1.5 h-1.5 rounded-full shrink-0"
+          style={{ background: d.aktiv ? C.gruen : "rgba(255,255,255,0.18)", boxShadow: d.aktiv ? `0 0 5px ${C.gruen}88` : "none" }} />
+      )}
+      <a href={`https://${d.host}`} target="_blank" rel="noopener noreferrer"
+        className="text-white/80 hover:text-cyber-400 transition break-all">{d.host}</a>
+      {d.ip && <span className="text-white/35 text-[11px]">{d.ip}</span>}
+      <span className="ml-auto flex gap-1 shrink-0">
+        {d.quellen.map((q) => (
+          <span key={q} className="w-1.5 h-1.5 rounded-full" title={q} style={{ background: QUELLE_FARBE[q] ?? C.cyber }} />
+        ))}
+      </span>
+    </div>
+  );
+}
+
+// ─── IP-Intel ───────────────────────────────────────────────────────
+
+function ReportIpIntel({ r }: { r: IpIntelErgebnis }) {
+  const [kid, copy] = useKopieren();
+  if (r.fehler) return <FehlerHinweis text={r.fehler} />;
+  return (
+    <div>
+      <Sektion titel="Ziel">
+        <Feld label="IP" copy={r.ip} copyId="ip" kopiertId={kid} onCopy={copy}>{r.ip}</Feld>
+        {r.eingabe_typ && <Feld label="Eingabe">{r.eingabe_typ}</Feld>}
+      </Sektion>
+      <Sektion titel="Routing">
+        {r.routing?.prefix && <Feld label="Prefix" copy={r.routing.prefix} copyId="px" kopiertId={kid} onCopy={copy}>{r.routing.prefix}</Feld>}
+        {r.routing?.prefix_inhaber && <Feld label="Inhaber">{r.routing.prefix_inhaber}</Feld>}
+        {!!r.routing?.asns?.length && (
+          <div className="flex flex-wrap gap-1.5 mt-1.5">
+            {r.routing.asns.map((a, i) => <Marke key={i} text={`AS${a}`} farbe={C.gelb} />)}
+            {r.routing.announced != null && <Marke text={r.routing.announced ? "announced" : "not announced"} farbe={r.routing.announced ? C.gruen : C.orange} />}
+          </div>
+        )}
+      </Sektion>
+      {(r.as?.holder || r.as?.asn != null) && (
+        <Sektion titel="Autonomes System" farbe={C.gelb}>
+          {r.as?.asn != null && <Feld label="ASN">AS{r.as.asn}</Feld>}
+          {r.as?.holder && <Feld label="Betreiber">{r.as.holder}</Feld>}
+          {r.as?.typ && <Feld label="Typ">{r.as.typ}</Feld>}
+        </Sektion>
+      )}
+      {!!r.abuse_kontakte?.length && (
+        <Sektion titel="Abuse-Kontakt" farbe={C.rot}>
+          {r.abuse_kontakte.map((mail, i) => <Feld key={i} label="E-Mail" href={`mailto:${mail}`}>{mail}</Feld>)}
+        </Sektion>
+      )}
+      {r.links && (
+        <Sektion titel="Weiterführend">
+          <div className="flex flex-wrap gap-1.5">
+            <LinkChip name="RIPEstat" url={r.links.ripestat} farbe={C.akzent} />
+            <LinkChip name="bgp.he.net" url={r.links.bgp_he} farbe={C.akzent} />
+          </div>
+        </Sektion>
+      )}
+      <FussZeile iso={r.analysiert_am} />
+    </div>
+  );
+}
+
+// ─── Gemeinsame Bausteine ───────────────────────────────────────────
+
+function FehlerHinweis({ text }: { text: string }) {
+  return (
+    <div className="rounded-lg border border-signal-rot/25 bg-signal-rot/[0.06] p-4 font-mono text-[12.5px] text-signal-rot/85">
+      [Fehler] {text}
+    </div>
+  );
+}
+
+function FussZeile({ iso }: { iso?: string }) {
+  return <div className="font-mono text-[10px] text-white/25 mt-5 pt-3 border-t border-white/[0.05]">analysiert: {zeit(iso)} UTC</div>;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// HAUPT-SWITCH
+// ═══════════════════════════════════════════════════════════════════
+
+export default function ErgebnisReport({ modulNummer, daten }: { modulNummer: string; daten: unknown }) {
+  let inhalt: React.ReactNode = null;
+  switch (modulNummer) {
+    case "2": { const d = daten as { basis: EmailErgebnis; recon: EmailReconErgebnis | null }; inhalt = <ReportEmail basis={d.basis} recon={d.recon} />; break; }
+    case "3": inhalt = <ReportUsername b={daten as BenutzerErgebnis} />; break;
+    case "4": inhalt = <ReportTelefon t={daten as TelefonErgebnis} />; break;
+    case "5": { const d = daten as { domain: DomainErgebnis; shodan: ShodanErgebnis | null }; inhalt = <ReportDomain domain={d.domain} shodan={d.shodan} />; break; }
+    case "6": inhalt = <ReportBild b={daten as BildErgebnis} />; break;
+    case "7": inhalt = <ReportAggregator a={daten as AggregatorErgebnis} />; break;
+    case "8": inhalt = <ReportOrchestrator o={daten as OrchestratorErgebnis} />; break;
+    case "9": inhalt = <ReportSubdomains s={daten as SubdomainErgebnis} />; break;
+    case "10": inhalt = <ReportIpIntel r={daten as IpIntelErgebnis} />; break;
+    default: return null;
+  }
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+      {inhalt}
+    </motion.div>
+  );
+}

@@ -4,15 +4,17 @@ import {
   domainAnalysieren, emailAnalysieren, benutzernameSuchen,
   telefonAnalysieren, bildAnalysieren,
   shodanAbfragen, emailReconnaissance, searchAggregator, orchestrator,
-  benutzernameVollscan,
+  benutzernameVollscan, subdomainsFinden, ipIntelAbfragen,
   Apifehler,
   type DomainErgebnis, type EmailErgebnis, type BenutzerErgebnis,
   type TelefonErgebnis, type BildErgebnis,
   type ShodanErgebnis, type EmailReconErgebnis,
   type AggregatorErgebnis, type OrchestratorErgebnis,
+  type SubdomainErgebnis, type IpIntelErgebnis,
 } from "../dienste/osintApi";
 import { DatenschutzModal } from "../bausteine/DatenschutzModal";
 import OsintGraph from "../bausteine/OsintGraph";
+import ErgebnisReport from "../bausteine/osint/ErgebnisReport";
 
 // ═══════════════════════════════════════════════════════
 // OSINT TOOLKIT – LIVE TERMINAL MIT ECHTEM BACKEND
@@ -71,6 +73,16 @@ const DEMO_MODULE: DemoModul[] = [
     nummer: "8", name: "Vollanalyse Orchestrator", farbe: "#10b981",
     eingabeLabel: "Beliebiges Target", beispielEingabe: "cloudflare.com", eingabeTyp: "text",
     beschreibung: "SpiderFoot-Style Orchestrator: erkennt Typ automatisch, führt alle relevanten Module parallel aus und entdeckt Pivots (E-Mail → Domain → ASN → IP → CVE). Visualisiert alle Beziehungen als Maltego-Style Graph mit interaktiver Detail-Anzeige.",
+  },
+  {
+    nummer: "9", name: "Subdomain-Recon (3 Quellen)", farbe: "#2dd4bf",
+    eingabeLabel: "Domain eingeben", beispielEingabe: "github.com", eingabeTyp: "text",
+    beschreibung: "Sammelt Subdomains aus drei unabhängigen keyless-Quellen parallel — Certificate-Transparency (crt.sh), Wayback Machine und CommonCrawl — und führt sie dedupliziert zusammen, mit Quellen-Herkunft pro Treffer und optionalem Live-Resolve (A-Record-Check). Jede Quelle ist fehler-isoliert: fällt eine aus, liefern die anderen weiter.",
+  },
+  {
+    nummer: "10", name: "IP-Intel (RIPEstat)", farbe: "#fbbf24",
+    eingabeLabel: "IP oder Domain", beispielEingabe: "1.1.1.1", eingabeTyp: "text",
+    beschreibung: "Autoritative Routing- und Ownership-Daten via RIPEstat (RIPE NCC, keyless): announced Prefix, ASN(s), AS-Holder (Betreiber) und der Abuse-Kontakt der IP. Ergänzt Shodan (Ports/CVEs) um die Frage: WEM gehört diese IP und WIE wird sie geroutet?",
   },
 ];
 
@@ -843,6 +855,63 @@ function orchestratorZuTerminal(o: OrchestratorErgebnis): string[] {
   return zeilen;
 }
 
+// ─── Modul 9: Subdomain-Recon ───────────────────────────────────
+
+function subdomainZuTerminal(s: SubdomainErgebnis): string[] {
+  if (s.fehler) return [R, K("SUBDOMAIN-RECON -- Fehler"), R, "", `  ${trunc(s.fehler, 30)}`];
+  const z = s.zusammenfassung;
+  const zeilen: string[] = [
+    R, K(`SUBDOMAINS -- ${trunc(s.domain, 17)}`), R,
+    "", S("ZUSAMMENFASSUNG"),
+    WW("Eindeutig", String(z?.gesamt_eindeutig ?? 0)),
+    WW("Angezeigt", String(z?.angezeigt ?? 0)),
+  ];
+  if (z?.live_aufgeloest != null) zeilen.push(WW("Live", `${z.live_aufgeloest} aktiv`));
+  zeilen.push("", S("QUELLEN-STATUS"));
+  if (s.quellen) {
+    for (const [name, meta] of Object.entries(s.quellen)) {
+      const val = meta.ok ? `${meta.anzahl ?? 0} Treffer` : (meta.hinweis ?? "Fehler");
+      zeilen.push(`  ${meta.ok ? "[ok]" : "[--]"}  ${name.padEnd(12)} ${val}`);
+    }
+  }
+  zeilen.push("", S("SUBDOMAINS"));
+  for (const d of (s.subdomains ?? []).slice(0, 40)) {
+    const mark = d.aktiv === true ? "[+]" : d.aktiv === false ? "[--]" : "  •";
+    zeilen.push(`  ${mark}  ${trunc(d.host, 30)}`);
+  }
+  const rest = (s.subdomains?.length ?? 0) - 40;
+  if (rest > 0) zeilen.push(`  ... +${rest} weitere`);
+  zeilen.push("", `  Quellen: crt.sh · Wayback · CommonCrawl`,
+              `  Analysiert: ${s.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
+  return zeilen;
+}
+
+// ─── Modul 10: IP-Intel (RIPEstat) ───────────────────────────────
+
+function ipIntelZuTerminal(r: IpIntelErgebnis): string[] {
+  if (r.fehler) return [R, K("IP-INTEL -- Fehler"), R, "", `  ${trunc(r.fehler, 30)}`];
+  const zeilen: string[] = [
+    R, K(`IP-INTEL -- ${trunc(r.ip ?? r.ziel, 19)}`), R,
+    "", S("ROUTING"),
+  ];
+  if (r.routing?.prefix) zeilen.push(WW("Prefix", trunc(r.routing.prefix, 20)));
+  if (r.routing?.prefix_inhaber) zeilen.push(WW("Inhaber", trunc(r.routing.prefix_inhaber, 20)));
+  if (r.routing?.asns?.length) zeilen.push(WW("ASN", r.routing.asns.map((a) => `AS${a}`).join(", ")));
+  if (r.as?.holder || r.as?.asn != null) {
+    zeilen.push("", S("AUTONOMES SYSTEM"));
+    if (r.as?.asn != null) zeilen.push(WW("ASN", `AS${r.as.asn}`));
+    if (r.as?.holder) zeilen.push(WW("Betreiber", trunc(r.as.holder, 20)));
+    if (r.as?.typ) zeilen.push(WW("Typ", r.as.typ));
+  }
+  if (r.abuse_kontakte?.length) {
+    zeilen.push("", S("ABUSE-KONTAKT"));
+    for (const m of r.abuse_kontakte.slice(0, 4)) zeilen.push(`  [@]  ${trunc(m, 28)}`);
+  }
+  zeilen.push("", `  Quelle: RIPEstat (RIPE NCC)`,
+              `  Analysiert: ${r.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
+  return zeilen;
+}
+
 // ─── Download-Utilities ──────────────────────────────────────────
 // Desktop: Standard Blob-Download via <a download>.
 // iOS: Ausschließlich Web Share API — kein Blob-Fallback.
@@ -889,6 +958,7 @@ function downloadDatei(dateiname: string, inhalt: string, mimeType: string): voi
 
 export default function OsintDemoView() {
   const [phase, setPhase] = useState<"menue" | "eingabe" | "laden" | "ausgabe">("menue");
+  const [ansicht, setAnsicht] = useState<"report" | "raw">("report");
   const [aktivesModul, setAktivesModul] = useState<DemoModul | null>(null);
   const [eingabeWert, setEingabeWert] = useState("");
   const [ausgabeZeilen, setAusgabeZeilen] = useState<string[]>([]);
@@ -901,6 +971,10 @@ export default function OsintDemoView() {
   const [btcKopiert, setBtcKopiert] = useState<"idle" | "success" | "error">("idle");
   const terminalRef = useRef<HTMLDivElement>(null);
   const eingabeRef = useRef<HTMLInputElement>(null);
+
+  // Report-Ansicht verfügbar für Live-Module mit Rohdaten (nicht Status/Demo).
+  const reportVerfuegbar = !!rohdaten && !!aktivesModul && aktivesModul.nummer !== "1";
+  const zeigeReport = reportVerfuegbar && ansicht === "report";
 
   // ─── Download-Funktionen ──────────────────────────────────────
   const alsTextHerunterladen = useCallback(() => {
@@ -943,7 +1017,8 @@ export default function OsintDemoView() {
   }, []);
 
   useEffect(() => {
-    if (phase !== "ausgabe" || ausgabeZeilen.length === 0) return;
+    // Typing-Animation nur in der Raw-Ansicht — im Report wird sofort gerendert.
+    if (phase !== "ausgabe" || ausgabeZeilen.length === 0 || zeigeReport) return;
     setZeilenIndex(0);
     setFertig(false);
     let aktuellerIndex = 0;
@@ -958,11 +1033,13 @@ export default function OsintDemoView() {
       }
     }, 28);
     return () => clearInterval(intervall);
-  }, [phase, ausgabeZeilen]);
+  }, [phase, ausgabeZeilen, zeigeReport]);
 
   useEffect(() => {
+    // Auto-Scroll nur während des Typings (Raw) — nicht im Report (Lesefluss).
+    if (zeigeReport) return;
     if (terminalRef.current) terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
-  }, [zeilenIndex]);
+  }, [zeilenIndex, zeigeReport]);
 
   useEffect(() => {
     if (phase === "eingabe" && eingabeRef.current) eingabeRef.current.focus();
@@ -1069,6 +1146,14 @@ export default function OsintDemoView() {
         const ergebnis = await orchestrator(wert, 2);
         zeilen = orchestratorZuTerminal(ergebnis);
         setRohdaten(ergebnis);
+      } else if (aktivesModul.nummer === "9") {
+        const ergebnis = await subdomainsFinden(wert, true);
+        zeilen = subdomainZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
+      } else if (aktivesModul.nummer === "10") {
+        const ergebnis = await ipIntelAbfragen(wert);
+        zeilen = ipIntelZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
       } else {
         zeilen = erstelleDemoAusgabe(aktivesModul.nummer, wert);
       }
@@ -1106,6 +1191,7 @@ export default function OsintDemoView() {
 
   const zurueckSetzen = useCallback(() => {
     setPhase("menue");
+    setAnsicht("report");
     setAktivesModul(null);
     setEingabeWert("");
     setAusgabeZeilen([]);
@@ -1132,6 +1218,36 @@ export default function OsintDemoView() {
     if (zeile.includes("->")) return "text-white/55";
     return "text-white/72";
   };
+
+  // Aktionsleiste (Downloads + Neustart) — geteilt zwischen Report- und Raw-Ansicht.
+  const aktionsLeiste = (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mt-5 border-t border-white/5 pt-4">
+      <div className="flex flex-wrap items-center gap-3">
+        {aktivesModul?.nummer !== "1" && (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsTextHerunterladen(); }}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-signal-gruen/10 border border-signal-gruen/25 text-signal-gruen/80 hover:bg-signal-gruen/20 hover:text-signal-gruen transition font-mono"
+          >
+            ↓ TXT
+          </button>
+        )}
+        {rohdaten && (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsJsonHerunterladen(); }}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-akzent-500/10 border border-akzent-400/25 text-akzent-400/80 hover:bg-akzent-500/20 hover:text-akzent-400 transition font-mono"
+          >
+            ↓ JSON
+          </button>
+        )}
+        <button onClick={zurueckSetzen}
+          className="text-xs text-white/50 hover:text-white/80 transition font-mono ml-auto">
+          [Neues Modul]
+        </button>
+      </div>
+    </motion.div>
+  );
 
   return (
     <section id="osint" className="py-16 px-6 max-w-5xl mx-auto">
@@ -1323,7 +1439,11 @@ export default function OsintDemoView() {
                   <span>Verbindung zur OSINT-API...</span>
                 </div>
                 <div className="mt-2 text-white/55 text-xs">
-                  POST /api/v1/osint/{aktivesModul?.nummer === "5" ? "domain" : aktivesModul?.nummer === "2" ? "email" : "benutzername"}
+                  POST /api/v1/osint/{({
+                    "2": "email", "3": "benutzername", "4": "telefon", "5": "domain",
+                    "6": "bild", "7": "aggregator", "8": "orchestrator",
+                    "9": "subdomains", "10": "ip-intel",
+                  } as Record<string, string>)[aktivesModul?.nummer ?? ""] ?? "osint"}
                 </div>
               </motion.div>
             )}
@@ -1331,7 +1451,34 @@ export default function OsintDemoView() {
             {/* Ausgabe */}
             {phase === "ausgabe" && (
               <motion.div key="ausgabe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                {ausgabeZeilen.slice(0, zeilenIndex + 1).map((zeile, index) => {
+                {/* Ansicht-Umschalter — nur wenn eine Report-Ansicht verfügbar ist */}
+                {reportVerfuegbar && (
+                  <div className="flex items-center gap-1.5 mb-4 font-mono text-[11px]">
+                    <span className="text-white/30 mr-1">ansicht:</span>
+                    {(["report", "raw"] as const).map((v) => (
+                      <button
+                        key={v}
+                        onClick={() => setAnsicht(v)}
+                        className={`px-2.5 py-1 rounded-md border transition ${
+                          ansicht === v
+                            ? "border-akzent-400/40 bg-akzent-500/15 text-akzent-400"
+                            : "border-white/[0.08] text-white/45 hover:text-white/75 hover:border-white/20"
+                        }`}
+                      >
+                        {v}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {zeigeReport && (
+                  <>
+                    <ErgebnisReport modulNummer={aktivesModul!.nummer} daten={rohdaten} />
+                    {aktionsLeiste}
+                  </>
+                )}
+
+                {!zeigeReport && ausgabeZeilen.slice(0, zeilenIndex + 1).map((zeile, index) => {
                   // Subline-Marker "  \u203A" \u2014 dezent, kleiner, hanging-indent, wrappable
                   if (zeile.startsWith("  \u203A")) {
                     const inhalt = zeile.replace(/^\s*\u203A\s+/, "");
@@ -1350,8 +1497,8 @@ export default function OsintDemoView() {
                     </div>
                   );
                 })}
-                {!fertig && <span className="text-signal-gruen/60 animate-pulse">█</span>}
-                {fertig && (
+                {!zeigeReport && !fertig && <span className="text-signal-gruen/60 animate-pulse">█</span>}
+                {!zeigeReport && fertig && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-5 border-t border-white/5 pt-4">
                     <div className="flex flex-wrap items-center gap-3">
                       {/* Download TXT — nicht beim Status-Check (Modul 1) */}
@@ -1389,7 +1536,7 @@ export default function OsintDemoView() {
       </div>
 
       {/* Maltego-Style Graph — nur bei Modul 8 (Orchestrator) mit Graph-Daten */}
-      {fertig && aktivesModul?.nummer === "8" && rohdaten && (rohdaten as OrchestratorErgebnis).graph && (
+      {(fertig || zeigeReport) && aktivesModul?.nummer === "8" && rohdaten && (rohdaten as OrchestratorErgebnis).graph && (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-6">
           <div className="flex items-center gap-2 px-4 py-2.5 bg-[#12121f] rounded-t-2xl border border-white/[0.08] border-b-0">
             <span className="font-mono text-[11px] text-white/55">graph_visualization — maltego_style</span>
