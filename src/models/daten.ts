@@ -207,8 +207,8 @@ export const PROJEKTE: ProjektModel[] = [
     linkGithub: "https://github.com/NEO849/ZAlmanach",
     galerieSlug: "z-almanach",
     bilder: [
-      { quelle: "/projekte/z-almanach/00-login.webp",     titel: "Login",     text: "Anmeldung im Retro-Arcade-Look." },
       { quelle: "/projekte/z-almanach/01-splash.webp",    titel: "Splash",    text: "Retro-Arcade-Einstieg ins DBZ-Universum." },
+      { quelle: "/projekte/z-almanach/00-login.webp",     titel: "Login",     text: "Anmeldung im Retro-Arcade-Look." },
       { quelle: "/projekte/z-almanach/02-home.webp",      titel: "Home",      text: "Charaktere und Fraktionen im Überblick." },
       { quelle: "/projekte/z-almanach/03-explore.webp",   titel: "Explore",   text: "Das ganze Universum durchstöbern." },
       { quelle: "/projekte/z-almanach/04-detail.webp",    titel: "Detail",    text: "Werte, Verwandlungsstufen und Fraktion." },
