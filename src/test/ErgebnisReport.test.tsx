@@ -141,6 +141,27 @@ describe("ErgebnisReport — Render-Smoke alle Module", () => {
     expect(screen.getByRole("link", { name: /abuse@cloudflare\.com/ })).toHaveAttribute("href", "mailto:abuse@cloudflare.com");
   });
 
+  it("Modul 6 (Bild) mit GPS: Vorschau-Img + OSM-Mini-Map + Standort-Verdikt", () => {
+    const daten = {
+      url: "https://example.com/foto.jpg", analysiert_am: JETZT,
+      bild: { format: "JPEG", breite: 4000, hoehe: 3000, modus: "RGB", groesse_kb: 2500, groesse_mb: 2.4 },
+      hashes: { md5: "a", sha256: "b", phash: "c", ahash: "d", dhash: "e" },
+      exif: { verfuegbar: true, kamera: "Apple iPhone 15", gps: { lat: 48.137154, lon: 11.576124, maps_link: "https://maps.google.com/?q=48.137154,11.576124", hinweis: "x" } },
+      suchlinks: [{ name: "TinEye", url: "https://tineye.com/x" }],
+      sicherheits_hinweise: [{ stufe: "hoch", meldung: "GPS-Koordinaten im Bild" }],
+    };
+    const { container } = render(<ErgebnisReport modulNummer="6" daten={daten} />);
+    // Vorschau-Thumbnail
+    const img = container.querySelector('img[alt="Analysiertes Bild"]') as HTMLImageElement | null;
+    expect(img?.getAttribute("src")).toBe("https://example.com/foto.jpg");
+    // OSM-Mini-Map (iframe mit Marker)
+    const iframe = container.querySelector('iframe[title="EXIF-GPS-Standort"]') as HTMLIFrameElement | null;
+    expect(iframe).not.toBeNull();
+    expect(iframe?.getAttribute("src")).toContain("marker=48.137154,11.576124");
+    // Standort-Verdikt sichtbar
+    expect(screen.getByText(/Standort-Risiko/i)).toBeInTheDocument();
+  });
+
   it("Fehlerfall: rendert FehlerHinweis statt Crash", () => {
     render(<ErgebnisReport modulNummer="10" daten={{ ziel: "x", analysiert_am: JETZT, fehler: "IP nicht öffentlich" }} />);
     const box = screen.getByText(/IP nicht öffentlich/);

@@ -10,7 +10,7 @@
 // Isoliert von OsintDemoView, damit der Terminal-Kern stabil bleibt.
 // ═══════════════════════════════════════════════════════════════════
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type {
   DomainErgebnis, EmailErgebnis, EmailReconErgebnis, BenutzerErgebnis,
@@ -59,6 +59,36 @@ function useKopieren(): [string | null, (wert: string, id: string) => void] {
     }
   };
   return [kopiertId, kopieren];
+}
+
+// ─── Bewegung / Count-up ────────────────────────────────────────────
+
+function bewegungReduziert(): boolean {
+  return typeof window !== "undefined"
+    && typeof window.matchMedia === "function"
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+/** Zählt von 0 auf das Ziel hoch (ease-out). Respektiert prefers-reduced-motion. */
+function useCountUp(ziel: number, dauer = 750): number {
+  const [wert, setWert] = useState(() => (bewegungReduziert() ? ziel : 0));
+  useEffect(() => {
+    if (bewegungReduziert() || typeof requestAnimationFrame !== "function") {
+      setWert(ziel);
+      return;
+    }
+    let raf = 0;
+    const start = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min((t - start) / dauer, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setWert(Math.round(ziel * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [ziel, dauer]);
+  return wert;
 }
 
 // ─── Primitive: Sektion ─────────────────────────────────────────────
@@ -283,6 +313,64 @@ function ReportTelefon({ t }: { t: TelefonErgebnis }) {
   );
 }
 
+// ─── Bild: GPS-Mini-Map (keyless OpenStreetMap-Embed) ───────────────
+
+function GpsKarte({ lat, lon }: { lat: number; lon: number }) {
+  // bbox um den Punkt (~1.1 km Kantenlänge) + Marker — kein API-Key nötig.
+  const d = 0.006;
+  const bbox = `${lon - d},${lat - d},${lon + d},${lat + d}`;
+  const src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`;
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
+      className="relative mt-2.5 rounded-lg overflow-hidden border" style={{ borderColor: `${C.rot}40` }}>
+      <iframe
+        title="EXIF-GPS-Standort"
+        src={src}
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        className="block w-full h-44"
+        style={{ border: 0, filter: "grayscale(0.2) contrast(0.95) brightness(0.9)" }}
+      />
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-2.5 py-1.5
+                      pointer-events-none font-mono text-[10px]"
+        style={{ background: "linear-gradient(180deg, rgba(6,8,15,0.85), transparent)" }}>
+        <span style={{ color: C.rot }}>● REKONSTRUIERTER AUFNAHMEORT</span>
+        <span className="text-white/70">{lat.toFixed(5)}, {lon.toFixed(5)}</span>
+      </div>
+      <a href={`https://www.google.com/maps?q=${lat},${lon}`} target="_blank" rel="noopener noreferrer"
+        className="absolute bottom-2 right-2 font-mono text-[10px] px-2 py-1 rounded
+                   bg-grund-950/80 border border-white/15 text-white/80 hover:text-white hover:border-white/30 transition">
+        in Maps öffnen ↗
+      </a>
+    </motion.div>
+  );
+}
+
+// ─── Bild: Vorschau-Thumbnail ───────────────────────────────────────
+
+function BildVorschau({ url, format, breite, hoehe }: {
+  url: string; format?: string; breite?: number; hoehe?: number;
+}) {
+  const [fehler, setFehler] = useState(false);
+  if (fehler) return null;
+  return (
+    <div className="relative mt-1 rounded-lg overflow-hidden border border-white/10 bg-grund-950"
+      style={{ backgroundImage: "linear-gradient(45deg,#0d1018 25%,transparent 25%),linear-gradient(-45deg,#0d1018 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#0d1018 75%),linear-gradient(-45deg,transparent 75%,#0d1018 75%)", backgroundSize: "16px 16px", backgroundPosition: "0 0,0 8px,8px -8px,-8px 0" }}>
+      <img
+        src={url} alt="Analysiertes Bild" loading="lazy" referrerPolicy="no-referrer"
+        onError={() => setFehler(true)}
+        className="block w-full max-h-52 object-contain mx-auto"
+      />
+      {(format || breite) && (
+        <div className="absolute bottom-1.5 left-1.5 font-mono text-[10px] px-1.5 py-0.5 rounded
+                        bg-grund-950/80 border border-white/10 text-white/65">
+          {format}{breite ? ` · ${breite}×${hoehe}` : ""}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Bild ───────────────────────────────────────────────────────────
 
 function ReportBild({ b }: { b: BildErgebnis }) {
@@ -293,9 +381,12 @@ function ReportBild({ b }: { b: BildErgebnis }) {
     <div>
       {gps && <Verdikt titel="Standort-Risiko" stufe="Hoch" wert={6} max={6} hinweis="GPS im Bild gefunden" />}
       <Sektion titel="Bild-Info">
-        <Feld label="Format">{b.bild?.format}</Feld>
-        <Feld label="Auflösung">{b.bild?.breite} × {b.bild?.hoehe} px</Feld>
-        <Feld label="Größe">{b.bild?.groesse_kb} KB</Feld>
+        <BildVorschau url={b.url} format={b.bild?.format} breite={b.bild?.breite} hoehe={b.bild?.hoehe} />
+        <div className="mt-2">
+          <Feld label="Format">{b.bild?.format}</Feld>
+          <Feld label="Auflösung">{b.bild?.breite} × {b.bild?.hoehe} px</Feld>
+          <Feld label="Größe">{b.bild?.groesse_kb} KB</Feld>
+        </div>
       </Sektion>
       <Sektion titel="Hashes" rechts={<span className="font-mono text-[10px] text-white/30">copy → reverse-DB</span>}>
         <Feld label="MD5"    copy={b.hashes?.md5}   copyId="md5"   kopiertId={kid} onCopy={copy}>{b.hashes?.md5}</Feld>
@@ -309,7 +400,8 @@ function ReportBild({ b }: { b: BildErgebnis }) {
           {b.exif.software && <Feld label="Software">{b.exif.software}</Feld>}
           {b.exif.iso != null && <Feld label="ISO">{String(b.exif.iso)}</Feld>}
           {b.exif.blende && <Feld label="Blende">f/{b.exif.blende}</Feld>}
-          {gps && <Feld label="GPS" href={gps.maps_link}>{gps.lat}, {gps.lon} — Maps öffnen ↗</Feld>}
+          {gps && <Feld label="GPS">{gps.lat}, {gps.lon}</Feld>}
+          {gps && <GpsKarte lat={gps.lat} lon={gps.lon} />}
         </Sektion>
       ) : <div className="font-mono text-[12px] text-white/40 mt-4">Keine EXIF-Metadaten vorhanden.</div>}
       {!!b.sicherheits_hinweise?.length && (
@@ -604,12 +696,46 @@ function ReportOrchestrator({ o }: { o: OrchestratorErgebnis }) {
 
 const QUELLE_FARBE: Record<string, string> = { "crt.sh": C.akzent, wayback: C.cyber, commoncrawl: C.lila };
 
+function ResolveBalken({ gesamt, geprueft, live }: { gesamt: number; geprueft: number; live: number }) {
+  const gesamtAnim = useCountUp(gesamt);
+  const liveAnim = useCountUp(live);
+  const pct = geprueft > 0 ? live / geprueft : 0;
+  return (
+    <div className="rounded-lg border border-white/[0.07] bg-white/[0.015] p-3.5 mb-1">
+      <div className="flex items-end justify-between mb-2.5 font-mono gap-4">
+        <div>
+          <div className="text-[24px] font-bold leading-none tabular-nums" style={{ color: C.cyber }}>{gesamtAnim}</div>
+          <div className="text-[10px] text-white/40 mt-1.5 tracking-[0.15em]">EINDEUTIGE SUBDOMAINS</div>
+        </div>
+        {geprueft > 0 && (
+          <div className="text-right">
+            <div className="text-[24px] font-bold leading-none tabular-nums" style={{ color: C.gruen }}>{liveAnim}</div>
+            <div className="text-[10px] text-white/40 mt-1.5 tracking-[0.15em]">LIVE · {geprueft} GEPRÜFT</div>
+          </div>
+        )}
+      </div>
+      {geprueft > 0 && (
+        <div className="h-2 rounded-full overflow-hidden bg-white/[0.06]" title={`${live} von ${geprueft} aufgelösten Subdomains sind live`}>
+          <motion.div
+            initial={{ width: 0 }} animate={{ width: `${Math.round(pct * 100)}%` }}
+            transition={{ duration: 0.9, ease: "easeOut", delay: 0.1 }}
+            className="h-full rounded-full"
+            style={{ background: `linear-gradient(90deg, ${C.cyber}, ${C.gruen})`, boxShadow: `0 0 10px ${C.gruen}55` }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ReportSubdomains({ s }: { s: SubdomainErgebnis }) {
   const [filter, setFilter] = useState("");
   const [kid, copy] = useKopieren();
   if (s.fehler) return <FehlerHinweis text={s.fehler} />;
   const z = s.zusammenfassung;
   const subs = s.subdomains ?? [];
+  const geprueft = subs.filter((d) => d.aktiv != null).length;
+  const live = subs.filter((d) => d.aktiv === true).length;
   const gefiltert = filter.trim()
     ? subs.filter(d => d.host.toLowerCase().includes(filter.trim().toLowerCase()))
     : subs;
@@ -618,11 +744,10 @@ function ReportSubdomains({ s }: { s: SubdomainErgebnis }) {
 
   return (
     <div>
-      <div className="flex flex-wrap gap-1.5 mb-1">
-        <Marke text={`${z?.gesamt_eindeutig ?? 0} eindeutig`} farbe={C.cyber} gefuellt />
-        {z?.live_aufgeloest != null && <Marke text={`${z.live_aufgeloest} live`} farbe={C.gruen} />}
-        {z?.limit_erreicht && <Marke text="Limit erreicht" farbe={C.gelb} />}
-      </div>
+      <ResolveBalken gesamt={z?.gesamt_eindeutig ?? subs.length} geprueft={geprueft} live={live} />
+      {z?.limit_erreicht && (
+        <div className="mb-1"><Marke text="Anzeige-Limit erreicht" farbe={C.gelb} /></div>
+      )}
 
       <Sektion titel="Quellen-Status">
         <div className="flex flex-wrap gap-1.5">
