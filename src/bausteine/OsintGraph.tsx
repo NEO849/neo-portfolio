@@ -15,24 +15,28 @@
 //   • Ruhige Interaktion, prefers-reduced-motion respektiert.
 // ═══════════════════════════════════════════════════════════════════
 
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { GraphNode, GraphEdge } from "../dienste/osintApi";
 
 // ─── Konstanten ────────────────────────────────────────────────────
 
+// Dezente, kohärente Palette rund um die Brand-Farben (Indigo/Cyan).
+// Identität = Indigo/Violett · Infrastruktur = Blau/Cyan/Teal ·
+// Geo/Kontakt = Slate/Salbeigrün · RISIKO (CVE) = einziger warmer Ton.
 const NODE_FARBEN: Record<string, string> = {
-  email:      "#818cf8", // indigo-400
-  domain:     "#22d3ee", // cyan-400
-  username:   "#c084fc", // purple-400
-  account:    "#a78bfa", // violet-400
-  ip:         "#ef4444", // red-500
-  cve:        "#f87171", // red-400
-  asn:        "#fbbf24", // amber-400
-  nameserver: "#fb923c", // orange-400
-  carrier:    "#34d399", // green-400
-  land:       "#86efac", // green-300
-  phone:      "#eab308", // yellow-500
+  email:      "#8b8fe6", // Identität – Indigo (Brand)
+  account:    "#9f9fdf", // Identität – helles Indigo
+  username:   "#ab9fd2", // Identität – gedämpftes Lavendel
+  domain:     "#5fb0cb", // Infra – ruhiges Cyan-Blau
+  ip:         "#5f93c4", // Infra – Stahlblau
+  nameserver: "#63b6b0", // Infra – gedämpftes Teal
+  asn:        "#8aa3c6", // Infra – Slate-Blau
+  carrier:    "#6cbfa6", // Kontakt/Geo – Teal-Grün
+  land:       "#85b795", // Geo – Salbeigrün
+  phone:      "#94a8c4", // Kontakt – kühles Slate
+  cve:        "#df8a6a", // RISIKO – einziger warmer Ton (Terrakotta)
 };
 
 // Lesbare Legenden-Labels (statt roher Typ-Keys)
@@ -152,12 +156,19 @@ interface Props {
 
 export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
   const reduce = useReducedMotion();
 
   const [dims, setDims] = useState({ w: breite ?? 720, h: hoehe ?? 460 });
   const [hoverNode, setHoverNode] = useState<string | null>(null);
   const [auswahl, setAuswahl] = useState<GraphNode | null>(null);
   const [legendeManuell, setLegendeManuell] = useState<boolean | null>(null);
+  // Pan/Zoom: Transform der Graph-Ebene (Hintergrund/Legende bleiben fix)
+  const [view, setView] = useState({ x: 0, y: 0, k: 1 });
+  const zeiger = useRef<Map<number, { x: number; y: number }>>(new Map());
+  const panLetzte = useRef<{ x: number; y: number } | null>(null);
+  const pinchLetzte = useRef<number | null>(null);
+  const bewegt = useRef(false);
 
   // Container 1:1 vermessen → SVG-Koordinaten = Pixel (kein Letterboxing).
   useLayoutEffect(() => {
@@ -179,6 +190,36 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
     ro.observe(el);
     return () => { ro.disconnect(); cancelAnimationFrame(raf); };
   }, [breite, hoehe]);
+
+  // Zoom um einen Fokuspunkt (Cursor/Pinch-Mitte), Skala begrenzt.
+  const zoomAuf = useCallback((faktor: number, px: number, py: number) => {
+    setView(v => {
+      const k = Math.min(4, Math.max(0.4, v.k * faktor));
+      const f = k / v.k;
+      return { k, x: px - (px - v.x) * f, y: py - (py - v.y) * f };
+    });
+  }, []);
+
+  // Ausgangs-Ansicht: Mobile herausgezoomt (Überblick), Desktop 1:1.
+  const ansichtZuruecksetzen = useCallback(() => {
+    const k0 = dims.w < 560 ? 0.7 : 1;
+    setView({ x: (dims.w / 2) * (1 - k0), y: (dims.h / 2) * (1 - k0), k: k0 });
+  }, [dims.w, dims.h]);
+
+  useEffect(() => { ansichtZuruecksetzen(); }, [ansichtZuruecksetzen]);
+
+  // Mausrad-Zoom (non-passive, um Seitenscroll zu unterbinden)
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const r = svg.getBoundingClientRect();
+      zoomAuf(Math.exp(-e.deltaY * 0.0015), e.clientX - r.left, e.clientY - r.top);
+    };
+    svg.addEventListener("wheel", onWheel, { passive: false });
+    return () => svg.removeEventListener("wheel", onWheel);
+  }, [zoomAuf]);
 
   const positionen = useMemo(
     () => berechneLayout(nodes, edges, dims.w, dims.h),
@@ -209,16 +250,64 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
 
   const trans = reduce ? "none" : "opacity 0.25s ease, stroke-width 0.2s ease";
 
+  // ── Pan & Pinch-Zoom über Pointer-Events (Maus + Touch vereinheitlicht) ──
+  const svgPunkt = (e: ReactPointerEvent) => {
+    const r = svgRef.current!.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  };
+  const onPointerDown = (e: ReactPointerEvent) => {
+    // kein setPointerCapture → click bleibt am Node (Auswahl funktioniert)
+    const p = svgPunkt(e);
+    zeiger.current.set(e.pointerId, p);
+    bewegt.current = false;
+    if (zeiger.current.size === 2) {
+      const [a, b] = [...zeiger.current.values()];
+      pinchLetzte.current = Math.hypot(a.x - b.x, a.y - b.y);
+      panLetzte.current = null;
+    } else {
+      panLetzte.current = p;
+    }
+  };
+  const onPointerMove = (e: ReactPointerEvent) => {
+    if (!zeiger.current.has(e.pointerId)) return;
+    const p = svgPunkt(e);
+    zeiger.current.set(e.pointerId, p);
+    if (zeiger.current.size === 2 && pinchLetzte.current != null) {
+      const [a, b] = [...zeiger.current.values()];
+      const dist = Math.hypot(a.x - b.x, a.y - b.y);
+      zoomAuf(dist / pinchLetzte.current, (a.x + b.x) / 2, (a.y + b.y) / 2);
+      pinchLetzte.current = dist;
+      bewegt.current = true;
+    } else if (zeiger.current.size === 1 && panLetzte.current) {
+      const dx = p.x - panLetzte.current.x;
+      const dy = p.y - panLetzte.current.y;
+      if (Math.abs(dx) + Math.abs(dy) > 3) bewegt.current = true;
+      setView(v => ({ ...v, x: v.x + dx, y: v.y + dy }));
+      panLetzte.current = p;
+    }
+  };
+  const onPointerUp = (e: ReactPointerEvent) => {
+    zeiger.current.delete(e.pointerId);
+    if (zeiger.current.size < 2) pinchLetzte.current = null;
+    panLetzte.current = zeiger.current.size === 1 ? [...zeiger.current.values()][0] : null;
+  };
+
   return (
     <div ref={containerRef} className="relative w-full bg-[#06080f]">
       <svg
+        ref={svgRef}
         width={dims.w}
         height={dims.h}
         viewBox={`0 0 ${dims.w} ${dims.h}`}
         className="block w-full"
-        style={{ height: dims.h }}
+        style={{ height: dims.h, touchAction: "none", cursor: "grab" }}
         role="img"
         aria-label={`Intelligence-Graph mit ${nodes.length} Knoten und ${edges.length} Verbindungen`}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        onPointerLeave={() => { zeiger.current.clear(); panLetzte.current = null; pinchLetzte.current = null; }}
       >
         <defs>
           {/* Hintergrund-Vignette für Tiefe */}
@@ -241,10 +330,10 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
           </filter>
           {/* Volumetrischer Radial-Gradient pro Farbe (Licht oben links) */}
           {Object.entries(NODE_FARBEN).map(([typ, farbe]) => (
-            <radialGradient key={`grad-${typ}`} id={`grad-${typ}`} cx="34%" cy="28%" r="78%">
-              <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.55" />
-              <stop offset="26%"  stopColor={farbe}   stopOpacity="1" />
-              <stop offset="100%" stopColor={farbe}   stopOpacity="0.5" />
+            <radialGradient key={`grad-${typ}`} id={`grad-${typ}`} cx="34%" cy="28%" r="80%">
+              <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.38" />
+              <stop offset="30%"  stopColor={farbe}   stopOpacity="0.96" />
+              <stop offset="100%" stopColor={farbe}   stopOpacity="0.46" />
             </radialGradient>
           ))}
         </defs>
@@ -252,6 +341,9 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
         {/* Hintergrund */}
         <rect width={dims.w} height={dims.h} fill="url(#bg-vignette)" />
         <rect width={dims.w} height={dims.h} fill="url(#dot-grid)" />
+
+        {/* ─── Pan/Zoom-Ebene (Hintergrund bleibt fix) ─── */}
+        <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
 
         {/* ─── Edges (gebogen, mit Fokus-Highlight) ─── */}
         <g>
@@ -318,7 +410,7 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
                 transform={`translate(${p.x},${p.y})`}
                 onMouseEnter={() => setHoverNode(n.id)}
                 onMouseLeave={() => setHoverNode(null)}
-                onClick={() => setAuswahl(n)}
+                onClick={() => { if (!bewegt.current) setAuswahl(n); }}
                 style={{ cursor: "pointer", transition: trans }}
                 opacity={aktiv ? 1 : 0.26}
               >
@@ -349,8 +441,8 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
                 {/* Specular Highlight oben links (3D-Anmutung) */}
                 <ellipse
                   cx={-r * 0.3} cy={-r * 0.42}
-                  rx={r * 0.42} ry={r * 0.26}
-                  fill="rgba(255,255,255,0.4)" pointerEvents="none"
+                  rx={r * 0.4} ry={r * 0.24}
+                  fill="rgba(255,255,255,0.28)" pointerEvents="none"
                 />
                 {/* Label mit dezenter Pill für Lesbarkeit */}
                 {labelSichtbar && (
@@ -378,6 +470,7 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
               </g>
             );
           })}
+        </g>
         </g>
       </svg>
 
@@ -420,6 +513,29 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
             ))}
           </ul>
         )}
+      </div>
+
+      {/* ─── Zoom-Steuerung (unten rechts) ─── */}
+      <div className="absolute right-3 bottom-3 flex flex-col gap-1.5">
+        <button
+          type="button" aria-label="Vergrößern"
+          onClick={() => zoomAuf(1.3, dims.w / 2, dims.h / 2)}
+          className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-[#0a0c16]/80 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors font-mono text-lg leading-none"
+        >+</button>
+        <button
+          type="button" aria-label="Verkleinern"
+          onClick={() => zoomAuf(1 / 1.3, dims.w / 2, dims.h / 2)}
+          className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-[#0a0c16]/80 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors font-mono text-lg leading-none"
+        >−</button>
+        <button
+          type="button" aria-label="Ansicht zurücksetzen"
+          onClick={ansichtZuruecksetzen}
+          className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-[#0a0c16]/80 backdrop-blur-md text-white/60 hover:text-white hover:bg-white/[0.06] transition-colors"
+        >
+          <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.6">
+            <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M12.5 1.5V5H9" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
       </div>
 
       {/* ─── Detail-Panel (Auswahl) ─── */}
