@@ -2,6 +2,16 @@
 // MODEL: Typ-Definitionen für das gesamte Portfolio
 // ═══════════════════════════════════════════════════════
 
+/** Ein Screenshot in der Projekt-Bildergalerie. */
+export interface ProjektBild {
+  /** Pfad ab /public, z.B. "/projekte/sports-almanach/sport_home_3.webp". */
+  readonly quelle: string;
+  /** Kurzer Titel des Screenshots. */
+  readonly titel: string;
+  /** Ein Satz Kontext zum Screenshot. */
+  readonly text: string;
+}
+
 export interface ProjektModel {
   readonly titel: string;
   readonly kurzbeschreibung: string;
@@ -13,6 +23,10 @@ export interface ProjektModel {
   readonly linkLive?: string;
   /** Interne Route zu einer In-App-Demo (z.B. "/voice-demo"). */
   readonly linkDemo?: string;
+  /** Slug für die Bildergalerie-Route "/projekte/<slug>/bilder". */
+  readonly galerieSlug?: string;
+  /** Screenshots für die Bildergalerie (gleiche Bilder wie im README). */
+  readonly bilder?: ProjektBild[];
   readonly zeitraum: string;
   readonly status: "aktiv" | "abgeschlossen" | "in-entwicklung";
 }

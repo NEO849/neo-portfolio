@@ -89,11 +89,16 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
             </ul>
           </div>
 
-          {(projekt.linkGithub || projekt.linkLive || projekt.linkDemo) && (
+          {(projekt.linkGithub || projekt.linkLive || projekt.linkDemo || (projekt.bilder?.length && projekt.galerieSlug)) && (
             <div className="flex flex-wrap gap-2 pt-1">
               {projekt.linkGithub && (
                 <KnopfSekundaer zuUrl={projekt.linkGithub} klassen="text-xs">
                   GitHub →
+                </KnopfSekundaer>
+              )}
+              {projekt.galerieSlug && (projekt.bilder?.length ?? 0) > 0 && (
+                <KnopfSekundaer zuRoute={`/projekte/${projekt.galerieSlug}/bilder`} klassen="text-xs">
+                  Bilder ({projekt.bilder!.length}) →
                 </KnopfSekundaer>
               )}
               {projekt.linkLive && (
