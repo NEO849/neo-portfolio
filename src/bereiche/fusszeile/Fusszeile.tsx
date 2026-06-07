@@ -3,7 +3,7 @@
 // Seitenfuß mit Links, Copyright und Social-Profilen.
 // ═══════════════════════════════════════════════════════════════════
 
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { aktuellesJahr } from "../../hilfsmittel/formatierung";
 import { PERSOENLICH } from "../../models/daten";
 import { NAV_EINTRAEGE } from "../navigation/navKonfiguration";
@@ -20,9 +20,19 @@ export function Fusszeile() {
 
           {/* Marke */}
           <div>
-            <p className="font-mono text-sm text-white/75 mb-1">
-              FREE DATA <span className="text-akzent-400">Solutions</span>
-            </p>
+            <Link
+              to="/"
+              className="inline-block mb-4 opacity-90 hover:opacity-100 focus-visible:opacity-100 transition-opacity duration-200 focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-akzent-400/60"
+            >
+              <img
+                src="/assets/free-data-logo.svg"
+                alt="FREE DATA Solutions Logo"
+                width={651}
+                height={121}
+                decoding="async"
+                className="h-8 md:h-10 w-auto"
+              />
+            </Link>
             <p className="text-xs text-white/70 leading-relaxed max-w-xs">
               KI-Automation & Integration · Linux/Infrastruktur · Security.<br />
               Produktive Systeme, selbst gebaut und betrieben.
