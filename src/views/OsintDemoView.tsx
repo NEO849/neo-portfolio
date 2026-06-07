@@ -31,8 +31,9 @@ interface DemoModul {
   readonly beschreibung: string;
 }
 
-// 8 konsolidierte Module — keine Redundanz, jedes Tool macht intern Vollanalyse.
-// Email/Username/Domain führen mehrere Backend-Calls parallel und mergen die Outputs.
+// 10 Module (1 Status + 9 Analyse-Werkzeuge), gruppiert nach Domäne:
+// Identität/Person · Infrastruktur · Aggregation/Meta. Die Menü-Nummer ist die
+// Anzeige-Position (Index); `nummer` bleibt die stabile interne ID für die Logik.
 const DEMO_MODULE: DemoModul[] = [
   {
     nummer: "1", name: "Status pruefen", farbe: "#9ca3af",
@@ -55,24 +56,14 @@ const DEMO_MODULE: DemoModul[] = [
     beschreibung: "Validiert Format via libphonenumber, ermittelt Land, Carrier, Leitungstyp und Zeitzone. Generiert kuratierte Suchlinks zu Truecaller, Tellows, sync.me, WhatsApp und Telegram — kein automatischer Aufruf.",
   },
   {
-    nummer: "5", name: "Domain & Shodan", farbe: "#22d3ee",
-    eingabeLabel: "Domain eingeben", beispielEingabe: "github.com", eingabeTyp: "text",
-    beschreibung: "Parallel: DNS (A / AAAA / MX / NS / SPF / DMARC), WHOIS, ASN via Team Cymru, HTTP-Security-Header-Audit und Shodan InternetDB (offene Ports, bekannte CVEs, Tags). Liefert zwei Risk-Scores: HTTP-Sec und Network-Exposure.",
-  },
-  {
     nummer: "6", name: "Reverse Image", farbe: "#22c55e",
     eingabeLabel: "Bild-URL", beispielEingabe: "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png", eingabeTyp: "text",
     beschreibung: "Extrahiert EXIF-Metadaten und GPS-Koordinaten, berechnet pHash / aHash / dHash. Generiert 14 Suchlinks über 5 Kategorien: Mainstream (Google Lens / TinEye / Bing), Regional (Yandex / Baidu), Face (PimEyes / FaceCheck / Search4Faces), Art (SauceNAO / IQDB) und Celebrity (PicTriev).",
   },
   {
-    nummer: "7", name: "Intel Search-Aggregator", farbe: "#06b6d4",
-    eingabeLabel: "Wert (Auto-Typ)", beispielEingabe: "github.com", eingabeTyp: "text",
-    beschreibung: "Erkennt den Eingabe-Typ automatisch (E-Mail / Username / Domain / IP / Telefon / Bild) und generiert bis zu 60 kuratierte Search-Links nach IntelTechniques-Methode. Wir rufen nichts automatisch auf — du klickst dich bewusst durch die Quellen.",
-  },
-  {
-    nummer: "8", name: "Vollanalyse Orchestrator", farbe: "#10b981",
-    eingabeLabel: "Beliebiges Target", beispielEingabe: "cloudflare.com", eingabeTyp: "text",
-    beschreibung: "SpiderFoot-Style Orchestrator: erkennt Typ automatisch, führt alle relevanten Module parallel aus und entdeckt Pivots (E-Mail → Domain → ASN → IP → CVE). Visualisiert alle Beziehungen als Maltego-Style Graph mit interaktiver Detail-Anzeige.",
+    nummer: "5", name: "Domain & Shodan", farbe: "#22d3ee",
+    eingabeLabel: "Domain eingeben", beispielEingabe: "github.com", eingabeTyp: "text",
+    beschreibung: "Parallel: DNS (A / AAAA / MX / NS / SPF / DMARC), WHOIS, ASN via Team Cymru, HTTP-Security-Header-Audit und Shodan InternetDB (offene Ports, bekannte CVEs, Tags). Liefert zwei Risk-Scores: HTTP-Sec und Network-Exposure.",
   },
   {
     nummer: "9", name: "Subdomain-Recon (3 Quellen)", farbe: "#2dd4bf",
@@ -83,6 +74,16 @@ const DEMO_MODULE: DemoModul[] = [
     nummer: "10", name: "IP-Intel (RIPEstat)", farbe: "#fbbf24",
     eingabeLabel: "IP oder Domain", beispielEingabe: "1.1.1.1", eingabeTyp: "text",
     beschreibung: "Autoritative Routing- und Ownership-Daten via RIPEstat (RIPE NCC, keyless): announced Prefix, ASN(s), AS-Holder (Betreiber) und der Abuse-Kontakt der IP. Ergänzt Shodan (Ports/CVEs) um die Frage: WEM gehört diese IP und WIE wird sie geroutet?",
+  },
+  {
+    nummer: "7", name: "Intel Search-Aggregator", farbe: "#06b6d4",
+    eingabeLabel: "Wert (Auto-Typ)", beispielEingabe: "github.com", eingabeTyp: "text",
+    beschreibung: "Erkennt den Eingabe-Typ automatisch (E-Mail / Username / Domain / IP / Telefon / Bild) und generiert bis zu 60 kuratierte Search-Links nach IntelTechniques-Methode. Wir rufen nichts automatisch auf — du klickst dich bewusst durch die Quellen.",
+  },
+  {
+    nummer: "8", name: "Vollanalyse Orchestrator", farbe: "#10b981",
+    eingabeLabel: "Beliebiges Target", beispielEingabe: "cloudflare.com", eingabeTyp: "text",
+    beschreibung: "SpiderFoot-Style Orchestrator: erkennt Typ automatisch, führt alle relevanten Module parallel aus und entdeckt Pivots (E-Mail → Domain → ASN → IP → CVE). Visualisiert alle Beziehungen als Maltego-Style Graph mit interaktiver Detail-Anzeige.",
   },
 ];
 
@@ -222,19 +223,19 @@ function erstelleDemoAusgabe(modulNummer: string, eingabe: string): string[] {
     "  ›  WhatsMyName-DB · 600+ Plattformen · Konfidenz-Score",
     "  [ok]  [4] Telefon Analyse",
     "  ›  Format · Carrier · Land · Zeitzone · Suchlinks",
-    "  [ok]  [6] Reverse Image",
+    "  [ok]  [5] Reverse Image",
     "  ›  EXIF · GPS-Karte · pHash/aHash/dHash · 14 Reverse-Engines",
     "", S("INFRASTRUKTUR"),
-    "  [ok]  [5] Domain & Shodan",
+    "  [ok]  [6] Domain & Shodan",
     "  ›  DNS · WHOIS · ASN · HTTP-Sec · Ports · CVEs",
-    "  [ok]  [9] Subdomain-Recon",
+    "  [ok]  [7] Subdomain-Recon",
     "  ›  crt.sh · Wayback · CommonCrawl · Live-Resolve",
-    "  [ok]  [10] IP-Intel (RIPEstat)",
+    "  [ok]  [8] IP-Intel (RIPEstat)",
     "  ›  ASN · Prefix · AS-Holder · Abuse-Kontakt",
     "", S("AGGREGATION / META"),
-    "  [ok]  [7] Intel Search-Aggregator",
+    "  [ok]  [9] Intel Search-Aggregator",
     "  ›  60+ kuratierte Quellen · klickbar",
-    "  [ok]  [8] Vollanalyse Orchestrator",
+    "  [ok]  [10] Vollanalyse Orchestrator",
     "  ›  Auto-Pivot · Subdomains · Maltego-Graph",
   ];
 
@@ -1303,11 +1304,11 @@ export default function OsintDemoView() {
             {phase === "menue" && (
               <motion.div key="menue" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
                 <div className="text-white/50 text-xs mb-3">+== OSINT TOOLKIT -- Modul waehlen ==+</div>
-                {DEMO_MODULE.map(modul => (
+                {DEMO_MODULE.map((modul, i) => (
                   <button key={modul.nummer} onClick={() => modulStarten(modul)}
                     className="block w-full text-left px-3 py-1.5 rounded-lg hover:bg-white/[0.04] transition-all group">
                     <span className="text-white/50">[</span>
-                    <span style={{ color: modul.farbe }} className="font-bold">{modul.nummer}</span>
+                    <span style={{ color: modul.farbe }} className="font-bold">{i + 1}</span>
                     <span className="text-white/50">]  </span>
                     <span className="text-white/75 group-hover:text-white transition">{modul.name}</span>
                     {modul.eingabeTyp === "text" && modul.nummer !== "4" && modul.nummer !== "6" && (
@@ -1352,7 +1353,7 @@ export default function OsintDemoView() {
             {phase === "eingabe" && aktivesModul && (
               <motion.div key="eingabe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="w-full min-w-0">
                 <div className="text-white/55 text-xs mb-3">
-                  Modul [{aktivesModul.nummer}]: {aktivesModul.name}
+                  Modul [{DEMO_MODULE.indexOf(aktivesModul) + 1}]: {aktivesModul.name}
                   {aktivesModul.eingabeTyp === "text" && <span className="ml-2 text-signal-gruen/70">— LIVE API</span>}
                 </div>
 
