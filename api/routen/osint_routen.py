@@ -20,6 +20,8 @@ from werkzeuge.bild_analyse import bild_analysieren
 from werkzeuge.shodan_recon import shodan_internetdb_abfragen
 from werkzeuge.intel_aggregator import links_generieren
 from werkzeuge.orchestrator import orchestrieren
+from werkzeuge.subdomain_recon import subdomains_finden
+from werkzeuge.ip_recon import ip_intel
 
 router = APIRouter(prefix="/osint", tags=["OSINT-Werkzeuge"])
 limiter = Limiter(key_func=get_remote_address)
@@ -403,6 +405,69 @@ async def orchestrator_route(anfrage: OrchestratorAnfrage, request: Request):
         raise HTTPException(status_code=500, detail=f"Orchestrator fehlgeschlagen: {str(e)}")
 
 
+class SubdomainAnfrage(BaseModel):
+    domain: str
+    aufloesen: bool = False  # True = bis zu 75 Subdomains live A-Record-Resolve
+
+    @field_validator("domain")
+    @classmethod
+    def domain_pruefen(cls, v: str) -> str:
+        v = v.strip().lower()
+        bereinigt = v.replace("https://", "").replace("http://", "").replace("www.", "")
+        bereinigt = bereinigt.split("/")[0].split("?")[0]
+        if not bereinigt or len(bereinigt) < 3 or len(bereinigt) > 253:
+            raise ValueError("Domain muss 3-253 Zeichen lang sein")
+        if not re.match(r'^[a-zA-Z0-9]([a-zA-Z0-9\-\.]*[a-zA-Z0-9])?$', bereinigt):
+            raise ValueError("Ungültiges Domain-Format")
+        if "." not in bereinigt:
+            raise ValueError("Domain benötigt eine TLD")
+        return v
+
+
+@router.post("/subdomains", summary="Subdomain-Recon (crt.sh + Wayback + CommonCrawl)")
+@limiter.limit("5/minute")
+async def subdomain_route(anfrage: SubdomainAnfrage, request: Request):
+    """
+    Sammelt Subdomains aus drei keyless-Quellen und führt sie dedupliziert
+    zusammen — mit Quellen-Herkunft pro Treffer.
+
+    - **crt.sh**: Certificate-Transparency-Logs
+    - **Wayback Machine**: historische URLs (CDX-API)
+    - **CommonCrawl**: gecrawlte URLs (neuester Index)
+
+    Mit `aufloesen=true` werden bis zu 75 Subdomains live aufgelöst und als
+    aktiv/inaktiv markiert.
+
+    **Rate-Limit:** 5 Anfragen pro Minute pro IP.
+    """
+    try:
+        ergebnis = await subdomains_finden(anfrage.domain, aufloesen=anfrage.aufloesen)
+        return JSONResponse(content=ergebnis)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Subdomain-Recon fehlgeschlagen: {str(e)}")
+
+
+@router.post("/ip-intel", summary="IP-Intel via RIPEstat (Routing/Owner/Abuse, keyless)")
+@limiter.limit("10/minute")
+async def ip_intel_route(anfrage: ShodanAnfrage, request: Request):
+    """
+    Autoritative Routing-/Ownership-/Abuse-Daten zu einer IP via RIPEstat.
+
+    **Rückgabe:**
+    - Routing: ASN(s), announced Prefix, Prefix-Inhaber
+    - AS: Holder (Betreiber), Typ, Routing-Status
+    - Abuse-Kontakte (für Missbrauchsmeldungen)
+
+    **Akzeptiert:** IP-Adresse ODER Domain (wird via DNS aufgelöst).
+    **Rate-Limit:** 10 Anfragen pro Minute pro IP.
+    """
+    try:
+        ergebnis = await ip_intel(anfrage.ziel)
+        return JSONResponse(content=ergebnis)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"IP-Intel fehlgeschlagen: {str(e)}")
+
+
 @router.get("/gesundheit", summary="API-Status prüfen")
 async def gesundheitscheck():
     """Einfacher Liveness-Check für Monitoring."""
@@ -410,7 +475,7 @@ async def gesundheitscheck():
         "status": "ok",
         "werkzeuge": [
             "domain", "email", "email-recon", "benutzername", "telefon",
-            "bild", "shodan", "aggregator", "orchestrator",
+            "bild", "shodan", "subdomains", "ip-intel", "aggregator", "orchestrator",
         ],
-        "version": "2.0-senior-elite",
+        "version": "2.1-senior-elite",
     }

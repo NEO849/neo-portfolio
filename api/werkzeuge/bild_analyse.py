@@ -13,6 +13,8 @@ from PIL import Image, ExifTags
 from PIL.ExifTags import TAGS, GPSTAGS
 import imagehash
 
+from werkzeuge.netz_schutz import sichere_get, SSRFBlockiert
+
 
 MAX_BILDGROESSE = 10 * 1024 * 1024  # 10 MB
 
@@ -106,30 +108,34 @@ async def bild_analysieren(bild_url: str) -> dict:
             "analysiert_am": datetime.utcnow().isoformat() + "Z",
         }
 
-    # Bild herunterladen
+    # Bild herunterladen — SSRF-sicher (Guard prüft Ziel-IP + jeden Redirect)
     try:
-        async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
-            antwort = await client.get(bild_url, headers={
-                "User-Agent": "Mozilla/5.0 (compatible; OSINTBot/1.0)"
-            })
-            antwort.raise_for_status()
+        antwort = await sichere_get(
+            bild_url,
+            headers={"User-Agent": "Mozilla/5.0 (compatible; OSINTBot/1.0)"},
+            timeout=15,
+            max_bytes=MAX_BILDGROESSE,
+        )
+        antwort.raise_for_status()
 
-            content_type = antwort.headers.get("content-type", "")
-            if not any(t in content_type for t in ("image/", "application/octet-stream")):
-                return {
-                    "url": bild_url,
-                    "fehler": f"URL liefert kein Bild (Content-Type: {content_type})",
-                    "analysiert_am": datetime.utcnow().isoformat() + "Z",
-                }
+        content_type = antwort.headers.get("content-type", "")
+        if not any(t in content_type for t in ("image/", "application/octet-stream")):
+            return {
+                "url": bild_url,
+                "fehler": f"URL liefert kein Bild (Content-Type: {content_type})",
+                "analysiert_am": datetime.utcnow().isoformat() + "Z",
+            }
 
-            bild_bytes = antwort.content
-            if len(bild_bytes) > MAX_BILDGROESSE:
-                return {
-                    "url": bild_url,
-                    "fehler": "Bild zu groß (max. 10 MB)",
-                    "analysiert_am": datetime.utcnow().isoformat() + "Z",
-                }
+        bild_bytes = antwort.content
+        if len(bild_bytes) > MAX_BILDGROESSE:
+            return {
+                "url": bild_url,
+                "fehler": "Bild zu groß (max. 10 MB)",
+                "analysiert_am": datetime.utcnow().isoformat() + "Z",
+            }
 
+    except SSRFBlockiert as e:
+        return {"url": bild_url, "fehler": f"Ziel blockiert (Sicherheitsrichtlinie): {e}", "analysiert_am": datetime.utcnow().isoformat() + "Z"}
     except httpx.HTTPStatusError as e:
         return {"url": bild_url, "fehler": f"HTTP-Fehler: {e.response.status_code}", "analysiert_am": datetime.utcnow().isoformat() + "Z"}
     except Exception as e:

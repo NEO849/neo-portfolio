@@ -378,7 +378,7 @@ async def email_recon(email: str) -> dict:
     hashes = _hashes_berechnen(email)
     domain = email.split("@")[1]
 
-    async with httpx.AsyncClient(verify=False) as client:
+    async with httpx.AsyncClient(verify=True) as client:
         gravatar, google_id, hibp, github, xposedornot, leakcheck, pgp = await asyncio.gather(
             _gravatar_pruefen(client, email),
             _google_id_pruefen(client, email),

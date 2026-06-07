@@ -23,6 +23,8 @@ from werkzeuge.email_recon       import email_recon
 from werkzeuge.intel_aggregator  import links_generieren
 from werkzeuge.shodan_recon      import shodan_internetdb_abfragen
 from werkzeuge.telefon_analyse   import telefon_analysieren
+from werkzeuge.subdomain_recon    import subdomains_finden
+from werkzeuge.ip_recon           import ip_intel
 
 
 # ─── Typ-Erkennung ──────────────────────────────────────────────────
@@ -174,9 +176,22 @@ async def _orchestriere_domain(domain: str, graph: dict, tiefe: int) -> dict:
         ns_node = _node(graph, f"ns:{ns}", ns, "nameserver")
         _edge(graph, root, ns_node, "nameserver")
 
+    # Pivot: Subdomain-Recon bei Tiefe ≥2 (crt.sh + Wayback + CommonCrawl)
+    subdomains = None
+    if tiefe >= 2:
+        subdomains = await subdomains_finden(domain, aufloesen=False)
+        for eintrag in subdomains.get("subdomains", [])[:25]:
+            host = eintrag["host"]
+            if host == domain:
+                continue
+            sub_node = _node(graph, f"domain:{host}", host, "subdomain",
+                             {"quellen": eintrag.get("quellen")})
+            _edge(graph, root, sub_node, "subdomain_von")
+
     return {
         "domain":       domain_analyse,
         "shodan":       shodan,
+        "subdomains":   subdomains,
         "search_links": links_generieren("domain", domain),
     }
 
@@ -209,7 +224,11 @@ async def _orchestriere_username(username: str, graph: dict, tiefe: int) -> dict
 async def _orchestriere_ip(ip: str, graph: dict, tiefe: int) -> dict:
     root = _node(graph, f"ip:{ip}", ip, "ip", {"primaer": True})
 
-    shodan = await shodan_internetdb_abfragen(ip)
+    # Shodan (Ports/Vulns) + RIPEstat (Routing/Owner) parallel
+    shodan, ripe = await asyncio.gather(
+        shodan_internetdb_abfragen(ip),
+        ip_intel(ip),
+    )
 
     for vuln in (shodan.get("aggregiert", {}).get("vulns") or [])[:10]:
         v_node = _node(graph, f"cve:{vuln}", vuln, "cve")
@@ -219,8 +238,17 @@ async def _orchestriere_ip(ip: str, graph: dict, tiefe: int) -> dict:
         h_node = _node(graph, f"domain:{host}", host, "domain")
         _edge(graph, root, h_node, "rdns")
 
+    # RIPEstat: ASN + Holder als Nodes
+    as_info = ripe.get("as", {}) if isinstance(ripe, dict) else {}
+    if as_info.get("asn"):
+        label = f"AS{as_info['asn']}" + (f" {as_info['holder']}" if as_info.get("holder") else "")
+        asn_node = _node(graph, f"asn:AS{as_info['asn']}", label, "asn",
+                         {"holder": as_info.get("holder")})
+        _edge(graph, root, asn_node, "gehostet_via")
+
     return {
         "shodan":       shodan,
+        "ip_intel":     ripe,
         "search_links": links_generieren("ip", ip),
     }
 

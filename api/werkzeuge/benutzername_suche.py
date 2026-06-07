@@ -192,7 +192,10 @@ async def benutzername_suchen(benutzername: str, nur_tier1: bool = False) -> dic
 
     semaphore = asyncio.Semaphore(MAX_PARALLEL)
 
-    async with httpx.AsyncClient(verify=False, http2=False) as client:
+    # TLS-Verifikation aktiv (Senior-Default). Einzelne fehlkonfigurierte
+    # Sites fallen dadurch in den graceful-degradation-Fehlerpfad statt
+    # still MITM-bar zu sein — bewusster Sicherheits-vor-Reichweite-Tradeoff.
+    async with httpx.AsyncClient(verify=True, http2=False) as client:
         # Tier-2 DB laden (parallel zur Tier-1-Ausführung)
         plattformen: list[dict] = list(TIER1_PLATTFORMEN)
 

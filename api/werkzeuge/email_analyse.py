@@ -6,7 +6,6 @@
 # ═══════════════════════════════════════════════════════════════════
 
 import re
-import hashlib
 import httpx
 import asyncio
 import dns.resolver
@@ -48,36 +47,38 @@ def _dns_records_holen(domain: str, typ: str) -> list[str]:
 
 async def _hibp_pruefen(adresse: str) -> dict:
     """
-    Prüft HaveIBeenPwned (v3 API) ob die Adresse in bekannten Leaks vorkommt.
-    Benötigt keinen API-Key für die Breach-Suche (nur k-Anonymity Passwort-Check).
-    Für E-Mail-Breach-Check ist leider ein bezahlter Key nötig — wir nutzen
-    den kostenlosen Hash-basierten Passwort-Check als Demo-Fallback.
+    Prüft via HaveIBeenPwned, ob die *Domain* der Adresse in bekannten
+    Breaches vorkommt. Nutzt den keyless-Endpoint /api/v3/breaches?domain=
+    (öffentliche Breach-Liste, kein API-Key nötig).
+
+    Hinweis: Ein E-Mail-*spezifischer* Breach-Check (account/{email}) braucht
+    bei HIBP einen bezahlten Key — dafür nutzt das Tool die keylosen Quellen
+    XposedOrNot/LeakCheck (siehe email_recon).
     """
     try:
-        # SHA-1 Hash der E-Mail für k-Anonymität
-        email_hash = hashlib.sha1(adresse.lower().encode()).hexdigest().upper()
-        praefix = email_hash[:5]
-        suffix = email_hash[5:]
-
-        async with httpx.AsyncClient(timeout=8) as client:
-            # HIBP Breach-Suche (ohne Key nur domain-Level möglich)
+        domain = adresse.split("@")[1]
+        async with httpx.AsyncClient(timeout=8, verify=True) as client:
             antwort = await client.get(
-                f"https://haveibeenpwned.com/api/v3/breacheddomain/{adresse.split('@')[1]}",
-                headers={"User-Agent": "SecurityPortfolio-Checker/1.0"}
+                "https://haveibeenpwned.com/api/v3/breaches",
+                params={"domain": domain},
+                headers={"User-Agent": "neo-portfolio-osint/1.0"},
             )
             if antwort.status_code == 200:
                 daten = antwort.json()
-                return {
-                    "geprueft": True,
-                    "domain_betroffen": True,
-                    "anzahl_nutzer": sum(len(v) for v in daten.values()) if isinstance(daten, dict) else 0,
-                    "hinweis": "Domain in öffentlichen Datenlecks gefunden"
-                }
+                if isinstance(daten, list) and daten:
+                    return {
+                        "geprueft": True,
+                        "domain_betroffen": True,
+                        "anzahl_breaches": len(daten),
+                        "breaches": [b.get("Name") for b in daten[:10]],
+                        "hinweis": "Domain in öffentlichen Datenlecks gefunden",
+                    }
+                return {"geprueft": True, "domain_betroffen": False}
             elif antwort.status_code == 404:
                 return {"geprueft": True, "domain_betroffen": False}
+            return {"geprueft": False, "hinweis": f"HIBP HTTP {antwort.status_code}"}
     except Exception:
-        pass
-    return {"geprueft": False, "hinweis": "HIBP nicht erreichbar"}
+        return {"geprueft": False, "hinweis": "HIBP nicht erreichbar"}
 
 
 async def email_analysieren(adresse: str) -> dict:

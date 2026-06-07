@@ -12,6 +12,8 @@ import asyncio
 import socket
 from datetime import datetime
 
+from werkzeuge.netz_schutz import sichere_get, SSRFBlockiert
+
 
 def _domain_bereinigen(eingabe: str) -> str:
     """Entfernt Protokoll und Pfad aus einer Domain-Eingabe."""
@@ -47,26 +49,28 @@ def _ip_zu_asn(ip: str) -> str:
 
 
 async def _http_info_holen(domain: str) -> dict:
-    """Prüft HTTP/HTTPS-Erreichbarkeit und liest Header."""
+    """Prüft HTTP/HTTPS-Erreichbarkeit und liest Header (SSRF-sicher)."""
     ergebnis = {"erreichbar": False, "status": None, "server": None,
                 "sicherheit": [], "weiterleitungsziel": None}
+    start_url = f"https://{domain}"
     try:
-        async with httpx.AsyncClient(timeout=8, follow_redirects=True,
-                                     verify=False) as client:
-            antwort = await client.get(f"https://{domain}")
-            ergebnis["erreichbar"] = True
-            ergebnis["status"] = antwort.status_code
-            ergebnis["server"] = antwort.headers.get("server", "unbekannt")
-            # Sicherheits-Header prüfen
-            sicherheits_header = [
-                "strict-transport-security", "content-security-policy",
-                "x-frame-options", "x-content-type-options",
-            ]
-            ergebnis["sicherheit"] = [
-                h for h in sicherheits_header if h in antwort.headers
-            ]
-            if str(antwort.url) != f"https://{domain}":
-                ergebnis["weiterleitungsziel"] = str(antwort.url)
+        antwort = await sichere_get(start_url, timeout=8)
+        ergebnis["erreichbar"] = True
+        ergebnis["status"] = antwort.status_code
+        ergebnis["server"] = antwort.headers.get("server", "unbekannt")
+        # Sicherheits-Header prüfen
+        sicherheits_header = [
+            "strict-transport-security", "content-security-policy",
+            "x-frame-options", "x-content-type-options",
+        ]
+        ergebnis["sicherheit"] = [
+            h for h in sicherheits_header if h in antwort.headers
+        ]
+        if str(antwort.url) != start_url:
+            ergebnis["weiterleitungsziel"] = str(antwort.url)
+    except SSRFBlockiert:
+        # Domain zeigt auf interne IP — bewusst nicht abgerufen
+        ergebnis["fehler"] = "intern/blockiert"
     except Exception:
         pass
     return ergebnis
