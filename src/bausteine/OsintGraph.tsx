@@ -22,21 +22,25 @@ import type { GraphNode, GraphEdge } from "../dienste/osintApi";
 
 // ─── Konstanten ────────────────────────────────────────────────────
 
-// Dezente, kohärente Palette rund um die Brand-Farben (Indigo/Cyan).
-// Identität = Indigo/Violett · Infrastruktur = Blau/Cyan/Teal ·
-// Geo/Kontakt = Slate/Salbeigrün · RISIKO (CVE) = einziger warmer Ton.
+// Kräftige, klar unterscheidbare Palette aus dem Webseiten-Farbsystem
+// (Tokens: akzent=Indigo, cyber=Cyan, signal=rot/gelb/grün) + harmonische
+// Nachbartöne. Semantisch gruppiert:
+//   Identität  = Indigo → Violett → Purple
+//   Infra      = Cyan → Teal → Sky
+//   Netz/Geo   = Amber/Grün · Kontakt = Orange
+//   RISIKO     = Rot (signal-rot)
 const NODE_FARBEN: Record<string, string> = {
-  email:      "#8b8fe6", // Identität – Indigo (Brand)
-  account:    "#9f9fdf", // Identität – helles Indigo
-  username:   "#ab9fd2", // Identität – gedämpftes Lavendel
-  domain:     "#5fb0cb", // Infra – ruhiges Cyan-Blau
-  ip:         "#5f93c4", // Infra – Stahlblau
-  nameserver: "#63b6b0", // Infra – gedämpftes Teal
-  asn:        "#8aa3c6", // Infra – Slate-Blau
-  carrier:    "#6cbfa6", // Kontakt/Geo – Teal-Grün
-  land:       "#85b795", // Geo – Salbeigrün
-  phone:      "#94a8c4", // Kontakt – kühles Slate
-  cve:        "#df8a6a", // RISIKO – einziger warmer Ton (Terrakotta)
+  email:      "#818cf8", // akzent-400 (Brand) – Identität
+  account:    "#a78bfa", // violet-400        – Identität
+  username:   "#c084fc", // purple-400        – Identität
+  domain:     "#22d3ee", // cyber-400         – Infrastruktur
+  nameserver: "#2dd4bf", // teal-400          – Infrastruktur
+  ip:         "#38bdf8", // sky-400           – Infrastruktur
+  asn:        "#f59e0b", // signal-gelb       – Netzwerk-Meta
+  carrier:    "#22c55e", // signal-gruen      – Kontakt/Geo
+  land:       "#4ade80", // green-400         – Geo
+  phone:      "#fb923c", // orange-400        – Kontakt
+  cve:        "#ef4444", // signal-rot        – RISIKO
 };
 
 // Lesbare Legenden-Labels (statt roher Typ-Keys)
@@ -202,7 +206,7 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
 
   // Ausgangs-Ansicht: Mobile herausgezoomt (Überblick), Desktop 1:1.
   const ansichtZuruecksetzen = useCallback(() => {
-    const k0 = dims.w < 560 ? 0.7 : 1;
+    const k0 = dims.w < 560 ? 0.56 : 1;
     setView({ x: (dims.w / 2) * (1 - k0), y: (dims.h / 2) * (1 - k0), k: k0 });
   }, [dims.w, dims.h]);
 
@@ -331,9 +335,9 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
           {/* Volumetrischer Radial-Gradient pro Farbe (Licht oben links) */}
           {Object.entries(NODE_FARBEN).map(([typ, farbe]) => (
             <radialGradient key={`grad-${typ}`} id={`grad-${typ}`} cx="34%" cy="28%" r="80%">
-              <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.38" />
-              <stop offset="30%"  stopColor={farbe}   stopOpacity="0.96" />
-              <stop offset="100%" stopColor={farbe}   stopOpacity="0.46" />
+              <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.5" />
+              <stop offset="28%"  stopColor={farbe}   stopOpacity="1" />
+              <stop offset="100%" stopColor={farbe}   stopOpacity="0.62" />
             </radialGradient>
           ))}
         </defs>
@@ -442,7 +446,7 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
                 <ellipse
                   cx={-r * 0.3} cy={-r * 0.42}
                   rx={r * 0.4} ry={r * 0.24}
-                  fill="rgba(255,255,255,0.28)" pointerEvents="none"
+                  fill="rgba(255,255,255,0.36)" pointerEvents="none"
                 />
                 {/* Label mit dezenter Pill für Lesbarkeit */}
                 {labelSichtbar && (
