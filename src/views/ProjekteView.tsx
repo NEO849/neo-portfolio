@@ -98,7 +98,7 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
               )}
               {projekt.galerieSlug && (projekt.bilder?.length ?? 0) > 0 && (
                 <KnopfSekundaer zuRoute={`/projekte/${projekt.galerieSlug}/bilder`} klassen="text-xs">
-                  Bilder ({projekt.bilder!.length}) →
+                  Bilder →
                 </KnopfSekundaer>
               )}
               {projekt.linkLive && (
