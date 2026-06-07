@@ -28,7 +28,8 @@ interface DemoModul {
   readonly eingabeLabel: string;
   readonly beispielEingabe: string;
   readonly eingabeTyp: "text" | "none" | "demo";
-  readonly beschreibung: string;
+  readonly ziel: string;          // Nutzen in einem klaren Satz (Mehrwert)
+  readonly beschreibung: string;  // technische Details / Quellen
 }
 
 // 10 Module (1 Status + 9 Analyse-Werkzeuge), gruppiert nach Domäne:
@@ -38,51 +39,61 @@ const DEMO_MODULE: DemoModul[] = [
   {
     nummer: "1", name: "Status pruefen", farbe: "#9ca3af",
     eingabeLabel: "", beispielEingabe: "", eingabeTyp: "none",
+    ziel: "Prüft auf einen Blick, ob alle 9 Analyse-Werkzeuge gerade live und einsatzbereit sind.",
     beschreibung: "Liveness-Check für FastAPI, dnspython, httpx (mit SSRF-Guard), WhatsMyName-DB, Shodan InternetDB, RIPEstat und die CT/Archiv-Quellen (crt.sh/Wayback/CommonCrawl) — bestätigt dass alle 9 Analyse-Werkzeuge live und produktiv sind.",
   },
   {
     nummer: "2", name: "E-Mail Vollanalyse", farbe: "#818cf8",
     eingabeLabel: "E-Mail eingeben", beispielEingabe: "demo@example.com", eingabeTyp: "text",
+    ziel: "Zeigt, ob eine E-Mail-Adresse in bekannten Datenlecks auftaucht und welche Profile & Spuren öffentlich daran hängen.",
     beschreibung: "Aggregiert MX / SPF / DMARC, HIBP, XposedOrNot, LeakCheck, Gravatar, Google-GAIA, GitHub-Discovery und PGP-Keyserver parallel. Liefert einen konsolidierten Risk-Score über alle Quellen.",
   },
   {
     nummer: "3", name: "Username Vollscan (600+)", farbe: "#c084fc",
     eingabeLabel: "Username eingeben", beispielEingabe: "torvalds", eingabeTyp: "text",
+    ziel: "Findet, auf welchen der 600+ Plattformen ein Benutzername existiert — der digitale Fußabdruck einer Person.",
     beschreibung: "Scannt 600+ Plattformen via WhatsMyName-Database mit Pattern-Match-Detection. Liefert pro Treffer eine Konfidenz (hoch / mittel / niedrig) statt nur Status-Code-False-Positives.",
   },
   {
     nummer: "4", name: "Telefon Analyse", farbe: "#eab308",
     eingabeLabel: "Telefonnummer", beispielEingabe: "+12025550143", eingabeTyp: "text",
+    ziel: "Verrät Land, Anbieter und Leitungstyp hinter einer Telefonnummer und bündelt seriöse Such-Quellen dazu.",
     beschreibung: "Validiert Format via libphonenumber, ermittelt Land, Carrier, Leitungstyp und Zeitzone. Generiert kuratierte Suchlinks zu Truecaller, Tellows, sync.me, WhatsApp und Telegram — kein automatischer Aufruf.",
   },
   {
     nummer: "6", name: "Reverse Image", farbe: "#22c55e",
     eingabeLabel: "Bild-URL", beispielEingabe: "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png", eingabeTyp: "text",
+    ziel: "Liest versteckte Foto-Daten (inkl. GPS-Aufnahmeort) aus und liefert Reverse-Image-Suchen, um die Bildquelle zu finden.",
     beschreibung: "Extrahiert EXIF-Metadaten und GPS-Koordinaten, berechnet pHash / aHash / dHash. Generiert 14 Suchlinks über 5 Kategorien: Mainstream (Google Lens / TinEye / Bing), Regional (Yandex / Baidu), Face (PimEyes / FaceCheck / Search4Faces), Art (SauceNAO / IQDB) und Celebrity (PicTriev).",
   },
   {
     nummer: "5", name: "Domain & Shodan", farbe: "#22d3ee",
     eingabeLabel: "Domain eingeben", beispielEingabe: "github.com", eingabeTyp: "text",
+    ziel: "Bewertet, wie gut eine Domain abgesichert ist und welche Ports & Schwachstellen nach außen sichtbar sind.",
     beschreibung: "Parallel: DNS (A / AAAA / MX / NS / SPF / DMARC), WHOIS, ASN via Team Cymru, HTTP-Security-Header-Audit und Shodan InternetDB (offene Ports, bekannte CVEs, Tags). Liefert zwei Risk-Scores: HTTP-Sec und Network-Exposure.",
   },
   {
     nummer: "9", name: "Subdomain-Recon (3 Quellen)", farbe: "#2dd4bf",
     eingabeLabel: "Domain eingeben", beispielEingabe: "github.com", eingabeTyp: "text",
+    ziel: "Deckt versteckte Subdomains einer Domain auf — die oft übersehene, eigentliche Angriffsfläche.",
     beschreibung: "Sammelt Subdomains aus drei unabhängigen keyless-Quellen parallel — Certificate-Transparency (crt.sh), Wayback Machine und CommonCrawl — und führt sie dedupliziert zusammen, mit Quellen-Herkunft pro Treffer und optionalem Live-Resolve (A-Record-Check). Jede Quelle ist fehler-isoliert: fällt eine aus, liefern die anderen weiter.",
   },
   {
     nummer: "10", name: "IP-Intel (RIPEstat)", farbe: "#fbbf24",
     eingabeLabel: "IP oder Domain", beispielEingabe: "1.1.1.1", eingabeTyp: "text",
+    ziel: "Beantwortet: Wem gehört diese IP-Adresse und wie wird sie im Internet geroutet?",
     beschreibung: "Autoritative Routing- und Ownership-Daten via RIPEstat (RIPE NCC, keyless): announced Prefix, ASN(s), AS-Holder (Betreiber) und der Abuse-Kontakt der IP. Ergänzt Shodan (Ports/CVEs) um die Frage: WEM gehört diese IP und WIE wird sie geroutet?",
   },
   {
     nummer: "7", name: "Intel Search-Aggregator", farbe: "#06b6d4",
     eingabeLabel: "Wert (Auto-Typ)", beispielEingabe: "github.com", eingabeTyp: "text",
+    ziel: "Macht aus einer einzigen Eingabe bis zu 60 gezielte Such-Links für eine schnelle, manuelle Recherche.",
     beschreibung: "Erkennt den Eingabe-Typ automatisch (E-Mail / Username / Domain / IP / Telefon / Bild) und generiert bis zu 60 kuratierte Search-Links nach IntelTechniques-Methode. Wir rufen nichts automatisch auf — du klickst dich bewusst durch die Quellen.",
   },
   {
     nummer: "8", name: "Vollanalyse Orchestrator", farbe: "#10b981",
     eingabeLabel: "Beliebiges Target", beispielEingabe: "cloudflare.com", eingabeTyp: "text",
+    ziel: "Führt alle passenden Module automatisch zusammen und zeigt die gefundenen Verbindungen als interaktiven Graph.",
     beschreibung: "SpiderFoot-Style Orchestrator: erkennt Typ automatisch, führt alle relevanten Module parallel aus und entdeckt Pivots (E-Mail → Domain → ASN → IP → CVE). Visualisiert alle Beziehungen als Maltego-Style Graph mit interaktiver Detail-Anzeige.",
   },
 ];
@@ -1357,13 +1368,19 @@ export default function OsintDemoView() {
                   {aktivesModul.eingabeTyp === "text" && <span className="ml-2 text-signal-gruen/70">— LIVE API</span>}
                 </div>
 
-                {/* Tool-Beschreibung — konsistent für alle Module */}
-                {aktivesModul.beschreibung && (
+                {/* Tool-Erklärung: Ziel zuerst (Mehrwert), Details dezent darunter */}
+                {aktivesModul.ziel && (
                   <div
-                    className="mb-4 px-4 py-3 rounded-lg border border-white/[0.06] bg-white/[0.02] text-white/55 text-[11.5px] leading-relaxed font-mono"
+                    className="mb-4 px-4 py-3 rounded-lg border border-white/[0.06] bg-white/[0.02] font-mono"
                     style={{ borderLeft: `2px solid ${aktivesModul.farbe}` }}
                   >
-                    {aktivesModul.beschreibung}
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[9px] tracking-[0.18em] uppercase shrink-0" style={{ color: aktivesModul.farbe }}>Ziel</span>
+                      <span className="text-white/85 text-[12.5px] leading-relaxed">{aktivesModul.ziel}</span>
+                    </div>
+                    {aktivesModul.beschreibung && (
+                      <p className="mt-2 text-white/40 text-[11px] leading-relaxed">{aktivesModul.beschreibung}</p>
+                    )}
                   </div>
                 )}
 

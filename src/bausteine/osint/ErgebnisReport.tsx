@@ -21,13 +21,14 @@ import type {
 // ─── Palette (terminal-konform, aus dem Design-System) ──────────────
 
 const C = {
-  gruen:  "#22c55e",
-  gelb:   "#f59e0b",
-  rot:    "#ef4444",
-  cyber:  "#22d3ee",
-  akzent: "#818cf8",
-  lila:   "#c084fc",
-  orange: "#fb923c",
+  gruen:   "#22c55e",
+  gelb:    "#f59e0b",
+  rot:     "#ef4444",
+  cyber:   "#22d3ee",
+  akzent:  "#818cf8",
+  lila:    "#c084fc",
+  orange:  "#fb923c",
+  neutral: "#8b94a8", // Chrome/Struktur — Farbe bleibt der Bedeutung vorbehalten
 };
 
 /** Mappt eine Risiko-/Severity-Stufe auf eine Farbe. */
@@ -93,16 +94,18 @@ function useCountUp(ziel: number, dauer = 750): number {
 
 // ─── Primitive: Sektion ─────────────────────────────────────────────
 
-function Sektion({ titel, farbe = C.akzent, rechts, children }: {
+// Sektions-Header sind bewusst einheitlich neutral (kein Regenbogen) — das
+// `farbe`-Prop bleibt akzeptiert, wird aber nicht mehr zur Einfärbung genutzt.
+function Sektion({ titel, rechts, children }: {
   titel: string; farbe?: string; rechts?: React.ReactNode; children: React.ReactNode;
 }) {
   return (
     <div className="mt-5 first:mt-0">
       <div className="flex items-center gap-3 mb-2">
         <span className="font-mono text-[10.5px] tracking-[0.22em] uppercase font-semibold"
-              style={{ color: farbe }}>{titel}</span>
+              style={{ color: C.neutral }}>{titel}</span>
         <span className="h-px flex-1"
-              style={{ background: `linear-gradient(90deg, ${farbe}40, transparent)` }} />
+              style={{ background: `linear-gradient(90deg, ${C.neutral}33, transparent)` }} />
         {rechts}
       </div>
       <div className="pl-0.5">{children}</div>
@@ -168,8 +171,8 @@ function Messleiste({ wert, max, stufe }: { wert: number; max: number; stufe: st
 
 // ─── Primitive: Verdikt-Banner (Headline mit Gauge) ─────────────────
 
-function Verdikt({ titel, stufe, wert, max, hinweis }: {
-  titel: string; stufe: string; wert: number; max: number; hinweis?: string;
+function Verdikt({ titel, stufe, wert, max, hinweis, deutung }: {
+  titel: string; stufe: string; wert: number; max: number; hinweis?: string; deutung?: string;
 }) {
   const farbe = stufeFarbe(stufe);
   return (
@@ -181,26 +184,36 @@ function Verdikt({ titel, stufe, wert, max, hinweis }: {
         {hinweis && <span className="font-mono text-[10px] text-white/35">{hinweis}</span>}
       </div>
       <Messleiste wert={wert} max={max} stufe={stufe} />
+      {deutung && (
+        <p className="font-mono text-[10.5px] text-white/45 mt-2.5 leading-snug">{deutung}</p>
+      )}
     </motion.div>
   );
 }
 
 // ─── Primitive: Marke / Badge ───────────────────────────────────────
 
-function Marke({ text, farbe = C.akzent, gefuellt }: { text: string; farbe?: string; gefuellt?: boolean }) {
+// Farbe = nur Bedeutung: rot/gelb/grün bleiben semantisch, orange wird zu
+// gelb (Warnung), alles Dekorative (cyber/akzent/lila …) wird neutral.
+function Marke({ text, farbe = C.neutral, gefuellt }: { text: string; farbe?: string; gefuellt?: boolean }) {
+  const semantisch = farbe === C.rot || farbe === C.gelb || farbe === C.gruen;
+  const f = semantisch ? farbe : farbe === C.orange ? C.gelb : C.neutral;
   return (
     <span className="inline-flex items-center px-2 py-0.5 rounded font-mono text-[10.5px] font-medium"
       style={{
-        color: farbe,
-        border: `1px solid ${farbe}${gefuellt ? "55" : "33"}`,
-        background: gefuellt ? `${farbe}1a` : `${farbe}0a`,
+        color: f,
+        border: `1px solid ${f}${gefuellt ? "55" : "33"}`,
+        background: gefuellt ? `${f}1a` : `${f}0a`,
       }}>{text}</span>
   );
 }
 
 // ─── Primitive: klickbarer Link-Chip ────────────────────────────────
 
-function LinkChip({ name, url, farbe = C.cyber }: { name: string; url: string; farbe?: string }) {
+// Links haben EINE konsistente, interaktive Farbe (cyber) — wie die Inline-
+// Links im Report. Das `farbe`-Prop bleibt akzeptiert, wird aber ignoriert.
+function LinkChip({ name, url }: { name: string; url: string; farbe?: string }) {
+  const farbe = C.cyber;
   return (
     <a href={url} target="_blank" rel="noopener noreferrer"
       className="group inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md font-mono text-[11.5px] transition-all"
@@ -236,7 +249,7 @@ function LinkRaster({ gruppen, farbe = C.cyber }: {
 
 function Item({ stufe, children }: { stufe?: "hoch" | "mittel" | "info" | "ok" | "neg"; children: React.ReactNode }) {
   const farbe = stufe === "hoch" ? C.rot : stufe === "mittel" ? C.gelb
-    : stufe === "ok" ? C.gruen : stufe === "neg" ? "rgba(255,255,255,0.3)" : C.cyber;
+    : stufe === "ok" ? C.gruen : stufe === "neg" ? "rgba(255,255,255,0.28)" : C.neutral;
   return (
     <div className="flex items-start gap-2.5 py-[3px] font-mono text-[12px]">
       <span className="mt-[5px] w-1.5 h-1.5 rounded-full shrink-0"
@@ -379,7 +392,8 @@ function ReportBild({ b }: { b: BildErgebnis }) {
   const gps = b.exif?.gps;
   return (
     <div>
-      {gps && <Verdikt titel="Standort-Risiko" stufe="Hoch" wert={6} max={6} hinweis="GPS im Bild gefunden" />}
+      {gps && <Verdikt titel="Standort-Risiko" stufe="Hoch" wert={6} max={6} hinweis="GPS im Bild gefunden"
+        deutung="Das Bild enthält GPS-Koordinaten — der Aufnahmeort lässt sich auf der Karte unten rekonstruieren." />}
       <Sektion titel="Bild-Info">
         <BildVorschau url={b.url} format={b.bild?.format} breite={b.bild?.breite} hoehe={b.bild?.hoehe} />
         <div className="mt-2">
@@ -430,7 +444,8 @@ function ReportEmail({ basis, recon }: { basis: EmailErgebnis; recon: EmailRecon
   const gravatar = recon?.gravatar;
   return (
     <div>
-      {risiko && <Verdikt titel="Exposure-Risiko" stufe={risiko.stufe} wert={risiko.punkte} max={12} hinweis={`${basis.adresse}`} />}
+      {risiko && <Verdikt titel="Exposure-Risiko" stufe={risiko.stufe} wert={risiko.punkte} max={12} hinweis={`${basis.adresse}`}
+        deutung="Wie stark diese Adresse öffentlich exponiert ist — Datenlecks und verknüpfte Profile zusammengefasst. Höher = größere Angriffsfläche." />}
 
       {gravatar?.gefunden && gravatar.avatar_url && (
         <div className="flex items-center gap-3 mt-4 mb-1">
@@ -544,7 +559,8 @@ function ReportUsername({ b }: { b: BenutzerErgebnis }) {
 
   return (
     <div>
-      {s && <Verdikt titel="Treffer-Rate" stufe={s.treffer_rate >= 50 ? "Hoch" : s.treffer_rate >= 20 ? "Mittel" : "Gering"} wert={s.gefunden} max={Math.max(s.geprueft, 1)} hinweis={`@${b.benutzername} · ${s.geprueft} Plattformen`} />}
+      {s && <Verdikt titel="Treffer-Rate" stufe={s.treffer_rate >= 50 ? "Hoch" : s.treffer_rate >= 20 ? "Mittel" : "Gering"} wert={s.gefunden} max={Math.max(s.geprueft, 1)} hinweis={`@${b.benutzername} · ${s.geprueft} Plattformen`}
+        deutung="Auf wie vielen geprüften Plattformen dieser Name existiert. Mehr Treffer = größerer digitaler Fußabdruck." />}
       {s && (
         <div className="flex flex-wrap gap-1.5 mt-3 mb-1">
           <Marke text={`${s.gefunden} gefunden`} farbe={C.gruen} gefuellt />
@@ -585,8 +601,10 @@ function ReportDomain({ domain, shodan }: { domain: DomainErgebnis; shodan: Shod
   return (
     <div>
       <div className="grid sm:grid-cols-2 gap-2.5">
-        <Verdikt titel="HTTP-Sicherheit" stufe={sv.note === "Gut" ? "Keines" : sv.note === "Mittel" ? "Mittel" : "Hoch"} wert={sv.punkte} max={sv.max} hinweis={`${sv.prozent}%`} />
-        {shodan?.risiko && <Verdikt titel="Netzwerk-Exposure" stufe={shodan.risiko.stufe} wert={shodan.risiko.punkte} max={shodan.risiko.max} hinweis="Shodan InternetDB" />}
+        <Verdikt titel="HTTP-Sicherheit" stufe={sv.note === "Gut" ? "Keines" : sv.note === "Mittel" ? "Mittel" : "Hoch"} wert={sv.punkte} max={sv.max} hinweis={`${sv.prozent}%`}
+          deutung="Qualität der HTTP-Sicherheits-Header. Voll & grün = gut abgesichert." />
+        {shodan?.risiko && <Verdikt titel="Netzwerk-Exposure" stufe={shodan.risiko.stufe} wert={shodan.risiko.punkte} max={shodan.risiko.max} hinweis="Shodan InternetDB"
+          deutung="Nach außen sichtbare offene Ports und bekannte Schwachstellen. Höher = mehr Risiko." />}
       </div>
 
       <Sektion titel="DNS-Records">
