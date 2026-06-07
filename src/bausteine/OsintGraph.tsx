@@ -166,7 +166,6 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
   const [dims, setDims] = useState({ w: breite ?? 720, h: hoehe ?? 460 });
   const [hoverNode, setHoverNode] = useState<string | null>(null);
   const [auswahl, setAuswahl] = useState<GraphNode | null>(null);
-  const [legendeManuell, setLegendeManuell] = useState<boolean | null>(null);
   // Pan/Zoom: Transform der Graph-Ebene (Hintergrund/Legende bleiben fix)
   const [view, setView] = useState({ x: 0, y: 0, k: 1 });
   const zeiger = useRef<Map<number, { x: number; y: number }>>(new Map());
@@ -239,10 +238,6 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
 
   const istAktiv = (id: string): boolean =>
     !hoverNode || hoverNode === id || !!nachbarn.get(hoverNode)?.has(id);
-
-  // Legende: Desktop offen, schmale Screens standardmäßig eingeklappt
-  const istMobil = dims.w < 560;
-  const legendeOffen = legendeManuell ?? !istMobil;
 
   if (!nodes.length) {
     return (
@@ -478,45 +473,26 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
         </g>
       </svg>
 
-      {/* ─── Legende: HTML-Glass-Overlay, immer unten links verankert ───
-          Auf schmalen Screens einklappbar (Default zu), Desktop offen. */}
+      {/* ─── Legende: HTML-Glass-Overlay, immer sichtbar, unten links verankert ─── */}
       <div
-        className="absolute left-3 bottom-3 select-none overflow-hidden
+        className="absolute left-3 bottom-3 select-none pointer-events-none
                    rounded-xl border border-white/10 bg-[#0a0c16]/80 backdrop-blur-md
-                   shadow-[0_8px_30px_rgba(0,0,0,0.45)]"
+                   px-3 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.45)]"
       >
-        <button
-          type="button"
-          onClick={() => setLegendeManuell(!legendeOffen)}
-          aria-expanded={legendeOffen}
-          className="flex items-center gap-1.5 w-full px-3 py-2 text-left
-                     hover:bg-white/[0.03] transition-colors focus-visible:outline-none"
-        >
-          <span className="font-mono text-[9px] tracking-[0.18em] text-white/45">LEGENDE</span>
-          <span className="font-mono text-[9px] text-white/30">({vorhandeneTypen.length})</span>
-          <svg
-            viewBox="0 0 12 12"
-            className={`ml-auto w-3 h-3 text-white/40 transition-transform motion-reduce:transition-none ${legendeOffen ? "rotate-180" : ""}`}
-            fill="none" stroke="currentColor" strokeWidth={1.6}
-          >
-            <path d="M3 4.5 6 7.5 9 4.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-        {legendeOffen && (
-          <ul className="grid grid-cols-1 gap-y-1 px-3 pb-2.5 pt-0.5 pointer-events-none">
-            {vorhandeneTypen.map(typ => (
-              <li key={typ} className="flex items-center gap-2">
-                <span
-                  className="w-2.5 h-2.5 rounded-full shrink-0"
-                  style={{ background: NODE_FARBEN[typ], boxShadow: `0 0 6px ${NODE_FARBEN[typ]}80` }}
-                />
-                <span className="font-mono text-[10.5px] text-white/75 leading-none">
-                  {TYP_LABEL[typ] ?? typ}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="font-mono text-[9px] tracking-[0.18em] text-white/45 mb-1.5">LEGENDE</div>
+        <ul className="grid grid-cols-1 gap-y-1">
+          {vorhandeneTypen.map(typ => (
+            <li key={typ} className="flex items-center gap-2">
+              <span
+                className="w-2.5 h-2.5 rounded-full shrink-0"
+                style={{ background: NODE_FARBEN[typ], boxShadow: `0 0 6px ${NODE_FARBEN[typ]}80` }}
+              />
+              <span className="font-mono text-[10.5px] text-white/75 leading-none">
+                {TYP_LABEL[typ] ?? typ}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
 
       {/* ─── Zoom-Steuerung (unten rechts) ─── */}
