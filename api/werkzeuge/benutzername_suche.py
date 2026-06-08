@@ -33,6 +33,7 @@ CACHE_TTL_SEKUNDEN = 86_400  # 24h
 
 MAX_PARALLEL = 40
 TIMEOUT_S = 8
+TIMEOUT_S_TIER1 = 15   # Hochwert-Sites (GitHub & Co.) dürfen unter Last länger brauchen
 
 # Tier-1: kuratiert, hohe Aussagekraft (immer zuerst, eigene Beschreibung)
 TIER1_PLATTFORMEN: list[dict] = [
@@ -186,9 +187,24 @@ async def _plattform_pruefen(
             "kategorie": plattform.get("kategorie", "sonstige"),
             "url": url,
         }
+        # Tier-1 (12 kuratierte Hochwert-Sites, u.a. GitHub) bekommen mehr Zeit
+        # + einen Retry — sie sind wenige, aber die aussagekräftigsten Quellen.
+        # Tier-2 (Long-Tail, hunderte) bleibt schlank (1 Versuch, kürzeres Limit).
+        ist_tier1 = plattform.get("tier", 2) == 1
+        timeout_s = TIMEOUT_S_TIER1 if ist_tier1 else TIMEOUT_S
+        max_versuche = 2 if ist_tier1 else 1
         try:
             headers = {**DEFAULT_HEADERS, **plattform.get("headers", {})}
-            antwort = await client.get(url, headers=headers, follow_redirects=False, timeout=TIMEOUT_S)
+            antwort = None
+            for versuch in range(max_versuche):
+                try:
+                    antwort = await client.get(url, headers=headers, follow_redirects=False, timeout=timeout_s)
+                    break
+                except (httpx.TimeoutException, httpx.ConnectError):
+                    if versuch + 1 >= max_versuche:
+                        raise
+                    # kurzer Backoff vor dem Retry
+                    await asyncio.sleep(0.4)
 
             status = antwort.status_code
             text = antwort.text if antwort.status_code < 400 else ""
