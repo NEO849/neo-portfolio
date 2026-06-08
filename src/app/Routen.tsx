@@ -5,21 +5,25 @@
 // Lazy Loading: Seiten werden erst geladen wenn sie gebraucht werden.
 // ═══════════════════════════════════════════════════════════════════
 
-import { lazy, Suspense, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { KartenSkeleton } from "../bausteine/LadeanzeigePuls";
+import { FehlerGrenze } from "../bausteine/FehlerGrenze";
+import { lazyMitNeuversuch } from "./chunkSelbstheilung";
 
-// Lazy-Imports: Jede Seite wird nur geladen wenn sie aufgerufen wird
-const StartSeite      = lazy(() => import("../seiten/StartSeite"));
-const UeberMichSeite  = lazy(() => import("../seiten/UeberMichSeite"));
-const ProjekteSeite   = lazy(() => import("../seiten/ProjekteSeite"));
-const SecuritySeite   = lazy(() => import("../seiten/SecuritySeite"));
-const LaborSeite      = lazy(() => import("../seiten/LaborSeite"));
-const OsintToolSeite  = lazy(() => import("../seiten/OsintToolSeite"));
-const KontaktSeite    = lazy(() => import("../seiten/KontaktSeite"));
-const VoiceDemoSeite  = lazy(() => import("../seiten/VoiceDemoSeite"));
-const BilderSeite     = lazy(() => import("../seiten/BilderSeite"));
+// Lazy-Imports: Jede Seite wird nur geladen wenn sie aufgerufen wird.
+// lazyMitNeuversuch verhält sich wie React.lazy(), heilt aber Stale-Chunks
+// nach einem Deploy automatisch (Retry → einmaliger Hard-Reload).
+const StartSeite      = lazyMitNeuversuch(() => import("../seiten/StartSeite"));
+const UeberMichSeite  = lazyMitNeuversuch(() => import("../seiten/UeberMichSeite"));
+const ProjekteSeite   = lazyMitNeuversuch(() => import("../seiten/ProjekteSeite"));
+const SecuritySeite   = lazyMitNeuversuch(() => import("../seiten/SecuritySeite"));
+const LaborSeite      = lazyMitNeuversuch(() => import("../seiten/LaborSeite"));
+const OsintToolSeite  = lazyMitNeuversuch(() => import("../seiten/OsintToolSeite"));
+const KontaktSeite    = lazyMitNeuversuch(() => import("../seiten/KontaktSeite"));
+const VoiceDemoSeite  = lazyMitNeuversuch(() => import("../seiten/VoiceDemoSeite"));
+const BilderSeite     = lazyMitNeuversuch(() => import("../seiten/BilderSeite"));
 
 // Fallback während eine Seite geladen wird
 function SeitenLadeindikator() {
@@ -64,6 +68,7 @@ export function Routen() {
   return (
     <>
       <ScrollZuTop />
+    <FehlerGrenze resetSchluessel={ort.pathname}>
     <AnimatePresence mode="wait" initial={false}>
       <Suspense fallback={<SeitenLadeindikator />}>
         <Routes location={ort} key={ort.pathname}>
@@ -80,6 +85,7 @@ export function Routen() {
         </Routes>
       </Suspense>
     </AnimatePresence>
+    </FehlerGrenze>
     </>
   );
 }
