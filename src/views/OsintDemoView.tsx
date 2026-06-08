@@ -15,6 +15,7 @@ import {
 import { DatenschutzModal } from "../bausteine/DatenschutzModal";
 import OsintGraph from "../bausteine/OsintGraph";
 import ErgebnisReport from "../bausteine/osint/ErgebnisReport";
+import DatenflussHinweis from "../bausteine/osint/DatenflussHinweis";
 
 // ═══════════════════════════════════════════════════════
 // OSINT TOOLKIT – LIVE TERMINAL MIT ECHTEM BACKEND
@@ -1067,14 +1068,14 @@ export default function OsintDemoView() {
     setWartendesModul(null);
   }, []);
 
-  const eingabeAbsenden = useCallback(async () => {
-    if (!aktivesModul || !eingabeWert.trim()) return;
-    const wert = eingabeWert.trim();
+  // Kernlogik: führt ein Modul mit explizitem Wert aus (kein Closure-State →
+  // auch für Pivot-Folgeanalysen sicher aufrufbar).
+  const ausfuehren = useCallback(async (modul: DemoModul, wert: string) => {
     setApiFehler(null);
 
     // Demo-Module ohne Backend
-    if (aktivesModul.eingabeTyp === "demo") {
-      setAusgabeZeilen(erstelleDemoAusgabe(aktivesModul.nummer, wert));
+    if (modul.eingabeTyp === "demo") {
+      setAusgabeZeilen(erstelleDemoAusgabe(modul.nummer, wert));
       setPhase("ausgabe");
       return;
     }
@@ -1084,7 +1085,7 @@ export default function OsintDemoView() {
     try {
       let zeilen: string[] = [];
 
-      if (aktivesModul.nummer === "2") {
+      if (modul.nummer === "2") {
         // E-Mail Vollanalyse: Basis + Recon parallel
         const [basis, recon] = await Promise.allSettled([
           emailAnalysieren(wert),
@@ -1095,16 +1096,16 @@ export default function OsintDemoView() {
         if (!basisOk) throw basis.status === "rejected" ? basis.reason : new Apifehler("Basis-Email-Check fehlgeschlagen");
         zeilen = emailVollZuTerminal(basisOk, reconOk);
         setRohdaten({ basis: basisOk, recon: reconOk });
-      } else if (aktivesModul.nummer === "3") {
+      } else if (modul.nummer === "3") {
         // Username: nur noch Vollscan (600+ Plattformen)
         const ergebnis = await benutzernameVollscan(wert);
         zeilen = vollscanZuTerminal(ergebnis);
         setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "4") {
+      } else if (modul.nummer === "4") {
         const ergebnis = await telefonAnalysieren(wert);
         zeilen = telefonZuTerminal(ergebnis);
         setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "5") {
+      } else if (modul.nummer === "5") {
         // Domain + Shodan parallel
         const [domain, shodan] = await Promise.allSettled([
           domainAnalysieren(wert),
@@ -1115,24 +1116,24 @@ export default function OsintDemoView() {
         if (!domainOk) throw domain.status === "rejected" ? domain.reason : new Apifehler("Domain-Check fehlgeschlagen");
         zeilen = domainVollZuTerminal(domainOk, shodanOk);
         setRohdaten({ domain: domainOk, shodan: shodanOk });
-      } else if (aktivesModul.nummer === "6") {
+      } else if (modul.nummer === "6") {
         const ergebnis = await bildAnalysieren(wert);
         zeilen = bildZuTerminal(ergebnis);
         setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "8") {
+      } else if (modul.nummer === "8") {
         const ergebnis = await orchestrator(wert, 2);
         zeilen = orchestratorZuTerminal(ergebnis);
         setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "9") {
+      } else if (modul.nummer === "9") {
         const ergebnis = await subdomainsFinden(wert, true);
         zeilen = subdomainZuTerminal(ergebnis);
         setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "10") {
+      } else if (modul.nummer === "10") {
         const ergebnis = await ipIntelAbfragen(wert);
         zeilen = ipIntelZuTerminal(ergebnis);
         setRohdaten(ergebnis);
       } else {
-        zeilen = erstelleDemoAusgabe(aktivesModul.nummer, wert);
+        zeilen = erstelleDemoAusgabe(modul.nummer, wert);
       }
 
       setAusgabeZeilen(zeilen);
@@ -1164,7 +1165,27 @@ export default function OsintDemoView() {
       setApiFehler(meldung);
       setPhase("eingabe");
     }
-  }, [aktivesModul, eingabeWert]);
+  }, []);
+
+  const eingabeAbsenden = useCallback(() => {
+    if (!aktivesModul || !eingabeWert.trim()) return;
+    void ausfuehren(aktivesModul, eingabeWert.trim());
+  }, [aktivesModul, eingabeWert, ausfuehren]);
+
+  // Pivot: aus einem Ergebnis direkt das passende Werkzeug mit dem Wert starten.
+  const pivotStarten = useCallback((typ: string, wert: string) => {
+    const PIVOT_ZU_MODUL: Record<string, string> = {
+      username: "3", email: "2", domain: "5", ip: "10", image: "6",
+    };
+    const nummer = PIVOT_ZU_MODUL[typ];
+    const modul = nummer ? DEMO_MODULE.find((m) => m.nummer === nummer) : undefined;
+    if (!modul) return;
+    setAktivesModul(modul);
+    setEingabeWert(wert);
+    setAnsicht("report");
+    setApiFehler(null);
+    void ausfuehren(modul, wert);
+  }, [ausfuehren]);
 
   const zurueckSetzen = useCallback(() => {
     setPhase("menue");
@@ -1371,6 +1392,8 @@ export default function OsintDemoView() {
                   </button>
                 </div>
 
+                <DatenflussHinweis nummer={aktivesModul.nummer} />
+
                 {/* Imgur-Anleitung — nur bei Modul 6 */}
                 {aktivesModul?.nummer === "6" && (
                   <div className="mt-5 border-t border-white/[0.06] pt-4 text-[11px] font-mono leading-relaxed">
@@ -1456,7 +1479,7 @@ export default function OsintDemoView() {
 
                 {zeigeReport && (
                   <>
-                    <ErgebnisReport modulNummer={aktivesModul!.nummer} daten={rohdaten} />
+                    <ErgebnisReport modulNummer={aktivesModul!.nummer} daten={rohdaten} onPivot={pivotStarten} />
                     {aktionsLeiste}
                   </>
                 )}
