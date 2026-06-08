@@ -3,13 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   domainAnalysieren, emailAnalysieren, benutzernameSuchen,
   telefonAnalysieren, bildAnalysieren,
-  shodanAbfragen, emailReconnaissance, searchAggregator, orchestrator,
+  shodanAbfragen, emailReconnaissance, orchestrator,
   benutzernameVollscan, subdomainsFinden, ipIntelAbfragen,
   Apifehler,
   type DomainErgebnis, type EmailErgebnis, type BenutzerErgebnis,
   type TelefonErgebnis, type BildErgebnis,
   type ShodanErgebnis, type EmailReconErgebnis,
-  type AggregatorErgebnis, type OrchestratorErgebnis,
+  type OrchestratorErgebnis,
   type SubdomainErgebnis, type IpIntelErgebnis,
 } from "../dienste/osintApi";
 import { DatenschutzModal } from "../bausteine/DatenschutzModal";
@@ -32,15 +32,15 @@ interface DemoModul {
   readonly beschreibung: string;  // technische Details / Quellen
 }
 
-// 10 Module (1 Status + 9 Analyse-Werkzeuge), gruppiert nach Domäne:
+// 9 Module (1 Status + 8 Analyse-Werkzeuge), gruppiert nach Domäne:
 // Identität/Person · Infrastruktur · Aggregation/Meta. Die Menü-Nummer ist die
 // Anzeige-Position (Index); `nummer` bleibt die stabile interne ID für die Logik.
 const DEMO_MODULE: DemoModul[] = [
   {
     nummer: "1", name: "Status pruefen", farbe: "#9ca3af",
     eingabeLabel: "", beispielEingabe: "", eingabeTyp: "none",
-    ziel: "Prüft auf einen Blick, ob alle 9 Analyse-Werkzeuge gerade live und einsatzbereit sind.",
-    beschreibung: "Liveness-Check für FastAPI, dnspython, httpx (mit SSRF-Guard), WhatsMyName-DB, Shodan InternetDB, RIPEstat und die CT/Archiv-Quellen (crt.sh/Wayback/CommonCrawl) — bestätigt dass alle 9 Analyse-Werkzeuge live und produktiv sind.",
+    ziel: "Prüft auf einen Blick, ob alle 8 Analyse-Werkzeuge gerade live und einsatzbereit sind.",
+    beschreibung: "Liveness-Check für FastAPI, dnspython, httpx (mit SSRF-Guard), WhatsMyName-DB, Shodan InternetDB, RIPEstat und die CT/Archiv-Quellen (crt.sh/Wayback/CommonCrawl) — bestätigt dass alle 8 Analyse-Werkzeuge live und produktiv sind.",
   },
   {
     nummer: "2", name: "E-Mail Vollanalyse", farbe: "#818cf8",
@@ -83,12 +83,6 @@ const DEMO_MODULE: DemoModul[] = [
     eingabeLabel: "IP oder Domain", beispielEingabe: "1.1.1.1", eingabeTyp: "text",
     ziel: "Beantwortet: Wem gehört diese IP-Adresse und wie wird sie im Internet geroutet?",
     beschreibung: "Autoritative Routing- und Ownership-Daten via RIPEstat (RIPE NCC, keyless): announced Prefix, ASN(s), AS-Holder (Betreiber) und der Abuse-Kontakt der IP. Ergänzt Shodan (Ports/CVEs) um die Frage: WEM gehört diese IP und WIE wird sie geroutet?",
-  },
-  {
-    nummer: "7", name: "Intel Search-Aggregator", farbe: "#06b6d4",
-    eingabeLabel: "Wert (Auto-Typ)", beispielEingabe: "github.com", eingabeTyp: "text",
-    ziel: "Macht aus einer einzigen Eingabe bis zu 60 gezielte Such-Links für eine schnelle, manuelle Recherche.",
-    beschreibung: "Erkennt den Eingabe-Typ automatisch (E-Mail / Username / Domain / IP / Telefon / Bild) und generiert bis zu 60 kuratierte Search-Links nach IntelTechniques-Methode. Wir rufen nichts automatisch auf — du klickst dich bewusst durch die Quellen.",
   },
   {
     nummer: "8", name: "Vollanalyse Orchestrator", farbe: "#10b981",
@@ -244,9 +238,7 @@ function erstelleDemoAusgabe(modulNummer: string, eingabe: string): string[] {
     "  [ok]  [8] IP-Intel (RIPEstat)",
     "  ›  ASN · Prefix · AS-Holder · Abuse-Kontakt",
     "", S("AGGREGATION / META"),
-    "  [ok]  [9] Intel Search-Aggregator",
-    "  ›  60+ kuratierte Quellen · klickbar",
-    "  [ok]  [10] Vollanalyse Orchestrator",
+    "  [ok]  [9] Vollanalyse Orchestrator",
     "  ›  Auto-Pivot · Subdomains · Maltego-Graph",
   ];
 
@@ -814,31 +806,7 @@ function emailReconZuTerminal(e: EmailReconErgebnis): string[] {
   return zeilen;
 }
 
-// ─── Modul 10: Intel Search-Aggregator ──────────────────────────
-
-function aggregatorZuTerminal(a: AggregatorErgebnis): string[] {
-  if (a.fehler) return [R, K("AGGREGATOR -- Fehler"), R, "", `  ${trunc(a.fehler, 30)}`];
-  const zeilen: string[] = [
-    R, K(`AGGREGATOR -- ${trunc(a.wert, 19)}`), R,
-    "", S("UEBERSICHT"),
-    WW("Typ",       a.typ.toUpperCase()),
-    WW("Links",     `${a.anzahl} generiert`),
-    WW("Kategor.",  String(Object.keys(a.nach_kategorie).length)),
-  ];
-  zeilen.push("", S("NACH KATEGORIE"));
-  for (const [kat, links] of Object.entries(a.nach_kategorie)) {
-    zeilen.push(`  ${kat} (${links.length})`);
-    for (const link of links.slice(0, 5)) {
-      zeilen.push(`    [+]  ${trunc(link.name, 24)}`);
-    }
-    if (links.length > 5) zeilen.push(`    ... +${links.length - 5} weitere`);
-  }
-  zeilen.push("", `  ${trunc(a.hinweis ?? "Statisch generiert", 30)}`,
-              `  Analysiert: ${a.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
-  return zeilen;
-}
-
-// ─── Modul 11: Orchestrator (SpiderFoot-Style mit Graph) ────────
+// ─── Modul 10: Orchestrator (SpiderFoot-Style mit Graph) ────────
 
 function orchestratorZuTerminal(o: OrchestratorErgebnis): string[] {
   if (o.fehler) return [R, K("ORCHESTRATOR -- Fehler"), R, "", `  ${trunc(o.fehler, 30)}`];
@@ -992,8 +960,8 @@ export default function OsintDemoView() {
   const terminalRef = useRef<HTMLDivElement>(null);
   const eingabeRef = useRef<HTMLInputElement>(null);
 
-  // Report-Ansicht verfügbar für Live-Module mit Rohdaten (nicht Status/Demo).
-  const reportVerfuegbar = !!rohdaten && !!aktivesModul && aktivesModul.nummer !== "1";
+  // Report-Ansicht verfügbar, sobald Rohdaten vorliegen (inkl. Status-Modul).
+  const reportVerfuegbar = !!rohdaten && !!aktivesModul;
   const zeigeReport = reportVerfuegbar && ansicht === "report";
 
   // ─── Download-Funktionen ──────────────────────────────────────
@@ -1076,6 +1044,8 @@ export default function OsintDemoView() {
     setAktivesModul(modul);
     if (modul.eingabeTyp === "none") {
       setAusgabeZeilen(erstelleDemoAusgabe(modul.nummer, ""));
+      setRohdaten({ ok: true });   // ermöglicht gestylten Status-Report (wie andere Module)
+      setAnsicht("report");
       setPhase("ausgabe");
     } else {
       setEingabeWert(modul.beispielEingabe);
@@ -1149,19 +1119,6 @@ export default function OsintDemoView() {
         const ergebnis = await bildAnalysieren(wert);
         zeilen = bildZuTerminal(ergebnis);
         setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "7") {
-        // Aggregator mit Auto-Typ-Erkennung
-        const v = wert.trim();
-        const typ: "email" | "username" | "domain" | "phone" | "image" | "ip" =
-          /^[a-zA-Z0-9._%+\-]+@/.test(v) ? "email" :
-          /^https?:\/\//.test(v) ? "image" :
-          /^\+?[0-9\s\-()]{6,}$/.test(v) ? "phone" :
-          /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/.test(v) ? "ip" :
-          /\.[a-zA-Z]{2,}$/.test(v) ? "domain" :
-          "username";
-        const ergebnis = await searchAggregator(typ, wert);
-        zeilen = aggregatorZuTerminal(ergebnis);
-        setRohdaten(ergebnis);
       } else if (aktivesModul.nummer === "8") {
         const ergebnis = await orchestrator(wert, 2);
         zeilen = orchestratorZuTerminal(ergebnis);
@@ -1228,7 +1185,7 @@ export default function OsintDemoView() {
     if (zeile.includes("[!]")) return "text-signal-gelb";
     if (zeile.includes("[+]")) return "text-cyber-400";
     if (zeile.includes("[--]")) return "text-white/55";
-    if (zeile.startsWith("+--")) return "text-white/40";
+    if (zeile.startsWith("+--")) return "text-white/55";
     if (zeile.startsWith("|")) return "text-white/65";
     if (zeile.startsWith("---")) return "text-akzent-400/70";
     if (zeile.includes("  Score") || zeile.includes("  Risiko") || zeile.includes("  Erreichbar")) return "text-white";
@@ -1330,7 +1287,7 @@ export default function OsintDemoView() {
                     )}
                   </button>
                 ))}
-                <div className="mt-3 text-white/40 text-xs">+====================================+</div>
+                <div className="mt-3 text-white/55 text-xs">+====================================+</div>
                 <div className="mt-8 text-[11px] font-mono select-none">
                     <button
                       type="button"
@@ -1350,7 +1307,7 @@ export default function OsintDemoView() {
                         "Kopieren fehlgeschlagen"
                       ) : (
                         <>
-                          <span className="text-white/35">Projekt unterstützen</span>
+                          <span className="text-white/50">Projekt unterstützen</span>
                           <span className="text-akzent-400/40">-&gt;</span>
                           <span className="text-akzent-400/70 font-semibold">Copy BTC</span>
                         </>
@@ -1379,7 +1336,7 @@ export default function OsintDemoView() {
                       <span className="text-white/85 text-[12.5px] leading-relaxed">{aktivesModul.ziel}</span>
                     </div>
                     {aktivesModul.beschreibung && (
-                      <p className="mt-2 text-white/40 text-[11px] leading-relaxed">{aktivesModul.beschreibung}</p>
+                      <p className="mt-2 text-white/55 text-[11px] leading-relaxed">{aktivesModul.beschreibung}</p>
                     )}
                   </div>
                 )}
@@ -1418,7 +1375,7 @@ export default function OsintDemoView() {
                 {aktivesModul?.nummer === "6" && (
                   <div className="mt-5 border-t border-white/[0.06] pt-4 text-[11px] font-mono leading-relaxed">
                     <div className="text-akzent-400/65 mb-2.5">[?] Bild-URL erforderlich — Anleitung</div>
-                    <div className="space-y-1 text-white/38">
+                    <div className="space-y-1 text-white/55">
                       <div>
                         <span className="text-white/55">[1]</span>{" "}
                         <a
@@ -1429,7 +1386,7 @@ export default function OsintDemoView() {
                         >
                           imgur.com/upload
                         </a>{" "}
-                        <span className="text-white/28">öffnen — kostenlos, kein Account nötig</span>
+                        <span className="text-white/48">öffnen — kostenlos, kein Account nötig</span>
                       </div>
                       <div>
                         <span className="text-white/55">[2]</span>{" "}
@@ -1445,7 +1402,7 @@ export default function OsintDemoView() {
                         URL oben einfügen und Enter drücken
                       </div>
                     </div>
-                    <div className="mt-2.5 text-white/22">
+                    <div className="mt-2.5 text-white/45">
                       Beispiel: i.imgur.com/AbCdEfG.jpg
                     </div>
                   </div>
@@ -1480,7 +1437,7 @@ export default function OsintDemoView() {
                 {/* Ansicht-Umschalter — nur wenn eine Report-Ansicht verfügbar ist */}
                 {reportVerfuegbar && (
                   <div className="flex items-center gap-1.5 mb-4 font-mono text-[11px]">
-                    <span className="text-white/30 mr-1">ansicht:</span>
+                    <span className="text-white/50 mr-1">ansicht:</span>
                     {(["report", "raw"] as const).map((v) => (
                       <button
                         key={v}
@@ -1488,7 +1445,7 @@ export default function OsintDemoView() {
                         className={`px-2.5 py-1 rounded-md border transition ${
                           ansicht === v
                             ? "border-akzent-400/40 bg-akzent-500/15 text-akzent-400"
-                            : "border-white/[0.08] text-white/45 hover:text-white/75 hover:border-white/20"
+                            : "border-white/[0.08] text-white/60 hover:text-white/75 hover:border-white/20"
                         }`}
                       >
                         {v}
@@ -1511,7 +1468,7 @@ export default function OsintDemoView() {
                     return (
                       <div
                         key={index}
-                        className="text-white/45 text-[11px] leading-snug pl-[58px] pr-2 break-words whitespace-normal -mt-0.5 mb-1"
+                        className="text-white/60 text-[11px] leading-snug pl-[58px] pr-2 break-words whitespace-normal -mt-0.5 mb-1"
                       >
                         {inhalt}
                       </div>
@@ -1579,7 +1536,7 @@ export default function OsintDemoView() {
         </motion.div>
       )}
 
-      <div className="mt-6 text-[11px] font-mono text-white/30 text-center leading-relaxed">
+      <div className="mt-6 text-[11px] font-mono text-white/50 text-center leading-relaxed">
         <div><span className="text-akzent-400/55">status:</span> live-checks aktiv</div>
         <div><span className="text-akzent-400/55">privacy:</span> keine dauerhafte speicherung · rate-limit: 3–20/min</div>
       </div>

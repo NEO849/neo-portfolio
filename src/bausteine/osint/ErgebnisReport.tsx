@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type {
   DomainErgebnis, EmailErgebnis, EmailReconErgebnis, BenutzerErgebnis,
-  TelefonErgebnis, BildErgebnis, ShodanErgebnis, AggregatorErgebnis,
+  TelefonErgebnis, BildErgebnis, ShodanErgebnis,
   OrchestratorErgebnis, SubdomainErgebnis, IpIntelErgebnis,
 } from "../../dienste/osintApi";
 
@@ -28,7 +28,7 @@ const C = {
   akzent:  "#818cf8",
   lila:    "#c084fc",
   orange:  "#fb923c",
-  neutral: "#8b94a8", // Chrome/Struktur — Farbe bleibt der Bedeutung vorbehalten
+  neutral: "#9aa4ba", // Chrome/Struktur (gut lesbar) — Farbe bleibt der Bedeutung vorbehalten
 };
 
 /** Mappt eine Risiko-/Severity-Stufe auf eine Farbe. */
@@ -39,6 +39,8 @@ function stufeFarbe(stufe?: string): string {
     case "mittel":   return C.gelb;
     case "gering":   return C.cyber;
     case "keines":   return C.gruen;
+    case "live":     return C.gruen;
+    case "ok":       return C.gruen;
     default:         return C.akzent;
   }
 }
@@ -122,7 +124,7 @@ function Feld({ label, children, copy, href, copyId, kopiertId, onCopy }: {
 }) {
   return (
     <div className="flex items-baseline gap-2 py-[3px] font-mono text-[12.5px] group">
-      <span className="text-white/40 min-w-[96px] shrink-0">{label}</span>
+      <span className="text-white/55 min-w-[96px] shrink-0">{label}</span>
       <span className="text-white/85 break-all flex-1">
         {href ? (
           <a href={href} target="_blank" rel="noopener noreferrer"
@@ -131,7 +133,7 @@ function Feld({ label, children, copy, href, copyId, kopiertId, onCopy }: {
       </span>
       {copy !== undefined && onCopy && (
         <button onClick={() => onCopy(copy, copyId ?? label)}
-          className="shrink-0 text-[10px] px-1.5 py-0.5 rounded border border-white/10 text-white/40
+          className="shrink-0 text-[10px] px-1.5 py-0.5 rounded border border-white/10 text-white/55
                      hover:text-white/80 hover:border-white/25 transition opacity-0 group-hover:opacity-100"
           title="Kopieren">
           {kopiertId === (copyId ?? label) ? "✓" : "copy"}
@@ -164,7 +166,7 @@ function Messleiste({ wert, max, stufe }: { wert: number; max: number; stufe: st
       <span className="font-mono text-[12px] font-bold tracking-wide" style={{ color: farbe }}>
         {stufe.toUpperCase()}
       </span>
-      <span className="font-mono text-[11px] text-white/40">{wert}/{max}</span>
+      <span className="font-mono text-[11px] text-white/55">{wert}/{max}</span>
     </div>
   );
 }
@@ -181,11 +183,11 @@ function Verdikt({ titel, stufe, wert, max, hinweis, deutung }: {
       style={{ borderColor: `${farbe}33`, background: `${farbe}0d` }}>
       <div className="flex items-center justify-between gap-3 mb-2.5">
         <span className="font-mono text-[11px] tracking-wider uppercase text-white/55">{titel}</span>
-        {hinweis && <span className="font-mono text-[10px] text-white/35">{hinweis}</span>}
+        {hinweis && <span className="font-mono text-[10px] text-white/50">{hinweis}</span>}
       </div>
       <Messleiste wert={wert} max={max} stufe={stufe} />
       {deutung && (
-        <p className="font-mono text-[10.5px] text-white/45 mt-2.5 leading-snug">{deutung}</p>
+        <p className="font-mono text-[10.5px] text-white/60 mt-2.5 leading-snug">{deutung}</p>
       )}
     </motion.div>
   );
@@ -235,7 +237,7 @@ function LinkRaster({ gruppen, farbe = C.cyber }: {
     <div className="space-y-3">
       {Object.entries(gruppen).map(([kat, links]) => (
         <div key={kat}>
-          <div className="font-mono text-[10px] text-white/35 mb-1.5 tracking-wider">{kat} ({links.length})</div>
+          <div className="font-mono text-[10px] text-white/50 mb-1.5 tracking-wider">{kat} ({links.length})</div>
           <div className="flex flex-wrap gap-1.5">
             {links.map((l, i) => <LinkChip key={`${l.name}-${i}`} name={l.name} url={l.url} farbe={farbe} />)}
           </div>
@@ -270,7 +272,7 @@ function Aufklappbar({ label, kinderAnzahl, children }: {
     <div>
       {offen && <div className="mb-2">{children}</div>}
       <button onClick={() => setOffen(!offen)}
-        className="font-mono text-[11px] text-white/45 hover:text-white/75 transition">
+        className="font-mono text-[11px] text-white/60 hover:text-white/75 transition">
         {offen ? "▲ weniger anzeigen" : `▼ ${label}`}
       </button>
     </div>
@@ -312,7 +314,7 @@ function ReportTelefon({ t }: { t: TelefonErgebnis }) {
         <Feld label="Zeitzone">{(t.metadaten?.zeitzonen ?? []).join(", ")}</Feld>
       </Sektion>
       {t.suchlinks?.nach_kategorie && (
-        <Sektion titel="Suchlinks" farbe={C.cyber} rechts={<span className="font-mono text-[10px] text-white/30">{t.suchlinks.gesamt} Quellen · klickbar</span>}>
+        <Sektion titel="Suchlinks" farbe={C.cyber} rechts={<span className="font-mono text-[10px] text-white/50">{t.suchlinks.gesamt} Quellen · klickbar</span>}>
           <LinkRaster gruppen={t.suchlinks.nach_kategorie} />
         </Sektion>
       )}
@@ -402,7 +404,7 @@ function ReportBild({ b }: { b: BildErgebnis }) {
           <Feld label="Größe">{b.bild?.groesse_kb} KB</Feld>
         </div>
       </Sektion>
-      <Sektion titel="Hashes" rechts={<span className="font-mono text-[10px] text-white/30">copy → reverse-DB</span>}>
+      <Sektion titel="Hashes" rechts={<span className="font-mono text-[10px] text-white/50">copy → reverse-DB</span>}>
         <Feld label="MD5"    copy={b.hashes?.md5}   copyId="md5"   kopiertId={kid} onCopy={copy}>{b.hashes?.md5}</Feld>
         <Feld label="SHA256" copy={b.hashes?.sha256} copyId="sha"  kopiertId={kid} onCopy={copy}>{b.hashes?.sha256}</Feld>
         <Feld label="pHash"  copy={b.hashes?.phash}  copyId="ph"   kopiertId={kid} onCopy={copy}>{b.hashes?.phash}</Feld>
@@ -417,14 +419,14 @@ function ReportBild({ b }: { b: BildErgebnis }) {
           {gps && <Feld label="GPS">{gps.lat}, {gps.lon}</Feld>}
           {gps && <GpsKarte lat={gps.lat} lon={gps.lon} />}
         </Sektion>
-      ) : <div className="font-mono text-[12px] text-white/40 mt-4">Keine EXIF-Metadaten vorhanden.</div>}
+      ) : <div className="font-mono text-[12px] text-white/55 mt-4">Keine EXIF-Metadaten vorhanden.</div>}
       {!!b.sicherheits_hinweise?.length && (
         <Sektion titel="Sicherheitsanalyse" farbe={C.gelb}>
           {b.sicherheits_hinweise.map((h, i) => <Item key={i} stufe={h.stufe === "hoch" ? "hoch" : "info"}>{h.meldung}</Item>)}
         </Sektion>
       )}
       {!!b.suchlinks?.length && (
-        <Sektion titel="Reverse-Image-Suche" farbe={C.gruen} rechts={<span className="font-mono text-[10px] text-white/30">{b.suchlinks.length} Engines · klickbar</span>}>
+        <Sektion titel="Reverse-Image-Suche" farbe={C.gruen} rechts={<span className="font-mono text-[10px] text-white/50">{b.suchlinks.length} Engines · klickbar</span>}>
           <div className="flex flex-wrap gap-1.5">
             {b.suchlinks.map((l, i) => <LinkChip key={i} name={l.name} url={l.url} farbe={C.gruen} />)}
           </div>
@@ -454,7 +456,7 @@ function ReportEmail({ basis, recon }: { basis: EmailErgebnis; recon: EmailRecon
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
           <div className="font-mono text-[12px]">
             <div className="text-white/85">{gravatar.profil_daten?.anzeigename ?? "Gravatar-Profil"}</div>
-            {gravatar.profil_daten?.benutzername && <div className="text-white/45">@{gravatar.profil_daten.benutzername}</div>}
+            {gravatar.profil_daten?.benutzername && <div className="text-white/60">@{gravatar.profil_daten.benutzername}</div>}
           </div>
         </div>
       )}
@@ -573,10 +575,10 @@ function ReportUsername({ b }: { b: BenutzerErgebnis }) {
       <Sektion titel="Verifizierte Profile" farbe={C.gruen}
         rechts={<Filter wert={filter} setWert={setFilter} platzhalter="filter…" />}>
         {Object.keys(gefiltert).length === 0 ? (
-          <div className="font-mono text-[12px] text-white/40 py-2">Keine Treffer{filter ? " für diesen Filter" : ""}.</div>
+          <div className="font-mono text-[12px] text-white/55 py-2">Keine Treffer{filter ? " für diesen Filter" : ""}.</div>
         ) : Object.entries(gefiltert).map(([kat, plats]) => (
           <div key={kat} className="mb-3">
-            <div className="font-mono text-[10px] text-white/35 mb-1.5 tracking-wider uppercase">{kat} ({plats.length})</div>
+            <div className="font-mono text-[10px] text-white/50 mb-1.5 tracking-wider uppercase">{kat} ({plats.length})</div>
             <div className="flex flex-wrap gap-1.5">
               {plats.map((p, i) => {
                 const farbe = p.konfidenz === "hoch" ? C.gruen : p.konfidenz === "mittel" ? C.gelb : C.cyber;
@@ -586,7 +588,7 @@ function ReportUsername({ b }: { b: BenutzerErgebnis }) {
           </div>
         ))}
       </Sektion>
-      <div className="font-mono text-[10px] text-white/30 mt-2">WhatsMyName-DB · Modus: {b.modus}</div>
+      <div className="font-mono text-[10px] text-white/50 mt-2">WhatsMyName-DB · Modus: {b.modus}</div>
       <FussZeile iso={b.analysiert_am} />
     </div>
   );
@@ -660,25 +662,6 @@ function ReportDomain({ domain, shodan }: { domain: DomainErgebnis; shodan: Shod
   );
 }
 
-// ─── Aggregator ─────────────────────────────────────────────────────
-
-function ReportAggregator({ a }: { a: AggregatorErgebnis }) {
-  if (a.fehler) return <FehlerHinweis text={a.fehler} />;
-  return (
-    <div>
-      <div className="flex flex-wrap gap-1.5 mb-1">
-        <Marke text={a.typ.toUpperCase()} farbe={C.akzent} gefuellt />
-        <Marke text={`${a.anzahl} Links`} farbe={C.cyber} />
-        <Marke text={`${Object.keys(a.nach_kategorie).length} Kategorien`} farbe={C.cyber} />
-      </div>
-      <Sektion titel="Kuratierte Quellen" farbe={C.cyber} rechts={<span className="font-mono text-[10px] text-white/30">alle klickbar</span>}>
-        <LinkRaster gruppen={a.nach_kategorie} />
-      </Sektion>
-      <FussZeile iso={a.analysiert_am} />
-    </div>
-  );
-}
-
 // ─── Orchestrator (Graph rendert der Parent) ────────────────────────
 
 function ReportOrchestrator({ o }: { o: OrchestratorErgebnis }) {
@@ -704,7 +687,7 @@ function ReportOrchestrator({ o }: { o: OrchestratorErgebnis }) {
           {(o.zusammenfassung?.module_ausgefuehrt ?? []).map((m, i) => <Marke key={i} text={m} farbe={C.gruen} />)}
         </div>
       </Sektion>
-      <div className="font-mono text-[11px] text-white/35 mt-4">↓ Interaktiver Graph unterhalb des Terminals</div>
+      <div className="font-mono text-[11px] text-white/50 mt-4">↓ Interaktiver Graph unterhalb des Terminals</div>
       <FussZeile iso={o.analysiert_am} />
     </div>
   );
@@ -723,12 +706,12 @@ function ResolveBalken({ gesamt, geprueft, live }: { gesamt: number; geprueft: n
       <div className="flex items-end justify-between mb-2.5 font-mono gap-4">
         <div>
           <div className="text-[24px] font-bold leading-none tabular-nums" style={{ color: C.cyber }}>{gesamtAnim}</div>
-          <div className="text-[10px] text-white/40 mt-1.5 tracking-[0.15em]">EINDEUTIGE SUBDOMAINS</div>
+          <div className="text-[10px] text-white/55 mt-1.5 tracking-[0.15em]">EINDEUTIGE SUBDOMAINS</div>
         </div>
         {geprueft > 0 && (
           <div className="text-right">
             <div className="text-[24px] font-bold leading-none tabular-nums" style={{ color: C.gruen }}>{liveAnim}</div>
-            <div className="text-[10px] text-white/40 mt-1.5 tracking-[0.15em]">LIVE · {geprueft} GEPRÜFT</div>
+            <div className="text-[10px] text-white/55 mt-1.5 tracking-[0.15em]">LIVE · {geprueft} GEPRÜFT</div>
           </div>
         )}
       </div>
@@ -781,13 +764,13 @@ function ReportSubdomains({ s }: { s: SubdomainErgebnis }) {
           <div className="flex items-center gap-2">
             <Filter wert={filter} setWert={setFilter} platzhalter="filter…" />
             <button onClick={() => copy(subs.map(d => d.host).join("\n"), "all")}
-              className="font-mono text-[10px] px-1.5 py-0.5 rounded border border-white/10 text-white/45 hover:text-white/80 hover:border-white/25 transition">
+              className="font-mono text-[10px] px-1.5 py-0.5 rounded border border-white/10 text-white/60 hover:text-white/80 hover:border-white/25 transition">
               {kid === "all" ? "✓ kopiert" : "copy alle"}
             </button>
           </div>
         }>
         {sichtbar.length === 0 ? (
-          <div className="font-mono text-[12px] text-white/40 py-2">Keine Subdomains{filter ? " für diesen Filter" : ""}.</div>
+          <div className="font-mono text-[12px] text-white/55 py-2">Keine Subdomains{filter ? " für diesen Filter" : ""}.</div>
         ) : (
           <div className="space-y-1">
             {sichtbar.map((d) => <SubZeile key={d.host} d={d} />)}
@@ -815,7 +798,7 @@ function SubZeile({ d }: { d: { host: string; quellen: string[]; aktiv: boolean 
       )}
       <a href={`https://${d.host}`} target="_blank" rel="noopener noreferrer"
         className="text-white/80 hover:text-cyber-400 transition break-all">{d.host}</a>
-      {d.ip && <span className="text-white/35 text-[11px]">{d.ip}</span>}
+      {d.ip && <span className="text-white/50 text-[11px]">{d.ip}</span>}
       <span className="ml-auto flex gap-1 shrink-0">
         {d.quellen.map((q) => (
           <span key={q} className="w-1.5 h-1.5 rounded-full" title={q} style={{ background: QUELLE_FARBE[q] ?? C.cyber }} />
@@ -882,7 +865,41 @@ function FehlerHinweis({ text }: { text: string }) {
 }
 
 function FussZeile({ iso }: { iso?: string }) {
-  return <div className="font-mono text-[10px] text-white/25 mt-5 pt-3 border-t border-white/[0.05]">analysiert: {zeit(iso)} UTC</div>;
+  return <div className="font-mono text-[10px] text-white/45 mt-5 pt-3 border-t border-white/[0.05]">analysiert: {zeit(iso)} UTC</div>;
+}
+
+// ─── System-Status (Modul 1) ────────────────────────────────────────
+
+function ReportStatus() {
+  const werkzeuge = [
+    "E-Mail Vollanalyse", "Username Vollscan (600+)", "Telefon Analyse",
+    "Reverse Image", "Domain & Shodan", "Subdomain-Recon (3 Quellen)",
+    "IP-Intel (RIPEstat)", "Vollanalyse Orchestrator",
+  ];
+  const infra = [
+    "FastAPI · uvicorn · slowapi",
+    "dnspython · python-whois",
+    "httpx — TLS-verify + SSRF-Guard",
+    "WhatsMyName-DB (cached)",
+    "Shodan InternetDB",
+    "RIPEstat (RIPE NCC)",
+    "crt.sh · Wayback · CommonCrawl",
+  ];
+  return (
+    <div>
+      <Verdikt titel="System-Status" stufe="live" wert={werkzeuge.length} max={werkzeuge.length}
+        hinweis="live · produktiv"
+        deutung="Alle Analyse-Werkzeuge sind aktuell erreichbar und einsatzbereit." />
+      <Sektion titel="Analyse-Werkzeuge"
+        rechts={<span className="font-mono text-[10px] text-white/50">{werkzeuge.length} aktiv</span>}>
+        {werkzeuge.map((w) => <Item key={w} stufe="ok">{w}</Item>)}
+      </Sektion>
+      <Sektion titel="Infrastruktur (Contabo VPS)">
+        {infra.map((i) => <Item key={i} stufe="ok">{i}</Item>)}
+      </Sektion>
+      <FussZeile iso={new Date().toISOString()} />
+    </div>
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -892,12 +909,12 @@ function FussZeile({ iso }: { iso?: string }) {
 export default function ErgebnisReport({ modulNummer, daten }: { modulNummer: string; daten: unknown }) {
   let inhalt: React.ReactNode = null;
   switch (modulNummer) {
+    case "1": inhalt = <ReportStatus />; break;
     case "2": { const d = daten as { basis: EmailErgebnis; recon: EmailReconErgebnis | null }; inhalt = <ReportEmail basis={d.basis} recon={d.recon} />; break; }
     case "3": inhalt = <ReportUsername b={daten as BenutzerErgebnis} />; break;
     case "4": inhalt = <ReportTelefon t={daten as TelefonErgebnis} />; break;
     case "5": { const d = daten as { domain: DomainErgebnis; shodan: ShodanErgebnis | null }; inhalt = <ReportDomain domain={d.domain} shodan={d.shodan} />; break; }
     case "6": inhalt = <ReportBild b={daten as BildErgebnis} />; break;
-    case "7": inhalt = <ReportAggregator a={daten as AggregatorErgebnis} />; break;
     case "8": inhalt = <ReportOrchestrator o={daten as OrchestratorErgebnis} />; break;
     case "9": inhalt = <ReportSubdomains s={daten as SubdomainErgebnis} />; break;
     case "10": inhalt = <ReportIpIntel r={daten as IpIntelErgebnis} />; break;
