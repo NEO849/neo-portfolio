@@ -130,14 +130,20 @@ DATENFLUSS: dict[str, dict] = {
     },
 
     "telefon": {
-        "beschreibung": "Analysiert eine Telefonnummer (Format, Land, Carrier, Typ).",
-        "sendet_an": [],
+        "beschreibung": "Analysiert eine Telefonnummer (Format, Land, Carrier, Typ) "
+                        "+ optionaler HLR-Live-Status.",
+        "sendet_an": [
+            _dienst("hlr-lookups.com", "Telefonnummer (E.164) — NUR wenn HLR aktiviert",
+                    "Live-Status (erreichbar/Roaming/Carrier/Portierung) via HLR-Abfrage",
+                    "https://www.hlr-lookups.com/en/privacy-policy", "EU"),
+        ],
         "nur_links": [
             "tellows, Truecaller, sync.me, NumLookup, Facebook, LinkedIn, WhatsApp, Telegram "
             "(ausschließlich anklickbare Such-Links — es werden keine Daten automatisch gesendet)",
         ],
-        "hinweis": "Die Analyse läuft vollständig LOKAL über die phonenumbers-Bibliothek. "
-                   "Es wird serverseitig KEIN Drittdienst kontaktiert.",
+        "hinweis": "Die Basis-Analyse läuft vollständig LOKAL (phonenumbers-Bibliothek). "
+                   "Ein Drittdienst (hlr-lookups.com) wird NUR kontaktiert, wenn der "
+                   "HLR-Live-Status aktiviert (API-Key gesetzt) ist.",
         "speicherung": SPEICHER_HINWEIS,
     },
 

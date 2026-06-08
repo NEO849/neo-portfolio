@@ -58,11 +58,13 @@ def test_struktur():
 
 def test_wahrheit_kein_serverseitiger_call():
     print("test_wahrheit_kein_serverseitiger_call:")
-    # telefon + aggregator kontaktieren bewusst KEINEN Drittdienst serverseitig.
-    pruefe(DATENFLUSS["telefon"]["sendet_an"] == [],
-           "telefon: kein serverseitiger Drittdienst-Call (nur lokal/Links)")
+    # aggregator kontaktiert IMMER KEINEN Drittdienst serverseitig (nur Links).
     pruefe(DATENFLUSS["aggregator"]["sendet_an"] == [],
            "aggregator: kein serverseitiger Drittdienst-Call (nur Links)")
+    # telefon kontaktiert serverseitig NUR optional hlr-lookups.com (HLR), sonst nichts.
+    tel = DATENFLUSS["telefon"]["sendet_an"]
+    pruefe(all("hlr-lookups" in d["dienst"] for d in tel),
+           "telefon: serverseitig höchstens HLR (optional), kein anderer Dienst")
 
 
 def test_abfrage_funktion():

@@ -527,6 +527,6 @@ async def gesundheitscheck():
             "bild", "passwort", "shodan", "subdomains", "ip-intel",
             "aggregator", "orchestrator",
         ],
-        "fundament": ["cache", "transparenz", "pivots", "geocoding"],
-        "version": "2.3-welle2",
+        "fundament": ["cache", "transparenz", "pivots", "geocoding", "hlr_lookup"],
+        "version": "2.4-welle4",
     }
