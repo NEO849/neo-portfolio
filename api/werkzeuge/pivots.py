@@ -111,6 +111,12 @@ def _aus_benutzername(erg: dict) -> list[dict | None]:
                                  f"{treffer.get('plattform', 'Plattform')}",
                                  treffer.get("konfidenz", "mittel"),
                                  url=treffer["url"]))
+    # Avatare aus extrahierten Profilen → Bild-Pivots (Welle 3)
+    for av in (erg.get("identitaet") or {}).get("avatare", []) or []:
+        if av.get("avatar"):
+            pivots.append(_pivot("image", av["avatar"],
+                                 f"Avatar ({av.get('plattform', 'Profil')})",
+                                 "mittel", url=av["avatar"]))
     return pivots
 
 

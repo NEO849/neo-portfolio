@@ -16,7 +16,9 @@
 # ═══════════════════════════════════════════════════════════════════
 
 import asyncio
+import html as html_modul
 import json
+import re
 import time
 from pathlib import Path
 
@@ -118,6 +120,55 @@ def _wmn_zu_plattform(wmn_site: dict) -> dict | None:
     }
 
 
+# ─── Profil-Extraktion (OpenGraph) ──────────────────────────────────
+
+_META_MUSTER = re.compile(
+    r'<meta[^>]+(?:property|name)=["\'](?P<key>og:[a-z]+|twitter:[a-z:]+|description)["\']'
+    r'[^>]*?content=["\'](?P<val>[^"\']*)["\']',
+    re.IGNORECASE,
+)
+# Variante mit umgekehrter Attribut-Reihenfolge (content vor property)
+_META_MUSTER_REV = re.compile(
+    r'<meta[^>]+content=["\'](?P<val>[^"\']*)["\']'
+    r'[^>]*?(?:property|name)=["\'](?P<key>og:[a-z]+|twitter:[a-z:]+|description)["\']',
+    re.IGNORECASE,
+)
+
+
+def _opengraph_extrahieren(html_text: str) -> dict:
+    """
+    Zieht generisch Profildaten aus OpenGraph-/Twitter-Card-/Meta-Tags.
+    Funktioniert plattformübergreifend (GitHub, Mastodon, dev.to, …) ohne
+    Einzel-Scraper. Reiner Parser — kein Netzwerk, tolerant, nie werfend.
+    """
+    if not html_text:
+        return {}
+    treffer: dict[str, str] = {}
+    for muster in (_META_MUSTER, _META_MUSTER_REV):
+        for m in muster.finditer(html_text[:200_000]):  # Größe begrenzen
+            key = m.group("key").lower()
+            val = html_modul.unescape(m.group("val").strip())
+            if val and key not in treffer:
+                treffer[key] = val
+
+    anzeigename = treffer.get("og:title") or treffer.get("twitter:title")
+    beschreibung = (
+        treffer.get("og:description")
+        or treffer.get("twitter:description")
+        or treffer.get("description")
+    )
+    avatar = treffer.get("og:image") or treffer.get("twitter:image")
+
+    profil: dict[str, str] = {}
+    if anzeigename:
+        profil["anzeigename"] = anzeigename[:120]
+    if beschreibung:
+        profil["beschreibung"] = beschreibung[:300]
+    if avatar and avatar.startswith("http"):
+        profil["avatar"] = avatar
+    return profil
+
+
 # ─── Detection ──────────────────────────────────────────────────────
 
 async def _plattform_pruefen(
@@ -158,13 +209,19 @@ async def _plattform_pruefen(
                 gefunden = status == e_code
                 konfidenz = "niedrig"  # Status-only ist anfällig für False-Positives
 
-            return {
+            ergebnis = {
                 **ergebnis_basis,
                 "gefunden": gefunden,
                 "status": status,
                 "konfidenz": konfidenz,
                 "tier": plattform.get("tier", 2),
             }
+            # Profil-Daten (Bio/Avatar/Anzeigename) nur bei Treffern extrahieren
+            if gefunden and text:
+                profil = _opengraph_extrahieren(text)
+                if profil:
+                    ergebnis["profil"] = profil
+            return ergebnis
         except (httpx.TimeoutException, httpx.ConnectError):
             return {**ergebnis_basis, "gefunden": None, "fehler": "Timeout"}
         except Exception:
@@ -232,10 +289,29 @@ async def benutzername_suchen(benutzername: str, nur_tier1: bool = False) -> dic
 
     treffer_basis = max(len(ergebnisse) - len(fehler), 1)
 
+    # Identitäts-Aggregation aus den extrahierten Profilen (Welle 3):
+    # verdichtet Anzeigenamen/Bios/Avatare über alle Treffer zu einem Bild.
+    profile = [
+        {"plattform": e["plattform"], "url": e["url"], **e["profil"]}
+        for e in gefunden if e.get("profil")
+    ]
+    anzeigenamen = sorted({p["anzeigename"] for p in profile if p.get("anzeigename")})
+    avatare = [
+        {"plattform": p["plattform"], "avatar": p["avatar"]}
+        for p in profile if p.get("avatar")
+    ]
+    identitaet = {
+        "profile_gefunden": len(profile),
+        "anzeigenamen": anzeigenamen[:10],
+        "avatare": avatare[:10],
+        "profile": profile[:25],
+    }
+
     return {
         "benutzername": benutzername,
         "analysiert_am": datetime.utcnow().isoformat() + "Z",
         "modus": "tier1" if nur_tier1 else "vollscan",
+        "identitaet": identitaet,
         "zusammenfassung": {
             "geprueft": len(ergebnisse),
             "gefunden": len(gefunden),

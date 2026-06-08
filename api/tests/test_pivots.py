@@ -59,13 +59,19 @@ def test_email_recon():
 
 def test_benutzername():
     print("test_benutzername:")
-    erg = {"plattformen": {"gefunden": [
-        {"plattform": "GitHub", "url": "https://github.com/bob", "konfidenz": "hoch"},
-        {"plattform": "Reddit", "url": "https://reddit.com/u/bob", "konfidenz": "mittel"},
-    ]}}
+    erg = {
+        "plattformen": {"gefunden": [
+            {"plattform": "GitHub", "url": "https://github.com/bob", "konfidenz": "hoch"},
+            {"plattform": "Reddit", "url": "https://reddit.com/u/bob", "konfidenz": "mittel"},
+        ]},
+        "identitaet": {"avatare": [
+            {"plattform": "GitHub", "avatar": "https://avatars.githubusercontent.com/bob"},
+        ]},
+    }
     p = extrahiere_pivots("benutzername", erg)
     pruefe(_hat(p, "account", "https://github.com/bob"), "GitHub-Account-Pivot")
     pruefe(_hat(p, "account", "https://reddit.com/u/bob"), "Reddit-Account-Pivot")
+    pruefe(_hat(p, "image", "https://avatars.githubusercontent.com/bob"), "Avatar→Bild-Pivot aus Identität")
 
 
 def test_domain():
