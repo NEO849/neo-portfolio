@@ -24,9 +24,19 @@ from werkzeuge.subdomain_recon import subdomains_finden
 from werkzeuge.ip_recon import ip_intel
 from werkzeuge.passwort_recon import passwort_pruefen
 from werkzeuge.transparenz import transparenz_fuer
+from werkzeuge.pivots import extrahiere_pivots
 
 router = APIRouter(prefix="/osint", tags=["OSINT-Werkzeuge"])
 limiter = Limiter(key_func=get_remote_address)
+
+
+def _mit_pivots(typ: str, ergebnis: dict) -> dict:
+    """Hängt verknüpfbare Pivots additiv an ein Ergebnis (für 'weiter analysieren')."""
+    if isinstance(ergebnis, dict) and not ergebnis.get("fehler"):
+        pivots = extrahiere_pivots(typ, ergebnis)
+        if pivots:
+            ergebnis["pivots"] = pivots
+    return ergebnis
 
 
 # ─── Request-Modelle ────────────────────────────────────────────────
@@ -102,7 +112,7 @@ async def domain_analyse(anfrage: DomainAnfrage, request: Request):
     """
     try:
         ergebnis = await domain_analysieren(anfrage.domain)
-        return JSONResponse(content=ergebnis)
+        return JSONResponse(content=_mit_pivots("domain", ergebnis))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analyse fehlgeschlagen: {str(e)}")
 
@@ -162,7 +172,7 @@ async def benutzername_analyse(anfrage: BenutzerVollscanAnfrage, request: Reques
     """
     try:
         ergebnis = await benutzername_suchen(anfrage.benutzername, nur_tier1=not anfrage.vollscan)
-        return JSONResponse(content=ergebnis)
+        return JSONResponse(content=_mit_pivots("benutzername", ergebnis))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Suche fehlgeschlagen: {str(e)}")
 
@@ -228,7 +238,7 @@ async def bild_analyse(anfrage: BildAnfrage, request: Request):
     """
     try:
         ergebnis = await bild_analysieren(anfrage.url)
-        return JSONResponse(content=ergebnis)
+        return JSONResponse(content=_mit_pivots("bild", ergebnis))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analyse fehlgeschlagen: {str(e)}")
 
@@ -310,7 +320,7 @@ async def email_recon_route(anfrage: EmailReconAnfrage, request: Request):
     """
     try:
         ergebnis = await email_recon(anfrage.email)
-        return JSONResponse(content=ergebnis)
+        return JSONResponse(content=_mit_pivots("email-recon", ergebnis))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Email-Recon fehlgeschlagen: {str(e)}")
 
