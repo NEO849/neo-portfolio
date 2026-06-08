@@ -19,14 +19,33 @@
 
 import asyncio
 import hashlib
+import os
 import re
 from datetime import datetime
 
 import httpx
 
+from werkzeuge.cache import cache_schluessel, standard_cache
+
 TIMEOUT_S = 8
+CACHE_TTL_S = 3600  # 1h — Breach-/Profil-Daten ändern sich selten
 
 EMAIL_MUSTER = re.compile(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$')
+
+
+def _github_auth_header() -> dict:
+    """Optionaler GitHub-Token aus der Service-Env (nie im Code).
+
+    Mit gültigem Token: 30 Such-Anfragen/min statt 10 (unauth) + Commit-Suche
+    zuverlässiger. Ohne/ungültig: graceful unauth-Pfad.
+    """
+    token = (
+        os.environ.get("OSINT_GITHUB_TOKEN")            # bevorzugt: dediziert, minimal-scope
+        or os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")
+        or os.environ.get("GITHUB_TOKEN")
+        or ""
+    ).strip()
+    return {"Authorization": f"Bearer {token}"} if token else {}
 
 
 def _md5(text: str) -> str:
@@ -296,37 +315,95 @@ async def _pgp_pruefen(client: httpx.AsyncClient, email: str) -> dict:
 
 async def _github_user_finden(client: httpx.AsyncClient, email: str) -> dict:
     """
-    Nutzt die freie GitHub Search-API (unauthenticated: 10 req/min).
-    Sucht nach Commits mit dieser E-Mail → GitHub-User.
+    GitHub-Discovery via zwei freie Such-APIs (Token-optional):
+      1) search/users  — Konten mit dieser E-Mail im Profil
+      2) search/commits — Commits mit dieser E-Mail als Author
+         (findet oft in alten Commits geleakte Privat-Adressen → echter
+          Name + Repos, auch wenn das Profil die Mail nicht zeigt)
+
+    Beide Treffer werden zu einer dedupliziertem Nutzer-Liste fusioniert.
     """
+    basis_headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "neo-portfolio-osint",
+        **_github_auth_header(),
+    }
+    nutzer: dict[str, dict] = {}   # login → datensatz
+    namen: set[str] = set()        # aus Commits abgeleitete Klarnamen
+    repos: list[dict] = []
+    hinweise: list[str] = []
+
+    # 1) User-Search
     try:
-        antwort = await client.get(
-            f"https://api.github.com/search/users?q={email}+in:email",
-            headers={"Accept": "application/vnd.github+json", "User-Agent": "neo-portfolio-osint"},
-            timeout=TIMEOUT_S,
+        r = await client.get(
+            "https://api.github.com/search/users",
+            params={"q": f"{email} in:email"},
+            headers=basis_headers, timeout=TIMEOUT_S,
         )
-        if antwort.status_code == 200:
-            daten = antwort.json()
-            items = daten.get("items", [])
-            if items:
-                return {
-                    "gefunden": True,
-                    "treffer": len(items),
-                    "nutzer": [
-                        {
-                            "login":  u.get("login"),
-                            "url":    u.get("html_url"),
-                            "avatar": u.get("avatar_url"),
-                            "typ":    u.get("type"),
-                        }
-                        for u in items[:5]
-                    ],
-                }
-            return {"gefunden": False}
-        # Rate-limited oder unauthorized? → 403 ist normal ohne Token
-        return {"gefunden": False, "hinweis": f"GitHub HTTP {antwort.status_code}"}
+        if r.status_code == 200:
+            for u in r.json().get("items", [])[:5]:
+                if u.get("login"):
+                    nutzer[u["login"]] = {
+                        "login": u.get("login"),
+                        "url": u.get("html_url"),
+                        "avatar": u.get("avatar_url"),
+                        "typ": u.get("type"),
+                        "quelle": "Profil-Mail",
+                    }
+        elif r.status_code in (401, 403):
+            hinweise.append(f"User-Suche limitiert (HTTP {r.status_code})")
     except Exception:
-        return {"gefunden": False, "hinweis": "GitHub nicht erreichbar"}
+        hinweise.append("User-Suche nicht erreichbar")
+
+    # 2) Commit-Search (exakte Author-Mail)
+    try:
+        rc = await client.get(
+            "https://api.github.com/search/commits",
+            params={"q": f"author-email:{email}", "per_page": 10},
+            headers=basis_headers, timeout=TIMEOUT_S,
+        )
+        if rc.status_code == 200:
+            for item in rc.json().get("items", [])[:10]:
+                autor = item.get("author") or {}
+                commit_autor = (item.get("commit") or {}).get("author") or {}
+                if commit_autor.get("name"):
+                    namen.add(commit_autor["name"])
+                login = autor.get("login")
+                if login:
+                    eintrag = nutzer.get(login, {
+                        "login": login,
+                        "url": autor.get("html_url"),
+                        "avatar": autor.get("avatar_url"),
+                        "typ": autor.get("type"),
+                        "quelle": "Commit-Mail",
+                    })
+                    eintrag.setdefault("quelle", "Commit-Mail")
+                    nutzer[login] = eintrag
+                repo = item.get("repository") or {}
+                if repo.get("full_name"):
+                    repos.append({"name": repo["full_name"], "url": repo.get("html_url")})
+        elif rc.status_code in (401, 403):
+            hinweise.append(f"Commit-Suche limitiert (HTTP {rc.status_code})")
+    except Exception:
+        hinweise.append("Commit-Suche nicht erreichbar")
+
+    # Repos deduplizieren
+    repos_dedup, gesehen = [], set()
+    for rp in repos:
+        if rp["name"] not in gesehen:
+            gesehen.add(rp["name"])
+            repos_dedup.append(rp)
+
+    gefunden = bool(nutzer)
+    return {
+        "gefunden": gefunden,
+        "treffer": len(nutzer),
+        "nutzer": list(nutzer.values())[:8],
+        "klarnamen": sorted(namen)[:5],
+        "repositories": repos_dedup[:8],
+        "authentifiziert": bool(_github_auth_header()),
+        **({"hinweis": "; ".join(hinweise)} if hinweise and not gefunden else {}),
+    }
 
 
 # ─── Plattform-Existenz (silent registration) ───────────────────────
@@ -363,8 +440,11 @@ def _hashes_berechnen(email: str) -> dict:
 
 async def email_recon(email: str) -> dict:
     """
-    Vollständige E-Mail-Recon (Epieos/GHunt-Style).
-    Alle Module parallel — graceful degradation.
+    Vollständige E-Mail-Recon (Epieos/GHunt-Style), gecacht.
+
+    Ergebnisse werden 1h gecacht (Breach-/Profil-Daten sind quasi-statisch) —
+    spart Drittdienst-Last + Latenz. Cache-Key ist GEHASHT (keine Klartext-PII).
+    Nur erfolgreiche Läufe werden gecacht (kein Negativ-Caching).
     """
     email = email.strip().lower()
     if not EMAIL_MUSTER.match(email):
@@ -374,6 +454,20 @@ async def email_recon(email: str) -> dict:
             "fehler": "Ungültiges E-Mail-Format",
             "analysiert_am": datetime.utcnow().isoformat() + "Z",
         }
+
+    schluessel = cache_schluessel("email_recon", email)
+    gecacht = await standard_cache.holen(schluessel)
+    if gecacht is not None:
+        return {**gecacht, "aus_cache": True}  # type: ignore[dict-item]
+
+    ergebnis = await _email_recon_compute(email)
+    if ergebnis.get("gueltig"):
+        await standard_cache.setzen(schluessel, ergebnis, ttl_sekunden=CACHE_TTL_S)
+    return ergebnis
+
+
+async def _email_recon_compute(email: str) -> dict:
+    """Eigentliche Recon-Berechnung (ohne Cache). Alle Module parallel."""
 
     hashes = _hashes_berechnen(email)
     domain = email.split("@")[1]
@@ -406,9 +500,15 @@ async def email_recon(email: str) -> dict:
     if github.get("gefunden"):
         for nutzer in github.get("nutzer", []):
             wer_ist_das.append({
-                "quelle": "GitHub",
+                "quelle": f"GitHub ({nutzer.get('quelle', 'GitHub')})",
                 "wert": f"@{nutzer['login']}",
                 "url": nutzer.get("url"),
+                "konfidenz": "hoch",
+            })
+        for name in github.get("klarnamen", []):
+            wer_ist_das.append({
+                "quelle": "GitHub-Commit",
+                "wert": f"Name: {name}",
                 "konfidenz": "hoch",
             })
     if pgp.get("hat_pgp_key"):

@@ -16,7 +16,11 @@ import type {
   DomainErgebnis, EmailErgebnis, EmailReconErgebnis, BenutzerErgebnis,
   TelefonErgebnis, BildErgebnis, ShodanErgebnis,
   OrchestratorErgebnis, SubdomainErgebnis, IpIntelErgebnis,
+  Pivot, PivotTyp,
 } from "../../dienste/osintApi";
+
+// Callback-Typ: ein analysierbarer Pivot wird in-app weiteranalysiert.
+export type PivotHandler = (typ: PivotTyp, wert: string) => void;
 
 // ─── Palette (terminal-konform, aus dem Design-System) ──────────────
 
@@ -291,6 +295,51 @@ function Filter({ wert, setWert, platzhalter }: { wert: string; setWert: (v: str
 
 const zeit = (iso?: string) => (iso ?? "").replace("T", " ").substring(0, 19);
 
+// ─── Primitive: Pivot-Sektion ("weiter analysieren") ────────────────
+
+const PIVOT_IKON: Record<string, string> = {
+  username: "◈", email: "✉", domain: "🌐", ip: "▦", account: "↗", image: "🖼",
+};
+
+function kuerzen(text: string, max = 36): string {
+  return text.length > max ? text.slice(0, max - 1) + "…" : text;
+}
+
+function PivotSektion({ pivots, onPivot }: { pivots?: Pivot[]; onPivot?: PivotHandler }) {
+  if (!pivots || pivots.length === 0) return null;
+  return (
+    <Sektion titel="Weiter analysieren" farbe={C.lila}
+      rechts={<span className="font-mono text-[10px] text-white/50">{pivots.length} Datenpunkte</span>}>
+      <div className="flex flex-wrap gap-1.5">
+        {pivots.map((p, i) => {
+          const ikon = PIVOT_IKON[p.typ] ?? "•";
+          const label = `${ikon} ${kuerzen(p.wert)}`;
+          // Analysierbar + Handler → in-app Folge-Analyse per Klick
+          if (p.analysierbar && onPivot) {
+            return (
+              <button key={`${p.typ}-${i}`} onClick={() => onPivot(p.typ, p.wert)}
+                title={`${p.typ} aus: ${p.quelle} → in der App analysieren`}
+                className="group inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md font-mono text-[11.5px] transition-all"
+                style={{ border: `1px solid ${C.lila}26`, background: `${C.lila}0a`, color: "rgba(255,255,255,0.82)" }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = `${C.lila}66`; e.currentTarget.style.background = `${C.lila}1a`; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = `${C.lila}26`; e.currentTarget.style.background = `${C.lila}0a`; }}>
+                <span>{label}</span>
+                <span className="opacity-50 group-hover:opacity-90 transition" style={{ color: C.lila }}>→ analysieren</span>
+              </button>
+            );
+          }
+          // Sonst: externer Link (z.B. Account-Profil) oder passiver Hinweis
+          if (p.url) return <LinkChip key={`${p.typ}-${i}`} name={label} url={p.url} />;
+          return <Marke key={`${p.typ}-${i}`} text={label} />;
+        })}
+      </div>
+      <p className="font-mono text-[10px] text-white/45 mt-2 leading-snug">
+        Verknüpfte Datenpunkte aus diesem Ergebnis — ein Klick startet die nächste Analyse.
+      </p>
+    </Sektion>
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // MODUL-REPORTS
 // ═══════════════════════════════════════════════════════════════════
@@ -313,6 +362,19 @@ function ReportTelefon({ t }: { t: TelefonErgebnis }) {
         <Feld label="Carrier">{t.metadaten?.carrier || "—"}</Feld>
         <Feld label="Zeitzone">{(t.metadaten?.zeitzonen ?? []).join(", ")}</Feld>
       </Sektion>
+      {t.live_status?.aktiv && (
+        <Sektion titel="Live-Status (HLR)" farbe={C.gruen}
+          rechts={<span className="font-mono text-[10px] text-white/50">Echtzeit · {t.live_status.quelle}</span>}>
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            <Marke text={t.live_status.status_text ?? t.live_status.status ?? "—"}
+              farbe={t.live_status.erreichbar ? C.gruen : C.gelb} gefuellt />
+            {t.live_status.roaming && <Marke text="Roaming" farbe={C.gelb} />}
+            {t.live_status.portiert && <Marke text="portiert" farbe={C.cyber} />}
+          </div>
+          {t.live_status.carrier && <Feld label="Carrier (live)">{t.live_status.carrier}</Feld>}
+          {t.live_status.roaming_netz && <Feld label="Roaming-Netz">{t.live_status.roaming_netz}</Feld>}
+        </Sektion>
+      )}
       {t.suchlinks?.nach_kategorie && (
         <Sektion titel="Suchlinks" farbe={C.cyber} rechts={<span className="font-mono text-[10px] text-white/50">{t.suchlinks.gesamt} Quellen · klickbar</span>}>
           <LinkRaster gruppen={t.suchlinks.nach_kategorie} />
@@ -388,14 +450,18 @@ function BildVorschau({ url, format, breite, hoehe }: {
 
 // ─── Bild ───────────────────────────────────────────────────────────
 
-function ReportBild({ b }: { b: BildErgebnis }) {
+function ReportBild({ b, onPivot }: { b: BildErgebnis; onPivot?: PivotHandler }) {
   const [kid, copy] = useKopieren();
   if (b.fehler) return <FehlerHinweis text={b.fehler} />;
   const gps = b.exif?.gps;
+  const bw = b.bewertung;
   return (
     <div>
-      {gps && <Verdikt titel="Standort-Risiko" stufe="Hoch" wert={6} max={6} hinweis="GPS im Bild gefunden"
-        deutung="Das Bild enthält GPS-Koordinaten — der Aufnahmeort lässt sich auf der Karte unten rekonstruieren." />}
+      {bw
+        ? <Verdikt titel="Privatsphäre-Risiko" stufe={bw.stufe} wert={bw.punkte} max={10}
+            hinweis={`${bw.befunde.length} Befund(e)`} deutung={bw.zusammenfassung} />
+        : gps && <Verdikt titel="Standort-Risiko" stufe="Hoch" wert={6} max={6} hinweis="GPS im Bild gefunden"
+            deutung="Das Bild enthält GPS-Koordinaten — der Aufnahmeort lässt sich auf der Karte unten rekonstruieren." />}
       <Sektion titel="Bild-Info">
         <BildVorschau url={b.url} format={b.bild?.format} breite={b.bild?.breite} hoehe={b.bild?.hoehe} />
         <div className="mt-2">
@@ -412,15 +478,37 @@ function ReportBild({ b }: { b: BildErgebnis }) {
       {b.exif?.verfuegbar ? (
         <Sektion titel="EXIF-Metadaten" farbe={C.gelb}>
           {b.exif.kamera && <Feld label="Kamera">{b.exif.kamera}</Feld>}
+          {b.exif.objektiv && <Feld label="Objektiv">{b.exif.objektiv}</Feld>}
+          {b.exif.seriennummer && <Feld label="Serien-Nr.">{b.exif.seriennummer}</Feld>}
           {b.exif.aufnahmedatum && <Feld label="Datum">{b.exif.aufnahmedatum}</Feld>}
           {b.exif.software && <Feld label="Software">{b.exif.software}</Feld>}
+          {b.exif.kuenstler && <Feld label="Künstler">{b.exif.kuenstler}</Feld>}
+          {b.exif.copyright && <Feld label="Copyright">{b.exif.copyright}</Feld>}
           {b.exif.iso != null && <Feld label="ISO">{String(b.exif.iso)}</Feld>}
           {b.exif.blende && <Feld label="Blende">f/{b.exif.blende}</Feld>}
-          {gps && <Feld label="GPS">{gps.lat}, {gps.lon}</Feld>}
+          {gps?.ort_name && <Feld label="Ort">{gps.ort_name}</Feld>}
+          {gps?.adresse && <Feld label="Adresse">{gps.adresse}</Feld>}
+          {gps && <Feld label="GPS" href={gps.osm_link ?? gps.maps_link}>
+            {gps.lat}, {gps.lon}{gps.hoehe_meter != null ? ` · ${gps.hoehe_meter} m` : ""} ↗
+          </Feld>}
           {gps && <GpsKarte lat={gps.lat} lon={gps.lon} />}
         </Sektion>
-      ) : <div className="font-mono text-[12px] text-white/55 mt-4">Keine EXIF-Metadaten vorhanden.</div>}
-      {!!b.sicherheits_hinweise?.length && (
+      ) : <div className="font-mono text-[12px] text-white/55 mt-4">Keine EXIF-Metadaten vorhanden — gut für die Privatsphäre.</div>}
+      {bw && bw.befunde.length > 0 && (
+        <Sektion titel="Befunde" farbe={C.gelb}>
+          {bw.befunde.map((h, i) => (
+            <Item key={i} stufe={h.stufe === "hoch" ? "hoch" : h.stufe === "mittel" ? "mittel" : "info"}>
+              {h.kategorie ? <span className="text-white/45">[{h.kategorie}] </span> : null}{h.meldung}
+            </Item>
+          ))}
+        </Sektion>
+      )}
+      {bw && bw.empfehlungen.length > 0 && (
+        <Sektion titel="Handlungsempfehlungen" farbe={C.gruen}>
+          {bw.empfehlungen.map((e, i) => <Item key={i} stufe="ok">{e}</Item>)}
+        </Sektion>
+      )}
+      {!bw && !!b.sicherheits_hinweise?.length && (
         <Sektion titel="Sicherheitsanalyse" farbe={C.gelb}>
           {b.sicherheits_hinweise.map((h, i) => <Item key={i} stufe={h.stufe === "hoch" ? "hoch" : "info"}>{h.meldung}</Item>)}
         </Sektion>
@@ -432,6 +520,7 @@ function ReportBild({ b }: { b: BildErgebnis }) {
           </div>
         </Sektion>
       )}
+      <PivotSektion pivots={b.pivots} onPivot={onPivot} />
       <FussZeile iso={b.analysiert_am} />
     </div>
   );
@@ -439,7 +528,7 @@ function ReportBild({ b }: { b: BildErgebnis }) {
 
 // ─── E-Mail Vollanalyse ─────────────────────────────────────────────
 
-function ReportEmail({ basis, recon }: { basis: EmailErgebnis; recon: EmailReconErgebnis | null }) {
+function ReportEmail({ basis, recon, onPivot }: { basis: EmailErgebnis; recon: EmailReconErgebnis | null; onPivot?: PivotHandler }) {
   const [kid, copy] = useKopieren();
   if (!basis.gueltig) return <FehlerHinweis text={basis.fehler ?? "Ungültige Adresse"} />;
   const risiko = recon?.risiko ?? basis.risiko;
@@ -507,8 +596,18 @@ function ReportEmail({ basis, recon }: { basis: EmailErgebnis; recon: EmailRecon
       {(gravatar?.profil_daten?.verifizierte_konten?.length || recon?.github?.gefunden || recon?.pgp?.hat_pgp_key) && (
         <Sektion titel="Verknüpfte Identitäten" farbe={C.lila}>
           {recon?.github?.gefunden && (recon.github.nutzer ?? []).map((n, i) => (
-            <Feld key={`gh${i}`} label="GitHub" href={n.url}>@{n.login} ↗</Feld>
+            <Feld key={`gh${i}`} label="GitHub" href={n.url}>@{n.login}{n.quelle ? ` · ${n.quelle}` : ""} ↗</Feld>
           ))}
+          {!!recon?.github?.klarnamen?.length && (
+            <Feld label="Klarname">{recon.github.klarnamen.join(", ")}</Feld>
+          )}
+          {!!recon?.github?.repositories?.length && (
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {recon.github.repositories.slice(0, 6).map((r, i) => (
+                <LinkChip key={`repo${i}`} name={r.name} url={r.url} farbe={C.lila} />
+              ))}
+            </div>
+          )}
           {(gravatar?.profil_daten?.verifizierte_konten ?? []).length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-1.5">
               {gravatar!.profil_daten!.verifizierte_konten!.map((k, i) => (
@@ -537,6 +636,7 @@ function ReportEmail({ basis, recon }: { basis: EmailErgebnis; recon: EmailRecon
           <Feld label="SHA-1" copy={recon.hashes.sha1} copyId="s" kopiertId={kid} onCopy={copy}>{recon.hashes.sha1}</Feld>
         </Sektion>
       )}
+      <PivotSektion pivots={recon?.pivots} onPivot={onPivot} />
       <FussZeile iso={basis.analysiert_am} />
     </div>
   );
@@ -544,7 +644,7 @@ function ReportEmail({ basis, recon }: { basis: EmailErgebnis; recon: EmailRecon
 
 // ─── Username Vollscan ──────────────────────────────────────────────
 
-function ReportUsername({ b }: { b: BenutzerErgebnis }) {
+function ReportUsername({ b, onPivot }: { b: BenutzerErgebnis; onPivot?: PivotHandler }) {
   const [filter, setFilter] = useState("");
   if (b.fehler) return <FehlerHinweis text={b.fehler} />;
   const s = b.zusammenfassung;
@@ -572,6 +672,28 @@ function ReportUsername({ b }: { b: BenutzerErgebnis }) {
           <Marke text={`${s.fehler} Fehler`} farbe={C.orange} />
         </div>
       )}
+      {b.identitaet && b.identitaet.profile_gefunden > 0 && (
+        <Sektion titel="Identität" farbe={C.lila}
+          rechts={<span className="font-mono text-[10px] text-white/50">{b.identitaet.profile_gefunden} Profil(e)</span>}>
+          {b.identitaet.anzeigenamen.length > 0 && (
+            <Feld label="Namen">{b.identitaet.anzeigenamen.join(" · ")}</Feld>
+          )}
+          {b.identitaet.avatare.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {b.identitaet.avatare.slice(0, 8).map((a, i) => (
+                <img key={i} src={a.avatar} alt={a.plattform} title={a.plattform} loading="lazy" referrerPolicy="no-referrer"
+                  className="w-10 h-10 rounded-lg border border-white/10 object-cover"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+              ))}
+            </div>
+          )}
+          {b.identitaet.profile.filter((p) => p.beschreibung).slice(0, 3).map((p, i) => (
+            <div key={i} className="font-mono text-[11.5px] text-white/65 mt-2 leading-snug">
+              <span className="text-white/45">{p.plattform}: </span>{p.beschreibung}
+            </div>
+          ))}
+        </Sektion>
+      )}
       <Sektion titel="Verifizierte Profile" farbe={C.gruen}
         rechts={<Filter wert={filter} setWert={setFilter} platzhalter="filter…" />}>
         {Object.keys(gefiltert).length === 0 ? (
@@ -588,6 +710,7 @@ function ReportUsername({ b }: { b: BenutzerErgebnis }) {
           </div>
         ))}
       </Sektion>
+      <PivotSektion pivots={b.pivots} onPivot={onPivot} />
       <div className="font-mono text-[10px] text-white/50 mt-2">WhatsMyName-DB · Modus: {b.modus}</div>
       <FussZeile iso={b.analysiert_am} />
     </div>
@@ -596,7 +719,7 @@ function ReportUsername({ b }: { b: BenutzerErgebnis }) {
 
 // ─── Domain & Shodan ────────────────────────────────────────────────
 
-function ReportDomain({ domain, shodan }: { domain: DomainErgebnis; shodan: ShodanErgebnis | null }) {
+function ReportDomain({ domain, shodan, onPivot }: { domain: DomainErgebnis; shodan: ShodanErgebnis | null; onPivot?: PivotHandler }) {
   const [kid, copy] = useKopieren();
   const sv = domain.sicherheits_bewertung;
   const ag = shodan?.aggregiert;
@@ -657,6 +780,7 @@ function ReportDomain({ domain, shodan }: { domain: DomainErgebnis; shodan: Shod
           )}
         </Sektion>
       )}
+      <PivotSektion pivots={domain.pivots} onPivot={onPivot} />
       <FussZeile iso={domain.analysiert_am} />
     </div>
   );
@@ -906,15 +1030,15 @@ function ReportStatus() {
 // HAUPT-SWITCH
 // ═══════════════════════════════════════════════════════════════════
 
-export default function ErgebnisReport({ modulNummer, daten }: { modulNummer: string; daten: unknown }) {
+export default function ErgebnisReport({ modulNummer, daten, onPivot }: { modulNummer: string; daten: unknown; onPivot?: PivotHandler }) {
   let inhalt: React.ReactNode = null;
   switch (modulNummer) {
     case "1": inhalt = <ReportStatus />; break;
-    case "2": { const d = daten as { basis: EmailErgebnis; recon: EmailReconErgebnis | null }; inhalt = <ReportEmail basis={d.basis} recon={d.recon} />; break; }
-    case "3": inhalt = <ReportUsername b={daten as BenutzerErgebnis} />; break;
+    case "2": { const d = daten as { basis: EmailErgebnis; recon: EmailReconErgebnis | null }; inhalt = <ReportEmail basis={d.basis} recon={d.recon} onPivot={onPivot} />; break; }
+    case "3": inhalt = <ReportUsername b={daten as BenutzerErgebnis} onPivot={onPivot} />; break;
     case "4": inhalt = <ReportTelefon t={daten as TelefonErgebnis} />; break;
-    case "5": { const d = daten as { domain: DomainErgebnis; shodan: ShodanErgebnis | null }; inhalt = <ReportDomain domain={d.domain} shodan={d.shodan} />; break; }
-    case "6": inhalt = <ReportBild b={daten as BildErgebnis} />; break;
+    case "5": { const d = daten as { domain: DomainErgebnis; shodan: ShodanErgebnis | null }; inhalt = <ReportDomain domain={d.domain} shodan={d.shodan} onPivot={onPivot} />; break; }
+    case "6": inhalt = <ReportBild b={daten as BildErgebnis} onPivot={onPivot} />; break;
     case "8": inhalt = <ReportOrchestrator o={daten as OrchestratorErgebnis} />; break;
     case "9": inhalt = <ReportSubdomains s={daten as SubdomainErgebnis} />; break;
     case "10": inhalt = <ReportIpIntel r={daten as IpIntelErgebnis} />; break;

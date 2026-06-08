@@ -53,6 +53,7 @@ export interface DomainErgebnis {
     weiterleitungsziel: string | null;
   };
   sicherheits_bewertung: SicherheitsBewertung;
+  pivots?: Pivot[];
 }
 
 // ─── Typen: E-Mail-Analyse ────────────────────────────────────────
@@ -92,6 +93,25 @@ export interface EmailErgebnis {
 
 // ─── Typen: Benutzername-Suche ────────────────────────────────────
 
+// ─── Typ: Pivot (verknüpfbarer Datenpunkt für "weiter analysieren") ──
+
+export type PivotTyp = "username" | "email" | "domain" | "ip" | "account" | "image";
+
+export interface Pivot {
+  typ: PivotTyp;
+  wert: string;
+  quelle: string;
+  konfidenz: "hoch" | "mittel" | "niedrig";
+  analysierbar: boolean;   // true = eigenes Analyse-Werkzeug verfügbar
+  url?: string | null;
+}
+
+export interface ProfilDaten {
+  anzeigename?: string;
+  beschreibung?: string;
+  avatar?: string;
+}
+
 export interface PlattformErgebnis {
   plattform: string;
   kategorie: string;
@@ -102,6 +122,7 @@ export interface PlattformErgebnis {
   tier?: number;
   fehler?: string;
   hinweis?: string;
+  profil?: ProfilDaten;
 }
 
 export interface BenutzerErgebnis {
@@ -119,12 +140,19 @@ export interface BenutzerErgebnis {
     konfidenz_mittel?: number;
     konfidenz_niedrig?: number;
   };
+  identitaet?: {
+    profile_gefunden: number;
+    anzeigenamen: string[];
+    avatare: Array<{ plattform: string; avatar: string }>;
+    profile: Array<{ plattform: string; url: string } & ProfilDaten>;
+  };
   plattformen?: {
     gefunden: PlattformErgebnis[];
     nicht_gefunden: Array<{ plattform: string; kategorie: string; url: string }>;
     fehler: PlattformErgebnis[];
   };
   nach_kategorie?: Record<string, PlattformErgebnis[]>;
+  pivots?: Pivot[];
 }
 
 // ─── Typen: Telefon-Analyse ───────────────────────────────────────
@@ -156,6 +184,21 @@ export interface TelefonErgebnis {
     stufe: string;
     details: string[];
   };
+  live_status?: {
+    aktiv: boolean;
+    hinweis?: string;
+    status?: string;
+    status_text?: string;
+    erreichbar?: boolean;
+    carrier?: string | null;
+    ursprungs_carrier?: string | null;
+    portiert?: boolean | null;
+    roaming?: boolean | null;
+    roaming_netz?: string | null;
+    mccmnc?: string | null;
+    kosten_eur?: string | null;
+    quelle?: string;
+  };
 }
 
 // ─── Typen: Bild-Analyse ──────────────────────────────────────────
@@ -186,15 +229,36 @@ export interface BildErgebnis {
     software?: string | null;
     blende?: string | null;
     iso?: number | null;
+    seriennummer?: string | null;
+    objektiv?: string | null;
+    kuenstler?: string | null;
+    copyright?: string | null;
+    benutzerkommentar?: string | null;
     gps?: {
       lat: number;
       lon: number;
       maps_link: string;
       hinweis: string;
+      hoehe_meter?: number;
+      blickrichtung_grad?: number;
+      gps_datum?: string;
+      ort_name?: string | null;
+      adresse?: string | null;
+      osm_link?: string;
+      geocoding_quelle?: string;
+      komponenten?: Record<string, string | null>;
     } | null;
   };
-  suchlinks?: Array<{ name: string; url: string }>;
+  bewertung?: {
+    stufe: "Hoch" | "Mittel" | "Gering" | "Unkritisch";
+    punkte: number;
+    zusammenfassung: string;
+    befunde: Array<{ stufe: string; kategorie?: string; meldung: string }>;
+    empfehlungen: string[];
+  };
+  suchlinks?: Array<{ name: string; url: string; kategorie?: string }>;
   sicherheits_hinweise?: Array<{ stufe: string; meldung: string }>;
+  pivots?: Pivot[];
 }
 
 // ─── API-Fehler-Klasse ────────────────────────────────────────────
@@ -486,7 +550,10 @@ export interface EmailReconErgebnis {
   github?: {
     gefunden: boolean;
     treffer?: number;
-    nutzer?: Array<{ login: string; url: string; avatar: string; typ: string }>;
+    nutzer?: Array<{ login: string; url: string; avatar: string; typ: string; quelle?: string }>;
+    klarnamen?: string[];
+    repositories?: Array<{ name: string; url: string }>;
+    authentifiziert?: boolean;
     hinweis?: string;
   };
   xposedornot?: {
@@ -517,6 +584,8 @@ export interface EmailReconErgebnis {
     details: string[];
   };
   quellen?: string[];
+  aus_cache?: boolean;
+  pivots?: Pivot[];
 }
 
 // ─── Typen: Search-Aggregator ─────────────────────────────────────
@@ -697,4 +766,50 @@ export async function subdomainsFinden(
  */
 export async function ipIntelAbfragen(ziel: string): Promise<IpIntelErgebnis> {
   return apiFetch<IpIntelErgebnis>("/ip-intel", { ziel });
+}
+
+// ─── Transparenz / Datenfluss (DSGVO Art. 13/14) ──────────────────
+
+export interface DatenflussDienst {
+  dienst: string;
+  uebermittelte_daten: string;
+  zweck: string;
+  datenschutz_url: string;
+  region: string;
+}
+
+export interface WerkzeugDatenfluss {
+  beschreibung: string;
+  sendet_an: DatenflussDienst[];
+  nur_links: string[];
+  hinweis?: string;
+  speicherung: string;
+}
+
+export interface TransparenzUebersicht {
+  hinweis: string;
+  speicherung: string;
+  werkzeuge: Record<string, WerkzeugDatenfluss>;
+}
+
+/**
+ * Holt die maschinenlesbare Datenfluss-Deklaration (welche Drittdienste pro
+ * Werkzeug serverseitig kontaktiert werden). Read-only GET, gecacht im Modul.
+ */
+let _transparenzCache: TransparenzUebersicht | null = null;
+
+export async function transparenzLaden(): Promise<TransparenzUebersicht | null> {
+  if (_transparenzCache) return _transparenzCache;
+  const abbrecher = new AbortController();
+  const timeoutId = setTimeout(() => abbrecher.abort(), 8_000);
+  try {
+    const antwort = await fetch(`${API_PFAD}/transparenz`, { signal: abbrecher.signal });
+    clearTimeout(timeoutId);
+    if (!antwort.ok) return null;
+    _transparenzCache = (await antwort.json()) as TransparenzUebersicht;
+    return _transparenzCache;
+  } catch {
+    clearTimeout(timeoutId);
+    return null;
+  }
 }

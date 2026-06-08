@@ -11,10 +11,12 @@ import {
   type ShodanErgebnis, type EmailReconErgebnis,
   type OrchestratorErgebnis,
   type SubdomainErgebnis, type IpIntelErgebnis,
+  type Pivot,
 } from "../dienste/osintApi";
 import { DatenschutzModal } from "../bausteine/DatenschutzModal";
 import OsintGraph from "../bausteine/OsintGraph";
 import ErgebnisReport from "../bausteine/osint/ErgebnisReport";
+import DatenflussHinweis from "../bausteine/osint/DatenflussHinweis";
 
 // ═══════════════════════════════════════════════════════
 // OSINT TOOLKIT – LIVE TERMINAL MIT ECHTEM BACKEND
@@ -123,6 +125,31 @@ const S  = (n: string) => { const p = `--- ${n} `; return p + "-".repeat(Math.ma
 const WW = (key: string, val: string, kw = 11) => `  ${key.padEnd(kw)}: ${val}`;
 const trunc = (s: string, n: number) => s.length > n ? s.substring(0, n - 1) + "…" : s;
 
+// Weicher Zeilenumbruch für längere Fließtexte (Verdikt/Empfehlungen).
+function wrap(text: string, breite = 32, pfx = "  "): string[] {
+  const woerter = text.split(" ");
+  const out: string[] = [];
+  let zeile = "";
+  for (const w of woerter) {
+    if ((zeile + " " + w).trim().length > breite) {
+      if (zeile) out.push(pfx + zeile.trim());
+      zeile = w;
+    } else {
+      zeile = (zeile + " " + w).trim();
+    }
+  }
+  if (zeile) out.push(pfx + zeile.trim());
+  return out;
+}
+
+// Pivots ("weiter analysieren") für die Raw-Ansicht.
+function pivotsZuTerminal(pivots?: Pivot[]): string[] {
+  if (!pivots?.length) return [];
+  const z = ["", S("WEITER ANALYSIEREN")];
+  for (const p of pivots) z.push(`  [>]  ${p.typ}: ${trunc(p.wert, 24)}`);
+  return z;
+}
+
 // ─── Telefon ─────────────────────────────────────────────────────
 
 function telefonZuTerminal(t: TelefonErgebnis): string[] {
@@ -141,6 +168,13 @@ function telefonZuTerminal(t: TelefonErgebnis): string[] {
     WW("Carrier", trunc(t.metadaten?.carrier ?? "", 20)),
     WW("Zeitzone",trunc((t.metadaten?.zeitzonen ?? []).join(", "), 20)),
   ];
+  if (t.live_status?.aktiv) {
+    zeilen.push("", S("LIVE-STATUS (HLR)"));
+    zeilen.push(WW("Status", trunc(t.live_status.status_text ?? t.live_status.status ?? "", 20)));
+    if (t.live_status.carrier) zeilen.push(WW("Carrier", trunc(t.live_status.carrier, 20)));
+    if (t.live_status.roaming)  zeilen.push("  [!]  Roaming aktiv");
+    if (t.live_status.portiert) zeilen.push("  [i]  Nummer portiert");
+  }
   if (t.suchlinks?.nach_kategorie) {
     zeilen.push("", S("SUCHLINKS"));
     for (const [kat, links] of Object.entries(t.suchlinks.nach_kategorie)) {
@@ -177,31 +211,51 @@ function bildZuTerminal(b: BildErgebnis): string[] {
     WW("SHA256", trunc(b.hashes?.sha256 ?? "", 22)),
     WW("pHash",  trunc(b.hashes?.phash ?? "", 22)),
   ];
+  if (b.bewertung) {
+    zeilen.push("", S(`VERDIKT: ${b.bewertung.stufe.toUpperCase()}`));
+    zeilen.push(...wrap(b.bewertung.zusammenfassung));
+  }
   if (b.exif?.verfuegbar) {
     zeilen.push("", S("EXIF-METADATEN"));
     if (b.exif.kamera)        zeilen.push(WW("Kamera",   trunc(b.exif.kamera, 20)));
+    if (b.exif.objektiv)      zeilen.push(WW("Objektiv", trunc(b.exif.objektiv, 20)));
+    if (b.exif.seriennummer)  zeilen.push(WW("Serien-Nr", trunc(b.exif.seriennummer, 19)));
     if (b.exif.aufnahmedatum) zeilen.push(WW("Datum",    trunc(b.exif.aufnahmedatum, 20)));
     if (b.exif.software)      zeilen.push(WW("Software", trunc(b.exif.software, 20)));
+    if (b.exif.kuenstler)     zeilen.push(WW("Künstler", trunc(b.exif.kuenstler, 20)));
+    if (b.exif.copyright)     zeilen.push(WW("Copyright",trunc(b.exif.copyright, 19)));
     if (b.exif.iso)           zeilen.push(WW("ISO",      String(b.exif.iso)));
     if (b.exif.blende)        zeilen.push(WW("Blende",   `f/${b.exif.blende}`));
     if (b.exif.gps) {
       zeilen.push(WW("GPS", `${b.exif.gps.lat}, ${b.exif.gps.lon}`));
+      if (b.exif.gps.ort_name) zeilen.push(WW("Ort", trunc(b.exif.gps.ort_name, 22)));
       zeilen.push(`  Maps-Link  : (generiert)`);
     }
   } else {
     zeilen.push("", "  EXIF: Keine Metadaten vorhanden");
   }
-  if (b.sicherheits_hinweise?.length) {
+  if (b.bewertung?.befunde.length) {
+    zeilen.push("", S("BEFUNDE"));
+    for (const h of b.bewertung.befunde) {
+      const pfx = h.stufe === "hoch" ? "[!]" : h.stufe === "mittel" ? "[*]" : "[i]";
+      zeilen.push(`  ${pfx}  ${trunc(h.meldung, 26)}`);
+    }
+  } else if (b.sicherheits_hinweise?.length) {
     zeilen.push("", S("SICHERHEITSANALYSE"));
     for (const h of b.sicherheits_hinweise) {
       const pfx = h.stufe === "hoch" ? "[!]" : "[i]";
       zeilen.push(`  ${pfx}  ${trunc(h.meldung, 26)}`);
     }
   }
+  if (b.bewertung?.empfehlungen.length) {
+    zeilen.push("", S("HANDLUNGSEMPFEHLUNGEN"));
+    for (const e of b.bewertung.empfehlungen) zeilen.push(...wrap(e, 30, "  - "));
+  }
   if (b.suchlinks?.length) {
     zeilen.push("", S("REVERSE IMAGE LINKS"));
     for (const link of b.suchlinks) zeilen.push(`  [+]  ${trunc(link.name, 26)}`);
   }
+  zeilen.push(...pivotsZuTerminal(b.pivots));
   zeilen.push("", `  Analysiert: ${b.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
   return zeilen;
 }
@@ -532,6 +586,15 @@ function emailVollZuTerminal(e: EmailErgebnis, r: EmailReconErgebnis | null): st
       for (const n of (r.github.nutzer ?? []).slice(0, 3)) {
         zeilen.push(`    [+]  @${trunc(n.login, 22)}`);
       }
+      for (const name of (r.github.klarnamen ?? []).slice(0, 3)) {
+        zeilen.push(`    Name: ${trunc(name, 24)}`);
+      }
+      if ((r.github.repositories?.length ?? 0) > 0) {
+        zeilen.push("  Repos:");
+        for (const repo of r.github.repositories!.slice(0, 4)) {
+          zeilen.push(`    [+]  ${trunc(repo.name, 26)}`);
+        }
+      }
     } else {
       zeilen.push(`  [-]  ${trunc(r.github.hinweis ?? "Keine GitHub-Treffer", 30)}`);
     }
@@ -558,6 +621,7 @@ function emailVollZuTerminal(e: EmailErgebnis, r: EmailReconErgebnis | null): st
     for (const d of r?.risiko?.details ?? [])   zeilen.push(`  [!]  ${trunc(d, 26)}`);
   }
 
+  zeilen.push(...pivotsZuTerminal(r?.pivots));
   zeilen.push("", `  Analysiert: ${e.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
   return zeilen;
 }
@@ -577,6 +641,18 @@ function vollscanZuTerminal(b: BenutzerErgebnis): string[] {
     WW("Konf. nied", String(s.konfidenz_niedrig ?? 0)),
     WW("Fehler",     String(s.fehler)),
   ];
+  if (b.identitaet && b.identitaet.profile_gefunden > 0) {
+    zeilen.push("", S("IDENTITAET"));
+    if (b.identitaet.anzeigenamen.length) {
+      zeilen.push("  Namen:");
+      for (const n of b.identitaet.anzeigenamen.slice(0, 4)) zeilen.push(`    [+]  ${trunc(n, 26)}`);
+    }
+    for (const p of b.identitaet.profile.filter((x) => x.beschreibung).slice(0, 3)) {
+      zeilen.push(`  ${trunc(p.plattform, 12)}:`);
+      zeilen.push(...wrap(p.beschreibung ?? "", 30));
+    }
+    if (b.identitaet.avatare.length) zeilen.push(`  Avatare: ${b.identitaet.avatare.length} gefunden`);
+  }
   if (b.nach_kategorie && Object.keys(b.nach_kategorie).length > 0) {
     zeilen.push("", S("TREFFER NACH KATEGORIE"));
     for (const [kat, plattformen] of Object.entries(b.nach_kategorie)) {
@@ -588,6 +664,7 @@ function vollscanZuTerminal(b: BenutzerErgebnis): string[] {
       if (plattformen.length > 8) zeilen.push(`    ... +${plattformen.length - 8} weitere`);
     }
   }
+  zeilen.push(...pivotsZuTerminal(b.pivots));
   zeilen.push("", `  WhatsMyName-DB (${b.modus})`,
               `  Analysiert: ${b.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
   return zeilen;
@@ -672,6 +749,7 @@ function domainVollZuTerminal(d: DomainErgebnis, s: ShodanErgebnis | null): stri
     zeilen.push(`  ${trunc(s.fehler, 30)}`);
   }
 
+  zeilen.push(...pivotsZuTerminal(d.pivots));
   zeilen.push("", `  Analysiert: ${d.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
   return zeilen;
 }
@@ -1067,14 +1145,14 @@ export default function OsintDemoView() {
     setWartendesModul(null);
   }, []);
 
-  const eingabeAbsenden = useCallback(async () => {
-    if (!aktivesModul || !eingabeWert.trim()) return;
-    const wert = eingabeWert.trim();
+  // Kernlogik: führt ein Modul mit explizitem Wert aus (kein Closure-State →
+  // auch für Pivot-Folgeanalysen sicher aufrufbar).
+  const ausfuehren = useCallback(async (modul: DemoModul, wert: string) => {
     setApiFehler(null);
 
     // Demo-Module ohne Backend
-    if (aktivesModul.eingabeTyp === "demo") {
-      setAusgabeZeilen(erstelleDemoAusgabe(aktivesModul.nummer, wert));
+    if (modul.eingabeTyp === "demo") {
+      setAusgabeZeilen(erstelleDemoAusgabe(modul.nummer, wert));
       setPhase("ausgabe");
       return;
     }
@@ -1084,7 +1162,7 @@ export default function OsintDemoView() {
     try {
       let zeilen: string[] = [];
 
-      if (aktivesModul.nummer === "2") {
+      if (modul.nummer === "2") {
         // E-Mail Vollanalyse: Basis + Recon parallel
         const [basis, recon] = await Promise.allSettled([
           emailAnalysieren(wert),
@@ -1095,16 +1173,16 @@ export default function OsintDemoView() {
         if (!basisOk) throw basis.status === "rejected" ? basis.reason : new Apifehler("Basis-Email-Check fehlgeschlagen");
         zeilen = emailVollZuTerminal(basisOk, reconOk);
         setRohdaten({ basis: basisOk, recon: reconOk });
-      } else if (aktivesModul.nummer === "3") {
+      } else if (modul.nummer === "3") {
         // Username: nur noch Vollscan (600+ Plattformen)
         const ergebnis = await benutzernameVollscan(wert);
         zeilen = vollscanZuTerminal(ergebnis);
         setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "4") {
+      } else if (modul.nummer === "4") {
         const ergebnis = await telefonAnalysieren(wert);
         zeilen = telefonZuTerminal(ergebnis);
         setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "5") {
+      } else if (modul.nummer === "5") {
         // Domain + Shodan parallel
         const [domain, shodan] = await Promise.allSettled([
           domainAnalysieren(wert),
@@ -1115,24 +1193,24 @@ export default function OsintDemoView() {
         if (!domainOk) throw domain.status === "rejected" ? domain.reason : new Apifehler("Domain-Check fehlgeschlagen");
         zeilen = domainVollZuTerminal(domainOk, shodanOk);
         setRohdaten({ domain: domainOk, shodan: shodanOk });
-      } else if (aktivesModul.nummer === "6") {
+      } else if (modul.nummer === "6") {
         const ergebnis = await bildAnalysieren(wert);
         zeilen = bildZuTerminal(ergebnis);
         setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "8") {
+      } else if (modul.nummer === "8") {
         const ergebnis = await orchestrator(wert, 2);
         zeilen = orchestratorZuTerminal(ergebnis);
         setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "9") {
+      } else if (modul.nummer === "9") {
         const ergebnis = await subdomainsFinden(wert, true);
         zeilen = subdomainZuTerminal(ergebnis);
         setRohdaten(ergebnis);
-      } else if (aktivesModul.nummer === "10") {
+      } else if (modul.nummer === "10") {
         const ergebnis = await ipIntelAbfragen(wert);
         zeilen = ipIntelZuTerminal(ergebnis);
         setRohdaten(ergebnis);
       } else {
-        zeilen = erstelleDemoAusgabe(aktivesModul.nummer, wert);
+        zeilen = erstelleDemoAusgabe(modul.nummer, wert);
       }
 
       setAusgabeZeilen(zeilen);
@@ -1164,7 +1242,27 @@ export default function OsintDemoView() {
       setApiFehler(meldung);
       setPhase("eingabe");
     }
-  }, [aktivesModul, eingabeWert]);
+  }, []);
+
+  const eingabeAbsenden = useCallback(() => {
+    if (!aktivesModul || !eingabeWert.trim()) return;
+    void ausfuehren(aktivesModul, eingabeWert.trim());
+  }, [aktivesModul, eingabeWert, ausfuehren]);
+
+  // Pivot: aus einem Ergebnis direkt das passende Werkzeug mit dem Wert starten.
+  const pivotStarten = useCallback((typ: string, wert: string) => {
+    const PIVOT_ZU_MODUL: Record<string, string> = {
+      username: "3", email: "2", domain: "5", ip: "10", image: "6",
+    };
+    const nummer = PIVOT_ZU_MODUL[typ];
+    const modul = nummer ? DEMO_MODULE.find((m) => m.nummer === nummer) : undefined;
+    if (!modul) return;
+    setAktivesModul(modul);
+    setEingabeWert(wert);
+    setAnsicht("report");
+    setApiFehler(null);
+    void ausfuehren(modul, wert);
+  }, [ausfuehren]);
 
   const zurueckSetzen = useCallback(() => {
     setPhase("menue");
@@ -1371,6 +1469,8 @@ export default function OsintDemoView() {
                   </button>
                 </div>
 
+                <DatenflussHinweis nummer={aktivesModul.nummer} />
+
                 {/* Imgur-Anleitung — nur bei Modul 6 */}
                 {aktivesModul?.nummer === "6" && (
                   <div className="mt-5 border-t border-white/[0.06] pt-4 text-[11px] font-mono leading-relaxed">
@@ -1456,7 +1556,7 @@ export default function OsintDemoView() {
 
                 {zeigeReport && (
                   <>
-                    <ErgebnisReport modulNummer={aktivesModul!.nummer} daten={rohdaten} />
+                    <ErgebnisReport modulNummer={aktivesModul!.nummer} daten={rohdaten} onPivot={pivotStarten} />
                     {aktionsLeiste}
                   </>
                 )}

@@ -1,7 +1,7 @@
 # ═══════════════════════════════════════════════════════════════════
 # WERKZEUG: Telefon-Analyse
 # Passive Analyse von Telefonnummern via phonenumbers-Bibliothek.
-# Nur öffentlich zugängliche Metadaten — keine aktiven Abfragen.
+# Lokale Metadaten + optionaler HLR-Live-Status (wenn konfiguriert).
 # ═══════════════════════════════════════════════════════════════════
 
 import phonenumbers
@@ -10,6 +10,8 @@ from phonenumbers import PhoneNumberType, PhoneNumberFormat
 from phonenumbers import number_type, is_valid_number, is_possible_number
 from phonenumbers import format_number, region_code_for_number
 from datetime import datetime
+
+from werkzeuge.hlr_lookup import hlr_lookup, hlr_konfiguriert
 
 
 LEITUNGSTYPEN: dict[PhoneNumberType, str] = {
@@ -100,11 +102,19 @@ async def telefon_analysieren(nummer_eingabe: str) -> dict:
             nach_kategorie[kat] = []
         nach_kategorie[kat].append(link)
 
+    # Optionaler HLR-Live-Status (nur bei gültiger Nummer + konfiguriertem Anbieter).
+    # Graceful: ohne Keys liefert hlr_lookup {aktiv: False} und das Werkzeug
+    # bleibt rein lokal.
+    live_status = {"aktiv": False, "hinweis": "HLR-Live-Status nicht konfiguriert"}
+    if gueltig and hlr_konfiguriert():
+        live_status = await hlr_lookup(e164)
+
     return {
         "nummer": nummer_eingabe,
         "analysiert_am": datetime.utcnow().isoformat() + "Z",
         "gueltig": gueltig,
         "moeglich": moeglich,
+        "live_status": live_status,
         "format": {
             "international": international,
             "national": national,

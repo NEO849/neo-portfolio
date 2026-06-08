@@ -3,6 +3,11 @@
 # Lädt ein Bild von einer URL, extrahiert EXIF-Metadaten,
 # berechnet Perceptual Hash und generiert Reverse-Search-Links.
 # Nur passive Analyse — kein Upload zu Drittdiensten.
+#
+# Welle 1: + Reverse-Geocoding (GPS → Ortsname via Nominatim),
+#          + erweiterte forensische EXIF-Felder (Seriennummer/Objektiv/…),
+#          + Privacy-Verdikt mit konkreten Handlungsempfehlungen
+#            ("kenne deine Spur — gibt es Handlungsbedarf?").
 # ═══════════════════════════════════════════════════════════════════
 
 import httpx
@@ -14,6 +19,7 @@ from PIL.ExifTags import TAGS, GPSTAGS
 import imagehash
 
 from werkzeuge.netz_schutz import sichere_get, SSRFBlockiert
+from werkzeuge.geocoding import reverse_geocode, koordinaten_gueltig
 
 
 MAX_BILDGROESSE = 10 * 1024 * 1024  # 10 MB
@@ -29,6 +35,16 @@ def _gps_dezimal(werte, ref: str) -> float | None:
         if ref in ("S", "W"):
             dezimal = -dezimal
         return round(dezimal, 6)
+    except Exception:
+        return None
+
+
+def _rational(wert) -> float | None:
+    """Wandelt einen EXIF-Rational/Tupel-Wert in float (oder None)."""
+    try:
+        if isinstance(wert, (tuple, list)) and len(wert) == 2:
+            return round(float(wert[0]) / float(wert[1]), 2)
+        return round(float(wert), 2)
     except Exception:
         return None
 
@@ -56,8 +72,7 @@ def _exif_extrahieren(bild: Image.Image) -> dict:
                     exif_roh[tag] = str(wert) if isinstance(wert, bytes) else wert
 
         ergebnis["verfuegbar"] = True
-        ergebnis["kamera"] = exif_roh.get("Make", "") + " " + exif_roh.get("Model", "")
-        ergebnis["kamera"] = ergebnis["kamera"].strip() or None
+        ergebnis["kamera"] = (exif_roh.get("Make", "") + " " + exif_roh.get("Model", "")).strip() or None
         ergebnis["aufnahmedatum"] = exif_roh.get("DateTimeOriginal") or exif_roh.get("DateTime")
         ergebnis["software"] = exif_roh.get("Software")
         ergebnis["blende"] = str(exif_roh.get("FNumber")) if exif_roh.get("FNumber") else None
@@ -66,7 +81,20 @@ def _exif_extrahieren(bild: Image.Image) -> dict:
         ergebnis["brennweite"] = str(exif_roh.get("FocalLength")) if exif_roh.get("FocalLength") else None
         ergebnis["orientierung"] = exif_roh.get("Orientation")
 
-        # GPS-Koordinaten
+        # Erweiterte, forensisch/Privacy-relevante Felder
+        # Seriennummer = eindeutiger Geräte-Identifikator (verkettet Fotos derselben Kamera!)
+        ergebnis["seriennummer"] = (
+            exif_roh.get("BodySerialNumber")
+            or exif_roh.get("CameraSerialNumber")
+            or exif_roh.get("SerialNumber")
+        )
+        ergebnis["objektiv"] = exif_roh.get("LensModel") or exif_roh.get("LensMake")
+        # Artist/Copyright tragen oft den Klarnamen des Fotografen
+        ergebnis["kuenstler"] = exif_roh.get("Artist")
+        ergebnis["copyright"] = exif_roh.get("Copyright")
+        ergebnis["benutzerkommentar"] = exif_roh.get("UserComment") or exif_roh.get("ImageDescription")
+
+        # GPS-Koordinaten + Zusatzdaten
         if gps_daten:
             lat = _gps_dezimal(
                 gps_daten.get("GPSLatitude", []),
@@ -77,12 +105,26 @@ def _exif_extrahieren(bild: Image.Image) -> dict:
                 gps_daten.get("GPSLongitudeRef", "E")
             )
             if lat and lon:
-                ergebnis["gps"] = {
+                gps = {
                     "lat": lat,
                     "lon": lon,
                     "maps_link": f"https://www.google.com/maps?q={lat},{lon}",
                     "hinweis": "GPS-Koordinaten gefunden — Aufnahmeort rekonstruierbar",
                 }
+                # Höhe
+                hoehe = _rational(gps_daten.get("GPSAltitude"))
+                if hoehe is not None:
+                    if gps_daten.get("GPSAltitudeRef") in (1, b"\x01"):
+                        hoehe = -hoehe
+                    gps["hoehe_meter"] = hoehe
+                # Blickrichtung (in welche Richtung die Kamera zeigte)
+                richtung = _rational(gps_daten.get("GPSImgDirection"))
+                if richtung is not None:
+                    gps["blickrichtung_grad"] = richtung
+                # GPS-Zeitstempel (Datum)
+                if gps_daten.get("GPSDateStamp"):
+                    gps["gps_datum"] = str(gps_daten.get("GPSDateStamp"))
+                ergebnis["gps"] = gps
             else:
                 ergebnis["gps"] = None
         else:
@@ -92,6 +134,95 @@ def _exif_extrahieren(bild: Image.Image) -> dict:
         return {"verfuegbar": False, "hinweis": "EXIF konnte nicht gelesen werden"}
 
     return ergebnis
+
+
+def _privacy_bewertung(exif: dict) -> dict:
+    """
+    Reiner Bewerter: leitet aus den EXIF-Daten ein klares Privacy-Verdikt
+    + konkrete Handlungsempfehlungen ab. Kern der "gibt es Handlungsbedarf?"-
+    Mission. Seiteneffektfrei → offline testbar.
+    """
+    punkte = 0
+    befunde: list[dict] = []
+    empfehlungen: list[str] = []
+
+    if not exif or not exif.get("verfuegbar"):
+        return {
+            "stufe": "Unkritisch",
+            "punkte": 0,
+            "zusammenfassung": "Das Bild enthält keine auslesbaren EXIF-Metadaten — "
+                               "gut für die Privatsphäre (vermutlich bereits bereinigt).",
+            "befunde": [],
+            "empfehlungen": [],
+        }
+
+    gps = exif.get("gps") or {}
+    if gps.get("lat") is not None and gps.get("lon") is not None:
+        punkte += 4
+        ort = gps.get("ort_name")
+        meldung = "Exakte GPS-Koordinaten im Bild — der Aufnahmeort ist rekonstruierbar"
+        if ort:
+            meldung = f"Exakter Aufnahmeort im Bild: {ort}"
+        befunde.append({"stufe": "hoch", "kategorie": "Standort", "meldung": meldung})
+        empfehlungen.append("Entferne die GPS-/Standortdaten, bevor du das Bild öffentlich teilst.")
+
+    if exif.get("seriennummer"):
+        punkte += 3
+        befunde.append({
+            "stufe": "hoch", "kategorie": "Geräte-ID",
+            "meldung": f"Kamera-Seriennummer sichtbar: {exif['seriennummer']} — "
+                       "verkettet alle Fotos desselben Geräts eindeutig.",
+        })
+        empfehlungen.append("Seriennummer aus den Metadaten entfernen (verhindert Geräte-Verkettung).")
+
+    if exif.get("kuenstler") or exif.get("copyright"):
+        punkte += 2
+        wer = exif.get("kuenstler") or exif.get("copyright")
+        befunde.append({
+            "stufe": "mittel", "kategorie": "Identität",
+            "meldung": f"Name/Copyright im Bild hinterlegt: {wer}",
+        })
+        empfehlungen.append("Prüfe das Artist-/Copyright-Feld — es kann deinen Klarnamen enthalten.")
+
+    if exif.get("kamera"):
+        punkte += 1
+        befunde.append({
+            "stufe": "niedrig", "kategorie": "Gerät",
+            "meldung": f"Kameramodell sichtbar: {exif['kamera']}",
+        })
+
+    if exif.get("aufnahmedatum"):
+        punkte += 1
+        befunde.append({
+            "stufe": "niedrig", "kategorie": "Zeit",
+            "meldung": f"Aufnahmezeitpunkt sichtbar: {exif['aufnahmedatum']}",
+        })
+
+    if exif.get("software"):
+        befunde.append({
+            "stufe": "info", "kategorie": "Software",
+            "meldung": f"Bearbeitungs-/Geräte-Software sichtbar: {exif['software']}",
+        })
+
+    if befunde and not any(e for e in empfehlungen):
+        empfehlungen.append("Metadaten vor dem Teilen mit einem EXIF-Cleaner entfernen.")
+
+    if punkte >= 5:
+        stufe, zus = "Hoch", "Das Bild verrät sensible Informationen (u.a. Standort/Geräte-ID). Vor dem Teilen bereinigen."
+    elif punkte >= 2:
+        stufe, zus = "Mittel", "Das Bild enthält identifizierende Metadaten. Prüfe, ob du sie öffentlich preisgeben willst."
+    elif punkte >= 1:
+        stufe, zus = "Gering", "Das Bild enthält geringfügige Metadaten."
+    else:
+        stufe, zus = "Unkritisch", "Keine kritischen Metadaten gefunden."
+
+    return {
+        "stufe": stufe,
+        "punkte": punkte,
+        "zusammenfassung": zus,
+        "befunde": befunde,
+        "empfehlungen": list(dict.fromkeys(empfehlungen)),
+    }
 
 
 async def bild_analysieren(bild_url: str) -> dict:
@@ -163,6 +294,21 @@ async def bild_analysieren(bild_url: str) -> dict:
     # EXIF extrahieren
     exif = _exif_extrahieren(bild)
 
+    # GPS → Ortsname (Reverse-Geocoding, gecacht, graceful).
+    # Roh-Koordinaten + Karten-Link bleiben IMMER erhalten, auch wenn
+    # der Geocoding-Dienst nicht erreichbar ist.
+    gps = exif.get("gps") if isinstance(exif, dict) else None
+    if gps and koordinaten_gueltig(gps.get("lat"), gps.get("lon")):
+        geo = await reverse_geocode(gps["lat"], gps["lon"])
+        if geo.get("gefunden"):
+            gps["ort_name"] = geo.get("ort_name")
+            gps["adresse"] = geo.get("adresse")
+            gps["komponenten"] = geo.get("komponenten")
+            gps["osm_link"] = geo.get("osm_link")
+            gps["geocoding_quelle"] = geo.get("quelle")
+            if geo.get("ort_name"):
+                gps["hinweis"] = f"Aufnahmeort rekonstruiert: {geo['ort_name']}"
+
     # Dateigröße
     groesse_kb = round(len(bild_bytes) / 1024, 1)
     groesse_mb = round(len(bild_bytes) / (1024 * 1024), 2)
@@ -192,23 +338,16 @@ async def bild_analysieren(bild_url: str) -> dict:
         {"name": "PicTriev",      "kategorie": "Celebrity",   "url": "http://www.pictriev.com"},
     ]
 
-    # Sicherheitsanalyse
-    sicherheits_hinweise = []
-    if exif.get("gps"):
-        sicherheits_hinweise.append({
-            "stufe": "hoch",
-            "meldung": "GPS-Koordinaten im Bild — Aufnahmeort ist rekonstruierbar",
-        })
-    if exif.get("kamera"):
-        sicherheits_hinweise.append({
-            "stufe": "mittel",
-            "meldung": f"Kameramodell sichtbar: {exif['kamera']}",
-        })
-    if exif.get("aufnahmedatum"):
-        sicherheits_hinweise.append({
-            "stufe": "niedrig",
-            "meldung": f"Aufnahmedatum sichtbar: {exif['aufnahmedatum']}",
-        })
+    # Privacy-Verdikt + konkrete Handlungsempfehlungen (Welle 1)
+    bewertung = _privacy_bewertung(exif)
+
+    # Backward-Compat: flache Hinweis-Liste (alte UI-Form {stufe, meldung}),
+    # abgeleitet aus den Verdikt-Befunden.
+    sicherheits_hinweise = [
+        {"stufe": b["stufe"], "meldung": b["meldung"]}
+        for b in bewertung.get("befunde", [])
+        if b.get("stufe") != "info"
+    ]
 
     return {
         "url": bild_url,
@@ -230,5 +369,6 @@ async def bild_analysieren(bild_url: str) -> dict:
         },
         "exif": exif,
         "suchlinks": suchlinks,
+        "bewertung": bewertung,
         "sicherheits_hinweise": sicherheits_hinweise,
     }

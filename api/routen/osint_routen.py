@@ -22,9 +22,21 @@ from werkzeuge.intel_aggregator import links_generieren
 from werkzeuge.orchestrator import orchestrieren
 from werkzeuge.subdomain_recon import subdomains_finden
 from werkzeuge.ip_recon import ip_intel
+from werkzeuge.passwort_recon import passwort_pruefen
+from werkzeuge.transparenz import transparenz_fuer
+from werkzeuge.pivots import extrahiere_pivots
 
 router = APIRouter(prefix="/osint", tags=["OSINT-Werkzeuge"])
 limiter = Limiter(key_func=get_remote_address)
+
+
+def _mit_pivots(typ: str, ergebnis: dict) -> dict:
+    """Hängt verknüpfbare Pivots additiv an ein Ergebnis (für 'weiter analysieren')."""
+    if isinstance(ergebnis, dict) and not ergebnis.get("fehler"):
+        pivots = extrahiere_pivots(typ, ergebnis)
+        if pivots:
+            ergebnis["pivots"] = pivots
+    return ergebnis
 
 
 # ─── Request-Modelle ────────────────────────────────────────────────
@@ -100,7 +112,7 @@ async def domain_analyse(anfrage: DomainAnfrage, request: Request):
     """
     try:
         ergebnis = await domain_analysieren(anfrage.domain)
-        return JSONResponse(content=ergebnis)
+        return JSONResponse(content=_mit_pivots("domain", ergebnis))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analyse fehlgeschlagen: {str(e)}")
 
@@ -160,7 +172,7 @@ async def benutzername_analyse(anfrage: BenutzerVollscanAnfrage, request: Reques
     """
     try:
         ergebnis = await benutzername_suchen(anfrage.benutzername, nur_tier1=not anfrage.vollscan)
-        return JSONResponse(content=ergebnis)
+        return JSONResponse(content=_mit_pivots("benutzername", ergebnis))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Suche fehlgeschlagen: {str(e)}")
 
@@ -226,7 +238,7 @@ async def bild_analyse(anfrage: BildAnfrage, request: Request):
     """
     try:
         ergebnis = await bild_analysieren(anfrage.url)
-        return JSONResponse(content=ergebnis)
+        return JSONResponse(content=_mit_pivots("bild", ergebnis))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analyse fehlgeschlagen: {str(e)}")
 
@@ -308,7 +320,7 @@ async def email_recon_route(anfrage: EmailReconAnfrage, request: Request):
     """
     try:
         ergebnis = await email_recon(anfrage.email)
-        return JSONResponse(content=ergebnis)
+        return JSONResponse(content=_mit_pivots("email-recon", ergebnis))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Email-Recon fehlgeschlagen: {str(e)}")
 
@@ -468,6 +480,53 @@ async def ip_intel_route(anfrage: ShodanAnfrage, request: Request):
         raise HTTPException(status_code=500, detail=f"IP-Intel fehlgeschlagen: {str(e)}")
 
 
+class PasswortAnfrage(BaseModel):
+    passwort: str
+
+    @field_validator("passwort")
+    @classmethod
+    def passwort_pruefen_feld(cls, v: str) -> str:
+        if not v:
+            raise ValueError("Kein Passwort angegeben")
+        if len(v) > 256:
+            raise ValueError("Passwort zu lang (max. 256 Zeichen)")
+        return v
+
+
+@router.post("/passwort", summary="Passwort-Exposure-Check (HIBP, k-Anonymität)")
+@limiter.limit("10/minute")
+async def passwort_route(anfrage: PasswortAnfrage, request: Request):
+    """
+    Prüft, ob ein Passwort in bekannten Daten-Leaks auftaucht — **ohne das
+    Passwort preiszugeben** (k-Anonymität: nur die ersten 5 Zeichen des
+    SHA-1-Hashes werden gesendet, der Abgleich erfolgt lokal).
+
+    **Datenschutz:** Das Passwort wird nie gespeichert, geloggt oder gecacht.
+    **Rate-Limit:** 10 Anfragen pro Minute pro IP.
+    """
+    try:
+        ergebnis = await passwort_pruefen(anfrage.passwort)
+        return JSONResponse(content=ergebnis)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Passwort-Check fehlgeschlagen: {str(e)}")
+
+
+@router.get("/transparenz", summary="Datenfluss-Transparenz (DSGVO Art. 13/14)")
+async def transparenz_route(werkzeug: str | None = None):
+    """
+    Liefert die maschinenlesbare Datenfluss-Deklaration: welche Drittdienste
+    pro Werkzeug **serverseitig** kontaktiert werden (= wohin Nutzerdaten
+    fließen) bzw. wo nur **Such-Links** erzeugt werden (kein automatischer
+    Datenfluss). Grundlage für den Einwilligungs-/Transparenz-Layer der UI.
+
+    - **ohne Parameter**: Gesamtübersicht aller Werkzeuge
+    - **?werkzeug=email-recon**: nur dieser Eintrag
+
+    Read-only, kein Rate-Limit (statische Deklaration, keine Drittdienst-Last).
+    """
+    return JSONResponse(content=transparenz_fuer(werkzeug))
+
+
 @router.get("/gesundheit", summary="API-Status prüfen")
 async def gesundheitscheck():
     """Einfacher Liveness-Check für Monitoring."""
@@ -475,7 +534,9 @@ async def gesundheitscheck():
         "status": "ok",
         "werkzeuge": [
             "domain", "email", "email-recon", "benutzername", "telefon",
-            "bild", "shodan", "subdomains", "ip-intel", "aggregator", "orchestrator",
+            "bild", "passwort", "shodan", "subdomains", "ip-intel",
+            "aggregator", "orchestrator",
         ],
-        "version": "2.1-senior-elite",
+        "fundament": ["cache", "transparenz", "pivots", "geocoding", "hlr_lookup"],
+        "version": "2.4-welle4",
     }
