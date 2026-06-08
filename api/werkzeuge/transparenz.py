@@ -126,11 +126,14 @@ DATENFLUSS: dict[str, dict] = {
     },
 
     "bild": {
-        "beschreibung": "Analysiert ein Bild von einer URL (EXIF, GPS, Hashes, Reverse-Links).",
+        "beschreibung": "Analysiert ein Bild von einer URL (EXIF, GPS→Ort, Hashes, Reverse-Links).",
         "sendet_an": [
             _dienst("Der angegebene Bild-Host", "HTTP-Anfrage an die Bild-URL",
                     "Bild temporär laden (SSRF-geschützt) für EXIF/Hash-Analyse",
                     "URL-abhängig", "Anbieter-abhängig"),
+            _dienst("Nominatim / OpenStreetMap", "GPS-Koordinaten aus dem Bild (nur falls vorhanden)",
+                    "Reverse-Geocoding: Koordinaten → lesbarer Ortsname",
+                    "https://wiki.osmfoundation.org/wiki/Privacy_Policy", "EU"),
         ],
         "nur_links": [
             "Google Lens, TinEye, Bing, Yandex, Baidu, SauceNAO, IQDB sowie "
