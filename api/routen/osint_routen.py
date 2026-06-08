@@ -22,6 +22,7 @@ from werkzeuge.intel_aggregator import links_generieren
 from werkzeuge.orchestrator import orchestrieren
 from werkzeuge.subdomain_recon import subdomains_finden
 from werkzeuge.ip_recon import ip_intel
+from werkzeuge.transparenz import transparenz_fuer
 
 router = APIRouter(prefix="/osint", tags=["OSINT-Werkzeuge"])
 limiter = Limiter(key_func=get_remote_address)
@@ -468,6 +469,22 @@ async def ip_intel_route(anfrage: ShodanAnfrage, request: Request):
         raise HTTPException(status_code=500, detail=f"IP-Intel fehlgeschlagen: {str(e)}")
 
 
+@router.get("/transparenz", summary="Datenfluss-Transparenz (DSGVO Art. 13/14)")
+async def transparenz_route(werkzeug: str | None = None):
+    """
+    Liefert die maschinenlesbare Datenfluss-Deklaration: welche Drittdienste
+    pro Werkzeug **serverseitig** kontaktiert werden (= wohin Nutzerdaten
+    fließen) bzw. wo nur **Such-Links** erzeugt werden (kein automatischer
+    Datenfluss). Grundlage für den Einwilligungs-/Transparenz-Layer der UI.
+
+    - **ohne Parameter**: Gesamtübersicht aller Werkzeuge
+    - **?werkzeug=email-recon**: nur dieser Eintrag
+
+    Read-only, kein Rate-Limit (statische Deklaration, keine Drittdienst-Last).
+    """
+    return JSONResponse(content=transparenz_fuer(werkzeug))
+
+
 @router.get("/gesundheit", summary="API-Status prüfen")
 async def gesundheitscheck():
     """Einfacher Liveness-Check für Monitoring."""
@@ -477,5 +494,6 @@ async def gesundheitscheck():
             "domain", "email", "email-recon", "benutzername", "telefon",
             "bild", "shodan", "subdomains", "ip-intel", "aggregator", "orchestrator",
         ],
-        "version": "2.1-senior-elite",
+        "fundament": ["cache", "transparenz", "pivots"],
+        "version": "2.2-fundament",
     }
