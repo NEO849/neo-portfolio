@@ -64,8 +64,8 @@ const DEMO_MODULE: DemoModul[] = [
   },
   {
     nummer: "6", name: "Reverse Image", farbe: "#22c55e",
-    eingabeLabel: "Bild-URL", beispielEingabe: "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png", eingabeTyp: "text",
-    ziel: "Liest versteckte Foto-Daten (inkl. GPS-Aufnahmeort) aus und liefert Reverse-Image-Suchen, um die Bildquelle zu finden.",
+    eingabeLabel: "Bild-URL", beispielEingabe: "https://upload.wikimedia.org/wikipedia/commons/7/79/Tesla_circa_1890.jpeg", eingabeTyp: "text",
+    ziel: "Liest versteckte Foto-Daten (inkl. GPS-Aufnahmeort) aus und liefert Reverse-Image-Suchen, um die Bildquelle zu finden. (Beispiel: Porträt von Nikola Tesla — die Reverse-Suchen finden zahlreiche Fundstellen.)",
     beschreibung: "Extrahiert EXIF-Metadaten und GPS-Koordinaten, berechnet pHash / aHash / dHash. Generiert 14 Suchlinks über 5 Kategorien: Mainstream (Google Lens / TinEye / Bing), Regional (Yandex / Baidu), Face (PimEyes / FaceCheck / Search4Faces), Art (SauceNAO / IQDB) und Celebrity (PicTriev).",
   },
   {
