@@ -30,7 +30,8 @@ def pruefe(bedingung: bool, beschreibung: str) -> None:
 # Werkzeuge, die der gesundheit-Endpunkt als ausgeliefert meldet.
 AUSGELIEFERTE_WERKZEUGE = {
     "domain", "email", "email-recon", "benutzername", "telefon",
-    "bild", "shodan", "subdomains", "ip-intel", "aggregator", "orchestrator",
+    "bild", "passwort", "shodan", "subdomains", "ip-intel",
+    "aggregator", "orchestrator",
 }
 
 

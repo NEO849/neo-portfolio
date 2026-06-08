@@ -22,6 +22,7 @@ from werkzeuge.intel_aggregator import links_generieren
 from werkzeuge.orchestrator import orchestrieren
 from werkzeuge.subdomain_recon import subdomains_finden
 from werkzeuge.ip_recon import ip_intel
+from werkzeuge.passwort_recon import passwort_pruefen
 from werkzeuge.transparenz import transparenz_fuer
 
 router = APIRouter(prefix="/osint", tags=["OSINT-Werkzeuge"])
@@ -469,6 +470,37 @@ async def ip_intel_route(anfrage: ShodanAnfrage, request: Request):
         raise HTTPException(status_code=500, detail=f"IP-Intel fehlgeschlagen: {str(e)}")
 
 
+class PasswortAnfrage(BaseModel):
+    passwort: str
+
+    @field_validator("passwort")
+    @classmethod
+    def passwort_pruefen_feld(cls, v: str) -> str:
+        if not v:
+            raise ValueError("Kein Passwort angegeben")
+        if len(v) > 256:
+            raise ValueError("Passwort zu lang (max. 256 Zeichen)")
+        return v
+
+
+@router.post("/passwort", summary="Passwort-Exposure-Check (HIBP, k-Anonymität)")
+@limiter.limit("10/minute")
+async def passwort_route(anfrage: PasswortAnfrage, request: Request):
+    """
+    Prüft, ob ein Passwort in bekannten Daten-Leaks auftaucht — **ohne das
+    Passwort preiszugeben** (k-Anonymität: nur die ersten 5 Zeichen des
+    SHA-1-Hashes werden gesendet, der Abgleich erfolgt lokal).
+
+    **Datenschutz:** Das Passwort wird nie gespeichert, geloggt oder gecacht.
+    **Rate-Limit:** 10 Anfragen pro Minute pro IP.
+    """
+    try:
+        ergebnis = await passwort_pruefen(anfrage.passwort)
+        return JSONResponse(content=ergebnis)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Passwort-Check fehlgeschlagen: {str(e)}")
+
+
 @router.get("/transparenz", summary="Datenfluss-Transparenz (DSGVO Art. 13/14)")
 async def transparenz_route(werkzeug: str | None = None):
     """
@@ -492,8 +524,9 @@ async def gesundheitscheck():
         "status": "ok",
         "werkzeuge": [
             "domain", "email", "email-recon", "benutzername", "telefon",
-            "bild", "shodan", "subdomains", "ip-intel", "aggregator", "orchestrator",
+            "bild", "passwort", "shodan", "subdomains", "ip-intel",
+            "aggregator", "orchestrator",
         ],
-        "fundament": ["cache", "transparenz", "pivots"],
-        "version": "2.2-fundament",
+        "fundament": ["cache", "transparenz", "pivots", "geocoding"],
+        "version": "2.3-welle2",
     }

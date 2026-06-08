@@ -86,13 +86,29 @@ DATENFLUSS: dict[str, dict] = {
                     "Vorhandensein eines öffentlichen PGP-Schlüssels",
                     "https://keys.openpgp.org/about/privacy", "EU"),
             _dienst("GitHub", "E-Mail-Adresse",
-                    "Verknüpfte GitHub-Konten via öffentliche Such-API",
+                    "Verknüpfte GitHub-Konten via öffentliche User- UND Commit-Such-API "
+                    "(findet in alten Commits hinterlegte Adressen → Konto, Klarname, Repos)",
                     "https://docs.github.com/site-policy/privacy-policies", "US"),
         ],
         "nur_links": [
             "Google Maps/YouTube/Drive (nur Such-Links, falls Gmail-Adresse)",
         ],
         "speicherung": SPEICHER_HINWEIS,
+    },
+
+    "passwort": {
+        "beschreibung": "Prüft, ob ein Passwort in bekannten Leaks auftaucht (k-Anonymität).",
+        "sendet_an": [
+            _dienst("HaveIBeenPwned (Pwned Passwords)",
+                    "NUR die ersten 5 Zeichen des SHA-1-Hashes (k-Anonymität)",
+                    "Abgleich gegen geleakte Passwörter — das Passwort selbst verlässt "
+                    "den Server NIE; der Abgleich erfolgt lokal.",
+                    "https://haveibeenpwned.com/Privacy", "AU"),
+        ],
+        "nur_links": [],
+        "hinweis": "Das Passwort wird niemals gespeichert, geloggt oder gecacht. "
+                   "Nur ein 5-Zeichen-Hash-Präfix wird übertragen.",
+        "speicherung": "Keine Speicherung des Passworts oder vollständigen Hashes.",
     },
 
     "benutzername": {
