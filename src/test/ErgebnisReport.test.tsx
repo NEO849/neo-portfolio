@@ -33,7 +33,9 @@ describe("ErgebnisReport — Render-Smoke alle Module", () => {
     };
     render(<ErgebnisReport modulNummer="2" daten={daten} />);
     expect(screen.getByText("example.com")).toBeInTheDocument();
-    expect(screen.getByText(/Datenlecks/i)).toBeInTheDocument();
+    // "Datenlecks" erscheint sowohl im Verdikt-Text als auch als Sektionstitel —
+    // daher getAllByText (Vorhandensein genügt für den Render-Smoke).
+    expect(screen.getAllByText(/Datenlecks/i).length).toBeGreaterThan(0);
     // GitHub-Link klickbar
     const link = screen.getByRole("link", { name: /@demo/i });
     expect(link).toHaveAttribute("href", "https://github.com/demo");
@@ -95,15 +97,9 @@ describe("ErgebnisReport — Render-Smoke alle Module", () => {
     expect(screen.getByRole("link", { name: /Google Lens/i })).toHaveAttribute("href", "https://lens.google.com/x");
   });
 
-  it("Modul 7 (Aggregator): gruppierte Link-Chips", () => {
-    const daten = {
-      typ: "domain", wert: "example.com", analysiert_am: JETZT, anzahl: 1,
-      links: [{ name: "crt.sh", kategorie: "Cert", url: "https://crt.sh/?q=example.com" }],
-      nach_kategorie: { Cert: [{ name: "crt.sh", kategorie: "Cert", url: "https://crt.sh/?q=example.com" }] },
-    };
-    render(<ErgebnisReport modulNummer="7" daten={daten} />);
-    expect(screen.getByRole("link", { name: /crt\.sh/i })).toHaveAttribute("href", "https://crt.sh/?q=example.com");
-  });
+  // Hinweis: Modul 7 (Standalone-Aggregator) wurde aus der UI entfernt — die
+  // Such-Aggregation ist in die anderen Module integriert. ErgebnisReport hat
+  // bewusst keinen case "7" mehr; ein Test dafür entfällt.
 
   it("Modul 8 (Orchestrator): Statistik-Marken", () => {
     const daten = {
