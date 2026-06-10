@@ -22,30 +22,43 @@ import type { GraphNode, GraphEdge } from "../dienste/osintApi";
 
 // ─── Konstanten ────────────────────────────────────────────────────
 
-// Kräftige, klar unterscheidbare Palette aus dem Webseiten-Farbsystem
-// (Tokens: akzent=Indigo, cyber=Cyan, signal=rot/gelb/grün) + harmonische
-// Nachbartöne. Semantisch gruppiert:
-//   Identität  = Indigo → Violett → Purple
-//   Infra      = Cyan → Teal → Sky
-//   Netz/Geo   = Amber/Grün · Kontakt = Orange
-//   RISIKO     = Rot (signal-rot)
+// Unterscheidbarkeit nach dem Maltego-Prinzip: FORM kodiert die Kategorie,
+// FARBE den konkreten Typ. So sind Knoten auch bei ähnlichen Farben sofort
+// trennbar (z.B. cyan-Hexagon=Domain vs. blaues Hexagon=IP).
+// Farben innerhalb jeder Gruppe bewusst kontrastreich gewählt:
+//   Identität (Kreis)   = Indigo / Fuchsia / Purple
+//   Infrastruktur (Hex) = Cyan / Teal / Blau
+//   Netz-Meta (Raute)   = Amber
+//   Geo/Kontakt (Quad)  = Grün / Lime / Orange
+//   RISIKO (Dreieck)    = Rot
 const NODE_FARBEN: Record<string, string> = {
-  email:      "#818cf8", // akzent-400 (Brand) – Identität
-  account:    "#a78bfa", // violet-400        – Identität
-  username:   "#c084fc", // purple-400        – Identität
-  domain:     "#22d3ee", // cyber-400         – Infrastruktur
-  nameserver: "#2dd4bf", // teal-400          – Infrastruktur
-  ip:         "#38bdf8", // sky-400           – Infrastruktur
-  asn:        "#f59e0b", // signal-gelb       – Netzwerk-Meta
-  carrier:    "#22c55e", // signal-gruen      – Kontakt/Geo
-  land:       "#4ade80", // green-400         – Geo
-  phone:      "#fb923c", // orange-400        – Kontakt
-  cve:        "#ef4444", // signal-rot        – RISIKO
+  email:      "#818cf8", // indigo
+  account:    "#e879f9", // fuchsia  (klar von Indigo/Purple getrennt)
+  username:   "#c084fc", // purple
+  domain:     "#22d3ee", // cyan      (Haupt-Host, kräftig)
+  subdomain:  "#7dd3fc", // hell-cyan (Kind der Domain, bewusst blasser)
+  nameserver: "#2dd4bf", // teal
+  ip:         "#60a5fa", // blau      (klar von Cyan/Teal getrennt)
+  asn:        "#f59e0b", // amber
+  carrier:    "#22c55e", // grün
+  land:       "#a3e635", // lime
+  phone:      "#fb923c", // orange
+  cve:        "#ef4444", // rot
+};
+
+// Form pro Typ — eine Form pro semantischer Gruppe.
+type NodeForm = "kreis" | "hexagon" | "raute" | "quadrat" | "dreieck";
+const NODE_FORM: Record<string, NodeForm> = {
+  email: "kreis", account: "kreis", username: "kreis",                 // Identität
+  domain: "hexagon", subdomain: "hexagon", nameserver: "hexagon", ip: "hexagon", // Infrastruktur
+  asn: "raute",                                                        // Netz-Meta
+  carrier: "quadrat", land: "quadrat", phone: "quadrat",               // Geo/Kontakt
+  cve: "dreieck",                                                      // Risiko
 };
 
 // Lesbare Legenden-Labels (statt roher Typ-Keys)
 const TYP_LABEL: Record<string, string> = {
-  email: "E-Mail", domain: "Domain", username: "Username", account: "Account",
+  email: "E-Mail", domain: "Domain", subdomain: "Subdomain", username: "Username", account: "Account",
   ip: "IP-Adresse", cve: "CVE", asn: "ASN", nameserver: "Nameserver",
   carrier: "Carrier", land: "Land", phone: "Telefon",
 };
@@ -53,9 +66,44 @@ const TYP_LABEL: Record<string, string> = {
 const FALLBACK_FARBE = "#94a3b8";
 
 // Knoten-Radius nach Typ/Wichtigkeit. Primary deutlich größer (Hierarchie),
-// kritische CVE-Knoten bewusst klein (viele, sekundär).
+// kritische CVE-Knoten bewusst klein (viele, sekundär) — aber groß genug,
+// dass die Dreiecksform klar erkennbar bleibt.
 const NODE_RADIUS = (typ: string, primaer: boolean): number =>
-  primaer ? 24 : typ === "cve" ? 8 : typ === "account" || typ === "username" ? 10 : 13;
+  primaer ? 24 : typ === "cve" ? 10 : typ === "account" || typ === "username" ? 11 : 14;
+
+// ─── Form-Geometrie (zentriert auf 0,0, "Radius" r) ─────────────────
+
+function hexagonPunkte(r: number): string {
+  // pointy-top Hexagon
+  return Array.from({ length: 6 }, (_, i) => {
+    const a = (Math.PI / 180) * (60 * i - 90);
+    return `${(r * Math.cos(a)).toFixed(2)},${(r * Math.sin(a)).toFixed(2)}`;
+  }).join(" ");
+}
+function rautePunkte(r: number): string {
+  const d = r * 1.18;
+  return `0,${-d} ${d},0 0,${d} ${-d},0`;
+}
+function dreieckPunkte(r: number): string {
+  // gleichseitiges Dreieck, Spitze oben, optisch auf Kreisfläche normiert
+  const h = r * 1.16;
+  return `0,${(-h).toFixed(2)} ${(h * 0.92).toFixed(2)},${(h * 0.66).toFixed(2)} ${(-h * 0.92).toFixed(2)},${(h * 0.66).toFixed(2)}`;
+}
+
+interface KoerperProps {
+  form: NodeForm; r: number; fill: string;
+  stroke?: string; strokeWidth?: number; filter?: string;
+}
+function KnotenKoerper({ form, r, fill, stroke, strokeWidth, filter }: KoerperProps) {
+  const g = { fill, stroke, strokeWidth, filter } as const;
+  switch (form) {
+    case "hexagon": return <polygon points={hexagonPunkte(r)} {...g} />;
+    case "raute":   return <polygon points={rautePunkte(r)} {...g} />;
+    case "quadrat": return <rect x={-r} y={-r} width={2 * r} height={2 * r} rx={r * 0.34} {...g} />;
+    case "dreieck": return <polygon points={dreieckPunkte(r)} strokeLinejoin="round" {...g} />;
+    default:        return <circle r={r} {...g} />;
+  }
+}
 
 // ─── Force-Layout Berechnung ──────────────────────────────────────
 
@@ -429,20 +477,24 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
                 {selektiert && (
                   <circle r={r + 5} fill="none" stroke="#ffffff" strokeWidth={1.4} opacity={0.85} />
                 )}
-                {/* Hauptkörper mit Gradient + Tiefe */}
-                <circle
+                {/* Hauptkörper: Form = Kategorie, Gradient/Farbe = Typ */}
+                <KnotenKoerper
+                  form={NODE_FORM[n.typ] ?? "kreis"}
                   r={r}
                   fill={`url(#grad-${n.typ in NODE_FARBEN ? n.typ : "domain"})`}
                   stroke="rgba(255,255,255,0.2)"
                   strokeWidth={hover ? 1.6 : 0.8}
                   filter={hover || selektiert ? "url(#node-glow)" : "url(#node-shadow)"}
                 />
-                {/* Specular Highlight oben links (3D-Anmutung) */}
-                <ellipse
-                  cx={-r * 0.3} cy={-r * 0.42}
-                  rx={r * 0.4} ry={r * 0.24}
-                  fill="rgba(255,255,255,0.36)" pointerEvents="none"
-                />
+                {/* Specular Highlight oben links (3D-Anmutung) — nur bei
+                    flächigen Formen; bei Raute/Dreieck säße er optisch daneben. */}
+                {(NODE_FORM[n.typ] ?? "kreis") !== "raute" && (NODE_FORM[n.typ] ?? "kreis") !== "dreieck" && (
+                  <ellipse
+                    cx={-r * 0.32} cy={-r * 0.44}
+                    rx={r * 0.32} ry={r * 0.2}
+                    fill="rgba(255,255,255,0.24)" pointerEvents="none"
+                  />
+                )}
                 {/* Label mit dezenter Pill für Lesbarkeit */}
                 {labelSichtbar && (
                 <g pointerEvents="none">
@@ -483,10 +535,11 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
         <ul className="grid grid-cols-1 gap-y-1">
           {vorhandeneTypen.map(typ => (
             <li key={typ} className="flex items-center gap-2">
-              <span
-                className="w-2.5 h-2.5 rounded-full shrink-0"
-                style={{ background: NODE_FARBEN[typ], boxShadow: `0 0 6px ${NODE_FARBEN[typ]}80` }}
-              />
+              <svg width="14" height="14" viewBox="-8 -8 16 16" className="shrink-0"
+                   style={{ filter: `drop-shadow(0 0 3px ${NODE_FARBEN[typ]}88)` }}>
+                <KnotenKoerper form={NODE_FORM[typ] ?? "kreis"} r={5.6}
+                  fill={NODE_FARBEN[typ]} stroke="rgba(255,255,255,0.25)" strokeWidth={0.6} />
+              </svg>
               <span className="font-mono text-[10.5px] text-white/75 leading-none">
                 {TYP_LABEL[typ] ?? typ}
               </span>
@@ -527,11 +580,11 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
           <div className="flex items-start justify-between gap-2 mb-2">
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 text-white/55 text-[9px] uppercase tracking-wider">
-                <span
-                  className="w-2 h-2 rounded-full"
-                  style={{ background: NODE_FARBEN[auswahl.typ] ?? FALLBACK_FARBE }}
-                />
-                {auswahl.typ}
+                <svg width="12" height="12" viewBox="-8 -8 16 16" className="shrink-0">
+                  <KnotenKoerper form={NODE_FORM[auswahl.typ] ?? "kreis"} r={5.6}
+                    fill={NODE_FARBEN[auswahl.typ] ?? FALLBACK_FARBE} />
+                </svg>
+                {TYP_LABEL[auswahl.typ] ?? auswahl.typ}
               </div>
               <div className="text-white font-semibold break-all">{auswahl.label}</div>
             </div>
