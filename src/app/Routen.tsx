@@ -70,8 +70,16 @@ export function Routen() {
       <ScrollZuTop />
     <FehlerGrenze resetSchluessel={ort.pathname}>
     <AnimatePresence mode="wait" initial={false}>
-      <Suspense fallback={<SeitenLadeindikator />}>
-        <Routes location={ort} key={ort.pathname}>
+      {/*
+        Der pathname-Key MUSS auf dem direkten AnimatePresence-Kind sitzen,
+        damit die Exit-Animationen (SEITEN_EINGANG.verlassen) feuern. Liegt er
+        — wie früher — auf <Routes> innerhalb von <Suspense>, ist das stabile
+        <Suspense> das direkte Kind und AnimatePresence sieht nie einen
+        Key-Wechsel → kein Exit. `location={ort}` bleibt auf <Routes>, damit die
+        ausgehende (eingefrorene) Seite während des Exits ihre alte Route rendert.
+      */}
+      <Suspense key={ort.pathname} fallback={<SeitenLadeindikator />}>
+        <Routes location={ort}>
           <Route path="/"              element={<StartSeite />} />
           <Route path="/ueber-mich"    element={<UeberMichSeite />} />
           <Route path="/projekte"      element={<ProjekteSeite />} />
