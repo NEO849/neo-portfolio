@@ -25,6 +25,7 @@ from werkzeuge.ip_recon import ip_intel
 from werkzeuge.passwort_recon import passwort_pruefen
 from werkzeuge.transparenz import transparenz_fuer
 from werkzeuge.pivots import extrahiere_pivots
+from werkzeuge.virustotal import vt_anreichern
 
 router = APIRouter(prefix="/osint", tags=["OSINT-Werkzeuge"])
 limiter = Limiter(key_func=get_remote_address)
@@ -112,7 +113,9 @@ async def domain_analyse(anfrage: DomainAnfrage, request: Request):
     """
     try:
         ergebnis = await domain_analysieren(anfrage.domain)
-        return JSONResponse(content=_mit_pivots("domain", ergebnis))
+        ergebnis = _mit_pivots("domain", ergebnis)
+        ergebnis = await vt_anreichern("domain", ergebnis)
+        return JSONResponse(content=ergebnis)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analyse fehlgeschlagen: {str(e)}")
 
@@ -475,6 +478,7 @@ async def ip_intel_route(anfrage: ShodanAnfrage, request: Request):
     """
     try:
         ergebnis = await ip_intel(anfrage.ziel)
+        ergebnis = await vt_anreichern("ip", ergebnis)
         return JSONResponse(content=ergebnis)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"IP-Intel fehlgeschlagen: {str(e)}")

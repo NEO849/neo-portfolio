@@ -22,6 +22,22 @@ export interface SicherheitsBewertung {
   details: SicherheitsDetail[];
 }
 
+// ─── Typ: VirusTotal-Reputation (optional, nur wenn Backend-Key gesetzt) ──
+
+export interface VtReputation {
+  geprueft: boolean;
+  hinweis?: string;
+  stufe?: "Schädlich" | "Verdächtig" | "Sauber" | "Unbekannt";
+  malicious?: number;
+  suspicious?: number;
+  harmless?: number;
+  undetected?: number;
+  gesamt_engines?: number;
+  reputation?: number | null;
+  kategorien?: string[];
+  quelle?: string;
+}
+
 export interface DomainErgebnis {
   domain: string;
   analysiert_am: string;
@@ -54,6 +70,7 @@ export interface DomainErgebnis {
   };
   sicherheits_bewertung: SicherheitsBewertung;
   pivots?: Pivot[];
+  vt?: VtReputation;
 }
 
 // ─── Typen: E-Mail-Analyse ────────────────────────────────────────
@@ -747,6 +764,7 @@ export interface IpIntelErgebnis {
   abuse_kontakte?: string[];
   links?: { ripestat: string; bgp_he: string };
   quelle?: string;
+  vt?: VtReputation;
 }
 
 /**

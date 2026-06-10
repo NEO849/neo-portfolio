@@ -7,7 +7,15 @@ Wants=network-online.target
 Type=simple
 User=root
 WorkingDirectory=/root/web-projekte/neo-portfolio/api
-ExecStart=/usr/bin/python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --workers 2 --log-level info
+# Optionale Geheimnis-Datei (mode 600). '-' = fehlt sie, startet der Dienst
+# trotzdem (keyless-Fallback). Enthält z.B. OSINT_GITHUB_TOKEN, HLR_API_*.
+EnvironmentFile=-/root/.config/osint-api.env
+# --host 127.0.0.1: nicht mehr vom Internet erreichbar (nur via nginx/cloudflared)
+# --proxy-headers: vertraut X-Forwarded-* von lokalen Reverse-Proxies
+# --forwarded-allow-ips: nur 127.0.0.1 darf X-Forwarded-* setzen (Spoofing-Schutz)
+ExecStart=/usr/bin/python3 -m uvicorn main:app \
+  --host 127.0.0.1 --port 8000 --workers 2 --log-level info \
+  --proxy-headers --forwarded-allow-ips 127.0.0.1
 Restart=on-failure
 RestartSec=5
 StandardOutput=journal
@@ -17,6 +25,19 @@ SyslogIdentifier=osint-api
 # Sicherheitshärtung
 NoNewPrivileges=true
 PrivateTmp=true
+# Zusätzliche systemd-Härtung (Senior-Elite):
+# ProtectHome=false weil App-Code in /root/web-projekte liegt. Wenn die App
+# jemals nach /opt umzieht, kann ProtectHome=true reaktiviert werden.
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+# /root/web-projekte/neo-portfolio/api braucht Schreibzugriff für osint_reports
+ReadWritePaths=/root/web-projekte/neo-portfolio/api /tmp
 
 [Install]
 WantedBy=multi-user.target
