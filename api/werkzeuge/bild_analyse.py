@@ -22,7 +22,15 @@ from werkzeuge.netz_schutz import sichere_get, SSRFBlockiert
 from werkzeuge.geocoding import reverse_geocode, koordinaten_gueltig
 
 
-MAX_BILDGROESSE = 10 * 1024 * 1024  # 10 MB
+MAX_BILDGROESSE = 10 * 1024 * 1024  # 10 MB (Bytes auf der Leitung)
+
+# Decompression-Bomb-Schutz: ein 10-MB-PNG kann zu mehreren GB Pixel
+# dekomprimieren → OOM-Vektor. Pillow wirft bei Überschreitung
+# DecompressionBombError (statt den Speicher zu sprengen). 24 MP (~6000×4000)
+# deckt jede reale Foto-/Kamera-Auflösung ab, blockt aber Bomben.
+# (Lehre 2026-06-10: jeder unbegrenzte Speicher-Pfad ist ein OOM-Risiko.)
+MAX_PIXEL = 24_000_000
+Image.MAX_IMAGE_PIXELS = MAX_PIXEL
 
 
 def _gps_dezimal(werte, ref: str) -> float | None:
@@ -272,14 +280,20 @@ async def bild_analysieren(bild_url: str) -> dict:
     except Exception as e:
         return {"url": bild_url, "fehler": f"Bild nicht erreichbar: {str(e)[:80]}", "analysiert_am": datetime.utcnow().isoformat() + "Z"}
 
-    # PIL öffnen
+    # PIL öffnen — der Header liefert die Maße OHNE Voll-Dekodierung (günstig).
     try:
         bild = Image.open(io.BytesIO(bild_bytes))
         breite, hoehe = bild.size
         format_name = bild.format or "Unbekannt"
         modus = bild.mode
+    except Image.DecompressionBombError:
+        return {"url": bild_url, "fehler": "Bild abgelehnt: Auflösung überschreitet das Sicherheitslimit (Decompression-Bomb-Schutz).", "analysiert_am": datetime.utcnow().isoformat() + "Z"}
     except Exception as e:
         return {"url": bild_url, "fehler": f"Bild konnte nicht geöffnet werden: {str(e)[:80]}", "analysiert_am": datetime.utcnow().isoformat() + "Z"}
+
+    # Pixel-Limit explizit prüfen, BEVOR imagehash das Bild voll dekodiert (OOM-Schutz)
+    if breite * hoehe > MAX_PIXEL:
+        return {"url": bild_url, "fehler": f"Bild abgelehnt: {breite}×{hoehe} Pixel überschreiten das Sicherheitslimit ({MAX_PIXEL:,} px).", "analysiert_am": datetime.utcnow().isoformat() + "Z"}
 
     # Hashes berechnen
     md5 = hashlib.md5(bild_bytes).hexdigest()

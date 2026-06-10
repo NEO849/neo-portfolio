@@ -80,3 +80,45 @@ jobs:
       # Voller Audit inkl. Dev-Deps — nur informativ, blockiert nicht.
       - name: Full audit (informational)
         run: npm audit || true
+
+  # Python-Backend-Deps (api/requirements.txt) auf bekannte CVEs prüfen.
+  # Schließt die Lücke: npm audit deckt nur das Frontend (Pillow/httpx/fastapi
+  # blieben sonst ungescannt).
+  python-audit:
+    name: Python Dependency Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      # Gate auf die direkten Backend-Deps. Bricht bei bekannten CVEs.
+      - name: Audit api/requirements.txt
+        run: pip-audit -r api/requirements.txt --desc
+
+  # Secret-Scan über den gesamten Verlauf — fängt versehentlich committete
+  # Keys, bevor sie ins Repo gelangen (.gitignore allein ist kein Schutz).
+  secret-scan:
+    name: Secret Scan (gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

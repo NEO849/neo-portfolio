@@ -83,8 +83,10 @@ DATENFLUSS: dict[str, dict] = {
                     "Bekannte Domain-Breaches", "https://haveibeenpwned.com/Privacy", "AU"),
             _dienst("XposedOrNot", "E-Mail-Adresse",
                     "Breach- und Paste-Treffer", "https://xposedornot.com/privacy_policy", "—"),
-            _dienst("LeakCheck (Public)", "E-Mail-Adresse",
-                    "Zusätzliche Breach-Quellen", "https://leakcheck.io/privacy", "—"),
+            _dienst("LeakCheck (Public/Pro)", "E-Mail-Adresse",
+                    "Zusätzliche Breach-Quellen — Pro-Tier (mehr Quellen) nur wenn "
+                    "LEAKCHECK_API_KEY gesetzt ist, sonst keyless Public-Tier",
+                    "https://leakcheck.io/privacy", "—"),
             _dienst("keys.openpgp.org", "E-Mail-Adresse",
                     "Vorhandensein eines öffentlichen PGP-Schlüssels",
                     "https://keys.openpgp.org/about/privacy", "EU"),
@@ -97,21 +99,6 @@ DATENFLUSS: dict[str, dict] = {
             "Google Maps/YouTube/Drive (nur Such-Links, falls Gmail-Adresse)",
         ],
         "speicherung": SPEICHER_HINWEIS,
-    },
-
-    "passwort": {
-        "beschreibung": "Prüft, ob ein Passwort in bekannten Leaks auftaucht (k-Anonymität).",
-        "sendet_an": [
-            _dienst("HaveIBeenPwned (Pwned Passwords)",
-                    "NUR die ersten 5 Zeichen des SHA-1-Hashes (k-Anonymität)",
-                    "Abgleich gegen geleakte Passwörter — das Passwort selbst verlässt "
-                    "den Server NIE; der Abgleich erfolgt lokal.",
-                    "https://haveibeenpwned.com/Privacy", "AU"),
-        ],
-        "nur_links": [],
-        "hinweis": "Das Passwort wird niemals gespeichert, geloggt oder gecacht. "
-                   "Nur ein 5-Zeichen-Hash-Präfix wird übertragen.",
-        "speicherung": "Keine Speicherung des Passworts oder vollständigen Hashes.",
     },
 
     "benutzername": {
@@ -182,6 +169,23 @@ DATENFLUSS: dict[str, dict] = {
                     "Auflösung zur IP", "—", "global"),
         ],
         "nur_links": [],
+        "speicherung": SPEICHER_HINWEIS,
+    },
+
+    "censys": {
+        "beschreibung": "Host-Intel zu einer IP/Domain via Censys Platform "
+                        "(Services, Standort, AS, WHOIS, Reverse-DNS).",
+        "sendet_an": [
+            _dienst("Censys Platform", "IP-Adresse (bzw. aufgelöste Domain) — NUR wenn Censys aktiviert",
+                    "Abruf von Services/Ports, Standort, Autonomous System, "
+                    "WHOIS-Organisation und Reverse-DNS",
+                    "https://censys.com/privacy-policy", "US"),
+            _dienst("Öffentliche DNS-Auflösung", "Domainname (falls Domain übergeben)",
+                    "Auflösung zur IP", "—", "global"),
+        ],
+        "nur_links": [],
+        "hinweis": "Censys wird NUR kontaktiert, wenn der Dienst aktiviert ist "
+                   "(CENSYS_PAT gesetzt). Ohne Key erfolgt keine Abfrage.",
         "speicherung": SPEICHER_HINWEIS,
     },
 

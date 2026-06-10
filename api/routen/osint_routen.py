@@ -4,13 +4,15 @@
 # Alle Endpunkte sind öffentlich — nur legale, passive Analyse.
 # ═══════════════════════════════════════════════════════════════════
 
+import asyncio
+import logging
+import re
+
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, field_validator
-from slowapi import Limiter
-from slowapi.util import get_remote_address
-import re
 
+from begrenzer import limiter
 from werkzeuge.domain_analyse import domain_analysieren
 from werkzeuge.email_analyse import email_analysieren
 from werkzeuge.email_recon import email_recon
@@ -18,18 +20,37 @@ from werkzeuge.benutzername_suche import benutzername_suchen
 from werkzeuge.telefon_analyse import telefon_analysieren
 from werkzeuge.bild_analyse import bild_analysieren
 from werkzeuge.shodan_recon import shodan_internetdb_abfragen
+from werkzeuge.censys_recon import censys_abfragen
 from werkzeuge.intel_aggregator import links_generieren
 from werkzeuge.orchestrator import orchestrieren
 from werkzeuge.subdomain_recon import subdomains_finden
 from werkzeuge.ip_recon import ip_intel
-from werkzeuge.passwort_recon import passwort_pruefen
 from werkzeuge.transparenz import transparenz_fuer
 from werkzeuge.pivots import extrahiere_pivots
 from werkzeuge.virustotal import vt_anreichern
 from werkzeuge.numverify import numverify_anreichern
 
 router = APIRouter(prefix="/osint", tags=["OSINT-Werkzeuge"])
-limiter = Limiter(key_func=get_remote_address)
+
+_log = logging.getLogger("osint")
+
+# ─── Globale Concurrency-Bremse für rechen-/speicherintensive Fan-outs ──
+# /orchestrator (kaskadierte Multi-Host-Calls) und /benutzername?vollscan
+# (600+ ausgehende Requests) können den RAM sprengen. Prozessweiter
+# Semaphore deckelt parallele Schwer-Jobs hart (OOM-Schutz, Lehre 2026-06-10).
+_SCHWER_SEM = asyncio.Semaphore(2)
+
+
+def _serverfehler(kontext: str, e: Exception) -> HTTPException:
+    """
+    Loggt den echten Fehler serverseitig (mit Stacktrace) und gibt dem Client
+    NUR eine generische Meldung — keine Exception-Strings/Pfade nach außen.
+    """
+    _log.warning("%s fehlgeschlagen: %s", kontext, e, exc_info=True)
+    return HTTPException(
+        status_code=500,
+        detail=f"{kontext} fehlgeschlagen. Bitte später erneut versuchen.",
+    )
 
 
 def _mit_pivots(typ: str, ergebnis: dict) -> dict:
@@ -118,7 +139,7 @@ async def domain_analyse(anfrage: DomainAnfrage, request: Request):
         ergebnis = await vt_anreichern("domain", ergebnis)
         return JSONResponse(content=ergebnis)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analyse fehlgeschlagen: {str(e)}")
+        raise _serverfehler("Domain-Analyse", e)
 
 
 @router.post("/email", summary="E-Mail analysieren")
@@ -140,7 +161,7 @@ async def email_analyse(anfrage: EmailAnfrage, request: Request):
         ergebnis = await email_analysieren(anfrage.email)
         return JSONResponse(content=ergebnis)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analyse fehlgeschlagen: {str(e)}")
+        raise _serverfehler("E-Mail-Analyse", e)
 
 
 class BenutzerVollscanAnfrage(BaseModel):
@@ -175,10 +196,15 @@ async def benutzername_analyse(anfrage: BenutzerVollscanAnfrage, request: Reques
     **Rate-Limit:** 3 Anfragen pro Minute pro IP.
     """
     try:
-        ergebnis = await benutzername_suchen(anfrage.benutzername, nur_tier1=not anfrage.vollscan)
+        if anfrage.vollscan:
+            # 600+ ausgehende Requests → unter die Concurrency-Bremse
+            async with _SCHWER_SEM:
+                ergebnis = await benutzername_suchen(anfrage.benutzername, nur_tier1=False)
+        else:
+            ergebnis = await benutzername_suchen(anfrage.benutzername, nur_tier1=True)
         return JSONResponse(content=_mit_pivots("benutzername", ergebnis))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Suche fehlgeschlagen: {str(e)}")
+        raise _serverfehler("Benutzersuche", e)
 
 
 class TelefonAnfrage(BaseModel):
@@ -229,7 +255,7 @@ async def telefon_analyse(anfrage: TelefonAnfrage, request: Request):
         ergebnis = await numverify_anreichern(ergebnis)
         return JSONResponse(content=ergebnis)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analyse fehlgeschlagen: {str(e)}")
+        raise _serverfehler("Telefon-Analyse", e)
 
 
 @router.post("/bild", summary="Bild analysieren (EXIF + Reverse Search)")
@@ -245,7 +271,7 @@ async def bild_analyse(anfrage: BildAnfrage, request: Request):
         ergebnis = await bild_analysieren(anfrage.url)
         return JSONResponse(content=_mit_pivots("bild", ergebnis))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analyse fehlgeschlagen: {str(e)}")
+        raise _serverfehler("Bild-Analyse", e)
 
 
 # ─── Senior-Elite Erweiterungen ──────────────────────────────────────
@@ -289,7 +315,31 @@ async def shodan_route(anfrage: ShodanAnfrage, request: Request):
         ergebnis = await shodan_internetdb_abfragen(anfrage.ziel)
         return JSONResponse(content=ergebnis)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Shodan-Abfrage fehlgeschlagen: {str(e)}")
+        raise _serverfehler("Shodan-Abfrage", e)
+
+
+@router.post("/censys", summary="Censys Platform Recon (Services/Standort/WHOIS, key-gated)")
+@limiter.limit("10/minute")
+async def censys_route(anfrage: ShodanAnfrage, request: Request):
+    """
+    Censys Platform Host-Lookup — Komplement zu Shodan.
+
+    **Rückgabe (pro IP):**
+    - Services: Port / Protokoll / Transport (gefährliche Ports markiert)
+    - Standort: Stadt / Land / Koordinaten / Zeitzone
+    - Autonomous System: ASN, Name, BGP-Prefix
+    - WHOIS-Organisation inkl. Abuse-Kontakten
+    - Reverse-DNS
+
+    **Akzeptiert:** IP-Adresse ODER Domain (wird via DNS aufgelöst).
+    **Key-gated:** liefert ohne CENSYS_PAT einen klaren Hinweis statt Fehler.
+    **Rate-Limit:** 10 Anfragen pro Minute pro IP.
+    """
+    try:
+        ergebnis = await censys_abfragen(anfrage.ziel)
+        return JSONResponse(content=ergebnis)
+    except Exception as e:
+        raise _serverfehler("Censys-Abfrage", e)
 
 
 class EmailReconAnfrage(BaseModel):
@@ -327,7 +377,7 @@ async def email_recon_route(anfrage: EmailReconAnfrage, request: Request):
         ergebnis = await email_recon(anfrage.email)
         return JSONResponse(content=_mit_pivots("email-recon", ergebnis))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Email-Recon fehlgeschlagen: {str(e)}")
+        raise _serverfehler("E-Mail-Recon", e)
 
 
 class AggregatorAnfrage(BaseModel):
@@ -371,7 +421,7 @@ async def aggregator_route(anfrage: AggregatorAnfrage, request: Request):
         ergebnis = links_generieren(anfrage.typ, anfrage.wert)  # type: ignore
         return JSONResponse(content=ergebnis)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Aggregator fehlgeschlagen: {str(e)}")
+        raise _serverfehler("Aggregator", e)
 
 
 class OrchestratorAnfrage(BaseModel):
@@ -416,10 +466,11 @@ async def orchestrator_route(anfrage: OrchestratorAnfrage, request: Request):
     **Rate-Limit:** 3 Anfragen pro Minute pro IP (rechenintensiv).
     """
     try:
-        ergebnis = await orchestrieren(anfrage.eingabe, anfrage.tiefe)
+        async with _SCHWER_SEM:
+            ergebnis = await orchestrieren(anfrage.eingabe, anfrage.tiefe)
         return JSONResponse(content=ergebnis)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Orchestrator fehlgeschlagen: {str(e)}")
+        raise _serverfehler("Orchestrator", e)
 
 
 class SubdomainAnfrage(BaseModel):
@@ -461,7 +512,7 @@ async def subdomain_route(anfrage: SubdomainAnfrage, request: Request):
         ergebnis = await subdomains_finden(anfrage.domain, aufloesen=anfrage.aufloesen)
         return JSONResponse(content=ergebnis)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Subdomain-Recon fehlgeschlagen: {str(e)}")
+        raise _serverfehler("Subdomain-Recon", e)
 
 
 @router.post("/ip-intel", summary="IP-Intel via RIPEstat (Routing/Owner/Abuse, keyless)")
@@ -483,38 +534,7 @@ async def ip_intel_route(anfrage: ShodanAnfrage, request: Request):
         ergebnis = await vt_anreichern("ip", ergebnis)
         return JSONResponse(content=ergebnis)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"IP-Intel fehlgeschlagen: {str(e)}")
-
-
-class PasswortAnfrage(BaseModel):
-    passwort: str
-
-    @field_validator("passwort")
-    @classmethod
-    def passwort_pruefen_feld(cls, v: str) -> str:
-        if not v:
-            raise ValueError("Kein Passwort angegeben")
-        if len(v) > 256:
-            raise ValueError("Passwort zu lang (max. 256 Zeichen)")
-        return v
-
-
-@router.post("/passwort", summary="Passwort-Exposure-Check (HIBP, k-Anonymität)")
-@limiter.limit("10/minute")
-async def passwort_route(anfrage: PasswortAnfrage, request: Request):
-    """
-    Prüft, ob ein Passwort in bekannten Daten-Leaks auftaucht — **ohne das
-    Passwort preiszugeben** (k-Anonymität: nur die ersten 5 Zeichen des
-    SHA-1-Hashes werden gesendet, der Abgleich erfolgt lokal).
-
-    **Datenschutz:** Das Passwort wird nie gespeichert, geloggt oder gecacht.
-    **Rate-Limit:** 10 Anfragen pro Minute pro IP.
-    """
-    try:
-        ergebnis = await passwort_pruefen(anfrage.passwort)
-        return JSONResponse(content=ergebnis)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Passwort-Check fehlgeschlagen: {str(e)}")
+        raise _serverfehler("IP-Intel", e)
 
 
 @router.get("/transparenz", summary="Datenfluss-Transparenz (DSGVO Art. 13/14)")
@@ -540,7 +560,7 @@ async def gesundheitscheck():
         "status": "ok",
         "werkzeuge": [
             "domain", "email", "email-recon", "benutzername", "telefon",
-            "bild", "passwort", "shodan", "subdomains", "ip-intel",
+            "bild", "shodan", "censys", "subdomains", "ip-intel",
             "aggregator", "orchestrator",
         ],
         "fundament": ["cache", "transparenz", "pivots", "geocoding", "hlr_lookup"],

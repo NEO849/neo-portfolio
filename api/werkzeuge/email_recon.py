@@ -249,8 +249,94 @@ async def _xposedornot_pruefen(client: httpx.AsyncClient, email: str) -> dict:
 
 # ─── LeakCheck — 3. Index-Quelle ────────────────────────────────────
 
-async def _leakcheck_pruefen(client: httpx.AsyncClient, email: str) -> dict:
-    """LeakCheck Public API — 1 req/s, keyless."""
+def _leakcheck_key() -> str:
+    """Optionaler LeakCheck-Pro-Key aus der Service-Env (nie im Code)."""
+    return (
+        os.environ.get("LEAKCHECK_API_KEY")
+        or os.environ.get("LEAKCHECK_APIKEY")
+        or ""
+    ).strip()
+
+
+# Browser-UA: LeakCheck liegt hinter Cloudflare, das die Default-Client-Signatur
+# (httpx/urllib) mit Error 1010 blockt. Echter UA umgeht das.
+LEAKCHECK_UA = (
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+)
+
+
+def _leakcheck_parse(data: dict, tier: str) -> dict:
+    """
+    Normalisiert ein erfolgreiches LeakCheck-Ergebnis (v1 ODER v2) auf die UI-Form.
+    Beide Tiers liefern `result[]`; `source` ist je nach Version Objekt oder String.
+    """
+    treffer = data.get("result") or []
+    sources: list[dict] = []
+    felder: set[str] = set()
+    for eintrag in treffer:
+        if not isinstance(eintrag, dict):
+            continue
+        quelle = eintrag.get("source") or {}
+        if isinstance(quelle, dict):
+            name = quelle.get("name") or "Unbekannt"
+            datum = quelle.get("breach_date") or quelle.get("date") or eintrag.get("last_breach") or ""
+        else:
+            name, datum = str(quelle), eintrag.get("last_breach") or ""
+        sources.append({"name": name, "datum": datum})
+        for f in (eintrag.get("fields") or []):
+            if isinstance(f, str):
+                felder.add(f)
+
+    # Quellen deduplizieren (gleiche Breach kann mehrfach auftauchen)
+    gesehen, dedup = set(), []
+    for s in sources:
+        k = (s["name"], s["datum"])
+        if k not in gesehen:
+            gesehen.add(k)
+            dedup.append(s)
+
+    return {
+        "geprueft": True,
+        "tier": tier,
+        "anzahl": data.get("found") if data.get("found") is not None else len(dedup),
+        "sources": dedup[:25],
+        "exposed_fields": sorted(felder)[:15],
+    }
+
+
+async def _leakcheck_v2(client: httpx.AsyncClient, email: str, key: str) -> dict:
+    """LeakCheck Pro API v2 (X-API-Key-Header). Wirft bei !success → Fallback-Kette."""
+    r = await client.get(
+        f"https://leakcheck.io/api/v2/query/{email}",
+        params={"type": "email"},
+        headers={"X-API-Key": key, "Accept": "application/json", "User-Agent": LEAKCHECK_UA},
+        timeout=TIMEOUT_S,
+    )
+    r.raise_for_status()
+    data = r.json()
+    if not data.get("success"):
+        raise ValueError(f"v2: {data.get('error', 'nicht erfolgreich')}")
+    return _leakcheck_parse(data, "pro")
+
+
+async def _leakcheck_v1(client: httpx.AsyncClient, email: str, key: str) -> dict:
+    """LeakCheck API v1 (key als Query-Param). Wirft bei !success → Fallback-Kette."""
+    r = await client.get(
+        "https://leakcheck.io/api",
+        params={"key": key, "check": email, "type": "email"},
+        headers={"Accept": "application/json", "User-Agent": LEAKCHECK_UA},
+        timeout=TIMEOUT_S,
+    )
+    r.raise_for_status()
+    data = r.json()
+    if not data.get("success"):
+        raise ValueError(f"v1: {data.get('error', 'nicht erfolgreich')}")
+    return _leakcheck_parse(data, "pro")
+
+
+async def _leakcheck_public(client: httpx.AsyncClient, email: str) -> dict:
+    """LeakCheck Public API — 1 req/s, keyless (Fallback)."""
     try:
         r = await client.get(
             "https://leakcheck.io/api/public",
@@ -263,6 +349,7 @@ async def _leakcheck_pruefen(client: httpx.AsyncClient, email: str) -> dict:
                 sources = data.get("sources") or []
                 return {
                     "geprueft": True,
+                    "tier": "public",
                     "anzahl": len(sources),
                     "sources": [
                         {
@@ -272,10 +359,26 @@ async def _leakcheck_pruefen(client: httpx.AsyncClient, email: str) -> dict:
                         for s in sources[:10]
                     ],
                 }
-            return {"geprueft": True, "anzahl": 0, "sources": []}
+            return {"geprueft": True, "tier": "public", "anzahl": 0, "sources": []}
     except Exception:
         pass
     return {"geprueft": False, "hinweis": "LeakCheck nicht erreichbar"}
+
+
+async def _leakcheck_pruefen(client: httpx.AsyncClient, email: str) -> dict:
+    """
+    LeakCheck-Breach-Lookup. Mit gesetztem + lizenziertem LEAKCHECK_API_KEY → Pro-Tier
+    (mehr Quellen + Feld-Typen): erst v2, dann v1. Ohne Key / ohne aktiven Plan /
+    bei Fehler → keyless Public-Tier (graceful, kein Regressionsrisiko).
+    """
+    key = _leakcheck_key()
+    if key:
+        for versuch in (_leakcheck_v2, _leakcheck_v1):
+            try:
+                return await versuch(client, email, key)
+            except Exception:
+                continue  # nächster Pro-Pfad bzw. am Ende Public
+    return await _leakcheck_public(client, email)
 
 
 # ─── PGP Keyserver — Existenz-Check ─────────────────────────────────

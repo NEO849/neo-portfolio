@@ -39,5 +39,17 @@ LockPersonality=true
 # /root/web-projekte/neo-portfolio/api braucht Schreibzugriff für osint_reports
 ReadWritePaths=/root/web-projekte/neo-portfolio/api /tmp
 
+# ─── Ressourcen-Limits (OOM-Schutz, Lehre 2026-06-10) ────────────────
+# Ohne MemoryMax kann ein Leak/Spike den GANZEN VPS in OOM treiben (genau
+# das ist am 2026-06-10 mit einem anderen Dienst passiert → tmux mitgerissen).
+# Baseline-Verbrauch ~558 MB (2 Worker) → großzügiges Headroom, aber harter
+# Deckel weit unter dem Host-RAM: ein Leak killt nur DIESEN Dienst, nicht den VPS.
+MemoryHigh=1024M
+MemoryMax=1280M
+TasksMax=512
+CPUQuota=85%
+# Bei globalem OOM diesen Dienst ZUERST opfern (vor sshd/tmux/kritischem).
+OOMScoreAdjust=400
+
 [Install]
 WantedBy=multi-user.target
