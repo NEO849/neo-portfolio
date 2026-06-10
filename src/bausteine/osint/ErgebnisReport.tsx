@@ -375,6 +375,23 @@ function ReportTelefon({ t }: { t: TelefonErgebnis }) {
           {t.live_status.roaming_netz && <Feld label="Roaming-Netz">{t.live_status.roaming_netz}</Feld>}
         </Sektion>
       )}
+      {t.numverify?.geprueft && (
+        <Sektion titel="Live-Carrier · NumVerify" farbe={C.cyber}
+          rechts={<span className="font-mono text-[10px] text-white/50">{t.numverify.quelle}</span>}>
+          {t.numverify.valid === false ? (
+            <Item stufe="mittel">{t.numverify.hinweis ?? "Nummer nicht zustellbar"}</Item>
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {t.numverify.line_type && <Marke text={t.numverify.line_type} farbe={C.cyber} gefuellt />}
+                {t.numverify.land && <Marke text={t.numverify.land} farbe={C.neutral} />}
+              </div>
+              {t.numverify.carrier && <Feld label="Carrier (live)">{t.numverify.carrier}</Feld>}
+              {t.numverify.location && <Feld label="Ort">{t.numverify.location}</Feld>}
+            </>
+          )}
+        </Sektion>
+      )}
       {t.suchlinks?.nach_kategorie && (
         <Sektion titel="Suchlinks" farbe={C.cyber} rechts={<span className="font-mono text-[10px] text-white/50">{t.suchlinks.gesamt} Quellen · klickbar</span>}>
           <LinkRaster gruppen={t.suchlinks.nach_kategorie} />

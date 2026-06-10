@@ -26,6 +26,7 @@ from werkzeuge.passwort_recon import passwort_pruefen
 from werkzeuge.transparenz import transparenz_fuer
 from werkzeuge.pivots import extrahiere_pivots
 from werkzeuge.virustotal import vt_anreichern
+from werkzeuge.numverify import numverify_anreichern
 
 router = APIRouter(prefix="/osint", tags=["OSINT-Werkzeuge"])
 limiter = Limiter(key_func=get_remote_address)
@@ -225,6 +226,7 @@ async def telefon_analyse(anfrage: TelefonAnfrage, request: Request):
     """
     try:
         ergebnis = await telefon_analysieren(anfrage.nummer)
+        ergebnis = await numverify_anreichern(ergebnis)
         return JSONResponse(content=ergebnis)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analyse fehlgeschlagen: {str(e)}")

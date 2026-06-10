@@ -61,10 +61,12 @@ def test_wahrheit_kein_serverseitiger_call():
     # aggregator kontaktiert IMMER KEINEN Drittdienst serverseitig (nur Links).
     pruefe(DATENFLUSS["aggregator"]["sendet_an"] == [],
            "aggregator: kein serverseitiger Drittdienst-Call (nur Links)")
-    # telefon kontaktiert serverseitig NUR optional hlr-lookups.com (HLR), sonst nichts.
+    # telefon kontaktiert serverseitig NUR optionale Live-Dienste: hlr-lookups.com
+    # (HLR) bzw. NumVerify (Live-Carrier) — beide opt-in via API-Key, sonst nichts.
     tel = DATENFLUSS["telefon"]["sendet_an"]
-    pruefe(all("hlr-lookups" in d["dienst"] for d in tel),
-           "telefon: serverseitig höchstens HLR (optional), kein anderer Dienst")
+    erlaubt = ("hlr-lookups", "NumVerify")
+    pruefe(all(any(e in d["dienst"] for e in erlaubt) for d in tel),
+           "telefon: serverseitig nur HLR/NumVerify (beide optional), kein anderer Dienst")
 
 
 def test_abfrage_funktion():
