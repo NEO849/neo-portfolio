@@ -1183,17 +1183,17 @@ function Klartext({ stufe, schlagzeile, text }: KlartextDaten) {
       className="relative rounded-2xl border p-4 sm:p-5 mb-6 overflow-hidden"
       style={{ borderColor: `${farbe}33`, background: `linear-gradient(135deg, ${farbe}14, ${farbe}05 62%, transparent)` }}
     >
-      <div className="flex items-start gap-3.5">
+      <div className="flex items-start gap-3">
         <span
-          className="grid place-items-center w-8 h-8 rounded-full shrink-0 text-[15px] font-bold leading-none"
+          className="grid place-items-center w-6 h-6 rounded-full shrink-0 text-[12px] font-bold leading-none"
           style={{ color: farbe, background: `${farbe}1f`, border: `1px solid ${farbe}44` }}
           aria-hidden
         >
           {glyph}
         </span>
         <div className="min-w-0">
-          <div className="text-white font-semibold text-[15px] leading-snug tracking-tight">{schlagzeile}</div>
-          <p className="text-white/70 text-[13px] mt-1.5 leading-relaxed">{text}</p>
+          <div className="text-white font-semibold text-[13.5px] leading-snug tracking-tight">{schlagzeile}</div>
+          <p className="text-white/70 text-[12px] mt-1.5 leading-relaxed">{text}</p>
         </div>
       </div>
     </motion.div>
