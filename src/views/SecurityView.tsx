@@ -5,6 +5,7 @@ import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
 import { AbzeichenStatus } from "../bausteine/AbzeichenStatus";
 import { GlassTabs } from "../bausteine/GlassTabs";
+import { AufklappIndikator } from "../bausteine/AufklappIndikator";
 
 // ═══════════════════════════════════════════════════════
 // VIEW: Security Research — Tab-System
@@ -211,7 +212,7 @@ export default function SecurityView() {
                       akzentRand={aktiverSchritt === schritt.nummer}
                       akzentFarbe="#22d3ee"
                       onClick={() => setAktiverSchritt(aktiverSchritt === schritt.nummer ? null : schritt.nummer)}
-                      klassen="cursor-pointer"
+                      klassen="cursor-pointer group"
                     >
                       <div className={`p-4 transition-colors ${aktiverSchritt === schritt.nummer ? "bg-cyber-400/4" : ""}`}>
                         <div className="flex items-center gap-4">
@@ -225,13 +226,12 @@ export default function SecurityView() {
                             </div>
                             <p className="text-xs text-white/40 mt-0.5">{schritt.beschreibung}</p>
                           </div>
-                          <motion.span
-                            animate={{ rotate: aktiverSchritt === schritt.nummer ? 45 : 0 }}
-                            transition={{ duration: 0.18 }}
-                            className="text-cyber-400 text-lg flex-shrink-0 font-light"
-                          >
-                            +
-                          </motion.span>
+                          <AufklappIndikator
+                            offen={aktiverSchritt === schritt.nummer}
+                            lichtfarbe="34, 211, 238"
+                            akzentFarbe="#22d3ee"
+                            groesse="sm"
+                          />
                         </div>
                         <AnimatePresence>
                           {aktiverSchritt === schritt.nummer && (
@@ -376,21 +376,20 @@ export default function SecurityView() {
                         <button
                           onClick={() => setAktivesWerkzeug(aktivesWerkzeug === werkzeug.name ? null : werkzeug.name)}
                           aria-expanded={aktivesWerkzeug === werkzeug.name}
-                          className="w-full flex items-center gap-3 p-3 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyber-400/40 rounded-xl"
+                          className="group w-full flex items-center gap-3 p-3 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyber-400/40 rounded-xl"
                         >
                           <div className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <span className="font-mono text-sm text-white font-medium">{werkzeug.name}</span>
                             <p className="text-xs text-white/35">{werkzeug.rolle}</p>
                           </div>
-                          <motion.span
-                            animate={{ rotate: aktivesWerkzeug === werkzeug.name ? 45 : 0 }}
-                            transition={{ duration: 0.18 }}
-                            aria-hidden="true"
-                            className="text-cyber-400 text-lg flex-shrink-0 font-light pr-1"
-                          >
-                            +
-                          </motion.span>
+                          <AufklappIndikator
+                            offen={aktivesWerkzeug === werkzeug.name}
+                            lichtfarbe="34, 211, 238"
+                            akzentFarbe="#22d3ee"
+                            groesse="sm"
+                            klassen="mr-1"
+                          />
                         </button>
                         <AnimatePresence>
                           {aktivesWerkzeug === werkzeug.name && werkzeug.beschreibung && (
@@ -437,21 +436,20 @@ export default function SecurityView() {
                         <button
                           onClick={() => setAktivesWerkzeug(aktivesWerkzeug === werkzeug.name ? null : werkzeug.name)}
                           aria-expanded={aktivesWerkzeug === werkzeug.name}
-                          className="w-full flex items-center gap-3 p-3 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyber-400/40 rounded-xl"
+                          className="group w-full flex items-center gap-3 p-3 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyber-400/40 rounded-xl"
                         >
                           <div className="w-1.5 h-1.5 rounded-full bg-cyber-400 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <span className="font-mono text-sm text-white font-medium">{werkzeug.name}</span>
                             <p className="text-xs text-white/35">{werkzeug.rolle}</p>
                           </div>
-                          <motion.span
-                            animate={{ rotate: aktivesWerkzeug === werkzeug.name ? 45 : 0 }}
-                            transition={{ duration: 0.18 }}
-                            aria-hidden="true"
-                            className="text-cyber-400 text-lg flex-shrink-0 font-light pr-1"
-                          >
-                            +
-                          </motion.span>
+                          <AufklappIndikator
+                            offen={aktivesWerkzeug === werkzeug.name}
+                            lichtfarbe="34, 211, 238"
+                            akzentFarbe="#22d3ee"
+                            groesse="sm"
+                            klassen="mr-1"
+                          />
                         </button>
                         <AnimatePresence>
                           {aktivesWerkzeug === werkzeug.name && werkzeug.beschreibung && (
