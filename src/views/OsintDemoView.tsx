@@ -51,10 +51,10 @@ const DEMO_MODULE: DemoModul[] = [
     beschreibung: "Aggregiert MX / SPF / DMARC, HIBP, XposedOrNot, LeakCheck, Gravatar, Google-GAIA, GitHub-Discovery und PGP-Keyserver parallel. Liefert einen konsolidierten Risk-Score über alle Quellen.",
   },
   {
-    nummer: "3", name: "Username Vollscan (600+)", farbe: "#c084fc",
+    nummer: "3", name: "Username-Suche", farbe: "#c084fc",
     eingabeLabel: "Username eingeben", beispielEingabe: "torvalds", eingabeTyp: "text",
-    ziel: "Findet, auf welchen der 600+ Plattformen ein Benutzername existiert — der digitale Fußabdruck einer Person.",
-    beschreibung: "Scannt 600+ Plattformen via WhatsMyName-Database mit Pattern-Match-Detection. Liefert pro Treffer eine Konfidenz (hoch / mittel / niedrig) statt nur Status-Code-False-Positives.",
+    ziel: "Findet, auf welchen Plattformen ein Benutzername existiert — der digitale Fußabdruck einer Person. Wahlweise Schnell (~12 Top-Plattformen, Sekunden) oder Vollscan (600+).",
+    beschreibung: "Schnell-Modus prüft die wichtigsten ~12 Plattformen in Sekunden; Vollscan scannt 600+ via WhatsMyName-Database (~30–60 s). Pattern-Match-Detection mit Konfidenz pro Treffer (hoch / mittel / niedrig) statt Status-Code-False-Positives.",
   },
   {
     nummer: "4", name: "Telefon Analyse", farbe: "#eab308",
@@ -1056,6 +1056,7 @@ function downloadDatei(dateiname: string, inhalt: string, mimeType: string): voi
 export default function OsintDemoView() {
   const [phase, setPhase] = useState<"menue" | "eingabe" | "laden" | "ausgabe">("menue");
   const [ansicht, setAnsicht] = useState<"report" | "raw">("report");
+  const [schnellModus, setSchnellModus] = useState(true); // Modul 3: Schnell (~12) vs Vollscan (600+)
   const [aktivesModul, setAktivesModul] = useState<DemoModul | null>(null);
   const [eingabeWert, setEingabeWert] = useState("");
   const [ausgabeZeilen, setAusgabeZeilen] = useState<string[]>([]);
@@ -1178,7 +1179,7 @@ export default function OsintDemoView() {
 
   // Kernlogik: führt ein Modul mit explizitem Wert aus (kein Closure-State →
   // auch für Pivot-Folgeanalysen sicher aufrufbar).
-  const ausfuehren = useCallback(async (modul: DemoModul, wert: string) => {
+  const ausfuehren = useCallback(async (modul: DemoModul, wert: string, schnell = false) => {
     setApiFehler(null);
 
     // Demo-Module ohne Backend
@@ -1205,8 +1206,8 @@ export default function OsintDemoView() {
         zeilen = emailVollZuTerminal(basisOk, reconOk);
         setRohdaten({ basis: basisOk, recon: reconOk });
       } else if (modul.nummer === "3") {
-        // Username: nur noch Vollscan (600+ Plattformen)
-        const ergebnis = await benutzernameVollscan(wert);
+        // Username: Schnell (~12 Tier-1-Plattformen) oder Vollscan (600+)
+        const ergebnis = schnell ? await benutzernameSuchen(wert) : await benutzernameVollscan(wert);
         zeilen = vollscanZuTerminal(ergebnis);
         setRohdaten(ergebnis);
       } else if (modul.nummer === "4") {
@@ -1281,8 +1282,8 @@ export default function OsintDemoView() {
 
   const eingabeAbsenden = useCallback(() => {
     if (!aktivesModul || !eingabeWert.trim()) return;
-    void ausfuehren(aktivesModul, eingabeWert.trim());
-  }, [aktivesModul, eingabeWert, ausfuehren]);
+    void ausfuehren(aktivesModul, eingabeWert.trim(), aktivesModul.nummer === "3" ? schnellModus : false);
+  }, [aktivesModul, eingabeWert, ausfuehren, schnellModus]);
 
   // Pivot: aus einem Ergebnis direkt das passende Werkzeug mit dem Wert starten.
   const pivotStarten = useCallback((typ: string, wert: string) => {
@@ -1488,6 +1489,32 @@ export default function OsintDemoView() {
                     spellCheck={false} autoComplete="off"
                   />
                 </div>
+
+                {/* Modul 3: Schnell-/Vollscan-Umschalter */}
+                {aktivesModul.nummer === "3" && (
+                  <div className="mt-3 flex items-center gap-1.5 font-mono text-[11px] flex-wrap">
+                    <span className="text-white/50 mr-0.5">Modus:</span>
+                    {([
+                      { schnell: true, label: "Schnell · ~12" },
+                      { schnell: false, label: "Vollscan · 600+" },
+                    ] as const).map((o) => (
+                      <button
+                        key={String(o.schnell)}
+                        type="button"
+                        onClick={() => setSchnellModus(o.schnell)}
+                        className={`px-2.5 py-1 rounded-md border transition ${
+                          schnellModus === o.schnell
+                            ? "border-akzent-400/40 bg-akzent-500/15 text-akzent-400"
+                            : "border-white/[0.08] text-white/55 hover:text-white/75 hover:border-white/20"
+                        }`}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                    <span className="text-white/35 ml-1">{schnellModus ? "Sekunden" : "~30–60 s"}</span>
+                  </div>
+                )}
+
                 {apiFehler && (
                   <div className="mt-3 text-signal-rot text-xs">
                     [Fehler]  {apiFehler}

@@ -1,11 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════
 // BAUSTEIN: AufklappIndikator
 // Der EINE Aufklapp-Indikator der ganzen Website (Plus → Kreuz).
-// Ein Akzent-„Chip": abgerundetes Feld mit dünnem, farbigem Rahmen +
-// leichter Füllung. Drei Zustände, klar unterscheidbar:
-//   zu            → dezenter Rahmen + Hauch Füllung
-//   zu + Hover    → Rahmen/Füllung heller (group-hover der Karte)
-//   offen         → Rahmen/Füllung kräftig (eindeutiges „aktiv")
+// Ein Akzent-„Chip": abgerundetes Feld mit leichter Füllung + dünnem,
+// farbigem Rahmen NUR unten + links (Eck-Klammer) — ein Vollrahmen wirkt
+// zu präsent; oben + rechts bleiben offen. Drei Zustände, klar unterscheidbar:
+//   zu            → dezente Eck-Klammer + Hauch Füllung
+//   zu + Hover    → Klammer/Füllung heller (group-hover der Karte)
+//   offen         → Klammer/Füllung kräftig (eindeutiges „aktiv")
 // Das „+" dreht 45° zum „×". Eine Quelle → überall identisch.
 //
 // Farbsteuerung über die CSS-Variable `--ak` (RGB-Tripel) + Tailwind-
@@ -51,7 +52,7 @@ export function AufklappIndikator({
     <span
       aria-hidden="true"
       style={{ ["--ak" as string]: lichtfarbe }}
-      className={`inline-flex items-center justify-center border flex-shrink-0 transition-colors duration-200 ${FELD[groesse]} ${offen ? OFFEN : ZU} ${klassen}`}
+      className={`inline-flex items-center justify-center border-l border-b flex-shrink-0 transition-colors duration-200 ${FELD[groesse]} ${offen ? OFFEN : ZU} ${klassen}`}
     >
       <motion.span
         animate={{ rotate: offen ? 45 : 0 }}
