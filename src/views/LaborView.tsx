@@ -237,7 +237,7 @@ function MemoryAct() {
             transition={{ delay: i * 0.08 + 0.2, duration: 0.4, ease: EASE }}
           >
             <InfoKarte lichtfarbe={meta.rgb} klassen="p-3">
-              <span className="inline-block font-mono text-[9px] px-1.5 py-0.5 rounded-md border border-white/8 bg-white/5 text-white/40 uppercase tracking-wider leading-none mb-2">
+              <span className="inline-block font-mono text-[9px] px-1.5 py-0.5 rounded-md border border-white/[0.05] bg-white/5 text-white/40 uppercase tracking-wider leading-none mb-2">
                 Mechanik
               </span>
               <div className="text-[12px] text-white font-medium mb-1">{meta.titel}</div>
@@ -697,7 +697,7 @@ function SkillRow({ skill, delay }: { skill: typeof CUSTOM_SKILLS[number]; delay
           <div className="flex-1 min-w-0">
             <div className="flex items-baseline gap-2 flex-wrap mb-1">
               <span className="font-mono text-[12px] font-semibold" style={{ color: `rgb(${rgb})` }}>{skill.name}</span>
-              <span className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border text-white/55 leading-none bg-white/[0.05] border-white/[0.12]">
+              <span className="font-mono text-[9px] px-1.5 py-0.5 rounded-md border text-white/55 leading-none bg-white/[0.05] border-white/[0.07]">
                 {skill.trigger}
               </span>
             </div>

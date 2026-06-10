@@ -1467,7 +1467,7 @@ export default function OsintDemoView() {
                   >
                     <div className="flex items-baseline gap-2">
                       <span className="text-[9px] tracking-[0.18em] uppercase shrink-0" style={{ color: aktivesModul.farbe }}>Ziel</span>
-                      <span className="text-white/85 text-[12.5px] leading-relaxed">{aktivesModul.ziel}</span>
+                      <span className="text-white/85 text-[11.5px] leading-relaxed">{aktivesModul.ziel}</span>
                     </div>
                     {aktivesModul.beschreibung && (
                       <p className="mt-2 text-white/55 text-[11px] leading-relaxed">{aktivesModul.beschreibung}</p>

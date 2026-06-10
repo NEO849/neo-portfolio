@@ -334,7 +334,7 @@ export default function SecurityView() {
                           </div>
                           <div className="flex flex-wrap gap-1.5">
                             {tier.klassen.map((klasse) => (
-                              <span key={klasse} className="text-xs px-2 py-1 rounded-lg bg-white/5 border border-white/8 text-white/55">
+                              <span key={klasse} className="text-xs px-2 py-1 rounded-lg bg-white/5 border border-white/[0.05] text-white/55">
                                 {klasse}
                               </span>
                             ))}

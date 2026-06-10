@@ -53,7 +53,7 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
               <AbzeichenStatus variante="aktiv" text="aktiv" mitPuls />
             )}
             {projekt.status === "abgeschlossen" && (
-              <span className="text-[10px] font-mono text-white/30 border border-white/[0.08] rounded-full px-2 py-0.5">
+              <span className="text-[10px] font-mono text-white/30 border border-white/[0.06] rounded-full px-2 py-0.5">
                 abgeschlossen
               </span>
             )}

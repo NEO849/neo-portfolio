@@ -7,10 +7,10 @@ type StatusVariante = "aktiv" | "abgeschlossen" | "entwicklung" | "geplant" | "n
 
 const VARIANTEN_STILE: Record<StatusVariante, string> = {
   aktiv:         "bg-signal-gruen/10 text-signal-gruen border-signal-gruen/20",
-  abgeschlossen: "bg-white/5 text-white/40 border-white/10",
+  abgeschlossen: "bg-white/5 text-white/40 border-white/[0.06]",
   entwicklung:   "bg-signal-gelb/10 text-signal-gelb border-signal-gelb/20",
-  geplant:       "bg-white/5 text-white/30 border-white/8",
-  neutral:       "bg-white/5 text-white/50 border-white/10",
+  geplant:       "bg-white/5 text-white/30 border-white/[0.05]",
+  neutral:       "bg-white/5 text-white/50 border-white/[0.06]",
   akzent:        "bg-akzent-500/10 text-akzent-400 border-akzent-400/20",
   cyber:         "bg-cyber-500/10 text-cyber-400 border-cyber-400/20",
 };
@@ -61,7 +61,7 @@ export function TechTag({ name, klassen = "" }: { name: string; klassen?: string
     <span className={`
       inline-block whitespace-nowrap
       px-2 py-0.5 text-xs font-mono rounded
-      bg-white/5 text-white/40 border border-white/8
+      bg-white/5 text-white/40 border border-white/[0.05]
       hover:text-white/60 hover:bg-white/8 transition-colors
       ${klassen}
     `}>
