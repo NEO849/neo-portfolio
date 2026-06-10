@@ -216,6 +216,16 @@ export interface TelefonErgebnis {
     kosten_eur?: string | null;
     quelle?: string;
   };
+  numverify?: {
+    geprueft: boolean;
+    valid?: boolean;
+    carrier?: string | null;
+    line_type?: string | null;
+    location?: string | null;
+    land?: string | null;
+    hinweis?: string;
+    quelle?: string;
+  };
 }
 
 // ─── Typen: Bild-Analyse ──────────────────────────────────────────

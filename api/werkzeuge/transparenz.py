@@ -139,14 +139,17 @@ DATENFLUSS: dict[str, dict] = {
             _dienst("hlr-lookups.com", "Telefonnummer (E.164) — NUR wenn HLR aktiviert",
                     "Live-Status (erreichbar/Roaming/Carrier/Portierung) via HLR-Abfrage",
                     "https://www.hlr-lookups.com/en/privacy-policy", "EU"),
+            _dienst("NumVerify (apilayer)", "Telefonnummer (E.164) — NUR wenn NumVerify aktiviert",
+                    "Validierung + Live-Carrier, Leitungstyp (mobile/landline), Ort",
+                    "https://apilayer.com/privacy", "US"),
         ],
         "nur_links": [
             "tellows, Truecaller, sync.me, NumLookup, Facebook, LinkedIn, WhatsApp, Telegram "
             "(ausschließlich anklickbare Such-Links — es werden keine Daten automatisch gesendet)",
         ],
         "hinweis": "Die Basis-Analyse läuft vollständig LOKAL (phonenumbers-Bibliothek). "
-                   "Ein Drittdienst (hlr-lookups.com) wird NUR kontaktiert, wenn der "
-                   "HLR-Live-Status aktiviert (API-Key gesetzt) ist.",
+                   "Drittdienste (hlr-lookups.com bzw. NumVerify) werden NUR kontaktiert, "
+                   "wenn der jeweilige Live-Dienst aktiviert (API-Key gesetzt) ist.",
         "speicherung": SPEICHER_HINWEIS,
     },
 
