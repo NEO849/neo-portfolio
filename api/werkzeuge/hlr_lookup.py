@@ -32,7 +32,12 @@ import httpx
 
 from werkzeuge.cache import cache_schluessel, standard_cache
 
-ENDPOINT_PATH = "/api/v2/hlr-lookup"
+# WICHTIG: Der Signatur-Pfad MUSS OHNE /api/v2-Präfix sein. Laut hlr-lookups-
+# Spec ist ENDPOINT_PATH der Endpunkt in der Form "/auth-test" / "/hlr-lookup".
+# Die Request-URL behält dagegen das /api/v2-Präfix. (Früher fälschlich
+# "/api/v2/hlr-lookup" signiert → "Digest auth failed".)
+API_PRAEFIX = "/api/v2"
+ENDPOINT_PATH = "/hlr-lookup"
 BASIS_URL = os.environ.get("HLR_BASE_URL", "https://www.hlr-lookups.com").rstrip("/")
 TIMEOUT_S = 12
 CACHE_TTL_S = 1800  # 30 min
@@ -121,7 +126,7 @@ async def hlr_lookup(
 
     fetcher = fetch or _standard_fetch
     try:
-        status_code, daten = await fetcher(f"{BASIS_URL}{ENDPOINT_PATH}", headers, body)
+        status_code, daten = await fetcher(f"{BASIS_URL}{API_PRAEFIX}{ENDPOINT_PATH}", headers, body)
     except Exception:
         return {"aktiv": False, "hinweis": "HLR-Dienst nicht erreichbar"}
 
