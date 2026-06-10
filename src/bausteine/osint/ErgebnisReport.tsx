@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import type {
   DomainErgebnis, EmailErgebnis, EmailReconErgebnis, BenutzerErgebnis,
-  TelefonErgebnis, BildErgebnis, ShodanErgebnis,
+  TelefonErgebnis, BildErgebnis, ShodanErgebnis, CensysErgebnis,
   OrchestratorErgebnis, SubdomainErgebnis, IpIntelErgebnis,
   Pivot, PivotTyp, VtReputation,
 } from "../../dienste/osintApi";
@@ -988,6 +988,83 @@ function SubZeile({ d }: { d: { host: string; quellen: string[]; aktiv: boolean 
   );
 }
 
+// ─── Censys Host-Intel ──────────────────────────────────────────────
+
+function ReportCensys({ c }: { c: CensysErgebnis }) {
+  const [kid, copy] = useKopieren();
+  if (c.fehler) return <FehlerHinweis text={c.fehler} />;
+  if (c.verfuegbar === false) {
+    return (
+      <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4 font-mono text-[12px] text-white/60 leading-relaxed">
+        {c.hinweis ?? "Censys ist derzeit nicht aktiviert."}
+      </div>
+    );
+  }
+  const treffer = (c.hosts ?? []).filter((h) => h.in_censys);
+  return (
+    <div>
+      <Sektion titel="Ziel">
+        <Feld label="Eingabe">{c.ziel}{c.eingabe_typ ? ` (${c.eingabe_typ})` : ""}</Feld>
+        <Feld label="IP-Adressen">{(c.ips ?? []).join(", ") || "—"}</Feld>
+      </Sektion>
+
+      {treffer.map((h, idx) => (
+        <div key={h.ip ?? idx}>
+          <Sektion titel={treffer.length > 1 ? `Host · ${h.ip}` : "Host"} farbe={C.cyber}>
+            {(h.standort?.stadt || h.standort?.land) && (
+              <Feld label="Standort">
+                {[h.standort?.stadt, h.standort?.provinz, h.standort?.land].filter(Boolean).join(", ")}
+              </Feld>
+            )}
+            {h.autonomes_system?.asn != null && (
+              <Feld label="Betreiber">AS{h.autonomes_system.asn} · {h.autonomes_system.name ?? h.autonomes_system.beschreibung ?? "—"}</Feld>
+            )}
+            {h.autonomes_system?.bgp_prefix && (
+              <Feld label="BGP-Prefix" copy={h.autonomes_system.bgp_prefix} copyId={`px${idx}`} kopiertId={kid} onCopy={copy}>{h.autonomes_system.bgp_prefix}</Feld>
+            )}
+            {h.whois_organisation?.name && <Feld label="Organisation">{h.whois_organisation.name}</Feld>}
+          </Sektion>
+
+          {!!h.dienste?.length && (
+            <Sektion titel="Dienste / Ports" farbe={C.rot}
+              rechts={<span className="font-mono text-[10px] text-white/50">{h.ports_anzahl} offen</span>}>
+              <div className="flex flex-wrap gap-1.5">
+                {h.dienste.map((d, i) => (
+                  <Marke key={i}
+                    text={`${d.port}${d.protokoll ? " " + d.protokoll : d.service ? " " + d.service : ""}`}
+                    farbe={d.gefaehrlich ? C.rot : C.cyber} gefuellt={d.gefaehrlich} />
+                ))}
+              </div>
+            </Sektion>
+          )}
+
+          {!!h.whois_organisation?.abuse_kontakte?.length && (
+            <Sektion titel="Abuse-Kontakt" farbe={C.rot}>
+              {h.whois_organisation.abuse_kontakte.map((m, i) => (
+                <Feld key={i} label="E-Mail" href={`mailto:${m}`}>{m}</Feld>
+              ))}
+            </Sektion>
+          )}
+
+          {!!h.reverse_dns?.length && (
+            <Sektion titel="Reverse-DNS">
+              <div className="flex flex-wrap gap-1.5">
+                {h.reverse_dns.map((n, i) => <Marke key={i} text={n} farbe={C.neutral} />)}
+              </div>
+            </Sektion>
+          )}
+        </div>
+      ))}
+
+      {treffer.length === 0 && (
+        <div className="font-mono text-[12px] text-white/55 mt-4">Kein Censys-Datensatz für dieses Ziel gefunden.</div>
+      )}
+      <div className="font-mono text-[10px] text-white/45 mt-3">{c.quelle}</div>
+      <FussZeile iso={c.analysiert_am} />
+    </div>
+  );
+}
+
 // ─── IP-Intel ───────────────────────────────────────────────────────
 
 function ReportIpIntel({ r }: { r: IpIntelErgebnis }) {
@@ -1054,15 +1131,15 @@ function FussZeile({ iso }: { iso?: string }) {
 function ReportStatus() {
   const werkzeuge = [
     "E-Mail Vollanalyse", "Username Vollscan (600+)", "Telefon Analyse",
-    "Reverse Image", "Domain & Shodan", "Subdomain-Recon (3 Quellen)",
-    "IP-Intel (RIPEstat)", "Vollanalyse Orchestrator",
+    "Reverse Image", "Domain & Shodan", "Censys Host-Intel",
+    "Subdomain-Recon (3 Quellen)", "IP-Intel (RIPEstat)", "Vollanalyse Orchestrator",
   ];
   const infra = [
     "FastAPI · uvicorn · slowapi",
     "dnspython · python-whois",
     "httpx — TLS-verify + SSRF-Guard",
     "WhatsMyName-DB (cached)",
-    "Shodan InternetDB",
+    "Shodan InternetDB · Censys Platform",
     "RIPEstat (RIPE NCC)",
     "crt.sh · Wayback · CommonCrawl",
   ];
@@ -1254,6 +1331,25 @@ function klartextFuer(modulNummer: string, daten: unknown): KlartextDaten | null
           text: `${r.as?.asn != null ? `Autonomes System AS${r.as.asn}. ` : ""}${r.routing?.prefix ? `Geroutet über ${r.routing.prefix}. ` : ""}${r.abuse_kontakte?.length ? "Für Missbrauchsmeldungen ist ein Abuse-Kontakt hinterlegt." : ""}`.trim() || "Routing- und Ownership-Daten dieser IP.",
         };
       }
+      case "11": {
+        const c = daten as CensysErgebnis;
+        if (c.verfuegbar === false) {
+          return {
+            stufe: "info",
+            schlagzeile: "Censys ist noch nicht aktiviert",
+            text: c.hinweis ?? "Sobald der Censys-Zugang hinterlegt ist, erscheinen hier Dienste, Standort und Betreiber des Hosts.",
+          };
+        }
+        const h = (c.hosts ?? []).find((x) => x.in_censys);
+        const ports = c.aggregiert?.ports_anzahl ?? 0;
+        const land = h?.standort?.land;
+        const betreiber = h?.autonomes_system?.name;
+        return {
+          stufe: "info",
+          schlagzeile: `${c.ziel} läuft bei ${betreiber ?? "einem Betreiber"}${land ? ` in ${land}` : ""}`,
+          text: `Censys sieht ${zahlwort(ports, "offenen Dienst", "offene Dienste")}${h?.whois_organisation?.abuse_kontakte?.length ? " und kennt einen Abuse-Kontakt" : ""}. Das ergänzt Shodan um die autoritative Sicht: Standort, Betreiber und WHOIS des Hosts.`,
+        };
+      }
       default:
         return null;
     }
@@ -1278,6 +1374,7 @@ export default function ErgebnisReport({ modulNummer, daten, onPivot }: { modulN
     case "8": inhalt = <ReportOrchestrator o={daten as OrchestratorErgebnis} />; break;
     case "9": inhalt = <ReportSubdomains s={daten as SubdomainErgebnis} />; break;
     case "10": inhalt = <ReportIpIntel r={daten as IpIntelErgebnis} />; break;
+    case "11": inhalt = <ReportCensys c={daten as CensysErgebnis} />; break;
     default: return null;
   }
   const klar = klartextFuer(modulNummer, daten);

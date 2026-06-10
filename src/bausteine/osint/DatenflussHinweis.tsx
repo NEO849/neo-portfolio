@@ -25,6 +25,7 @@ const MODUL_ZU_WERKZEUG: Record<string, string> = {
   "8": "orchestrator",
   "9": "subdomains",
   "10": "ip-intel",
+  "11": "censys",
 };
 
 function SchildIkon({ farbe }: { farbe: string }) {

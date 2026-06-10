@@ -681,6 +681,65 @@ export async function shodanAbfragen(ziel: string): Promise<ShodanErgebnis> {
   return apiFetch<ShodanErgebnis>("/shodan", { ziel });
 }
 
+// ─── Censys Platform Recon (key-gated) ────────────────────────────
+
+export interface CensysDienst {
+  port: number;
+  protokoll: string | null;
+  transport: string | null;
+  gefaehrlich: boolean;
+  service: string | null;
+}
+
+export interface CensysHost {
+  ip: string | null;
+  in_censys: boolean;
+  fehler?: string;
+  standort?: {
+    stadt?: string | null; provinz?: string | null; land?: string | null;
+    land_code?: string | null; kontinent?: string | null; zeitzone?: string | null;
+    koordinaten?: { lat: number; lon: number } | null;
+  };
+  autonomes_system?: {
+    asn?: number | null; name?: string | null; beschreibung?: string | null;
+    bgp_prefix?: string | null; land_code?: string | null;
+  };
+  whois_organisation?: { name?: string | null; land?: string | null; abuse_kontakte?: string[] };
+  ports?: number[];
+  ports_anzahl?: number;
+  dienste?: CensysDienst[];
+  reverse_dns?: string[];
+}
+
+export interface CensysErgebnis {
+  ziel: string;
+  eingabe_typ?: "ip" | "domain";
+  analysiert_am: string;
+  verfuegbar: boolean;
+  hinweis?: string;
+  fehler?: string;
+  ip_count?: number;
+  ips?: string[];
+  hosts?: CensysHost[];
+  aggregiert?: {
+    ports: number[];
+    ports_anzahl: number;
+    gefaehrliche_ports: Array<{ port: number; service: string }>;
+    laender: string[];
+    autonome_systeme: string[];
+  };
+  quelle?: string;
+}
+
+/**
+ * Censys Platform Host-Recon (key-gated) — Komplement zu Shodan.
+ * Liefert Services (Port/Protokoll), Standort, Autonomous System,
+ * WHOIS-Organisation inkl. Abuse-Kontakten und Reverse-DNS.
+ */
+export async function censysAbfragen(ziel: string): Promise<CensysErgebnis> {
+  return apiFetch<CensysErgebnis>("/censys", { ziel });
+}
+
 /**
  * E-Mail Tiefen-Recon (Epieos/GHunt-Style).
  * Gravatar + Google + HIBP + GitHub parallel.

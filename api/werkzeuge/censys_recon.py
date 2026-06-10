@@ -44,6 +44,20 @@ def _censys_pat() -> str:
     ).strip()
 
 
+def _kontakte_zu_mails(kontakte) -> list[str]:
+    """Censys liefert Abuse-Kontakte als Objekte ({email,name,handle}) ODER Strings.
+    Normalisiert auf reine Strings (E-Mail bevorzugt) — die UI rendert nur Strings."""
+    out: list[str] = []
+    for k in (kontakte or []):
+        if isinstance(k, dict):
+            wert = k.get("email") or k.get("name") or k.get("handle")
+            if wert:
+                out.append(str(wert))
+        elif isinstance(k, str) and k:
+            out.append(k)
+    return out
+
+
 def _host_parsen(resource: dict) -> dict:
     """Normalisiert ein result.resource-Objekt der Platform-API auf die UI-Form."""
     loc = resource.get("location") or {}
@@ -92,7 +106,7 @@ def _host_parsen(resource: dict) -> dict:
         "whois_organisation": {
             "name": org.get("name"),
             "land": org.get("country"),
-            "abuse_kontakte": org.get("abuse_contacts") or [],
+            "abuse_kontakte": _kontakte_zu_mails(org.get("abuse_contacts")),
         },
         "ports": ports,
         "ports_anzahl": resource.get("service_count") if resource.get("service_count") is not None else len(ports),

@@ -3,12 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   domainAnalysieren, emailAnalysieren, benutzernameSuchen,
   telefonAnalysieren, bildAnalysieren,
-  shodanAbfragen, emailReconnaissance, orchestrator,
+  shodanAbfragen, censysAbfragen, emailReconnaissance, orchestrator,
   benutzernameVollscan, subdomainsFinden, ipIntelAbfragen,
   Apifehler,
   type DomainErgebnis, type EmailErgebnis, type BenutzerErgebnis,
   type TelefonErgebnis, type BildErgebnis,
-  type ShodanErgebnis, type EmailReconErgebnis,
+  type ShodanErgebnis, type CensysErgebnis, type EmailReconErgebnis,
   type OrchestratorErgebnis,
   type SubdomainErgebnis, type IpIntelErgebnis,
   type Pivot,
@@ -85,6 +85,12 @@ const DEMO_MODULE: DemoModul[] = [
     eingabeLabel: "IP oder Domain", beispielEingabe: "1.1.1.1", eingabeTyp: "text",
     ziel: "Beantwortet: Wem gehört diese IP-Adresse und wie wird sie im Internet geroutet?",
     beschreibung: "Autoritative Routing- und Ownership-Daten via RIPEstat (RIPE NCC, keyless): announced Prefix, ASN(s), AS-Holder (Betreiber) und der Abuse-Kontakt der IP. Ergänzt Shodan (Ports/CVEs) um die Frage: WEM gehört diese IP und WIE wird sie geroutet?",
+  },
+  {
+    nummer: "11", name: "Censys Host-Intel", farbe: "#38bdf8",
+    eingabeLabel: "IP oder Domain", beispielEingabe: "8.8.8.8", eingabeTyp: "text",
+    ziel: "Zeigt, welche Dienste ein Server nach außen offen hat, wo er steht und wem er gehört — die autoritative Host-Sicht, die Shodan ergänzt.",
+    beschreibung: "Censys Platform: Services (Port/Protokoll/Transport), Standort (Stadt/Land/Koordinaten), Autonomous System, WHOIS-Organisation inkl. Abuse-Kontakt und Reverse-DNS. Akzeptiert IP oder Domain (wird aufgelöst).",
   },
   {
     nummer: "8", name: "Vollanalyse Orchestrator", farbe: "#10b981",
@@ -954,6 +960,31 @@ function subdomainZuTerminal(s: SubdomainErgebnis): string[] {
 
 // ─── Modul 10: IP-Intel (RIPEstat) ───────────────────────────────
 
+function censysZuTerminal(c: CensysErgebnis): string[] {
+  const z: string[] = [];
+  z.push(R); z.push(K(`CENSYS — ${trunc(c.ziel, 22)}`)); z.push(R); z.push("");
+  if (c.fehler) { z.push(`  [Fehler] ${c.fehler}`); return z; }
+  if (c.verfuegbar === false) { z.push(`  ${c.hinweis ?? "Censys nicht aktiviert"}`); return z; }
+  const h = (c.hosts ?? []).find((x) => x.in_censys);
+  if (!h) { z.push("  Kein Censys-Datensatz gefunden."); return z; }
+  z.push(S("STANDORT"));
+  z.push(WW("Ort", [h.standort?.stadt, h.standort?.land].filter(Boolean).join(", ") || "—"));
+  z.push(WW("AS", h.autonomes_system?.asn != null ? `AS${h.autonomes_system.asn} ${h.autonomes_system.name ?? ""}`.trim() : "—"));
+  if (h.whois_organisation?.name) z.push(WW("Org", trunc(h.whois_organisation.name, 24)));
+  z.push(""); z.push(S(`DIENSTE (${h.ports_anzahl ?? 0})`));
+  (h.dienste ?? []).slice(0, 20).forEach((d) =>
+    z.push(WW(String(d.port), `${d.protokoll ?? d.service ?? ""}${d.gefaehrlich ? " !" : ""}`)));
+  if (h.whois_organisation?.abuse_kontakte?.length) {
+    z.push(""); z.push(S("ABUSE-KONTAKT"));
+    h.whois_organisation.abuse_kontakte.slice(0, 4).forEach((m) => z.push(WW("Mail", trunc(m, 26))));
+  }
+  if (h.reverse_dns?.length) {
+    z.push(""); z.push(S("REVERSE-DNS"));
+    h.reverse_dns.slice(0, 6).forEach((n) => z.push(`  ${trunc(n, 30)}`));
+  }
+  return z;
+}
+
 function ipIntelZuTerminal(r: IpIntelErgebnis): string[] {
   if (r.fehler) return [R, K("IP-INTEL -- Fehler"), R, "", `  ${trunc(r.fehler, 30)}`];
   const zeilen: string[] = [
@@ -1208,6 +1239,10 @@ export default function OsintDemoView() {
       } else if (modul.nummer === "10") {
         const ergebnis = await ipIntelAbfragen(wert);
         zeilen = ipIntelZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
+      } else if (modul.nummer === "11") {
+        const ergebnis = await censysAbfragen(wert);
+        zeilen = censysZuTerminal(ergebnis);
         setRohdaten(ergebnis);
       } else {
         zeilen = erstelleDemoAusgabe(modul.nummer, wert);
@@ -1525,7 +1560,7 @@ export default function OsintDemoView() {
                   POST /api/v1/osint/{({
                     "2": "email", "3": "benutzername", "4": "telefon", "5": "domain",
                     "6": "bild", "7": "aggregator", "8": "orchestrator",
-                    "9": "subdomains", "10": "ip-intel",
+                    "9": "subdomains", "10": "ip-intel", "11": "censys",
                   } as Record<string, string>)[aktivesModul?.nummer ?? ""] ?? "osint"}
                 </div>
               </motion.div>
