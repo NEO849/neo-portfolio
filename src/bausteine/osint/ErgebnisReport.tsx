@@ -106,8 +106,8 @@ function Sektion({ titel, rechts, children }: {
   titel: string; farbe?: string; rechts?: React.ReactNode; children: React.ReactNode;
 }) {
   return (
-    <div className="mt-5 first:mt-0">
-      <div className="flex items-center gap-3 mb-2">
+    <div className="mt-6 first:mt-0">
+      <div className="flex items-center gap-3 mb-2.5">
         <span className="font-mono text-[10.5px] tracking-[0.22em] uppercase font-semibold"
               style={{ color: C.neutral }}>{titel}</span>
         <span className="h-px flex-1"
@@ -1084,6 +1084,185 @@ function ReportStatus() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// KLARTEXT — menschliche Zusammenfassung (was bedeutet das für mich?)
+//
+// Steht ganz oben, in LESBARER Schrift (nicht Mono): ein Satz Schlagzeile +
+// eine Erklärung in Alltagssprache. Übersetzt die technischen Daten in
+// klaren Mehrwert. Darunter folgen die Detail-Sektionen (Mono) für Experten.
+// ═══════════════════════════════════════════════════════════════════
+
+interface KlartextDaten { stufe: string; schlagzeile: string; text: string; }
+
+function zahlwort(n: number, eins: string, mehr: string): string {
+  return `${n} ${n === 1 ? eins : mehr}`;
+}
+
+function Klartext({ stufe, schlagzeile, text }: KlartextDaten) {
+  const farbe = stufeFarbe(stufe);
+  const s = (stufe ?? "").toLowerCase();
+  const positiv = s === "keines" || s === "ok" || s === "live" || s === "gering";
+  const glyph = positiv ? "✓" : s === "info" ? "i" : "!";
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      className="relative rounded-2xl border p-4 sm:p-5 mb-6 overflow-hidden"
+      style={{ borderColor: `${farbe}33`, background: `linear-gradient(135deg, ${farbe}14, ${farbe}05 62%, transparent)` }}
+    >
+      <div className="flex items-start gap-3.5">
+        <span
+          className="grid place-items-center w-8 h-8 rounded-full shrink-0 text-[15px] font-bold leading-none"
+          style={{ color: farbe, background: `${farbe}1f`, border: `1px solid ${farbe}44` }}
+          aria-hidden
+        >
+          {glyph}
+        </span>
+        <div className="min-w-0">
+          <div className="text-white font-semibold text-[15px] leading-snug tracking-tight">{schlagzeile}</div>
+          <p className="text-white/70 text-[13px] mt-1.5 leading-relaxed">{text}</p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/** Erzeugt die Klartext-Zusammenfassung pro Modul aus den echten Daten. */
+function klartextFuer(modulNummer: string, daten: unknown): KlartextDaten | null {
+  try {
+    switch (modulNummer) {
+      case "1":
+        return {
+          stufe: "ok",
+          schlagzeile: "Alle Werkzeuge sind live und einsatzbereit",
+          text: "Die OSINT-API antwortet — du kannst jede Analyse sofort starten. Alle Abfragen laufen passiv über öffentliche Quellen, ohne dauerhafte Speicherung.",
+        };
+      case "2": {
+        const d = daten as { basis: EmailErgebnis; recon: EmailReconErgebnis | null };
+        if (!d.basis?.gueltig) return null;
+        const r = d.recon?.risiko ?? d.basis.risiko;
+        const hibp = d.recon?.hibp;
+        const xon = d.recon?.xposedornot;
+        const leak = d.recon?.leakcheck;
+        const lecks = (xon?.anzahl_breaches ?? 0) > 0 || !!hibp?.domain_betroffen || (leak?.anzahl ?? 0) > 0;
+        const teile: string[] = [];
+        if (xon?.anzahl_breaches) teile.push(`${zahlwort(xon.anzahl_breaches, "Datenleck", "Datenlecks")}`);
+        else if (hibp?.domain_betroffen) teile.push(`Lecks der Domain (${hibp.anzahl_breaches ?? 0})`);
+        if (d.recon?.gravatar?.gefunden) teile.push("ein öffentliches Gravatar-Profil");
+        if (d.recon?.github?.gefunden) teile.push("verknüpfte GitHub-Konten");
+        if (lecks) {
+          return {
+            stufe: r?.stufe ?? "Mittel",
+            schlagzeile: "Diese Adresse ist öffentlich exponiert",
+            text: `Gefunden: ${teile.join(", ")}. Je mehr öffentlich verknüpft ist, desto größer die Angriffsfläche — bei Datenlecks die Passwörter ändern und 2-Faktor-Schutz aktivieren.`,
+          };
+        }
+        return {
+          stufe: "Keines",
+          schlagzeile: "Keine bekannten Datenlecks für diese Adresse",
+          text: teile.length
+            ? `Öffentlich sichtbar ist lediglich: ${teile.join(", ")}. Keine Treffer in den Leak-Datenbanken — guter Stand.`
+            : "Diese Adresse taucht in keiner bekannten Leak-Datenbank auf und hat keine öffentlich verknüpften Profile — sauber.",
+        };
+      }
+      case "3": {
+        const b = daten as BenutzerErgebnis;
+        const s = b.zusammenfassung;
+        if (!s) return null;
+        return {
+          stufe: s.treffer_rate >= 50 ? "Hoch" : s.treffer_rate >= 20 ? "Mittel" : "Gering",
+          schlagzeile: `„${b.benutzername}" existiert auf ${zahlwort(s.gefunden, "Plattform", "Plattformen")}`,
+          text: `Von ${s.geprueft} geprüften Plattformen gab es ${s.gefunden} Treffer — das ist der digitale Fußabdruck dieses Namens. Ein Klick auf einen Treffer öffnet das jeweilige Profil.`,
+        };
+      }
+      case "4": {
+        const t = daten as TelefonErgebnis;
+        if (!t.gueltig) return null;
+        const m = t.metadaten;
+        const ort = m?.region || m?.land_code || "unbekannter Region";
+        return {
+          stufe: "ok",
+          schlagzeile: `Nummer aus ${ort}${m?.leitungstyp ? ` · ${m.leitungstyp}` : ""}`,
+          text: `${m?.carrier ? `Anbieter: ${m.carrier}. ` : ""}Die Basis-Analyse läuft komplett lokal — die Such-Links zu Truecaller, Tellows & Co. öffnest du selbst, es werden keine Daten automatisch gesendet.`,
+        };
+      }
+      case "5": {
+        const d = daten as { domain: DomainErgebnis; shodan: ShodanErgebnis | null };
+        const sv = d.domain?.sicherheits_bewertung;
+        if (!sv) return null;
+        const ports = d.shodan?.aggregiert?.ports_anzahl ?? 0;
+        const vulns = d.shodan?.aggregiert?.vulns_anzahl ?? 0;
+        const note = sv.note;
+        const stufe = note === "Gut" ? "Keines" : note === "Mittel" ? "Mittel" : "Hoch";
+        const wort = note === "Gut" ? "gut" : note === "Mittel" ? "mittelmäßig" : "schwach";
+        return {
+          stufe,
+          schlagzeile: `Diese Domain ist ${wort} abgesichert`,
+          text: `Die HTTP-Sicherheits-Header erreichen ${sv.prozent}%. Nach außen sichtbar sind ${zahlwort(ports, "offener Port", "offene Ports")}${vulns ? ` und ${zahlwort(vulns, "bekannte Schwachstelle", "bekannte Schwachstellen")}` : ""} — das ist die Angriffsfläche, die jeder im Internet sehen kann.`,
+        };
+      }
+      case "6": {
+        const b = daten as BildErgebnis;
+        if (b.fehler) return null;
+        const bw = b.bewertung;
+        const gps = b.exif?.gps;
+        if (gps?.lat != null) {
+          return {
+            stufe: "Hoch",
+            schlagzeile: "Das Bild verrät seinen Aufnahmeort",
+            text: `In den Metadaten stecken GPS-Koordinaten${gps.ort_name ? ` (${gps.ort_name})` : ""} — der genaue Ort lässt sich auf der Karte unten rekonstruieren. Vor dem öffentlichen Teilen die Metadaten entfernen.`,
+          };
+        }
+        if (bw && bw.punkte >= 2) {
+          return { stufe: bw.stufe, schlagzeile: "Das Bild enthält identifizierende Metadaten", text: bw.zusammenfassung };
+        }
+        return {
+          stufe: "Keines",
+          schlagzeile: "Das Bild ist unkritisch",
+          text: b.exif?.verfuegbar
+            ? "Es wurden nur harmlose Metadaten gefunden — kein Standort, keine Geräte-ID."
+            : "Das Bild enthält keine auslesbaren Metadaten — gut für die Privatsphäre (vermutlich bereits bereinigt).",
+        };
+      }
+      case "8": {
+        const o = daten as OrchestratorErgebnis;
+        if (o.fehler) return null;
+        const k = o.graph?.statistik.knoten_gesamt ?? 0;
+        const p = o.zusammenfassung?.pivots_entdeckt ?? 0;
+        return {
+          stufe: "info",
+          schlagzeile: `${zahlwort(k, "Datenpunkt", "Datenpunkte")} rund um „${o.eingabe}" verknüpft`,
+          text: `Automatisch erkannt als ${o.typ}.${p ? ` ${zahlwort(p, "neue Verbindung", "neue Verbindungen")} entdeckt.` : ""} Der interaktive Graph unten zeigt, wie alle Datenpunkte zusammenhängen — Knoten anklicken für Details.`,
+        };
+      }
+      case "9": {
+        const s = daten as SubdomainErgebnis;
+        if (s.fehler) return null;
+        const ges = s.zusammenfassung?.gesamt_eindeutig ?? (s.subdomains?.length ?? 0);
+        const live = (s.subdomains ?? []).filter((d) => d.aktiv === true).length;
+        return {
+          stufe: ges > 20 ? "Mittel" : "Gering",
+          schlagzeile: `${zahlwort(ges, "Subdomain", "Subdomains")} entdeckt`,
+          text: `${live ? `${live} davon sind aktuell live erreichbar. ` : ""}Subdomains sind oft die übersehene Angriffsfläche — jede ist ein möglicher Einstiegspunkt und lohnt einen zweiten Blick.`,
+        };
+      }
+      case "10": {
+        const r = daten as IpIntelErgebnis;
+        if (r.fehler) return null;
+        return {
+          stufe: "info",
+          schlagzeile: `Diese IP gehört ${r.as?.holder ?? "einem unbekannten Betreiber"}`,
+          text: `${r.as?.asn != null ? `Autonomes System AS${r.as.asn}. ` : ""}${r.routing?.prefix ? `Geroutet über ${r.routing.prefix}. ` : ""}${r.abuse_kontakte?.length ? "Für Missbrauchsmeldungen ist ein Abuse-Kontakt hinterlegt." : ""}`.trim() || "Routing- und Ownership-Daten dieser IP.",
+        };
+      }
+      default:
+        return null;
+    }
+  } catch {
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // HAUPT-SWITCH
 // ═══════════════════════════════════════════════════════════════════
 
@@ -1101,8 +1280,10 @@ export default function ErgebnisReport({ modulNummer, daten, onPivot }: { modulN
     case "10": inhalt = <ReportIpIntel r={daten as IpIntelErgebnis} />; break;
     default: return null;
   }
+  const klar = klartextFuer(modulNummer, daten);
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+      {klar && <Klartext stufe={klar.stufe} schlagzeile={klar.schlagzeile} text={klar.text} />}
       {inhalt}
     </motion.div>
   );
