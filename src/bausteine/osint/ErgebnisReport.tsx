@@ -16,7 +16,7 @@ import type {
   DomainErgebnis, EmailErgebnis, EmailReconErgebnis, BenutzerErgebnis,
   TelefonErgebnis, BildErgebnis, ShodanErgebnis,
   OrchestratorErgebnis, SubdomainErgebnis, IpIntelErgebnis,
-  Pivot, PivotTyp,
+  Pivot, PivotTyp, VtReputation,
 } from "../../dienste/osintApi";
 
 // Callback-Typ: ein analysierbarer Pivot wird in-app weiteranalysiert.
@@ -719,6 +719,44 @@ function ReportUsername({ b, onPivot }: { b: BenutzerErgebnis; onPivot?: PivotHa
 
 // ─── Domain & Shodan ────────────────────────────────────────────────
 
+// ─── VirusTotal-Reputation (geteilt: Domain + IP) ───────────────────
+// Wird nur gerendert, wenn das Backend ein vt-Feld liefert (Key gesetzt).
+function VtSektion({ vt }: { vt?: VtReputation }) {
+  if (!vt) return null;
+  const farbe =
+    vt.stufe === "Schädlich" ? C.rot :
+    vt.stufe === "Verdächtig" ? C.gelb :
+    vt.stufe === "Sauber" ? C.gruen : C.neutral;
+  return (
+    <Sektion titel="Reputation · VirusTotal" farbe={farbe}>
+      {!vt.geprueft ? (
+        <Item stufe="info">{vt.hinweis ?? "VirusTotal nicht geprüft"}</Item>
+      ) : (
+        <>
+          <div className="flex items-center gap-2 flex-wrap mb-1.5">
+            <Marke text={vt.stufe ?? "Unbekannt"} farbe={farbe}
+              gefuellt={vt.stufe === "Schädlich" || vt.stufe === "Verdächtig"} />
+            {typeof vt.gesamt_engines === "number" && vt.gesamt_engines > 0 && (
+              <span className="font-mono text-[11px] text-white/55">
+                {vt.malicious ?? 0} / {vt.gesamt_engines} Engines melden „schädlich"
+              </span>
+            )}
+            {typeof vt.reputation === "number" && (
+              <span className="font-mono text-[11px] text-white/45">Reputation {vt.reputation}</span>
+            )}
+          </div>
+          {vt.hinweis && <Item stufe="info">{vt.hinweis}</Item>}
+          {!!vt.kategorien?.length && (
+            <div className="flex flex-wrap gap-1.5 mt-1">
+              {vt.kategorien.map((k, i) => <Marke key={i} text={k} farbe={C.neutral} />)}
+            </div>
+          )}
+        </>
+      )}
+    </Sektion>
+  );
+}
+
 function ReportDomain({ domain, shodan, onPivot }: { domain: DomainErgebnis; shodan: ShodanErgebnis | null; onPivot?: PivotHandler }) {
   const [kid, copy] = useKopieren();
   const sv = domain.sicherheits_bewertung;
@@ -780,6 +818,7 @@ function ReportDomain({ domain, shodan, onPivot }: { domain: DomainErgebnis; sho
           )}
         </Sektion>
       )}
+      <VtSektion vt={domain.vt} />
       <PivotSektion pivots={domain.pivots} onPivot={onPivot} />
       <FussZeile iso={domain.analysiert_am} />
     </div>
@@ -973,6 +1012,7 @@ function ReportIpIntel({ r }: { r: IpIntelErgebnis }) {
           </div>
         </Sektion>
       )}
+      <VtSektion vt={r.vt} />
       <FussZeile iso={r.analysiert_am} />
     </div>
   );
