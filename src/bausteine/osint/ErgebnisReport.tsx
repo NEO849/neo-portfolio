@@ -1145,9 +1145,6 @@ function ReportStatus() {
   ];
   return (
     <div>
-      <Verdikt titel="System-Status" stufe="live" wert={werkzeuge.length} max={werkzeuge.length}
-        hinweis="live · produktiv"
-        deutung="Alle Analyse-Werkzeuge sind aktuell erreichbar und einsatzbereit." />
       <Sektion titel="Analyse-Werkzeuge"
         rechts={<span className="font-mono text-[10px] text-white/50">{werkzeuge.length} aktiv</span>}>
         {werkzeuge.map((w) => <Item key={w} stufe="ok">{w}</Item>)}
@@ -1208,11 +1205,7 @@ function klartextFuer(modulNummer: string, daten: unknown): KlartextDaten | null
   try {
     switch (modulNummer) {
       case "1":
-        return {
-          stufe: "ok",
-          schlagzeile: "Alle Werkzeuge sind live und einsatzbereit",
-          text: "Die OSINT-API antwortet — du kannst jede Analyse sofort starten. Alle Abfragen laufen passiv über öffentliche Quellen, ohne dauerhafte Speicherung.",
-        };
+        return null;  // Status-Modul: kein Klartext-Banner (war redundant)
       case "2": {
         const d = daten as { basis: EmailErgebnis; recon: EmailReconErgebnis | null };
         if (!d.basis?.gueltig) return null;
