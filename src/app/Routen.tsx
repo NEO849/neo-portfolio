@@ -62,8 +62,33 @@ function ScrollZuTop() {
   return null;
 }
 
+// Lädt alle Routen-Chunks im Hintergrund (sobald der Browser idle ist) →
+// jede Folge-Navigation ist sofort da, ohne Lade-Skelett. Läuft genau einmal.
+function useRoutenVorladen() {
+  useEffect(() => {
+    const vorladen = () => {
+      void import("../seiten/UeberMichSeite");
+      void import("../seiten/ProjekteSeite");
+      void import("../seiten/SecuritySeite");
+      void import("../seiten/LaborSeite");
+      void import("../seiten/OsintToolSeite");
+      void import("../seiten/KontaktSeite");
+      void import("../seiten/VoiceDemoSeite");
+    };
+    const hatIdle = "requestIdleCallback" in window;
+    const id = hatIdle
+      ? window.requestIdleCallback(vorladen, { timeout: 2500 })
+      : window.setTimeout(vorladen, 1200);
+    return () => {
+      if (hatIdle) window.cancelIdleCallback(id as number);
+      else clearTimeout(id as number);
+    };
+  }, []);
+}
+
 export function Routen() {
   const ort = useLocation();
+  useRoutenVorladen();
 
   return (
     <>

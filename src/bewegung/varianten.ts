@@ -138,22 +138,21 @@ export const NAV_UNTERLINE: Variants = {
 };
 
 // ─── Identität: Seiten-Übergang ───────────────────────────────────
+// Schnell + flüssig, als EINE Einheit (kein Kaskaden-Stagger — der wirkte
+// langsam und unruhig). Kurzer Versatz + weiches Auslaufen = Profi-Gefühl,
+// nicht übertrieben. Mit AnimatePresence mode="wait": 0.13s Exit + 0.24s
+// Eingang ≈ 0.37s gesamt, subjektiv "sofort".
 export const SEITEN_EINGANG: Variants = {
-  versteckt: { opacity: 0, y: 16 },
+  versteckt: { opacity: 0, y: 8 },
   sichtbar: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.45,
-      ease: KURVEN.expressiv,
-      when: 'beforeChildren',
-      staggerChildren: 0.06,
-    },
+    transition: { duration: 0.24, ease: KURVEN.expressiv },
   },
   verlassen: {
     opacity: 0,
-    y: -8,
-    transition: { duration: 0.25, ease: KURVEN.praezise },
+    y: -4,
+    transition: { duration: 0.13, ease: KURVEN.praezise },
   },
 };
 
