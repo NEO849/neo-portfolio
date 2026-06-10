@@ -10,6 +10,7 @@
 import { type ReactNode, type CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { InfoKarte } from "./InfoKarte";
+import { AufklappIndikator } from "./AufklappIndikator";
 
 interface AusklappKarteProps {
   /** RGB ohne Klammern, z.B. "99, 102, 241" — für Licht-/Hover-Effekt. */
@@ -45,18 +46,15 @@ export function AusklappKarte({
         type="button"
         onClick={onUmschalten}
         aria-expanded={offen}
-        className="relative w-full text-left p-5 md:p-6 focus-visible:outline-none"
+        className="group relative w-full text-left p-5 md:p-6 focus-visible:outline-none"
       >
-        <motion.span
-          animate={{ rotate: offen ? 45 : 0 }}
-          transition={{ duration: 0.2, ease: "easeInOut" }}
-          className="absolute top-5 right-5 md:top-6 md:right-6 text-xl leading-none"
-          style={{ color: akzentFarbe, opacity: offen ? 0.85 : 0.45 }}
-          aria-hidden="true"
-        >
-          +
-        </motion.span>
-        <div className="pr-7">{kopf}</div>
+        <AufklappIndikator
+          offen={offen}
+          lichtfarbe={lichtfarbe}
+          akzentFarbe={akzentFarbe}
+          klassen="absolute top-4 right-4 md:top-5 md:right-5"
+        />
+        <div className="pr-10">{kopf}</div>
       </button>
 
       <AnimatePresence initial={false}>

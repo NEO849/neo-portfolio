@@ -24,6 +24,7 @@ import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
 import { AbzeichenStatus, TechTag } from "../bausteine/AbzeichenStatus";
 import { AusklappKarte } from "../bausteine/AusklappKarte";
+import { AufklappIndikator } from "../bausteine/AufklappIndikator";
 import { GlassTabs } from "../bausteine/GlassTabs";
 
 type LaborTab = "memory" | "mcps" | "workflows" | "commands";
@@ -471,7 +472,7 @@ function WorkflowRow({ workflow, delay, offen, onToggle }: WorkflowRowProps) {
         <button
           onClick={onToggle}
           aria-expanded={offen}
-          className="w-full text-left p-3 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset rounded-xl"
+          className="group w-full text-left p-3 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset rounded-xl"
           style={{ ['--tw-ring-color' as string]: `rgba(${workflow.farbeRgb}, 0.4)` }}
         >
           {/*
@@ -510,17 +511,14 @@ function WorkflowRow({ workflow, delay, offen, onToggle }: WorkflowRowProps) {
               {workflow.cadence}
             </span>
             {/* Spalte 3 — Icon-Slot mit konstanter Breite (stabile rechte Kante) */}
-            <div className="w-5 flex justify-center flex-shrink-0">
+            <div className="w-7 flex justify-center flex-shrink-0">
               {workflow.details && (
-                <motion.span
-                  animate={{ rotate: offen ? 45 : 0 }}
-                  transition={{ duration: 0.18 }}
-                  className="text-base font-light leading-none"
-                  style={{ color: `rgb(${workflow.farbeRgb})`, opacity: offen ? 0.9 : 0.4 }}
-                  aria-hidden="true"
-                >
-                  +
-                </motion.span>
+                <AufklappIndikator
+                  offen={offen}
+                  lichtfarbe={workflow.farbeRgb}
+                  akzentFarbe={`rgb(${workflow.farbeRgb})`}
+                  groesse="sm"
+                />
               )}
             </div>
           </div>
