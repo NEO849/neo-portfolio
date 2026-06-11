@@ -30,6 +30,13 @@
 /sitemap.xml
   Cache-Control: public, max-age=86400, must-revalidate
 
+# OG-Vorschaubild (Root, NICHT unter /assets/* → kein 1-Jahr-immutable).
+# max-age=0 + must-revalidate: Edge prüft jeden Abruf am Origin. Falls in der
+# Deploy-Propagationssekunde mal der SPA-HTML-Fallback gecacht würde, heilt es
+# sich beim nächsten Abruf selbst — Link-Vorschau bleibt dauerhaft stabil.
+/free-data-og.png
+  Cache-Control: public, max-age=0, must-revalidate
+
 # HTML-Routes → kein Cache, immer revalidieren (sonst veralten SPA-Builds)
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
