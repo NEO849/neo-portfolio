@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   domainAnalysieren, emailAnalysieren, benutzernameSuchen,
@@ -99,6 +99,57 @@ const DEMO_MODULE: DemoModul[] = [
     beschreibung: "SpiderFoot-Style Orchestrator: erkennt Typ automatisch, führt alle relevanten Module parallel aus und entdeckt Pivots (E-Mail → Domain → ASN → IP → CVE). Visualisiert alle Beziehungen als Maltego-Style Graph mit interaktiver Detail-Anzeige.",
   },
 ];
+
+// ─── Premium-UI: Icons je Modul (schlanke Inline-SVGs, keine Dependency) ──
+const ICO = {
+  width: 20, height: 20, viewBox: "0 0 24 24", fill: "none",
+  stroke: "currentColor", strokeWidth: 1.6,
+  strokeLinecap: "round" as const, strokeLinejoin: "round" as const,
+};
+const MODUL_ICON: Record<string, ReactNode> = {
+  "1": (<svg {...ICO}><path d="M3 12h4l2 6 4-14 2 8h6" /></svg>),                                   // Status / Liveness
+  "2": (<svg {...ICO}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>), // E-Mail
+  "3": (<svg {...ICO}><circle cx="12" cy="8" r="3.5" /><path d="M5 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5" /></svg>), // Username
+  "4": (<svg {...ICO}><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" /></svg>), // Telefon
+  "6": (<svg {...ICO}><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="9" cy="9.5" r="1.6" /><path d="m4 17 5-5 4 4 3-3 4 4" /></svg>), // Bild
+  "5": (<svg {...ICO}><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" /></svg>), // Domain
+  "9": (<svg {...ICO}><rect x="9" y="3" width="6" height="5" rx="1" /><rect x="3" y="16" width="6" height="5" rx="1" /><rect x="15" y="16" width="6" height="5" rx="1" /><path d="M12 8v4M6 16v-2h12v2" /></svg>), // Subdomains
+  "10": (<svg {...ICO}><circle cx="6" cy="18" r="2.5" /><circle cx="18" cy="6" r="2.5" /><path d="M8 16 16 8M8 8h8v8" /></svg>), // IP-Intel
+  "11": (<svg {...ICO}><rect x="3" y="4" width="18" height="6" rx="1.5" /><rect x="3" y="14" width="18" height="6" rx="1.5" /><path d="M7 7h.01M7 17h.01" /></svg>), // Censys / Host
+  "8": (<svg {...ICO}><circle cx="6" cy="6" r="2.2" /><circle cx="18" cy="7" r="2.2" /><circle cx="12" cy="18" r="2.2" /><path d="M7.6 7.6 11 16M16.6 8.6 13 16M8 6h8" /></svg>), // Orchestrator / Graph
+};
+
+// 3-Schritt-Indikator: spiegelt die phase-State-Machine als Premium-Stepper.
+function FlowStepper({ phase }: { phase: "menue" | "eingabe" | "laden" | "ausgabe" }) {
+  const aktiv = phase === "menue" ? 0 : phase === "eingabe" ? 1 : 2;
+  const schritte = ["Was analysieren?", "Eingabe", "Ergebnisse"];
+  return (
+    <div className="flex items-center gap-2 sm:gap-3">
+      {schritte.map((s, i) => (
+        <div key={s} className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <span
+              className={[
+                "grid place-items-center w-6 h-6 rounded-full text-[11px] font-semibold transition-colors duration-300 flex-shrink-0",
+                i < aktiv ? "bg-akzent-500/20 text-akzent-300 border border-akzent-500/30"
+                : i === aktiv ? "bg-akzent-500 text-white shadow-aura"
+                : "bg-white/[0.04] text-white/35 border border-white/[0.08]",
+              ].join(" ")}
+            >
+              {i < aktiv ? "✓" : i + 1}
+            </span>
+            <span className={`text-xs sm:text-[13px] truncate transition-colors duration-300 ${i === aktiv ? "text-white/90" : "text-white/40"}`}>
+              {s}
+            </span>
+          </div>
+          {i < schritte.length - 1 && (
+            <span className={`h-px w-4 sm:w-8 transition-colors duration-300 ${i < aktiv ? "bg-akzent-500/40" : "bg-white/10"}`} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // ─── Datenschutz-Konfiguration für sensitive Module ──────────────
 
@@ -1332,29 +1383,32 @@ export default function OsintDemoView() {
 
   // Aktionsleiste (Downloads + Neustart) — geteilt zwischen Report- und Raw-Ansicht.
   const aktionsLeiste = (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mt-5 border-t border-white/5 pt-4">
-      <div className="flex flex-wrap items-center gap-3">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mt-6 border-t border-white/[0.06] pt-4">
+      <div className="flex flex-wrap items-center gap-2.5">
         {aktivesModul?.nummer !== "1" && (
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsTextHerunterladen(); }}
-            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-signal-gruen/10 border border-signal-gruen/25 text-signal-gruen/80 hover:bg-signal-gruen/20 hover:text-signal-gruen transition font-mono"
+            className="inline-flex items-center gap-1.5 text-[13px] px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white/70 hover:text-white hover:border-white/20 transition"
           >
-            ↓ TXT
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 20h14" /></svg>
+            TXT
           </button>
         )}
         {rohdaten && (
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsJsonHerunterladen(); }}
-            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-akzent-500/10 border border-akzent-400/25 text-akzent-400/80 hover:bg-akzent-500/20 hover:text-akzent-400 transition font-mono"
+            className="inline-flex items-center gap-1.5 text-[13px] px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white/70 hover:text-white hover:border-white/20 transition"
           >
-            ↓ JSON
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 20h14" /></svg>
+            JSON
           </button>
         )}
         <button onClick={zurueckSetzen}
-          className="text-xs text-white/50 hover:text-white/80 transition font-mono ml-auto">
-          [Neues Modul]
+          className="inline-flex items-center gap-1.5 text-[13px] px-3.5 py-2 rounded-xl text-akzent-300 hover:text-white bg-akzent-500/10 border border-akzent-500/25 hover:border-akzent-500/45 transition ml-auto">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12a8 8 0 1 1 2.3 5.6M4 12V7m0 5h5" /></svg>
+          Neue Analyse
         </button>
       </div>
     </motion.div>
@@ -1370,83 +1424,105 @@ export default function OsintDemoView() {
         onAbbrechen={modalAbgebrochen}
       />
       <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }} transition={{ duration: 0.5 }}>
-        <h2 className="font-mono text-xl md:text-2xl font-semibold tracking-wider mb-3">
-          <span className="text-signal-gruen">&gt;</span>
-          <span className="text-white/70"> osint_tools</span>
+        viewport={{ once: true }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="mb-7">
+        <span className="flex items-center gap-2.5 mb-4">
+          <span className="h-px w-7 bg-gradient-to-r from-akzent-500/0 via-akzent-500/80 to-akzent-500/0" />
+          <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-akzent-400/90">Intelligence Suite</span>
+        </span>
+        <h2 className="font-display text-3xl md:text-4xl font-bold text-white tracking-[-0.02em] leading-tight mb-3">
+          OSINT&#8202;Analyseplattform
         </h2>
-        <p className="text-white/65 text-sm mb-6">
-          Ein kompaktes OSINT-Toolkit für schnelle Erstanalysen: Domains, E-Mails, Usernames und weitere Hinweise werden live gegen öffentliche Datenquellen geprüft — transparent, kontrolliert und ohne dauerhafte Speicherung.
+        <p className="text-white/60 text-[15px] leading-relaxed max-w-2xl">
+          E-Mails, Domains, Usernames, Telefonnummern und mehr — live gegen öffentliche Datenquellen geprüft.
+          Funde und ihre Beziehungen erscheinen als übersichtliche Karten und Graph. Transparent, kontrolliert,
+          ohne dauerhafte Speicherung.
         </p>
       </motion.div>
 
-      <div className="rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl shadow-black/40">
-        {/* Titelzeile */}
-        <div className="flex items-center gap-2 px-4 py-2.5 bg-[#12121f] border-b border-white/5">
-          <div className="flex gap-1.5">
-            <button onClick={zurueckSetzen} className="w-3 h-3 rounded-full bg-[#ff5f57] hover:brightness-125 transition" />
-            <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-            <div className="w-3 h-3 rounded-full bg-[#28c840]" />
-          </div>
-          <span className="font-mono text-[11px] text-white/55 ml-3">
-            neo@vps:~/osint-toolkit$ python3 main.py
-          </span>
-          <div className="ml-auto flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-signal-gruen animate-pulse" />
-            <span className="font-mono text-[10px] text-signal-gruen/80">LIVE</span>
+      {/* Premium-Analyse-Konsole */}
+      <div className="glass-stark rounded-3xl2 overflow-hidden kante-licht">
+        {/* Kopfzeile: 3-Schritt-Flow + Live-Status */}
+        <div className="flex items-center gap-3 px-4 md:px-6 py-3.5 border-b border-white/[0.07] bg-white/[0.02]">
+          <FlowStepper phase={phase} />
+          <div className="ml-auto hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-signal-gruen/25 bg-signal-gruen/[0.07] flex-shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-signal-gruen animate-pulse" />
+            <span className="font-mono text-[10px] uppercase tracking-wider text-signal-gruen/85">Live</span>
           </div>
         </div>
 
-        {/* Terminal-Körper */}
+        {/* Konsolen-Körper */}
         <div ref={terminalRef}
-          className="bg-[#08080f] p-5 md:p-6 font-mono text-[13px] leading-relaxed min-h-[420px] max-h-[540px] overflow-y-auto overflow-x-hidden">
+          className="relative p-5 md:p-7 min-h-[440px] max-h-[620px] overflow-y-auto overflow-x-hidden">
           <AnimatePresence mode="wait">
 
-            {/* Menü */}
+            {/* Menü — Modul-Auswahl als Premium-Karten */}
             {phase === "menue" && (
-              <motion.div key="menue" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                <div className="text-white/50 text-xs mb-3">+== OSINT TOOLKIT -- Modul waehlen ==+</div>
-                {DEMO_MODULE.map((modul, i) => (
-                  <button key={modul.nummer} onClick={() => modulStarten(modul)}
-                    className="block w-full text-left px-3 py-1.5 rounded-lg hover:bg-white/[0.04] transition-all group">
-                    <span className="text-white/50">[</span>
-                    <span style={{ color: modul.farbe }} className="font-bold">{i + 1}</span>
-                    <span className="text-white/50">]  </span>
-                    <span className="text-white/75 group-hover:text-white transition">{modul.name}</span>
-                    {modul.eingabeTyp === "text" && modul.nummer !== "4" && modul.nummer !== "6" && (
-                      <span className="ml-2 text-[10px] text-signal-gruen/70">LIVE</span>
-                    )}
-                    {(modul.nummer === "4" || modul.nummer === "6") && (
-                      <span className="ml-2 text-[10px] text-signal-gelb/75">LIVE ⚠</span>
-                    )}
+              <motion.div key="menue" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+                <p className="text-[13px] text-white/45 mb-5">
+                  Wähle ein Werkzeug. Du gibst ein Ziel ein — wir prüfen es live und bündeln die Funde verständlich.
+                </p>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  {DEMO_MODULE.map((modul, i) => {
+                    const istWarnung = modul.nummer === "4" || modul.nummer === "6";
+                    const istLive = modul.eingabeTyp === "text";
+                    return (
+                      <motion.button
+                        key={modul.nummer}
+                        type="button"
+                        onClick={() => modulStarten(modul)}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.03 * i, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                        whileHover={{ y: -2 }}
+                        className="group relative text-left rounded-2xl border border-white/[0.07] bg-white/[0.025] hover:bg-white/[0.05] hover:border-white/[0.16] p-4 transition-colors duration-300 overflow-hidden focus:outline-none focus-visible:border-akzent-500/50"
+                      >
+                        <div className="flex items-start gap-3.5">
+                          <span
+                            className="grid place-items-center w-10 h-10 rounded-xl2 flex-shrink-0 border transition-transform duration-300 group-hover:scale-105"
+                            style={{ color: modul.farbe, borderColor: `${modul.farbe}33`, background: `${modul.farbe}14` }}
+                          >
+                            {MODUL_ICON[modul.nummer] ?? null}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h4 className="font-display font-semibold text-white text-[15px] leading-tight">{modul.name}</h4>
+                              {istWarnung ? (
+                                <span className="inline-flex items-center gap-1 rounded-full border border-signal-gelb/30 bg-signal-gelb/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-signal-gelb/90">Live · sensibel</span>
+                              ) : istLive ? (
+                                <span className="inline-flex items-center gap-1 rounded-full border border-signal-gruen/25 bg-signal-gruen/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-signal-gruen/85">Live</span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-white/45">Check</span>
+                              )}
+                            </div>
+                            <p className="text-[13px] text-white/55 leading-snug mt-1.5 line-clamp-2">{modul.ziel}</p>
+                          </div>
+                          <span className="flex-shrink-0 mt-1 text-white/20 group-hover:text-akzent-300 group-hover:translate-x-0.5 transition-all duration-300">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                          </span>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+
+                {/* Projekt unterstützen — dezent */}
+                <div className="mt-7 pt-5 border-t border-white/[0.06] flex items-center justify-between gap-3 flex-wrap">
+                  <span className="text-[12px] text-white/35">Frei nutzbar · keine Anmeldung · keine Speicherung</span>
+                  <button
+                    type="button"
+                    onClick={btcAdresseKopieren}
+                    className={[
+                      "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[12px] transition-all duration-200 select-none",
+                      btcKopiert === "success"
+                        ? "border-signal-gruen/35 bg-signal-gruen/[0.07] text-signal-gruen/85"
+                        : btcKopiert === "error"
+                        ? "border-signal-rot/30 bg-signal-rot/[0.05] text-signal-rot/75"
+                        : "border-white/[0.08] bg-white/[0.03] text-white/55 hover:text-white/80 hover:border-white/20",
+                    ].join(" ")}
+                  >
+                    {btcKopiert === "success" ? "BTC-Adresse kopiert" : btcKopiert === "error" ? "Kopieren fehlgeschlagen" : "Projekt unterstützen · BTC"}
                   </button>
-                ))}
-                <div className="mt-3 text-white/55 text-xs">+====================================+</div>
-                <div className="mt-8 text-[11px] font-mono select-none">
-                    <button
-                      type="button"
-                      onClick={btcAdresseKopieren}
-                      className={[
-                        "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border font-mono text-[11px] transition-all duration-200 select-none",
-                        btcKopiert === "success"
-                          ? "border-signal-gruen/35 bg-signal-gruen/[0.06] text-signal-gruen/80"
-                          : btcKopiert === "error"
-                          ? "border-signal-rot/30 bg-signal-rot/[0.05] text-signal-rot/70"
-                          : "border-akzent-400/[0.22] bg-akzent-400/[0.04] hover:border-akzent-400/40 hover:bg-akzent-400/[0.09] active:bg-akzent-400/[0.14]",
-                      ].join(" ")}
-                    >
-                      {btcKopiert === "success" ? (
-                        "BTC-Adresse kopiert"
-                      ) : btcKopiert === "error" ? (
-                        "Kopieren fehlgeschlagen"
-                      ) : (
-                        <>
-                          <span className="text-white/50">Projekt unterstützen</span>
-                          <span className="text-akzent-400/40">-&gt;</span>
-                          <span className="text-akzent-400/70 font-semibold">Copy BTC</span>
-                        </>
-                      )}
-                    </button>
                 </div>
               </motion.div>
             )}
@@ -1454,82 +1530,104 @@ export default function OsintDemoView() {
             {/* Eingabe */}
             {phase === "eingabe" && aktivesModul && (
               <motion.div key="eingabe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="w-full min-w-0">
-                <div className="text-white/55 text-xs mb-3">
-                  Modul [{DEMO_MODULE.indexOf(aktivesModul) + 1}]: {aktivesModul.name}
-                  {aktivesModul.eingabeTyp === "text" && <span className="ml-2 text-signal-gruen/70">— LIVE API</span>}
+                {/* Zurück + Modul-Kopf */}
+                <button onClick={zurueckSetzen}
+                  className="inline-flex items-center gap-1.5 text-[12px] text-white/45 hover:text-white/80 transition mb-4">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6 6 6" /></svg>
+                  Auswahl
+                </button>
+
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="grid place-items-center w-10 h-10 rounded-xl2 flex-shrink-0 border"
+                    style={{ color: aktivesModul.farbe, borderColor: `${aktivesModul.farbe}33`, background: `${aktivesModul.farbe}14` }}>
+                    {MODUL_ICON[aktivesModul.nummer] ?? null}
+                  </span>
+                  <h3 className="font-display font-semibold text-white text-lg leading-tight">{aktivesModul.name}</h3>
                 </div>
 
-                {/* Tool-Erklärung: Ziel zuerst (Mehrwert), Details dezent darunter */}
+                {/* Ziel (Nutzen) + Details */}
                 {aktivesModul.ziel && (
-                  <div
-                    className="mb-4 px-4 py-3 rounded-lg border border-white/[0.06] bg-white/[0.02] font-mono"
-                    style={{ borderLeft: `2px solid ${aktivesModul.farbe}` }}
-                  >
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-[9px] tracking-[0.18em] uppercase shrink-0" style={{ color: aktivesModul.farbe }}>Ziel</span>
-                      <span className="text-white/85 text-[11.5px] leading-relaxed">{aktivesModul.ziel}</span>
-                    </div>
+                  <div className="mb-5 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4">
+                    <p className="text-white/85 text-sm leading-relaxed">{aktivesModul.ziel}</p>
                     {aktivesModul.beschreibung && (
-                      <p className="mt-2 text-white/55 text-[11px] leading-relaxed">{aktivesModul.beschreibung}</p>
+                      <p className="mt-2.5 text-white/50 text-[13px] leading-relaxed">{aktivesModul.beschreibung}</p>
                     )}
                   </div>
                 )}
 
-                <div className="flex items-center gap-2 w-full min-w-0">
-                  <span style={{ color: aktivesModul.farbe }} className="whitespace-nowrap flex-shrink-0">{aktivesModul.eingabeLabel}:</span>
-                  <input ref={eingabeRef} type="text" value={eingabeWert}
-                    onChange={(event) => setEingabeWert(event.target.value)}
-                    onKeyDown={(event) => event.key === "Enter" && eingabeAbsenden()}
-                    onFocus={() => {
-                      if (aktivesModul && eingabeWert === aktivesModul.beispielEingabe) {
-                        setEingabeWert("");
-                      }
-                    }}
-                    className="flex-1 min-w-0 w-full max-w-full terminal-eingabe font-mono text-base"
-                    spellCheck={false} autoComplete="off"
-                  />
-                </div>
+                {/* Premium-Eingabefeld */}
+                {aktivesModul.eingabeTyp === "text" && (
+                  <div>
+                    <label className="block font-mono text-[11px] uppercase tracking-[0.18em] text-white/45 mb-2">
+                      {aktivesModul.eingabeLabel}
+                    </label>
+                    <div className="flex flex-col sm:flex-row gap-2.5">
+                      <div className="flex-1 min-w-0 flex items-center gap-2.5 rounded-2xl border border-white/[0.1] bg-white/[0.03] focus-within:border-akzent-500/55 focus-within:bg-white/[0.05] transition-colors duration-200 px-4 py-3">
+                        <span className="text-white/30 flex-shrink-0">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
+                        </span>
+                        <input ref={eingabeRef} type="text" value={eingabeWert}
+                          onChange={(event) => setEingabeWert(event.target.value)}
+                          onKeyDown={(event) => event.key === "Enter" && eingabeAbsenden()}
+                          onFocus={() => {
+                            if (aktivesModul && eingabeWert === aktivesModul.beispielEingabe) setEingabeWert("");
+                          }}
+                          placeholder={aktivesModul.beispielEingabe}
+                          className="flex-1 min-w-0 w-full bg-transparent outline-none border-0 text-white text-[15px] placeholder:text-white/30 caret-akzent-400"
+                          spellCheck={false} autoComplete="off"
+                        />
+                      </div>
+                      <button onClick={eingabeAbsenden}
+                        className="group inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-akzent-500 hover:bg-akzent-600 text-white font-medium text-[14px] transition-colors duration-200 shadow-aura flex-shrink-0">
+                        Analysieren
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 transition-transform"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Module ohne Texteingabe (z. B. Status) — direkter Start */}
+                {aktivesModul.eingabeTyp !== "text" && (
+                  <button onClick={eingabeAbsenden}
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-akzent-500 hover:bg-akzent-600 text-white font-medium text-[14px] transition-colors duration-200 shadow-aura">
+                    Jetzt prüfen
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                  </button>
+                )}
 
                 {/* Modul 3: Schnell-/Vollscan-Umschalter */}
                 {aktivesModul.nummer === "3" && (
-                  <div className="mt-3 flex items-center gap-1.5 font-mono text-[11px] flex-wrap">
-                    <span className="text-white/50 mr-0.5">Modus:</span>
-                    {([
-                      { schnell: true, label: "Schnell · ~12" },
-                      { schnell: false, label: "Vollscan · 600+" },
-                    ] as const).map((o) => (
-                      <button
-                        key={String(o.schnell)}
-                        type="button"
-                        onClick={() => setSchnellModus(o.schnell)}
-                        className={`px-2.5 py-1 rounded-md border transition ${
-                          schnellModus === o.schnell
-                            ? "border-akzent-400/40 bg-akzent-500/15 text-akzent-400"
-                            : "border-white/[0.08] text-white/55 hover:text-white/75 hover:border-white/20"
-                        }`}
-                      >
-                        {o.label}
-                      </button>
-                    ))}
+                  <div className="mt-4 flex items-center gap-2 text-[12px] flex-wrap">
+                    <span className="text-white/45 mr-0.5">Tiefe:</span>
+                    <div className="inline-flex rounded-xl border border-white/[0.08] bg-white/[0.02] p-0.5">
+                      {([
+                        { schnell: true, label: "Schnell · ~12" },
+                        { schnell: false, label: "Vollscan · 600+" },
+                      ] as const).map((o) => (
+                        <button
+                          key={String(o.schnell)}
+                          type="button"
+                          onClick={() => setSchnellModus(o.schnell)}
+                          className={`px-3 py-1.5 rounded-lg transition ${
+                            schnellModus === o.schnell
+                              ? "bg-akzent-500/20 text-akzent-300"
+                              : "text-white/50 hover:text-white/75"
+                          }`}
+                        >
+                          {o.label}
+                        </button>
+                      ))}
+                    </div>
                     <span className="text-white/35 ml-1">{schnellModus ? "Sekunden" : "~30–60 s"}</span>
                   </div>
                 )}
 
                 {apiFehler && (
-                  <div className="mt-3 text-signal-rot text-xs">
-                    [Fehler]  {apiFehler}
+                  <div className="mt-4 flex items-start gap-2 rounded-xl border border-signal-rot/30 bg-signal-rot/[0.07] px-3.5 py-2.5 text-signal-rot/90 text-[13px]">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
+                    <span>{apiFehler}</span>
                   </div>
                 )}
-                <div className="mt-4 flex gap-3">
-                  <button onClick={eingabeAbsenden}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-akzent-500/20 border border-akzent-400/30 text-akzent-400 hover:bg-akzent-500/30 transition">
-                    Enter ↵
-                  </button>
-                  <button onClick={zurueckSetzen}
-                    className="text-xs px-3 py-1.5 rounded-lg text-white/55 hover:text-white/80 transition">
-                    Zurueck
-                  </button>
-                </div>
 
                 <DatenflussHinweis nummer={aktivesModul.nummer} />
 
@@ -1574,21 +1672,35 @@ export default function OsintDemoView() {
 
             {/* Laden */}
             {phase === "laden" && (
-              <motion.div key="laden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                <div className="text-white/55 text-xs mb-4">Anfrage wird verarbeitet...</div>
-                <div className="flex items-center gap-2 text-signal-gruen/85">
+              <motion.div key="laden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+                className="flex flex-col items-center justify-center text-center py-16">
+                {/* Pulsierender Akzent-Ring mit Modul-Icon */}
+                <div className="relative w-16 h-16 mb-6">
                   <motion.span
-                    animate={{ opacity: [1, 0.3, 1] }}
-                    transition={{ duration: 0.8, repeat: Infinity }}
-                  >▶</motion.span>
-                  <span>Verbindung zur OSINT-API...</span>
+                    className="absolute inset-0 rounded-full border border-akzent-500/30"
+                    animate={{ scale: [1, 1.35], opacity: [0.5, 0] }}
+                    transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
+                  />
+                  <motion.span
+                    className="absolute inset-0 rounded-full border border-akzent-500/30"
+                    animate={{ scale: [1, 1.35], opacity: [0.5, 0] }}
+                    transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut", delay: 0.8 }}
+                  />
+                  <span className="absolute inset-0 grid place-items-center rounded-full bg-akzent-500/12 border border-akzent-500/30 text-akzent-300">
+                    {aktivesModul ? MODUL_ICON[aktivesModul.nummer] : null}
+                  </span>
                 </div>
-                <div className="mt-2 text-white/55 text-xs">
-                  POST /api/v1/osint/{({
-                    "2": "email", "3": "benutzername", "4": "telefon", "5": "domain",
-                    "6": "bild", "7": "aggregator", "8": "orchestrator",
-                    "9": "subdomains", "10": "ip-intel", "11": "censys",
-                  } as Record<string, string>)[aktivesModul?.nummer ?? ""] ?? "osint"}
+                <p className="font-display font-semibold text-white text-[15px] mb-1.5">Analyse läuft</p>
+                <p className="text-white/45 text-[13px] max-w-xs">
+                  Öffentliche Datenquellen werden live geprüft und zusammengeführt …
+                </p>
+                {/* feiner Fortschritts-Shimmer */}
+                <div className="mt-5 h-1 w-40 rounded-full bg-white/[0.06] overflow-hidden">
+                  <motion.div
+                    className="h-full w-1/3 rounded-full bg-gradient-to-r from-transparent via-akzent-500 to-transparent"
+                    animate={{ x: ["-100%", "300%"] }}
+                    transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                  />
                 </div>
               </motion.div>
             )}
@@ -1596,23 +1708,25 @@ export default function OsintDemoView() {
             {/* Ausgabe */}
             {phase === "ausgabe" && (
               <motion.div key="ausgabe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                {/* Ansicht-Umschalter — nur wenn eine Report-Ansicht verfügbar ist */}
+                {/* Ansicht-Umschalter (Karten / Rohdaten) als Segmented Control */}
                 {reportVerfuegbar && (
-                  <div className="flex items-center gap-1.5 mb-4 font-mono text-[11px]">
-                    <span className="text-white/50 mr-1">ansicht:</span>
-                    {(["report", "raw"] as const).map((v) => (
-                      <button
-                        key={v}
-                        onClick={() => setAnsicht(v)}
-                        className={`px-2.5 py-1 rounded-md border transition ${
-                          ansicht === v
-                            ? "border-akzent-400/40 bg-akzent-500/15 text-akzent-400"
-                            : "border-white/[0.08] text-white/60 hover:text-white/75 hover:border-white/20"
-                        }`}
-                      >
-                        {v}
-                      </button>
-                    ))}
+                  <div className="flex items-center mb-5">
+                    <div className="inline-flex rounded-xl border border-white/[0.08] bg-white/[0.02] p-0.5 text-[12px]">
+                      {([
+                        { v: "report" as const, label: "Karten" },
+                        { v: "raw" as const, label: "Rohdaten" },
+                      ]).map(({ v, label }) => (
+                        <button
+                          key={v}
+                          onClick={() => setAnsicht(v)}
+                          className={`px-3 py-1.5 rounded-lg transition ${
+                            ansicht === v ? "bg-akzent-500/20 text-akzent-300" : "text-white/50 hover:text-white/75"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
 
@@ -1623,7 +1737,9 @@ export default function OsintDemoView() {
                   </>
                 )}
 
-                {!zeigeReport && ausgabeZeilen.slice(0, zeilenIndex + 1).map((zeile, index) => {
+                {!zeigeReport && (
+                  <div className="font-mono text-[13px] leading-relaxed rounded-xl border border-white/[0.06] bg-grund-950/50 p-4 overflow-x-auto">
+                  {ausgabeZeilen.slice(0, zeilenIndex + 1).map((zeile, index) => {
                   // Subline-Marker "  \u203A" \u2014 dezent, kleiner, hanging-indent, wrappable
                   if (zeile.startsWith("  \u203A")) {
                     const inhalt = zeile.replace(/^\s*\u203A\s+/, "");
@@ -1641,38 +1757,11 @@ export default function OsintDemoView() {
                       {zeile || "\u00A0"}
                     </div>
                   );
-                })}
-                {!zeigeReport && !fertig && <span className="text-signal-gruen/60 animate-pulse">█</span>}
-                {!zeigeReport && fertig && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-5 border-t border-white/5 pt-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                      {/* Download TXT — nicht beim Status-Check (Modul 1) */}
-                      {aktivesModul?.nummer !== "1" && (
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsTextHerunterladen(); }}
-                          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-signal-gruen/10 border border-signal-gruen/25 text-signal-gruen/80 hover:bg-signal-gruen/20 hover:text-signal-gruen transition font-mono"
-                        >
-                          ↓ TXT
-                        </button>
-                      )}
-                      {/* Download JSON — nur bei Live-Modulen */}
-                      {rohdaten && (
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); alsJsonHerunterladen(); }}
-                          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-akzent-500/10 border border-akzent-400/25 text-akzent-400/80 hover:bg-akzent-500/20 hover:text-akzent-400 transition font-mono"
-                        >
-                          ↓ JSON
-                        </button>
-                      )}
-                      <button onClick={zurueckSetzen}
-                        className="text-xs text-white/50 hover:text-white/80 transition font-mono ml-auto">
-                        [Neues Modul]
-                      </button>
-                    </div>
-                  </motion.div>
+                  })}
+                    {!fertig && <span className="text-akzent-400/70 animate-pulse">█</span>}
+                  </div>
                 )}
+                {!zeigeReport && fertig && aktionsLeiste}
               </motion.div>
             )}
 
@@ -1683,13 +1772,16 @@ export default function OsintDemoView() {
       {/* Maltego-Style Graph — nur bei Modul 8 (Orchestrator) mit Graph-Daten */}
       {(fertig || zeigeReport) && aktivesModul?.nummer === "8" && rohdaten && (rohdaten as OrchestratorErgebnis).graph && (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-6">
-          <div className="flex items-center gap-2 px-4 py-2.5 bg-[#12121f] rounded-t-2xl border border-white/[0.08] border-b-0">
-            <span className="font-mono text-[11px] text-white/55">graph_visualization — maltego_style</span>
-            <span className="ml-auto font-mono text-[10px] text-akzent-400/70">
+          <div className="flex items-center gap-2.5 px-5 py-3 rounded-t-2xl2 border border-white/[0.08] border-b-0 bg-white/[0.03] backdrop-blur-xl">
+            <span className="text-akzent-300">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="6" cy="6" r="2.2" /><circle cx="18" cy="7" r="2.2" /><circle cx="12" cy="18" r="2.2" /><path d="M7.6 7.6 11 16M16.6 8.6 13 16M8 6h8" /></svg>
+            </span>
+            <span className="font-display font-semibold text-white text-sm">Beziehungs-Graph</span>
+            <span className="ml-auto font-mono text-[11px] text-white/45">
               {(rohdaten as OrchestratorErgebnis).graph!.statistik.knoten_gesamt} Knoten · {(rohdaten as OrchestratorErgebnis).graph!.statistik.kanten_gesamt} Kanten
             </span>
           </div>
-          <div className="rounded-b-2xl overflow-hidden border border-white/[0.08] border-t-0">
+          <div className="rounded-b-2xl2 overflow-hidden border border-white/[0.08] border-t-0">
             <OsintGraph
               nodes={(rohdaten as OrchestratorErgebnis).graph!.nodes}
               edges={(rohdaten as OrchestratorErgebnis).graph!.edges}
@@ -1698,9 +1790,13 @@ export default function OsintDemoView() {
         </motion.div>
       )}
 
-      <div className="mt-6 text-[11px] font-mono text-white/50 text-center leading-relaxed">
-        <div><span className="text-akzent-400/55">status:</span> live-checks aktiv</div>
-        <div><span className="text-akzent-400/55">privacy:</span> keine dauerhafte speicherung · rate-limit: 3–20/min</div>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[12px] text-white/40">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-signal-gruen animate-pulse" />
+          Live-Checks aktiv
+        </span>
+        <span>Keine dauerhafte Speicherung</span>
+        <span>Rate-Limit: 3–20/min</span>
       </div>
     </section>
   );
