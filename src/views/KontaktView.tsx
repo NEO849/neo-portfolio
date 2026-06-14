@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { PERSOENLICH } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
+import { KnopfAktion } from "../bausteine/KnopfAktion";
 import { LegalModal, type LegalTab } from "../bausteine/LegalModal";
 import { STATISCHE_TEXTKARTE } from "../bewegung/varianten";
 
@@ -342,20 +343,13 @@ function KontaktFormular() {
           <p className="text-[10px] font-mono text-white/25 leading-relaxed">
             Deine Angaben werden nur zur Bearbeitung deiner Nachricht verwendet.
           </p>
-          <button
-            type="submit"
-            disabled={sendet}
-            className="w-full sm:w-auto flex-shrink-0 px-5 py-2 rounded-xl text-xs font-mono border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-cyber-400/[0.06] border-cyber-400/25 text-cyber-400/75 hover:text-cyber-400 hover:bg-cyber-400/[0.12] hover:border-cyber-400/45"
-          >
-            {sendet ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="inline-block w-3 h-3 border border-cyber-400/60 border-t-transparent rounded-full animate-spin" />
-                Senden…
-              </span>
-            ) : (
-              "Nachricht senden →"
-            )}
-          </button>
+          <KnopfAktion
+            typ="submit"
+            laedt={sendet}
+            ladeText="Senden…"
+            klassen="w-full sm:w-auto flex-shrink-0"
+            kinder="Nachricht senden →"
+          />
         </div>
 
       </InfoKarte>

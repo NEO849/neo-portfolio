@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, type ReactNode } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import { PHASEN_WECHSEL, FEDERN } from "../bewegung/varianten";
 import { GlanzUeberschrift } from "../bewegung/GlanzUeberschrift";
+import { KnopfAktion } from "../bausteine/KnopfAktion";
 import {
   domainAnalysieren, emailAnalysieren, benutzernameSuchen,
   telefonAnalysieren, bildAnalysieren,
@@ -174,6 +175,22 @@ const DATENSCHUTZ_HINWEISE: Record<string, string[]> = {
 };
 
 const BITCOIN_ADDRESS = "bc1qf666x5l4zs6tm9w69jsr9mn5glvf97fk9z6zs8";
+
+// Pro Modul ein kurzer, handlungsorientierter Hinweis: was bedeuten die
+// Ergebnisse und was macht man als Nächstes damit? Wird als horizontaler
+// Führungs-Banner über den Resultaten gezeigt (Nutzer-Orientierung).
+const ERGEBNIS_HINWEIS: Record<string, string> = {
+  "1": "Grün = live und einsatzbereit. Wähle links ein Modul und starte deine erste Analyse.",
+  "2": "Rote Treffer zuerst: Datenlecks und exponierte Profile. Klicke einen Pivot, um einen Fund weiter zu verfolgen.",
+  "3": "Jeder Treffer ist ein Profil auf einer Plattform. Achte auf die Konfidenz (hoch / mittel / niedrig), bevor du folgst.",
+  "4": "Land, Anbieter und Leitungstyp geben Kontext. Die Such-Links öffnest nur du selbst — nichts wird automatisch aufgerufen.",
+  "6": "Prüfe die EXIF-Daten auf GPS (Aufnahmeort) und nutze die Reverse-Image-Suchen, um die Bildquelle zu finden.",
+  "5": "Ordne zuerst die beiden Risk-Scores ein. Rote/gelbe Ports und fehlende Security-Header sind die relevanten Schwachstellen.",
+  "9": "Jede Subdomain ist potenzielle Angriffsfläche. Live aufgelöste (mit A-Record) zuerst ansehen.",
+  "10": "Zeigt Eigentümer und Routing der IP — die Basis, um Zuständigkeit und Abuse-Kontakt zu bestimmen.",
+  "11": "Offene Dienste und Standort des Hosts — die autoritative Sicht, die Shodan ergänzt.",
+  "8": "Unten erscheint der Beziehungs-Graph: Knoten anklicken und Verbindungen folgen — so werden die Zusammenhänge sichtbar.",
+};
 
 // ─── Terminal-Hilfsfunktionen ─────────────────────────────────────
 // Box: 36 Zeichen breit — passt auf Mobile ohne horizontalen Scroll.
@@ -1532,20 +1549,11 @@ export default function OsintDemoView() {
                 {/* Projekt unterstützen — dezent */}
                 <div className="mt-7 pt-5 border-t border-white/[0.06] flex items-center justify-between gap-3 flex-wrap">
                   <span className="text-[12px] text-white/35">Frei nutzbar · keine Anmeldung · keine Speicherung</span>
-                  <button
-                    type="button"
-                    onClick={btcAdresseKopieren}
-                    className={[
-                      "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[12px] transition-all duration-200 select-none",
-                      btcKopiert === "success"
-                        ? "border-signal-gruen/35 bg-signal-gruen/[0.07] text-signal-gruen/85"
-                        : btcKopiert === "error"
-                        ? "border-signal-rot/30 bg-signal-rot/[0.05] text-signal-rot/75"
-                        : "border-white/[0.08] bg-white/[0.03] text-white/55 hover:text-white/80 hover:border-white/20",
-                    ].join(" ")}
-                  >
-                    {btcKopiert === "success" ? "BTC-Adresse kopiert" : btcKopiert === "error" ? "Kopieren fehlgeschlagen" : "Projekt unterstützen · BTC"}
-                  </button>
+                  <KnopfAktion
+                    beimKlick={btcAdresseKopieren}
+                    klassen="select-none"
+                    kinder={btcKopiert === "success" ? "BTC-Adresse kopiert ✓" : btcKopiert === "error" ? "Kopieren fehlgeschlagen" : "Projekt unterstützen · BTC"}
+                  />
                 </div>
               </motion.div>
             )}
@@ -1600,22 +1608,14 @@ export default function OsintDemoView() {
                           spellCheck={false} autoComplete="off"
                         />
                       </div>
-                      <button onClick={eingabeAbsenden}
-                        className="group inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-akzent-500 hover:bg-akzent-600 text-white font-medium text-[14px] transition-colors duration-200 shadow-aura flex-shrink-0">
-                        Analysieren
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 transition-transform"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                      </button>
+                      <KnopfAktion beimKlick={eingabeAbsenden} klassen="flex-shrink-0" kinder="Analysieren →" />
                     </div>
                   </div>
                 )}
 
                 {/* Module ohne Texteingabe (z. B. Status) — direkter Start */}
                 {aktivesModul.eingabeTyp !== "text" && (
-                  <button onClick={eingabeAbsenden}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-akzent-500 hover:bg-akzent-600 text-white font-medium text-[14px] transition-colors duration-200 shadow-aura">
-                    Jetzt prüfen
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                  </button>
+                  <KnopfAktion beimKlick={eingabeAbsenden} kinder="Jetzt prüfen →" />
                 )}
 
                 {/* Modul 3: Schnell-/Vollscan-Umschalter */}
@@ -1731,6 +1731,20 @@ export default function OsintDemoView() {
             {/* Ausgabe */}
             {phase === "ausgabe" && (
               <motion.div key="ausgabe" variants={PHASEN_WECHSEL} initial="versteckt" animate="sichtbar" exit="verlassen">
+                {/* Führungs-Banner: sagt dem Nutzer pro Tool, was die Ergebnisse
+                    bedeuten und was er als Nächstes damit tut. */}
+                {aktivesModul && ERGEBNIS_HINWEIS[aktivesModul.nummer] && (
+                  <div className="mb-5 flex items-start gap-3 rounded-2xl border border-akzent-500/20 bg-akzent-500/[0.05] px-4 py-3">
+                    <span className="flex-shrink-0 mt-0.5 text-akzent-300">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6M10 21h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2h6c0-.8.4-1.5 1-2A7 7 0 0 0 12 2Z" /></svg>
+                    </span>
+                    <div className="min-w-0">
+                      <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-akzent-400/80 mb-0.5">So nutzt du die Ergebnisse</span>
+                      <span className="block text-[13px] text-white/70 leading-snug">{ERGEBNIS_HINWEIS[aktivesModul.nummer]}</span>
+                    </div>
+                  </div>
+                )}
+
                 {/* Ansicht-Umschalter (Karten / Rohdaten) als Segmented Control */}
                 {reportVerfuegbar && (
                   <div className="flex items-center mb-5">

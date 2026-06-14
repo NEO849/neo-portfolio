@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ZEITSTRAHL } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
+import { GlanzUeberschrift } from "../bewegung/GlanzUeberschrift";
 import { InfoKarte } from "../bausteine/InfoKarte";
 import { TechTag } from "../bausteine/AbzeichenStatus";
 import { AusklappKarte } from "../bausteine/AusklappKarte";
@@ -54,8 +55,25 @@ export default function UeberMichView() {
     <section id="ueber" className="py-16 px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
         prefix="> ueber_mich"
-        klassen="mb-10"
+        klassen="mb-7"
       />
+
+      {/* Lead-Statement mit Shine-Effekt — die Positionierung in einem Satz,
+          gleicher hochwertiger Effekt wie die Überschriften der anderen Views. */}
+      <motion.div
+        variants={STATISCHE_TEXTKARTE}
+        initial="versteckt"
+        whileInView="sichtbar"
+        viewport={{ once: true, margin: "-40px" }}
+        className="mb-9 max-w-3xl"
+      >
+        <GlanzUeberschrift
+          element="h3"
+          dauerSekunden={8}
+          klassen="font-display font-semibold text-xl md:text-[26px] leading-snug tracking-[-0.01em]"
+          kinder="Eine seltene Kombination: über 15 Jahre IT-Systeme aufgebaut — heute entwickle ich die Software für die Hardware. Das gibt mir einen besonderen Blick fürs große Ganze."
+        />
+      </motion.div>
 
       {/* Profil-Text */}
       <motion.div

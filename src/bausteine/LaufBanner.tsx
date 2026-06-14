@@ -62,10 +62,10 @@ export function LaufBanner({ tempoSekunden = 44, klassen = "" }: LaufBannerProps
       tabIndex={0}
     >
       {/* Sichtbare Laufspur — rein dekorativ (verdoppelt), daher vor AT verborgen.
-          Pause bei Hover ODER Tastaturfokus auf dem Container. */}
+          Läuft durchgehend; pausiert nur bei Tastaturfokus (A11y), nicht bei Hover. */}
       <div
         aria-hidden="true"
-        className="flex w-max animate-band-laufen group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused] motion-reduce:animate-none"
+        className="flex w-max animate-band-laufen group-focus-within:[animation-play-state:paused] motion-reduce:animate-none"
         style={{ animationDuration: `${tempoSekunden}s` }}
       >
         {sequenz.map((eintrag, index) => (
