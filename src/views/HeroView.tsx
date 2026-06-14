@@ -5,11 +5,13 @@ import { PERSOENLICH } from "../models/daten";
 import { KartenLicht } from "../bewegung/KartenLicht";
 import { KURVEN, FEDERN } from "../bewegung/varianten";
 import { useBewegungErlaubt } from "../bewegung/hooks/useBewegungErlaubt";
+import { MatrixSchleier } from "../bewegung/MatrixSchleier";
+import { LaufBanner } from "../bausteine/LaufBanner";
 
 // ═══════════════════════════════════════════════════════════════════
 // VIEW: Hero — Premium-Einstieg & Produkt-Inszenierung
-// Ruhige Tiefe statt Matrix. Horizontale Produkt-Banner führen den
-// Besucher gezielt in die wichtigsten Bereiche (OSINT featured).
+// Ruhige Tiefe (dezenter Code-Schleier + träge Lichtfelder), ein lebendiger
+// Infra-Ticker und Produkt-Banner führen gezielt in die Bereiche (OSINT featured).
 // ═══════════════════════════════════════════════════════════════════
 
 const EASE = KURVEN.expressiv;
@@ -31,47 +33,47 @@ const buchstabe = {
 
 interface Banner {
   readonly pfad: string;
-  readonly kicker: string;
-  readonly titel: string;
-  readonly nutzen: string;
+  readonly titel: string;       // Bereichsname — die fettgesetzte Hauptzeile
+  readonly nutzen: string;      // eine prägnante Wert-Zeile darunter
   readonly icon: ReactNode;
   readonly featured?: boolean;
 }
 
+// Einheitliche Icon-Geometrie — etwas kräftiger gezeichnet für mehr Präsenz.
 const ICON_PROPS = {
-  width: 22, height: 22, viewBox: "0 0 24 24", fill: "none",
-  stroke: "currentColor", strokeWidth: 1.6,
+  width: 23, height: 23, viewBox: "0 0 24 24", fill: "none",
+  stroke: "currentColor", strokeWidth: 1.7,
   strokeLinecap: "round" as const, strokeLinejoin: "round" as const,
 };
 
 const BANNER: Banner[] = [
   {
-    pfad: "/osint-tools", kicker: "Intelligence Suite", titel: "OSINT Analyseplattform",
-    nutzen: "E-Mail, Domain, Username & mehr live analysieren — Funde und ihre Beziehungen als Graph.",
+    pfad: "/osint-tools", titel: "OSINT Analyseplattform",
+    nutzen: "E-Mail, Domain, Username & mehr live — Beziehungen als Graph.",
     featured: true,
     icon: (
-      <svg {...ICON_PROPS}><circle cx="11" cy="11" r="6.5" /><path d="m20 20-3.5-3.5" /><circle cx="11" cy="11" r="2" /></svg>
+      <svg {...ICON_PROPS}><circle cx="10.5" cy="10.5" r="6" /><path d="m20 20-4.2-4.2" /><circle cx="10.5" cy="10.5" r="2" /></svg>
     ),
   },
   {
-    pfad: "/labor", kicker: "Infrastruktur & Automation", titel: "Systeme, die im Hintergrund tragen",
-    nutzen: "Gehärtete Linux-Infrastruktur und KI-Agenten, die wiederkehrende Abläufe übernehmen.",
+    pfad: "/labor", titel: "Infrastruktur & Automation",
+    nutzen: "Gehärtete Linux-Systeme & KI-Agenten, die Abläufe übernehmen.",
     icon: (
-      <svg {...ICON_PROPS}><rect x="3" y="4" width="18" height="6" rx="1.5" /><rect x="3" y="14" width="18" height="6" rx="1.5" /><path d="M7 7h.01M7 17h.01" /></svg>
+      <svg {...ICON_PROPS}><rect x="3" y="4" width="18" height="6.5" rx="2" /><rect x="3" y="13.5" width="18" height="6.5" rx="2" /><path d="M6.5 7.25h.01M6.5 16.75h.01" /></svg>
     ),
   },
   {
-    pfad: "/security", kicker: "Security & Analyse", titel: "Der Blick des Angreifers",
-    nutzen: "Schwachstellen finden, bevor andere es tun — methodisch geprüft, sauber dokumentiert.",
+    pfad: "/security", titel: "Security & Analyse",
+    nutzen: "Schwachstellen finden, bevor andere es tun — der Blick des Angreifers.",
     icon: (
-      <svg {...ICON_PROPS}><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" /><path d="m9.5 11.5 1.8 1.8 3.2-3.6" /></svg>
+      <svg {...ICON_PROPS}><path d="M12 2.5l7.5 3.2v5.1c0 4.7-3.2 8-7.5 9.7-4.3-1.7-7.5-5-7.5-9.7V5.7z" /><path d="m9 11.7 2 2 3.6-4" /></svg>
     ),
   },
   {
-    pfad: "/projekte", kicker: "Projekte & Entwicklung", titel: "Eigene Software, produktiv im Einsatz",
-    nutzen: "Vom KI-Workflow bis zum gehärteten Server — seit Jahren live, abgesichert, dokumentiert.",
+    pfad: "/projekte", titel: "Projekte & Entwicklung",
+    nutzen: "Eigene Software & Systeme — seit Jahren produktiv im Einsatz.",
     icon: (
-      <svg {...ICON_PROPS}><path d="m8 9-3 3 3 3" /><path d="m16 9 3 3-3 3" /><path d="m13 7-2 10" /></svg>
+      <svg {...ICON_PROPS}><path d="m8 8.5-3.5 3.5 3.5 3.5" /><path d="m16 8.5 3.5 3.5-3.5 3.5" /><path d="m13.5 6-3 12" /></svg>
     ),
   },
 ];
@@ -102,35 +104,40 @@ function ProduktBanner({ banner, index }: { banner: Banner; index: number }) {
             {/* Hover-Sheen — feiner Lichtstreif, der durchläuft */}
             <span aria-hidden className="sheen" />
 
-            {/* Icon-Plättchen */}
+            {/* Icon-Plättchen — Glas mit Tiefe, Akzent-Glow bei Hover */}
             <span
               className={[
-                "relative flex-shrink-0 grid place-items-center rounded-xl2 w-11 h-11 md:w-12 md:h-12 transition-colors duration-300",
+                "relative flex-shrink-0 grid place-items-center w-12 h-12 rounded-2xl2 border transition-all duration-300 group-hover:scale-[1.06]",
                 banner.featured
-                  ? "text-akzent-300 bg-akzent-500/12 border border-akzent-500/25"
-                  : "text-white/70 bg-white/[0.05] border border-white/[0.08] group-hover:text-akzent-300",
+                  ? "text-akzent-200 border-akzent-500/30"
+                  : "text-white/75 border-white/[0.09] group-hover:text-akzent-200 group-hover:border-akzent-500/30",
               ].join(" ")}
+              style={{
+                background: banner.featured
+                  ? "linear-gradient(140deg, rgba(79,124,251,0.24), rgba(79,124,251,0.04))"
+                  : "linear-gradient(140deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015))",
+                boxShadow: banner.featured
+                  ? "inset 0 1px 0 rgba(255,255,255,0.14), 0 8px 20px rgba(79,124,251,0.16)"
+                  : "inset 0 1px 0 rgba(255,255,255,0.06)",
+              }}
             >
               {banner.icon}
             </span>
 
-            {/* Text */}
+            {/* Text — Bereichsname prominent, Nutzen darunter */}
             <span className="relative min-w-0 flex-1">
               <span className="flex items-center gap-2">
-                <span className="font-mono text-[10px] uppercase tracking-[0.20em] text-akzent-400/80">
-                  {banner.kicker}
+                <span className="font-display font-semibold text-white text-[16px] md:text-[18px] tracking-[-0.01em] truncate">
+                  {banner.titel}
                 </span>
                 {banner.featured && (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-signal-gruen/25 bg-signal-gruen/10 px-1.5 py-0.5">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-signal-gruen/25 bg-signal-gruen/10 px-1.5 py-0.5 flex-shrink-0">
                     <span className="w-1 h-1 rounded-full bg-signal-gruen animate-pulse" />
                     <span className="font-mono text-[9px] uppercase tracking-wider text-signal-gruen/90">Live</span>
                   </span>
                 )}
               </span>
-              <span className="block font-display font-semibold text-white text-[15px] md:text-[17px] tracking-[-0.01em] mt-0.5 truncate">
-                {banner.titel}
-              </span>
-              <span className="block text-[13px] md:text-sm text-white/55 leading-snug mt-1 line-clamp-2 md:line-clamp-1">
+              <span className="block text-[13px] md:text-sm text-white/50 leading-snug mt-1 line-clamp-2 sm:line-clamp-1">
                 {banner.nutzen}
               </span>
             </span>
@@ -177,6 +184,8 @@ export default function HeroView() {
     >
       {/* Ruhige Premium-Tiefe — weiche, träge auf die Maus reagierende Lichtfelder */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Dezenter Code-Schleier (Azur, niedrige Deckkraft) — Tech-Anmutung ohne Klischee */}
+        <MatrixSchleier deckkraft={0.32} />
         <motion.div style={{ x: g1x, y: g1y, left: "calc(50% - 450px)" }} className="absolute -top-1/4 w-[900px] h-[900px]">
           <div className="w-full h-full rounded-full bg-akzent-500/[0.07] blur-[160px] animate-aurora-drift" />
         </motion.div>
@@ -251,10 +260,18 @@ export default function HeroView() {
         {/* Status-Pill */}
         <motion.div
           variants={einblend(0.65)} initial="versteckt" animate="sichtbar"
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-signal-gruen/25 bg-signal-gruen/[0.07] backdrop-blur-sm mb-12"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-signal-gruen/25 bg-signal-gruen/[0.07] backdrop-blur-sm mb-7"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-signal-gruen animate-pulse" />
           <span className="text-xs font-mono text-signal-gruen/85 tracking-wide">Verfügbar für neue Projekte</span>
+        </motion.div>
+
+        {/* Live-Infrastruktur-Ticker (Effekt A) — lebendiger Datenstrom */}
+        <motion.div
+          variants={einblend(0.78)} initial="versteckt" animate="sichtbar"
+          className="w-full max-w-2xl mb-11"
+        >
+          <LaufBanner />
         </motion.div>
 
         {/* Produkt-Banner */}

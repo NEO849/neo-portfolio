@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PHASEN_WECHSEL, FEDERN } from "../bewegung/varianten";
-import { LichtText } from "../bewegung/LichtText";
+import { GlanzUeberschrift } from "../bewegung/GlanzUeberschrift";
 import {
   domainAnalysieren, emailAnalysieren, benutzernameSuchen,
   telefonAnalysieren, bildAnalysieren,
@@ -1122,6 +1122,9 @@ export default function OsintDemoView() {
   const [btcKopiert, setBtcKopiert] = useState<"idle" | "success" | "error">("idle");
   const terminalRef = useRef<HTMLDivElement>(null);
   const eingabeRef = useRef<HTMLInputElement>(null);
+  const konsoleRef = useRef<HTMLDivElement>(null);
+  // Verhindert das Hochscrollen direkt beim ersten Render (nur echte Phasenwechsel scrollen).
+  const ersterRender = useRef(true);
 
   // Report-Ansicht verfügbar, sobald Rohdaten vorliegen (inkl. Status-Modul).
   const reportVerfuegbar = !!rohdaten && !!aktivesModul;
@@ -1193,7 +1196,21 @@ export default function OsintDemoView() {
   }, [zeilenIndex, zeigeReport]);
 
   useEffect(() => {
-    if (phase === "eingabe" && eingabeRef.current) eingabeRef.current.focus();
+    // Eingabe fokussieren OHNE den Browser zum Springen zu zwingen — das
+    // saubere Positionieren übernimmt der scrollIntoView-Effekt unten.
+    if (phase === "eingabe" && eingabeRef.current) eingabeRef.current.focus({ preventScroll: true });
+  }, [phase]);
+
+  useEffect(() => {
+    // Bei jedem Phasenwechsel die Konsole an den oberen Rand holen, damit
+    // Modulauswahl bzw. Eingabe nie „unter der Falte" beginnt (kein Hochscrollen
+    // mehr nötig). Beim allerersten Render bewusst nicht — sonst springt die
+    // Seite beim Laden zur Konsole statt zur Überschrift.
+    if (ersterRender.current) {
+      ersterRender.current = false;
+      return;
+    }
+    konsoleRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [phase]);
 
   const modulStarten = useCallback((modul: DemoModul) => {
@@ -1431,10 +1448,9 @@ export default function OsintDemoView() {
           <span className="h-px w-7 bg-gradient-to-r from-akzent-500/0 via-akzent-500/80 to-akzent-500/0" />
           <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-akzent-400/90">Intelligence Suite</span>
         </span>
-        <LichtText
-          text="OSINT Analyseplattform"
+        <GlanzUeberschrift
           element="h2"
-          scroll={false}
+          kinder="OSINT Analyseplattform"
           klassen="font-display text-3xl md:text-4xl font-bold tracking-[-0.02em] leading-tight mb-3"
         />
         <p className="text-white/60 text-[15px] leading-relaxed max-w-2xl">
@@ -1445,7 +1461,7 @@ export default function OsintDemoView() {
       </motion.div>
 
       {/* Premium-Analyse-Konsole */}
-      <div className="glass-stark rounded-3xl2 overflow-hidden kante-licht">
+      <div ref={konsoleRef} className="glass-stark rounded-3xl2 overflow-hidden kante-licht scroll-mt-24">
         {/* Kopfzeile: 3-Schritt-Flow + Live-Status */}
         <div className="flex items-center gap-3 px-4 md:px-6 py-3.5 border-b border-white/[0.07] bg-white/[0.02]">
           <FlowStepper phase={phase} />
@@ -1455,9 +1471,10 @@ export default function OsintDemoView() {
           </div>
         </div>
 
-        {/* Konsolen-Körper */}
+        {/* Konsolen-Körper — fließt natürlich in der Seite (kein verschachtelter
+            Scroll), damit die Modulauswahl nicht „unter der Falte" klemmt. */}
         <div ref={terminalRef}
-          className="relative p-5 md:p-7 min-h-[440px] max-h-[620px] overflow-y-auto overflow-x-hidden">
+          className="relative p-5 md:p-7 min-h-[420px] overflow-x-hidden">
           <AnimatePresence mode="wait">
 
             {/* Menü — Modul-Auswahl als Premium-Karten */}

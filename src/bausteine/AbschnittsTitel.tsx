@@ -8,6 +8,7 @@
 
 import { motion } from "framer-motion";
 import { EINBLENDEN } from "../bewegung/varianten";
+import { GlanzUeberschrift } from "../bewegung/GlanzUeberschrift";
 
 interface AbschnittsTitelProps {
   prefix: string;
@@ -43,9 +44,11 @@ export function AbschnittsTitel({
         </span>
       </span>
       {untertitel && (
-        <h2 className="font-display font-semibold text-white/90 tracking-[-0.01em] leading-snug text-xl md:text-2xl max-w-2xl">
-          {untertitel}
-        </h2>
+        <GlanzUeberschrift
+          element="h2"
+          klassen="font-display font-semibold tracking-[-0.01em] leading-snug text-xl md:text-2xl max-w-2xl"
+          kinder={untertitel}
+        />
       )}
     </motion.div>
   );
