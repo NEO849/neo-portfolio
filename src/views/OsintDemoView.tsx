@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PHASEN_WECHSEL, FEDERN } from "../bewegung/varianten";
+import { LichtText } from "../bewegung/LichtText";
 import {
   domainAnalysieren, emailAnalysieren, benutzernameSuchen,
   telefonAnalysieren, bildAnalysieren,
@@ -1429,9 +1431,12 @@ export default function OsintDemoView() {
           <span className="h-px w-7 bg-gradient-to-r from-akzent-500/0 via-akzent-500/80 to-akzent-500/0" />
           <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-akzent-400/90">Intelligence Suite</span>
         </span>
-        <h2 className="font-display text-3xl md:text-4xl font-bold text-white tracking-[-0.02em] leading-tight mb-3">
-          OSINT&#8202;Analyseplattform
-        </h2>
+        <LichtText
+          text="OSINT Analyseplattform"
+          element="h2"
+          scroll={false}
+          klassen="font-display text-3xl md:text-4xl font-bold tracking-[-0.02em] leading-tight mb-3"
+        />
         <p className="text-white/60 text-[15px] leading-relaxed max-w-2xl">
           E-Mails, Domains, Usernames, Telefonnummern und mehr — live gegen öffentliche Datenquellen geprüft.
           Funde und ihre Beziehungen erscheinen als übersichtliche Karten und Graph. Transparent, kontrolliert,
@@ -1457,7 +1462,7 @@ export default function OsintDemoView() {
 
             {/* Menü — Modul-Auswahl als Premium-Karten */}
             {phase === "menue" && (
-              <motion.div key="menue" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+              <motion.div key="menue" variants={PHASEN_WECHSEL} initial="versteckt" animate="sichtbar" exit="verlassen">
                 <p className="text-[13px] text-white/45 mb-5">
                   Wähle ein Werkzeug. Du gibst ein Ziel ein — wir prüfen es live und bündeln die Funde verständlich.
                 </p>
@@ -1471,12 +1476,13 @@ export default function OsintDemoView() {
                         key={modul.nummer}
                         type="button"
                         onClick={() => modulStarten(modul)}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.03 * i, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                        whileHover={{ y: -2 }}
+                        initial={{ opacity: 0, y: 14, filter: "blur(8px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        transition={{ delay: 0.03 * i, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                        whileHover={{ y: -3, transition: FEDERN.weich }}
                         className="group relative text-left rounded-2xl border border-white/[0.07] bg-white/[0.025] hover:bg-white/[0.05] hover:border-white/[0.16] p-4 transition-colors duration-300 overflow-hidden focus:outline-none focus-visible:border-akzent-500/50"
                       >
+                        <span aria-hidden className="sheen" />
                         <div className="flex items-start gap-3.5">
                           <span
                             className="grid place-items-center w-10 h-10 rounded-xl2 flex-shrink-0 border transition-transform duration-300 group-hover:scale-105"
@@ -1529,7 +1535,7 @@ export default function OsintDemoView() {
 
             {/* Eingabe */}
             {phase === "eingabe" && aktivesModul && (
-              <motion.div key="eingabe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="w-full min-w-0">
+              <motion.div key="eingabe" variants={PHASEN_WECHSEL} initial="versteckt" animate="sichtbar" exit="verlassen" className="w-full min-w-0">
                 {/* Zurück + Modul-Kopf */}
                 <button onClick={zurueckSetzen}
                   className="inline-flex items-center gap-1.5 text-[12px] text-white/45 hover:text-white/80 transition mb-4">
@@ -1672,7 +1678,7 @@ export default function OsintDemoView() {
 
             {/* Laden */}
             {phase === "laden" && (
-              <motion.div key="laden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+              <motion.div key="laden" variants={PHASEN_WECHSEL} initial="versteckt" animate="sichtbar" exit="verlassen"
                 className="flex flex-col items-center justify-center text-center py-16">
                 {/* Pulsierender Akzent-Ring mit Modul-Icon */}
                 <div className="relative w-16 h-16 mb-6">
@@ -1707,7 +1713,7 @@ export default function OsintDemoView() {
 
             {/* Ausgabe */}
             {phase === "ausgabe" && (
-              <motion.div key="ausgabe" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+              <motion.div key="ausgabe" variants={PHASEN_WECHSEL} initial="versteckt" animate="sichtbar" exit="verlassen">
                 {/* Ansicht-Umschalter (Karten / Rohdaten) als Segmented Control */}
                 {reportVerfuegbar && (
                   <div className="flex items-center mb-5">

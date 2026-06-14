@@ -21,13 +21,52 @@ export const KURVEN = {
   praezise:   [0.4, 0, 0.2, 1]         as KubischeBezier,  // Material Design Standard
 } as const;
 
-// ─── Orientierung: Einblend-Varianten ─────────────────────────────
-export const EINBLENDEN: Variants = {
-  versteckt: { opacity: 0, y: 24 },
+// ─── Physik: Feder-Presets ─────────────────────────────────────────
+// Trägheit + Dämpfung statt Linear-Timing. Für Hover, Parallaxe, Inszenierung.
+export const FEDERN = {
+  weich:    { type: "spring", stiffness: 120, damping: 20, mass: 0.9 } as const,
+  sanft:    { type: "spring", stiffness: 90,  damping: 18, mass: 1.0 } as const,
+  traege:   { type: "spring", stiffness: 45,  damping: 18, mass: 1.1 } as const,  // Ambient/Parallaxe
+  praezise: { type: "spring", stiffness: 220, damping: 28, mass: 0.8 } as const,  // Micro-Interactions
+} as const;
+
+// ─── Inszenierung: Blur-to-Sharp Reveal ────────────────────────────
+// Inhalte treten aus Unschärfe in Fokus — ruhig, hochwertig, „teuer".
+export const UNSCHARF_REVEAL: Variants = {
+  versteckt: { opacity: 0, y: 26, filter: "blur(10px)" },
   sichtbar: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, ease: KURVEN.expressiv },
+    filter: "blur(0px)",
+    transition: { duration: 0.8, ease: KURVEN.expressiv },
+  },
+};
+
+// Phasen-Wechsel (z. B. OSINT-State-Machine): Blur + Tiefe, als Einheit.
+export const PHASEN_WECHSEL: Variants = {
+  versteckt: { opacity: 0, y: 14, filter: "blur(7px)" },
+  sichtbar: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.5, ease: KURVEN.expressiv },
+  },
+  verlassen: {
+    opacity: 0,
+    y: -8,
+    filter: "blur(5px)",
+    transition: { duration: 0.26, ease: KURVEN.praezise },
+  },
+};
+
+// ─── Orientierung: Einblend-Varianten ─────────────────────────────
+export const EINBLENDEN: Variants = {
+  versteckt: { opacity: 0, y: 24, filter: "blur(8px)" },
+  sichtbar: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.7, ease: KURVEN.expressiv },
   },
 };
 
@@ -35,11 +74,12 @@ export const EINBLENDEN: Variants = {
 // Keine interaktiven Elemente, kein Bounce, keine Layout-Sprünge.
 // Framer Motion respektiert `prefers-reduced-motion` automatisch.
 export const STATISCHE_TEXTKARTE: Variants = {
-  versteckt: { opacity: 0, y: 20 },
+  versteckt: { opacity: 0, y: 20, filter: "blur(7px)" },
   sichtbar: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, ease: KURVEN.expressiv },
+    filter: "blur(0px)",
+    transition: { duration: 0.7, ease: KURVEN.expressiv },
   },
 };
 

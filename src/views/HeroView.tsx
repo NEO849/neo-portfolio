@@ -1,9 +1,10 @@
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
 import type { ReactNode } from "react";
 import { PERSOENLICH } from "../models/daten";
 import { KartenLicht } from "../bewegung/KartenLicht";
-import { KURVEN } from "../bewegung/varianten";
+import { KURVEN, FEDERN, UNSCHARF_REVEAL } from "../bewegung/varianten";
+import { useBewegungErlaubt } from "../bewegung/hooks/useBewegungErlaubt";
 
 // ═══════════════════════════════════════════════════════════════════
 // VIEW: Hero — Premium-Einstieg & Produkt-Inszenierung
@@ -14,15 +15,15 @@ import { KURVEN } from "../bewegung/varianten";
 const EASE = KURVEN.expressiv;
 
 const einblend = (delay: number) => ({
-  versteckt: { opacity: 0, y: 20 },
-  sichtbar: { opacity: 1, y: 0, transition: { duration: 0.7, delay, ease: EASE } },
+  versteckt: { opacity: 0, y: 20, filter: "blur(8px)" },
+  sichtbar: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.75, delay, ease: EASE } },
 });
 
 const buchstabe = {
-  versteckt: { opacity: 0, y: 28 },
+  versteckt: { opacity: 0, y: 32, filter: "blur(8px)" },
   sichtbar: (i: number) => ({
-    opacity: 1, y: 0,
-    transition: { duration: 0.5, delay: 0.04 * i, ease: EASE },
+    opacity: 1, y: 0, filter: "blur(0px)",
+    transition: { duration: 0.6, delay: 0.04 * i, ease: EASE },
   }),
 };
 
@@ -86,8 +87,8 @@ function ProduktBanner({ banner, index }: { banner: Banner; index: number }) {
           klassen="rounded-2xl2"
         >
           <motion.div
-            whileHover={{ y: -2 }}
-            transition={{ duration: 0.3, ease: KURVEN.sanft }}
+            whileHover={{ y: -3 }}
+            transition={FEDERN.weich}
             className={[
               "relative overflow-hidden rounded-2xl2 kante-licht",
               "px-5 py-4 md:px-6 md:py-5 flex items-center gap-4 md:gap-5",
@@ -99,11 +100,7 @@ function ProduktBanner({ banner, index }: { banner: Banner; index: number }) {
             style={banner.featured ? { boxShadow: "0 0 0 1px rgba(79,124,251,0.10), 0 20px 50px rgba(79,124,251,0.06)" } : undefined}
           >
             {/* Hover-Sheen — feiner Lichtstreif, der durchläuft */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1100ms] ease-out"
-              style={{ background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 50%, transparent 60%)" }}
-            />
+            <span aria-hidden className="sheen" />
 
             {/* Icon-Plättchen */}
             <span
@@ -153,16 +150,37 @@ function ProduktBanner({ banner, index }: { banner: Banner; index: number }) {
 
 export default function HeroView() {
   const [vorname, nachname] = PERSOENLICH.name.split(" ");
+  const erlaubt = useBewegungErlaubt();
+
+  // Ambient-Parallaxe: Lichtfelder folgen der Maus minimal & träge (Tiefe).
+  const mvX = useMotionValue(0);
+  const mvY = useMotionValue(0);
+  const sx = useSpring(mvX, FEDERN.traege);
+  const sy = useSpring(mvY, FEDERN.traege);
+  const g1x = useTransform(sx, (v) => v * 22);
+  const g1y = useTransform(sy, (v) => v * 16);
+  const g2x = useTransform(sx, (v) => v * -34);
+  const g2y = useTransform(sy, (v) => v * -26);
+
+  const beiMausBewegung = (e: React.MouseEvent<HTMLElement>) => {
+    if (!erlaubt) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    mvX.set(((e.clientX - r.left) / r.width - 0.5) * 2);
+    mvY.set(((e.clientY - r.top) / r.height - 0.5) * 2);
+  };
 
   return (
     <section
       id="hero"
+      onMouseMove={beiMausBewegung}
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-28 pb-16 px-6"
     >
-      {/* Ruhige Premium-Tiefe — weiche, langsam driftende Lichtfelder (kein Matrix) */}
+      {/* Ruhige Premium-Tiefe — weiche, träge auf die Maus reagierende Lichtfelder */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full bg-akzent-500/[0.07] blur-[160px] animate-aurora-drift" />
-        <div className="absolute bottom-0 right-[12%] w-[520px] h-[520px] rounded-full bg-akzent-400/[0.04] blur-[150px]" />
+        <motion.div style={{ x: g1x, y: g1y, left: "calc(50% - 450px)" }} className="absolute -top-1/4 w-[900px] h-[900px]">
+          <div className="w-full h-full rounded-full bg-akzent-500/[0.07] blur-[160px] animate-aurora-drift" />
+        </motion.div>
+        <motion.div style={{ x: g2x, y: g2y }} className="absolute bottom-0 right-[12%] w-[520px] h-[520px] rounded-full bg-akzent-400/[0.04] blur-[150px]" />
         {/* feines Raster — kaum sichtbar, gibt Materialität */}
         <div
           className="absolute inset-0 opacity-[0.18]"
@@ -213,13 +231,15 @@ export default function HeroView() {
               </motion.span>
             ))}
           </span>
-          <span className="flex">
-            {nachname.split("").map((b, i) => (
-              <motion.span key={`n-${i}`} custom={i + vorname.length + 2} variants={buchstabe} initial="versteckt" animate="sichtbar" className="text-akzent-verlauf">
-                {b}
-              </motion.span>
-            ))}
-          </span>
+          <motion.span
+            className="licht-name"
+            variants={UNSCHARF_REVEAL}
+            initial="versteckt"
+            animate="sichtbar"
+            transition={{ delay: 0.04 * (vorname.length + 3), duration: 0.95, ease: EASE }}
+          >
+            {nachname}
+          </motion.span>
         </h1>
 
         {/* Lead-Satz */}
