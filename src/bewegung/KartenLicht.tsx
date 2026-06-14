@@ -19,7 +19,7 @@ interface KartenLichtProps {
 
 export function KartenLicht({
   children,
-  lichtfarbe = "99, 102, 241",
+  lichtfarbe = "79, 124, 251",
   intensitaet = 0.12,
   radius = 280,
   klassen = "",

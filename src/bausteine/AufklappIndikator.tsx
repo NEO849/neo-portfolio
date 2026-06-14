@@ -19,7 +19,7 @@ import { motion } from "framer-motion";
 interface AufklappIndikatorProps {
   /** true = ausgeklappt (zeigt „×"). */
   offen: boolean;
-  /** RGB-Tripel ohne Klammern, z.B. "99, 102, 241" — Rahmen & Füllung. */
+  /** RGB-Tripel ohne Klammern, z.B. "79, 124, 251" — Rahmen & Füllung. */
   lichtfarbe: string;
   /** CSS-Farbe (Hex oder rgb()) für das Glyph. */
   akzentFarbe: string;

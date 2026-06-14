@@ -65,7 +65,7 @@ export default function LaborView() {
             viewport={{ once: true }}
             transition={{ delay: i * 0.05, duration: 0.35, ease: EASE }}
           >
-            <InfoKarte lichtfarbe="99, 102, 241" klassen="px-2.5 py-3 text-center h-full" mitHoverAnimation={false}>
+            <InfoKarte lichtfarbe="79, 124, 251" klassen="px-2.5 py-3 text-center h-full" mitHoverAnimation={false}>
               <div className="text-base mb-0.5 select-none">{stat.icon}</div>
               <div className="font-display text-lg font-bold text-white leading-none tabular-nums">{stat.wert}</div>
               <div className="text-[10px] text-white/40 leading-tight mt-1">{stat.label}</div>
@@ -225,7 +225,7 @@ function MemoryAct() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 pt-2">
         {[
-          { titel: "Drei Lifecycle-Hooks",   bsp: "Fangen Korrekturen ein, schreiben Session-Zusammenfassungen und melden offene Einträge.", rgb: "129, 140, 248" },
+          { titel: "Drei Lifecycle-Hooks",   bsp: "Fangen Korrekturen ein, schreiben Session-Zusammenfassungen und melden offene Einträge.", rgb: "122, 162, 255" },
           { titel: "A-MEM Auto-Linker",      bsp: "Erkennt verwandte Memories und schlägt bidirektionale Verlinkung vor",        rgb: "167, 139, 250" },
           { titel: "Confidence-Decay",       bsp: "Submit-Outcome aktualisiert die Vertrauens-Werte zitierter Memories",          rgb: "34, 197, 94" },
         ].map((meta, i) => (
@@ -653,7 +653,7 @@ function CommandRow({ cmd, delay }: { cmd: typeof SLASH_COMMANDS[number]; delay:
   // Beschreibung). Alle Slash-Cards in Akzent-Indigo. Der Pflicht-Charakter
   // der Submit-Pipeline steht bereits im Sektions-Eyebrow — kein lautes
   // rotes Badge pro Zeile, das aus dem Farbschema fällt.
-  const rgb = "99, 102, 241";
+  const rgb = "79, 124, 251";
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
@@ -679,7 +679,7 @@ function CommandRow({ cmd, delay }: { cmd: typeof SLASH_COMMANDS[number]; delay:
 }
 
 function SkillRow({ skill, delay }: { skill: typeof CUSTOM_SKILLS[number]; delay: number }) {
-  const rgb = skill.gruppe === "master-skill" ? "34, 211, 238" : "129, 140, 248";
+  const rgb = skill.gruppe === "master-skill" ? "138, 160, 200" : "122, 162, 255";
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}

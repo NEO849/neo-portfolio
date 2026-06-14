@@ -23,7 +23,7 @@ interface Props {
   akzentFarbe?: string;
 }
 
-export function BilderKarussell({ bilder, akzentFarbe = "#818cf8" }: Props) {
+export function BilderKarussell({ bilder, akzentFarbe = "#7aa2ff" }: Props) {
   const reduziert = useReducedMotion();
   const anzahl = bilder.length;
   const [[index, richtung], setZustand] = useState<[number, number]>([0, 0]);

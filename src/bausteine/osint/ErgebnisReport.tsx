@@ -28,8 +28,8 @@ const C = {
   gruen:   "#22c55e",
   gelb:    "#f59e0b",
   rot:     "#ef4444",
-  cyber:   "#22d3ee",
-  akzent:  "#818cf8",
+  cyber:   "#8aa0c8",
+  akzent:  "#7aa2ff",
   lila:    "#c084fc",
   orange:  "#fb923c",
   neutral: "#9aa4ba", // Chrome/Struktur (gut lesbar) — Farbe bleibt der Bedeutung vorbehalten

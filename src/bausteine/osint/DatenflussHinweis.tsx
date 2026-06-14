@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { transparenzLaden, type WerkzeugDatenfluss } from "../../dienste/osintApi";
 
 // Marken-Palette (konsistent mit dem Design-System / ErgebnisReport)
-const INDIGO = "#818cf8";   // akzent-400
+const INDIGO = "#7aa2ff";   // akzent-400
 const GRUEN = "#22c55e";    // signal-gruen (semantisch: positiv)
 
 // Modul-Nummer (UI) → Werkzeug-Schlüssel (Backend-Deklaration)

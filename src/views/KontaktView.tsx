@@ -7,7 +7,7 @@ import { LegalModal, type LegalTab } from "../bausteine/LegalModal";
 import { STATISCHE_TEXTKARTE } from "../bewegung/varianten";
 
 const CYBER_RGB = "22, 211, 238";
-const CYBER_HEX = "#22d3ee";
+const CYBER_HEX = "#8aa0c8";
 
 interface KontaktEintrag {
   href: string;

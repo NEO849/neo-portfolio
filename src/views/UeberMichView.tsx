@@ -16,10 +16,10 @@ const KATEGORIE_CFG: Record<ZeitstrahlKat, {
   akzentFarbe: string;
   label: string;
 }> = {
-  beruf:         { lichtfarbe: "99, 102, 241",  akzentFarbe: "#818cf8", label: "Beruf"         },
+  beruf:         { lichtfarbe: "79, 124, 251",  akzentFarbe: "#7aa2ff", label: "Beruf"         },
   teamarbeit:    { lichtfarbe: "167, 139, 250", akzentFarbe: "#a78bfa", label: "Praxis"        },
   infrastruktur: { lichtfarbe: "56, 189, 248",  akzentFarbe: "#38bdf8", label: "Infrastruktur" },
-  bildung:       { lichtfarbe: "34, 211, 238",  akzentFarbe: "#22d3ee", label: "Bildung"       },
+  bildung:       { lichtfarbe: "138, 160, 200",  akzentFarbe: "#8aa0c8", label: "Bildung"       },
   entwicklung:   { lichtfarbe: "52, 211, 153",  akzentFarbe: "#34d399", label: "Entwicklung"   },
   security:      { lichtfarbe: "148, 163, 184", akzentFarbe: "#94a3b8", label: "Security"      },
   eigenbau:      { lichtfarbe: "251, 146, 60",  akzentFarbe: "#fb923c", label: "Eigenbau"      },
@@ -65,7 +65,7 @@ export default function UeberMichView() {
         viewport={{ once: true, margin: "-40px" }}
         className="mb-4"
       >
-        <InfoKarte lichtfarbe="99, 102, 241" klassen="p-6 md:p-8">
+        <InfoKarte lichtfarbe="79, 124, 251" klassen="p-6 md:p-8">
           <div className="flex items-center gap-2 mb-4">
             <span className="font-mono text-[11px] text-akzent-400/55">› profil</span>
             <div className="h-px flex-1 bg-white/[0.04]" />
@@ -93,7 +93,7 @@ export default function UeberMichView() {
         transition={{ delay: 0.1 }}
         className="mb-14"
       >
-        <InfoKarte lichtfarbe="34, 211, 238" mitHoverAnimation={false} klassen="p-5">
+        <InfoKarte lichtfarbe="138, 160, 200" mitHoverAnimation={false} klassen="p-5">
           <div className="flex items-center gap-2 mb-3">
             <span className="font-mono text-[11px] text-cyber-400/50">› außerhalb_der_technik</span>
             <div className="h-px flex-1 bg-white/[0.04]" />
@@ -112,9 +112,9 @@ export default function UeberMichView() {
         transition={{ duration: 0.45 }}
         className="mb-6"
       >
-        <h3 className="font-mono text-base md:text-lg font-semibold tracking-wider">
-          <span className="text-akzent-400">&gt;</span>
-          <span className="text-white/70"> mein_weg</span>
+        <h3 className="flex items-center gap-2.5">
+          <span className="h-px w-7 bg-gradient-to-r from-akzent-500/0 via-akzent-500/80 to-akzent-500/0" />
+          <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-akzent-400/90">Mein Weg</span>
         </h3>
       </motion.div>
 

@@ -21,7 +21,7 @@ const GROESSEN = {
 export function LadeanzeigePuls({
   text,
   groesse = "mittel",
-  farbe = "#6366f1",
+  farbe = "#4f7cfb",
 }: LadeanzeigePulsProps) {
   return (
     <div className="flex items-center gap-3">

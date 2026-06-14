@@ -20,14 +20,14 @@ const WORKFLOW_PHASEN = [
     name: "Target Scope",
     beschreibung: "Programme, erlaubte Assets und Testgrenzen sauber definieren.",
     outputs: ["Scope", "Plattform", "Ziele"],
-    rgb: "129,140,248",
+    rgb: "122,162,255",
   },
   {
     nr: "02",
     name: "Recon",
     beschreibung: "Subdomains, URLs, Parameter und Einstiegspunkte systematisch erfassen.",
     outputs: ["Live Hosts", "URLs", "Parameter"],
-    rgb: "34,211,238",
+    rgb: "138,160,200",
   },
   {
     nr: "03",
@@ -55,7 +55,7 @@ const WORKFLOW_PHASEN = [
     name: "Report",
     beschreibung: "Bestätigte Findings klar und mit sauberer Beweiskette dokumentieren.",
     outputs: ["Summary", "Steps", "Impact"],
-    rgb: "129,140,248",
+    rgb: "122,162,255",
   },
 ];
 
@@ -69,7 +69,7 @@ const TABS: { id: SecurityTab; label: string; beschreibung: string }[] = [
 const WERKZEUG_FARBEN: Record<string, string> = {
   eigenbau:   "34, 197, 94",
   proxy:      "239, 68, 68",
-  recon:      "34, 211, 238",
+  recon:      "138, 160, 200",
   scanner:    "245, 158, 11",
   osint:      "34, 197, 94",
   automation: "167, 139, 250",
@@ -182,7 +182,7 @@ export default function SecurityView() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.06, duration: 0.35 }}
                 >
-                  <InfoKarte lichtfarbe="99, 102, 241" klassen="p-5 text-center h-full">
+                  <InfoKarte lichtfarbe="79, 124, 251" klassen="p-5 text-center h-full">
                     <div className="text-2xl mb-2">{stat.icon}</div>
                     <div className="font-display text-2xl font-bold text-white mb-0.5">{stat.wert}</div>
                     <div className="text-xs text-white/40 leading-tight">{stat.label}</div>
@@ -207,10 +207,10 @@ export default function SecurityView() {
                     transition={{ delay: index * 0.05, duration: 0.32 }}
                   >
                     <InfoKarte
-                      lichtfarbe="34, 211, 238"
+                      lichtfarbe="138, 160, 200"
                       mitHoverAnimation={false}
                       akzentRand={aktiverSchritt === schritt.nummer}
-                      akzentFarbe="#22d3ee"
+                      akzentFarbe="#8aa0c8"
                       onClick={() => setAktiverSchritt(aktiverSchritt === schritt.nummer ? null : schritt.nummer)}
                       klassen="cursor-pointer group"
                     >
@@ -228,8 +228,8 @@ export default function SecurityView() {
                           </div>
                           <AufklappIndikator
                             offen={aktiverSchritt === schritt.nummer}
-                            lichtfarbe="34, 211, 238"
-                            akzentFarbe="#22d3ee"
+                            lichtfarbe="138, 160, 200"
+                            akzentFarbe="#8aa0c8"
                             groesse="sm"
                           />
                         </div>
@@ -281,7 +281,7 @@ export default function SecurityView() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.04, duration: 0.3 }}
                       >
-                        <InfoKarte lichtfarbe="99, 102, 241" mitHoverAnimation={false} klassen="p-3">
+                        <InfoKarte lichtfarbe="79, 124, 251" mitHoverAnimation={false} klassen="p-3">
                           <div className="flex items-center gap-3">
                             <div className="font-mono text-sm text-akzent-400 font-bold w-5 text-center flex-shrink-0">
                               {kategorie.score}
@@ -293,7 +293,7 @@ export default function SecurityView() {
                               <div className="h-1 bg-white/5 rounded-full overflow-hidden">
                                 <motion.div
                                   className="h-full rounded-full"
-                                  style={{ background: "linear-gradient(90deg, #6366f1, #06b6d4)" }}
+                                  style={{ background: "linear-gradient(90deg, #4f7cfb, #5b6f99)" }}
                                   initial={{ width: 0 }}
                                   animate={{ width: `${breite}%` }}
                                   transition={{ delay: index * 0.04 + 0.15, duration: 0.55 }}
@@ -367,9 +367,9 @@ export default function SecurityView() {
                       transition={{ delay: index * 0.04, duration: 0.28 }}
                     >
                       <InfoKarte
-                        lichtfarbe="34, 211, 238"
+                        lichtfarbe="138, 160, 200"
                         akzentRand={aktivesWerkzeug === werkzeug.name}
-                        akzentFarbe="#22d3ee"
+                        akzentFarbe="#8aa0c8"
                         mitHoverAnimation={false}
                         klassen="p-0"
                       >
@@ -385,8 +385,8 @@ export default function SecurityView() {
                           </div>
                           <AufklappIndikator
                             offen={aktivesWerkzeug === werkzeug.name}
-                            lichtfarbe="34, 211, 238"
-                            akzentFarbe="#22d3ee"
+                            lichtfarbe="138, 160, 200"
+                            akzentFarbe="#8aa0c8"
                             groesse="sm"
                             klassen="mr-1"
                           />
@@ -427,9 +427,9 @@ export default function SecurityView() {
                       transition={{ delay: index * 0.04, duration: 0.28 }}
                     >
                       <InfoKarte
-                        lichtfarbe="34, 211, 238"
+                        lichtfarbe="138, 160, 200"
                         akzentRand={aktivesWerkzeug === werkzeug.name}
-                        akzentFarbe="#22d3ee"
+                        akzentFarbe="#8aa0c8"
                         mitHoverAnimation={false}
                         klassen="p-0"
                       >
@@ -445,8 +445,8 @@ export default function SecurityView() {
                           </div>
                           <AufklappIndikator
                             offen={aktivesWerkzeug === werkzeug.name}
-                            lichtfarbe="34, 211, 238"
-                            akzentFarbe="#22d3ee"
+                            lichtfarbe="138, 160, 200"
+                            akzentFarbe="#8aa0c8"
                             groesse="sm"
                             klassen="mr-1"
                           />

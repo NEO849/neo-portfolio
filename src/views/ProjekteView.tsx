@@ -17,8 +17,8 @@ const KATEGORIE_KONFIGURATION: Record<string, {
   label: string;
 }> = {
   security:    { lichtfarbe: "148, 163, 184", akzentFarbe: "#94a3b8", variante: "aktiv",   label: "Security"    },
-  development: { lichtfarbe: "99, 102, 241",  akzentFarbe: "#6366f1", variante: "akzent",  label: "Mobil"       },
-  tooling:     { lichtfarbe: "34, 211, 238",  akzentFarbe: "#22d3ee", variante: "cyber",   label: "Tooling"     },
+  development: { lichtfarbe: "79, 124, 251",  akzentFarbe: "#4f7cfb", variante: "akzent",  label: "Mobil"       },
+  tooling:     { lichtfarbe: "138, 160, 200",  akzentFarbe: "#8aa0c8", variante: "cyber",   label: "Tooling"     },
 };
 
 const FILTER_TABS: GlassTab[] = [

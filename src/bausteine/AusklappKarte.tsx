@@ -13,7 +13,7 @@ import { InfoKarte } from "./InfoKarte";
 import { AufklappIndikator } from "./AufklappIndikator";
 
 interface AusklappKarteProps {
-  /** RGB ohne Klammern, z.B. "99, 102, 241" — für Licht-/Hover-Effekt. */
+  /** RGB ohne Klammern, z.B. "79, 124, 251" — für Licht-/Hover-Effekt. */
   lichtfarbe: string;
   /** CSS-Farbe (Hex oder rgb()) für linken Akzentrand + „+"-Toggle. */
   akzentFarbe: string;

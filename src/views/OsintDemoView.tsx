@@ -45,7 +45,7 @@ const DEMO_MODULE: DemoModul[] = [
     beschreibung: "Liveness-Check für FastAPI, dnspython, httpx (mit SSRF-Guard), WhatsMyName-DB, Shodan InternetDB, RIPEstat und die CT/Archiv-Quellen (crt.sh/Wayback/CommonCrawl) — bestätigt dass alle 8 Analyse-Werkzeuge live und produktiv sind.",
   },
   {
-    nummer: "2", name: "E-Mail Vollanalyse", farbe: "#818cf8",
+    nummer: "2", name: "E-Mail Vollanalyse", farbe: "#7aa2ff",
     eingabeLabel: "E-Mail eingeben", beispielEingabe: "demo@example.com", eingabeTyp: "text",
     ziel: "Zeigt, ob eine E-Mail-Adresse in bekannten Datenlecks auftaucht und welche Profile & Spuren öffentlich daran hängen.",
     beschreibung: "Aggregiert MX / SPF / DMARC, HIBP, XposedOrNot, LeakCheck, Gravatar, Google-GAIA, GitHub-Discovery und PGP-Keyserver parallel. Liefert einen konsolidierten Risk-Score über alle Quellen.",
@@ -69,7 +69,7 @@ const DEMO_MODULE: DemoModul[] = [
     beschreibung: "Extrahiert EXIF-Metadaten und GPS-Koordinaten, berechnet pHash / aHash / dHash. Generiert 14 Suchlinks über 5 Kategorien: Mainstream (Google Lens / TinEye / Bing), Regional (Yandex / Baidu), Face (PimEyes / FaceCheck / Search4Faces), Art (SauceNAO / IQDB) und Celebrity (PicTriev).",
   },
   {
-    nummer: "5", name: "Domain & Shodan", farbe: "#22d3ee",
+    nummer: "5", name: "Domain & Shodan", farbe: "#8aa0c8",
     eingabeLabel: "Domain eingeben", beispielEingabe: "github.com", eingabeTyp: "text",
     ziel: "Bewertet, wie gut eine Domain abgesichert ist und welche Ports & Schwachstellen nach außen sichtbar sind.",
     beschreibung: "Parallel: DNS (A / AAAA / MX / NS / SPF / DMARC), WHOIS, ASN via Team Cymru, HTTP-Security-Header-Audit und Shodan InternetDB (offene Ports, bekannte CVEs, Tags). Liefert zwei Risk-Scores: HTTP-Sec und Network-Exposure.",

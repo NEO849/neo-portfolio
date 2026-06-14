@@ -25,7 +25,7 @@ const BASIS_STIL = `
   px-6 py-3 rounded-xl font-semibold text-sm text-white
   bg-akzent-500 border border-akzent-400/30
   transition-all duration-200
-  hover:bg-akzent-400 hover:shadow-[0_0_30px_rgba(99,102,241,0.35)]
+  hover:bg-akzent-400 hover:shadow-[0_0_30px_rgba(79,124,251,0.40)]
   focus:outline-none focus:ring-2 focus:ring-akzent-400 focus:ring-offset-2 focus:ring-offset-grund-950
   disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none
 `;

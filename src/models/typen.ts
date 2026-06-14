@@ -88,7 +88,7 @@ export interface MemoryTierModel {
   readonly loaded: string;
   readonly lifecycle: string;
   readonly anzahl?: string;
-  readonly farbeRgb: string;        // "99, 102, 241" Format
+  readonly farbeRgb: string;        // "79, 124, 251" Format
   /** Optionale Klartext-Erklärung für Aufklapp-Detail. */
   readonly bedeutung?: string;
 }

@@ -13,7 +13,7 @@ interface InfoKarteProps {
   children: ReactNode;
   mitLicht?: boolean;         // Maus-Licht-Effekt aktivieren
   mitHoverAnimation?: boolean;
-  lichtfarbe?: string;        // RGB ohne Klammern, z.B. "99, 102, 241"
+  lichtfarbe?: string;        // RGB ohne Klammern, z.B. "79, 124, 251"
   klassen?: string;
   stil?: CSSProperties;
   akzentRand?: boolean;       // Farbiger linker Rand
@@ -25,7 +25,7 @@ export function InfoKarte({
   children,
   mitLicht = true,
   mitHoverAnimation = true,
-  lichtfarbe = "99, 102, 241",
+  lichtfarbe = "79, 124, 251",
   klassen = "",
   stil,
   akzentRand = false,

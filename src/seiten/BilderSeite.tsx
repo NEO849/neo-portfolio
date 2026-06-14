@@ -15,8 +15,8 @@ import { BilderKarussell } from "../bausteine/BilderKarussell";
 // Akzentfarbe je Kategorie — konsistent zur ProjekteView.
 const AKZENT_FARBE: Record<string, string> = {
   security:    "#94a3b8",
-  development: "#818cf8",
-  tooling:     "#22d3ee",
+  development: "#7aa2ff",
+  tooling:     "#8aa0c8",
 };
 
 export default function BilderSeite() {
@@ -26,7 +26,7 @@ export default function BilderSeite() {
   // Unbekannter Slug oder keine Bilder → zurück zur Projekt-Übersicht.
   if (!projekt || !projekt.bilder) return <Navigate to="/projekte" replace />;
 
-  const akzent = AKZENT_FARBE[projekt.kategorie] ?? "#818cf8";
+  const akzent = AKZENT_FARBE[projekt.kategorie] ?? "#7aa2ff";
 
   return (
     <>

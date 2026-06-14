@@ -513,8 +513,8 @@ export const LEISTUNGEN: LeistungModel[] = [
       "Wissensbasis-Suche (RAG), auf Wunsch komplett auf Ihrem Server",
     ],
     ergebnis: "Weniger Handarbeit, schnellere Abläufe, weniger Fehler.",
-    farbeRgb: "99, 102, 241",
-    akzentHex: "#818cf8",
+    farbeRgb: "79, 124, 251",
+    akzentHex: "#7aa2ff",
   },
   {
     titel: "Linux & Infrastruktur",
@@ -576,7 +576,7 @@ export const MEMORY_TIERS: MemoryTierModel[] = [
     loaded: "bei jedem Turn",
     lifecycle: "hand-kuratiert, ≤ 195 Zeilen",
     anzahl: "1 Datei",
-    farbeRgb: "129, 140, 248",
+    farbeRgb: "122, 162, 255",
     bedeutung: "Die Inhaltsverzeichnis-Datei, die bei jeder neuen Anfrage automatisch mitgeladen wird. Verweist auf alles andere. Bewusst klein gehalten — was hier oben steht, sieht das Sprachmodell zuerst.",
   },
   {
@@ -585,7 +585,7 @@ export const MEMORY_TIERS: MemoryTierModel[] = [
     loaded: "bei Bedarf",
     lifecycle: "abgeschlossene Themen",
     anzahl: "1 Datei",
-    farbeRgb: "34, 211, 238",
+    farbeRgb: "138, 160, 200",
     bedeutung: "Themen, die ich nicht in jeder Session brauche — z.B. abgeschlossene Research-Targets oder alte iOS-Notizen. Wird nur geladen wenn ich explizit darauf zeige. Spart ca. 875 Tokens pro Session.",
   },
   {
@@ -625,7 +625,7 @@ export const MCP_KATEGORIEN: McpKategorieModel[] = [
   {
     kategorie: "Recon & Intel",
     icon: "",
-    farbeRgb: "34, 211, 238",
+    farbeRgb: "138, 160, 200",
     beschreibung: "Asset-Discovery, CVE-Lookup, Pattern-Recall — vor jeder Hunt-Phase",
     mcps: [
       { name: "censys",       rolle: "Platform-API v3 (Eigenbau, 6 Tools)", eigenbau: true },
@@ -652,7 +652,7 @@ export const MCP_KATEGORIEN: McpKategorieModel[] = [
   {
     kategorie: "Web · App · Mobile",
     icon: "",
-    farbeRgb: "99, 102, 241",
+    farbeRgb: "79, 124, 251",
     beschreibung: "Live-Browser, Caido-Bridge, APK-Decompile",
     mcps: [
       { name: "chrome-devtools",     rolle: "CDP: Browser-Control, DOM, Network (auch Mac-Chrome via SSH-Tunnel)" },
@@ -692,7 +692,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "timer",
     cadence: "täglich 04:15",
     output: "Git-Repository + rsync-Snapshot",
-    farbeRgb: "129, 140, 248",
+    farbeRgb: "122, 162, 255",
     details: "Sichert das Memory-Verzeichnis, alle Research-Notizen und die DATEV-Reports jede Nacht. Drei-Tier-Backup: Git-Repo, lokaler Snapshot, externer Sync. Bei Datenverlust ist alles in unter einer Minute wiederherstellbar.",
   },
   {
@@ -700,7 +700,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "timer",
     cadence: "Montag 04:30",
     output: "neuer Bearer-Token für iPhone-Endpunkt",
-    farbeRgb: "129, 140, 248",
+    farbeRgb: "122, 162, 255",
     details: "Wöchentliche Rotation des Authentifizierungs-Tokens für den iPhone-Endpunkt. Begrenzt das Schadenspotenzial, falls ein Token versehentlich offengelegt würde, auf maximal eine Woche.",
   },
   {
@@ -708,7 +708,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "timer",
     cadence: "stündlich (+ Zufalls-Offset)",
     output: "Sofort-Alarm bei Score ≥ 75",
-    farbeRgb: "129, 140, 248",
+    farbeRgb: "122, 162, 255",
     kritisch: true,
     details: "Pollt HackerOne-Disclosure-Reports und gleicht sie mit meinen aktiven Targets ab. Wenn ein neuer Report meinen Target-Stack betrifft oder ein bekanntes Pattern bestätigt, kommt sofort eine Benachrichtigung. First-Mover-Vorteil bei neuen Vulnerability-Klassen.",
   },
@@ -717,7 +717,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "timer",
     cadence: "täglich 18:00",
     output: "Tageszusammenfassung als Markdown",
-    farbeRgb: "129, 140, 248",
+    farbeRgb: "122, 162, 255",
     details: "Sammelt alle Findings, die unter dem Sofort-Alarm-Schwellenwert lagen, und liefert sie um 18 Uhr als kompakte Tageszusammenfassung. Verhindert Alarm-Müdigkeit, ohne Informationen zu verlieren.",
   },
   // ─── Services (laufen dauerhaft) — alle in Cyber-Cyan ────────────────
@@ -726,7 +726,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "dauerhaft",
     output: "Mac ↔ Server Mailbox (Tailscale)",
-    farbeRgb: "34, 211, 238",
+    farbeRgb: "138, 160, 200",
     details: "FastMCP-Server, über den Claude Desktop auf dem Mac asynchron mit Claude Code auf dem Server kommuniziert. Tailscale-geschützt, Bearer-authentifiziert, jeder Tool-Aufruf wird auditiert.",
   },
   {
@@ -734,7 +734,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "dauerhaft",
     output: "iPhone ↔ Server Mailbox (Cloudflare)",
-    farbeRgb: "34, 211, 238",
+    farbeRgb: "138, 160, 200",
     details: "Zweite Mailbox-Instanz speziell für die Claude.ai-iPhone-App. OAuth-2.1-Worker auf Cloudflare davor, strenge Pfad-Allowlist auf der Server-Seite — Mobile darf lesen, schreiben nur in den Handoff-Ordner, kein Shell-Zugriff.",
   },
   {
@@ -742,7 +742,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "dauerhaft",
     output: "Alarm bei Off-Hours / Burst / abgelehnten Zugriffen",
-    farbeRgb: "34, 211, 238",
+    farbeRgb: "138, 160, 200",
     kritisch: true,
     details: "Beobachtet das Audit-Log der beiden Mailbox-Services live. Bei verdächtigen Mustern — Aktivität nachts, viele Anfragen in kurzer Zeit, abgelehnte Pfade — kommt sofort ein Alarm. Frühwarnsystem für kompromittierte Tokens.",
   },
@@ -751,7 +751,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "Datei-Watcher",
     output: "HAR-Analyse → Markdown-Befund",
-    farbeRgb: "34, 211, 238",
+    farbeRgb: "138, 160, 200",
     details: "Überwacht den Handoff-Ordner. Sobald ich aus Caido eine HTTP-Session als HAR-Datei exportiere, läuft sie durch zehn Pattern-Detektoren (Auth, IDOR, SSRF, CORS …) und ich bekomme einen strukturierten Befund-Report inklusive Counter-Pattern-Check gegen mein Memory.",
   },
   {
@@ -759,7 +759,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "dauerhaft",
     output: "Sprachaufnahme → Claude-Session",
-    farbeRgb: "34, 211, 238",
+    farbeRgb: "138, 160, 200",
     details: "Nimmt Sprachaufnahmen vom iPhone oder Mac entgegen, schickt sie an den lokalen Whisper-Server und tippt den Text direkt in meine laufende Claude-Session. Null Anthropic-Token für Speech-to-Text, weil Whisper lokal läuft.",
   },
   {
@@ -767,7 +767,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "dauerhaft",
     output: "lokales Speech-to-Text (whisper.cpp)",
-    farbeRgb: "34, 211, 238",
+    farbeRgb: "138, 160, 200",
     details: "whisper.cpp-Server mit dem mehrsprachigen ggml-small-Modell (488 MB). Komplett offline, keine Cloud-Calls, kein Datentransfer nach außen. Latenz ~ 10–15 Sekunden für eine 5–15-Sekunden-Aufnahme.",
   },
   {
@@ -775,7 +775,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "dauerhaft",
     output: "Cloudflare-Tunnel zu m.cyp-hr.com",
-    farbeRgb: "34, 211, 238",
+    farbeRgb: "138, 160, 200",
     details: "Erzeugt einen sicheren Tunnel von Cloudflare zum Server, ohne dass ich einen Port nach außen öffnen muss. TLS automatisch erneuert, WAF + DDoS-Schutz am Edge — der iPhone-Endpunkt + Voice-UI sind nur über diesen Tunnel erreichbar.",
   },
   {
@@ -783,7 +783,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     typ: "service",
     cadence: "Docker",
     output: "Vektor-Datenbank für semantische Code-Suche",
-    farbeRgb: "34, 211, 238",
+    farbeRgb: "138, 160, 200",
     details: "Milvus-Standalone-Container, in dem die Embeddings meiner indexierten Codebases liegen. Ollama erzeugt die Embeddings lokal, claude-context legt sie hier ab — dadurch funktioniert semantische Code-Suche (etwa: 'zeig mir alle Stellen wo API-Keys verarbeitet werden') komplett ohne externe APIs.",
   },
 ];
@@ -930,8 +930,8 @@ export const DA_PATTERNS: ReadonlyArray<{ titel: string; problem: string; lesson
 // Senior-Elite Hardening Highlights (für /labor Hero-Banner)
 export const ELITE_PRINZIPIEN: ReadonlyArray<{ titel: string; beschreibung: string; rgb: string }> = [
   { titel: "Disziplin vor Menge",   beschreibung: "Vor jedem Submit greifen zwölf feste Prüf-Gates – eingereicht wird nur, was sie alle besteht.",                rgb: "239, 68, 68" },
-  { titel: "Lernendes System",      beschreibung: "Ein fünfstufiges Gedächtnis mit automatischen Hooks sorgt dafür, dass jede Sitzung auf der vorherigen aufbaut.", rgb: "129, 140, 248" },
-  { titel: "Geräteübergreifend",    beschreibung: "Mac, Server und iPhone arbeiten zusammen – sicher verbunden über ein privates Netz und einen eigenen OAuth-Worker.", rgb: "34, 211, 238" },
+  { titel: "Lernendes System",      beschreibung: "Ein fünfstufiges Gedächtnis mit automatischen Hooks sorgt dafür, dass jede Sitzung auf der vorherigen aufbaut.", rgb: "122, 162, 255" },
+  { titel: "Geräteübergreifend",    beschreibung: "Mac, Server und iPhone arbeiten zusammen – sicher verbunden über ein privates Netz und einen eigenen OAuth-Worker.", rgb: "138, 160, 200" },
   { titel: "Kostenbewusst",         beschreibung: "Spracherkennung, Embeddings und die meisten OSINT-Quellen laufen lokal oder schlüssellos – ohne laufende API-Kosten.", rgb: "34, 197, 94" },
   { titel: "Ausfallsicher",         beschreibung: "Lockfiles, Wiederholungslogik und eine dauerhafte Warteschlange fangen Fehler ab, bevor sie den Ablauf stoppen.",   rgb: "245, 158, 11" },
   { titel: "Stetiges Lernen",       beschreibung: "Aktive Wiederholung, Ergebnis-Rückkopplung und regelmäßige Refactorings halten das Wissen aktuell.",              rgb: "167, 139, 250" },

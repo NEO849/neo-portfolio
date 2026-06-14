@@ -32,10 +32,10 @@ import type { GraphNode, GraphEdge } from "../dienste/osintApi";
 //   Geo/Kontakt (Quad)  = Grün / Lime / Orange
 //   RISIKO (Dreieck)    = Rot
 const NODE_FARBEN: Record<string, string> = {
-  email:      "#818cf8", // indigo
+  email:      "#7aa2ff", // indigo
   account:    "#e879f9", // fuchsia  (klar von Indigo/Purple getrennt)
   username:   "#c084fc", // purple
-  domain:     "#22d3ee", // cyan      (Haupt-Host, kräftig)
+  domain:     "#8aa0c8", // cyan      (Haupt-Host, kräftig)
   subdomain:  "#7dd3fc", // hell-cyan (Kind der Domain, bewusst blasser)
   nameserver: "#2dd4bf", // teal
   ip:         "#60a5fa", // blau      (klar von Cyan/Teal getrennt)
@@ -406,7 +406,7 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
             const off = Math.min(38, len * 0.12);
             const cx = (pa.x + pb.x) / 2 + (-dy / len) * off;
             const cy = (pa.y + pb.y) / 2 + (dx / len) * off;
-            const farbe = verbunden ? (NODE_FARBEN[nodes.find(n => n.id === hoverNode)?.typ ?? ""] ?? "#a5b4fc") : "#ffffff";
+            const farbe = verbunden ? (NODE_FARBEN[nodes.find(n => n.id === hoverNode)?.typ ?? ""] ?? "#a9c4ff") : "#ffffff";
             return (
               <g key={`e-${i}`} style={{ transition: trans }} opacity={gedimmt ? 0.05 : 1}>
                 <path

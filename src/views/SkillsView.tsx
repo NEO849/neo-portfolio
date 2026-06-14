@@ -16,8 +16,8 @@ const FILTER_OPTIONEN: { wert: SkillFilter; label: string }[] = [
 
 const KATEGORIE_FARBEN: Record<string, string> = {
   security:       "239, 68, 68",
-  development:    "99, 102, 241",
-  infrastructure: "34, 211, 238",
+  development:    "79, 124, 251",
+  infrastructure: "138, 160, 200",
   tools:          "167, 139, 250",
 };
 
@@ -57,7 +57,7 @@ export default function SkillsView() {
       <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <AnimatePresence mode="popLayout">
           {gefiltert.map((skill, index) => {
-            const lichtfarbe = KATEGORIE_FARBEN[skill.kategorie] ?? "99, 102, 241";
+            const lichtfarbe = KATEGORIE_FARBEN[skill.kategorie] ?? "79, 124, 251";
             return (
               <motion.div
                 key={skill.name}
