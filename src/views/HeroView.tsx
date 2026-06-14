@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import type { ReactNode } from "react";
 import { PERSOENLICH } from "../models/daten";
 import { KartenLicht } from "../bewegung/KartenLicht";
-import { KURVEN, FEDERN, UNSCHARF_REVEAL } from "../bewegung/varianten";
+import { KURVEN, FEDERN } from "../bewegung/varianten";
 import { useBewegungErlaubt } from "../bewegung/hooks/useBewegungErlaubt";
 
 // ═══════════════════════════════════════════════════════════════════
@@ -231,15 +231,13 @@ export default function HeroView() {
               </motion.span>
             ))}
           </span>
-          <motion.span
-            className="licht-name"
-            variants={UNSCHARF_REVEAL}
-            initial="versteckt"
-            animate="sichtbar"
-            transition={{ delay: 0.04 * (vorname.length + 3), duration: 0.95, ease: EASE }}
-          >
-            {nachname}
-          </motion.span>
+          <span className="flex">
+            {nachname.split("").map((b, i) => (
+              <motion.span key={`n-${i}`} custom={i + vorname.length + 2} variants={buchstabe} initial="versteckt" animate="sichtbar" className="text-akzent-verlauf">
+                {b}
+              </motion.span>
+            ))}
+          </span>
         </h1>
 
         {/* Lead-Satz */}
