@@ -19,6 +19,8 @@ import {
 import { DatenschutzModal } from "../bausteine/DatenschutzModal";
 import OsintGraph from "../bausteine/OsintGraph";
 import ErgebnisReport from "../bausteine/osint/ErgebnisReport";
+import { ErgebnisUebersicht } from "../bausteine/osint/ErgebnisUebersicht";
+import { fasseErgebnisZusammen } from "../hilfsmittel/ergebnisZusammenfassung";
 import DatenflussHinweis from "../bausteine/osint/DatenflussHinweis";
 
 // ═══════════════════════════════════════════════════════
@@ -180,7 +182,7 @@ const BITCOIN_ADDRESS = "bc1qf666x5l4zs6tm9w69jsr9mn5glvf97fk9z6zs8";
 // Ergebnisse und was macht man als Nächstes damit? Wird als horizontaler
 // Führungs-Banner über den Resultaten gezeigt (Nutzer-Orientierung).
 const ERGEBNIS_HINWEIS: Record<string, string> = {
-  "1": "Grün = live und einsatzbereit. Wähle links ein Modul und starte deine erste Analyse.",
+  "1": "Grün = live und einsatzbereit. Wähle ein Modul und starte deine erste Analyse.",
   "2": "Rote Treffer zuerst: Datenlecks und exponierte Profile. Klicke einen Pivot, um einen Fund weiter zu verfolgen.",
   "3": "Jeder Treffer ist ein Profil auf einer Plattform. Achte auf die Konfidenz (hoch / mittel / niedrig), bevor du folgst.",
   "4": "Land, Anbieter und Leitungstyp geben Kontext. Die Such-Links öffnest nur du selbst — nichts wird automatisch aufgerufen.",
@@ -1731,9 +1733,13 @@ export default function OsintDemoView() {
             {/* Ausgabe */}
             {phase === "ausgabe" && (
               <motion.div key="ausgabe" variants={PHASEN_WECHSEL} initial="versteckt" animate="sichtbar" exit="verlassen">
-                {/* Führungs-Banner: sagt dem Nutzer pro Tool, was die Ergebnisse
-                    bedeuten und was er als Nächstes damit tut. */}
-                {aktivesModul && ERGEBNIS_HINWEIS[aktivesModul.nummer] && (
+                {/* Dynamische Ergebnis-Übersicht (Verdikt + Schweregrad +
+                    Kennzahlen + nächste Schritte). */}
+                <ErgebnisUebersicht modulNummer={aktivesModul?.nummer ?? ""} daten={rohdaten} onPivot={pivotStarten} />
+
+                {/* Statischer Führungs-Hinweis nur als Fallback, wenn sich keine
+                    dynamische Übersicht ableiten lässt (z. B. Status-Modul). */}
+                {aktivesModul && !fasseErgebnisZusammen(aktivesModul.nummer, rohdaten) && ERGEBNIS_HINWEIS[aktivesModul.nummer] && (
                   <div className="mb-5 flex items-start gap-3 rounded-2xl border border-akzent-500/20 bg-akzent-500/[0.05] px-4 py-3">
                     <span className="flex-shrink-0 mt-0.5 text-akzent-300">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6M10 21h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2h6c0-.8.4-1.5 1-2A7 7 0 0 0 12 2Z" /></svg>
