@@ -1,7 +1,9 @@
 // ═══════════════════════════════════════════════════════════════════
 // BAUSTEIN: AbschnittsTitel
 // Einheitliche Überschriften für alle Sektionen.
-// Enthält optionalen Terminal-Prefix und Untertitel.
+// Premium: kein Terminal-Präfix (">") mehr. Stattdessen ein ruhiges
+// Eyebrow-Kategorie-Label mit feiner Akzentlinie, darunter der Untertitel
+// als selbstbewusster Display-Lead (Manrope).
 // ═══════════════════════════════════════════════════════════════════
 
 import { motion } from "framer-motion";
@@ -20,27 +22,30 @@ export function AbschnittsTitel({
   zentriert = false,
   klassen = "",
 }: AbschnittsTitelProps) {
-  const ausrichtung = zentriert ? "text-center" : "text-left";
-  const spaceIdx = prefix.indexOf(" ");
-  const zeichen  = spaceIdx > -1 ? prefix.slice(0, spaceIdx) : prefix;
-  const label    = spaceIdx > -1 ? prefix.slice(spaceIdx) : "";
+  const ausrichtung = zentriert ? "items-center text-center" : "items-start text-left";
+  // Alt-Aufrufer übergeben "> slug_mit_underscores" — Terminal-Zeichen weg,
+  // Trenner zu Leerzeichen, als ruhiges Kategorie-Label setzen.
+  const label = prefix.replace(/^[>\s]+/, "").replace(/[_]+/g, " ").trim();
 
   return (
     <motion.div
-      className={`${ausrichtung} ${klassen}`}
+      className={`flex flex-col ${ausrichtung} ${klassen}`}
       variants={EINBLENDEN}
       initial="versteckt"
       whileInView="sichtbar"
       viewport={{ once: true, margin: "-80px" }}
     >
-      <h2 className="font-mono text-xl md:text-2xl font-semibold tracking-wider mb-3">
-        <span className="text-akzent-400">{zeichen}</span>
-        {label && <span className="text-white/70">{label}</span>}
-      </h2>
+      {/* Eyebrow: feine Akzentlinie + ruhiges Mono-Kategorie-Label */}
+      <span className={`flex items-center gap-2.5 mb-4 ${zentriert ? "justify-center" : ""}`}>
+        <span className="h-px w-7 bg-gradient-to-r from-akzent-500/0 via-akzent-500/80 to-akzent-500/0" />
+        <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-akzent-400/90">
+          {label}
+        </span>
+      </span>
       {untertitel && (
-        <p className="text-white/70 max-w-2xl leading-relaxed">
+        <h2 className="font-display font-semibold text-white/90 tracking-[-0.01em] leading-snug text-xl md:text-2xl max-w-2xl">
           {untertitel}
-        </p>
+        </h2>
       )}
     </motion.div>
   );

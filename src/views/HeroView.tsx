@@ -1,232 +1,258 @@
-import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import type { ReactNode } from "react";
 import { PERSOENLICH } from "../models/daten";
 import { KartenLicht } from "../bewegung/KartenLicht";
+import { KURVEN } from "../bewegung/varianten";
 
-// ═══════════════════════════════════════════════════════
-// VIEW: Hero — Erster Eindruck
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// VIEW: Hero — Premium-Einstieg & Produkt-Inszenierung
+// Ruhige Tiefe statt Matrix. Horizontale Produkt-Banner führen den
+// Besucher gezielt in die wichtigsten Bereiche (OSINT featured).
+// ═══════════════════════════════════════════════════════════════════
 
-function CodeRainCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+const EASE = KURVEN.expressiv;
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+const einblend = (delay: number) => ({
+  versteckt: { opacity: 0, y: 20 },
+  sichtbar: { opacity: 1, y: 0, transition: { duration: 0.7, delay, ease: EASE } },
+});
 
-    // Reduced-Motion respektieren: keine laufende Animation, Canvas bleibt ruhig/leer
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-
-    let w = window.innerWidth;
-    let h = window.innerHeight;
-    canvas.width = w;
-    canvas.height = h;
-
-    const zeichen = "01{}[]();=></>#!/usr/bin function const async await import graphql auth token";
-    const zeichenArr = zeichen.split("");
-    const spaltenBreite = 16;
-    let spalten = Math.floor(w / spaltenBreite);
-    let tropfen: number[] = Array(spalten).fill(0).map(() => Math.random() * -80);
-
-    const zeichnen = () => {
-      ctx.fillStyle = "rgba(6, 8, 15, 0.055)";
-      ctx.fillRect(0, 0, w, h);
-      ctx.font = `12px 'JetBrains Mono', monospace`;
-      for (let s = 0; s < spalten; s++) {
-        const z = zeichenArr[Math.floor(Math.random() * zeichenArr.length)];
-        const x = s * spaltenBreite;
-        const y = tropfen[s] * spaltenBreite;
-        const r = Math.random();
-        if (r > 0.98) ctx.fillStyle = "rgba(99, 102, 241, 0.55)";
-        else if (r > 0.94) ctx.fillStyle = "rgba(6, 182, 212, 0.25)";
-        else ctx.fillStyle = "rgba(99, 102, 241, 0.07)";
-        ctx.fillText(z, x, y);
-        if (y > h && Math.random() > 0.983) tropfen[s] = 0;
-        tropfen[s] += 0.45;
-      }
-    };
-
-    const intervall = setInterval(zeichnen, 50);
-    const resize = () => {
-      w = window.innerWidth; h = window.innerHeight;
-      canvas.width = w; canvas.height = h;
-      spalten = Math.floor(w / spaltenBreite);
-      tropfen = Array(spalten).fill(0).map(() => Math.random() * -80);
-    };
-    window.addEventListener("resize", resize);
-    return () => { clearInterval(intervall); window.removeEventListener("resize", resize); };
-  }, []);
-
-  // mask-image: blendet die Matrix-/Scanline-Animation zum unteren Hero-Rand hin
-  // weich aus (statt hart an der Section-Kante abgeschnitten). So entsteht ein
-  // nahtloser Übergang in den "Leistungen"-Abschnitt — keine harte Trennkante.
-  const ausblendMaske =
-    "linear-gradient(to bottom, #000 0%, #000 50%, rgba(0,0,0,0.4) 78%, transparent 96%)";
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 pointer-events-none"
-      style={{
-        opacity: 0.55,
-        maskImage: ausblendMaske,
-        WebkitMaskImage: ausblendMaske,
-      }}
-    />
-  );
-}
-
-const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
-
-const buchstabenVariante = {
-  versteckt: { opacity: 0, y: 36 },
+const buchstabe = {
+  versteckt: { opacity: 0, y: 28 },
   sichtbar: (i: number) => ({
     opacity: 1, y: 0,
-    transition: { duration: 0.5, delay: 0.035 * i, ease: EASE },
+    transition: { duration: 0.5, delay: 0.04 * i, ease: EASE },
   }),
 };
 
-const einblend = (delay: number) => ({
-  versteckt: { opacity: 0, y: 18 },
-  sichtbar: { opacity: 1, y: 0, transition: { duration: 0.65, delay, ease: EASE } },
-});
+// ─── Produkt-Banner (jeweils echte Route, keine toten Links) ──────────
+
+interface Banner {
+  readonly pfad: string;
+  readonly kicker: string;
+  readonly titel: string;
+  readonly nutzen: string;
+  readonly icon: ReactNode;
+  readonly featured?: boolean;
+}
+
+const ICON_PROPS = {
+  width: 22, height: 22, viewBox: "0 0 24 24", fill: "none",
+  stroke: "currentColor", strokeWidth: 1.6,
+  strokeLinecap: "round" as const, strokeLinejoin: "round" as const,
+};
+
+const BANNER: Banner[] = [
+  {
+    pfad: "/osint-tools", kicker: "Intelligence Suite", titel: "OSINT Analyseplattform",
+    nutzen: "E-Mail, Domain, Username & mehr live analysieren — Funde und ihre Beziehungen als Graph.",
+    featured: true,
+    icon: (
+      <svg {...ICON_PROPS}><circle cx="11" cy="11" r="6.5" /><path d="m20 20-3.5-3.5" /><circle cx="11" cy="11" r="2" /></svg>
+    ),
+  },
+  {
+    pfad: "/labor", kicker: "Infrastruktur & Automation", titel: "Systeme, die im Hintergrund tragen",
+    nutzen: "Gehärtete Linux-Infrastruktur und KI-Agenten, die wiederkehrende Abläufe übernehmen.",
+    icon: (
+      <svg {...ICON_PROPS}><rect x="3" y="4" width="18" height="6" rx="1.5" /><rect x="3" y="14" width="18" height="6" rx="1.5" /><path d="M7 7h.01M7 17h.01" /></svg>
+    ),
+  },
+  {
+    pfad: "/security", kicker: "Security & Analyse", titel: "Der Blick des Angreifers",
+    nutzen: "Schwachstellen finden, bevor andere es tun — methodisch geprüft, sauber dokumentiert.",
+    icon: (
+      <svg {...ICON_PROPS}><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" /><path d="m9.5 11.5 1.8 1.8 3.2-3.6" /></svg>
+    ),
+  },
+  {
+    pfad: "/projekte", kicker: "Projekte & Entwicklung", titel: "Eigene Software, produktiv im Einsatz",
+    nutzen: "Vom KI-Workflow bis zum gehärteten Server — seit Jahren live, abgesichert, dokumentiert.",
+    icon: (
+      <svg {...ICON_PROPS}><path d="m8 9-3 3 3 3" /><path d="m16 9 3 3-3 3" /><path d="m13 7-2 10" /></svg>
+    ),
+  },
+];
+
+function ProduktBanner({ banner, index }: { banner: Banner; index: number }) {
+  return (
+    <motion.div variants={einblend(0.95 + index * 0.08)} initial="versteckt" animate="sichtbar">
+      <Link to={banner.pfad} className="group block focus:outline-none">
+        <KartenLicht
+          lichtfarbe="79, 124, 251"
+          intensitaet={banner.featured ? 0.15 : 0.09}
+          radius={460}
+          klassen="rounded-2xl2"
+        >
+          <motion.div
+            whileHover={{ y: -2 }}
+            transition={{ duration: 0.3, ease: KURVEN.sanft }}
+            className={[
+              "relative overflow-hidden rounded-2xl2 kante-licht",
+              "px-5 py-4 md:px-6 md:py-5 flex items-center gap-4 md:gap-5",
+              "border bg-white/[0.03] backdrop-blur-xl transition-colors duration-300",
+              banner.featured
+                ? "border-akzent-500/30 group-hover:border-akzent-500/50"
+                : "border-white/[0.07] group-hover:border-white/[0.14]",
+            ].join(" ")}
+            style={banner.featured ? { boxShadow: "0 0 0 1px rgba(79,124,251,0.10), 0 20px 50px rgba(79,124,251,0.06)" } : undefined}
+          >
+            {/* Hover-Sheen — feiner Lichtstreif, der durchläuft */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1100ms] ease-out"
+              style={{ background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 50%, transparent 60%)" }}
+            />
+
+            {/* Icon-Plättchen */}
+            <span
+              className={[
+                "relative flex-shrink-0 grid place-items-center rounded-xl2 w-11 h-11 md:w-12 md:h-12 transition-colors duration-300",
+                banner.featured
+                  ? "text-akzent-300 bg-akzent-500/12 border border-akzent-500/25"
+                  : "text-white/70 bg-white/[0.05] border border-white/[0.08] group-hover:text-akzent-300",
+              ].join(" ")}
+            >
+              {banner.icon}
+            </span>
+
+            {/* Text */}
+            <span className="relative min-w-0 flex-1">
+              <span className="flex items-center gap-2">
+                <span className="font-mono text-[10px] uppercase tracking-[0.20em] text-akzent-400/80">
+                  {banner.kicker}
+                </span>
+                {banner.featured && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-signal-gruen/25 bg-signal-gruen/10 px-1.5 py-0.5">
+                    <span className="w-1 h-1 rounded-full bg-signal-gruen animate-pulse" />
+                    <span className="font-mono text-[9px] uppercase tracking-wider text-signal-gruen/90">Live</span>
+                  </span>
+                )}
+              </span>
+              <span className="block font-display font-semibold text-white text-[15px] md:text-[17px] tracking-[-0.01em] mt-0.5 truncate">
+                {banner.titel}
+              </span>
+              <span className="block text-[13px] md:text-sm text-white/55 leading-snug mt-1 line-clamp-2 md:line-clamp-1">
+                {banner.nutzen}
+              </span>
+            </span>
+
+            {/* Pfeil */}
+            <span className="relative flex-shrink-0 text-white/30 group-hover:text-akzent-300 transition-all duration-300 group-hover:translate-x-1">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </span>
+          </motion.div>
+        </KartenLicht>
+      </Link>
+    </motion.div>
+  );
+}
 
 export default function HeroView() {
-  const vorname = PERSOENLICH.name.split(" ")[0];
-  const nachname = PERSOENLICH.name.split(" ")[1];
+  const [vorname, nachname] = PERSOENLICH.name.split(" ");
 
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-24 pb-4 px-6"
+      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-28 pb-16 px-6"
     >
-      <CodeRainCanvas />
-
-      {/* Ambient Glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-akzent-500/5 rounded-full blur-[180px]" />
-        <div className="absolute bottom-1/3 right-1/4 w-[500px] h-[500px] bg-cyber-500/4 rounded-full blur-[160px]" />
+      {/* Ruhige Premium-Tiefe — weiche, langsam driftende Lichtfelder (kein Matrix) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full bg-akzent-500/[0.07] blur-[160px] animate-aurora-drift" />
+        <div className="absolute bottom-0 right-[12%] w-[520px] h-[520px] rounded-full bg-akzent-400/[0.04] blur-[150px]" />
+        {/* feines Raster — kaum sichtbar, gibt Materialität */}
+        <div
+          className="absolute inset-0 opacity-[0.18]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+            maskImage: "radial-gradient(ellipse 70% 55% at 50% 38%, #000 30%, transparent 75%)",
+            WebkitMaskImage: "radial-gradient(ellipse 70% 55% at 50% 38%, #000 30%, transparent 75%)",
+          }}
+        />
       </div>
 
-      <div className="relative z-10 text-center max-w-3xl w-full">
+      <div className="relative z-10 w-full max-w-3xl mx-auto flex flex-col items-center text-center">
 
         {/* Profilbild */}
-        <motion.div
-          variants={einblend(0.05)}
-          initial="versteckt"
-          animate="sichtbar"
-          className="mb-8"
-        >
+        <motion.div variants={einblend(0.05)} initial="versteckt" animate="sichtbar" className="mb-7">
           <div
-            className="w-28 h-28 md:w-32 md:h-32 mx-auto rounded-full overflow-hidden"
+            className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden"
             style={{
-              border: "1.5px solid rgba(99,102,241,0.3)",
-              boxShadow: "0 0 0 6px rgba(99,102,241,0.06), 0 0 60px rgba(99,102,241,0.15), 0 20px 60px rgba(0,0,0,0.5)",
+              border: "1px solid rgba(122,162,255,0.28)",
+              boxShadow: "0 0 0 6px rgba(79,124,251,0.05), 0 18px 50px rgba(0,0,0,0.5)",
             }}
           >
             <img
               src="/profilbild.jpg"
-              alt="Michael Fleps"
+              alt={PERSOENLICH.name}
               className="w-full h-full object-cover"
               onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
           </div>
         </motion.div>
 
-        {/* Name */}
-        <div className="mb-3">
-          <h1 className="font-display text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight inline-flex flex-wrap justify-center gap-x-4">
-            <span className="flex">
-              {vorname.split("").map((b, i) => (
-                <motion.span key={`v-${i}`} custom={i} variants={buchstabenVariante} initial="versteckt" animate="sichtbar" className="text-white">
-                  {b}
-                </motion.span>
-              ))}
-            </span>
-            <span className="flex">
-              {nachname.split("").map((b, i) => (
-                <motion.span
-                  key={`n-${i}`}
-                  custom={i + vorname.length + 2}
-                  variants={buchstabenVariante}
-                  initial="versteckt"
-                  animate="sichtbar"
-                  style={{ background: "linear-gradient(135deg, #818cf8, #22d3ee)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
-                >
-                  {b}
-                </motion.span>
-              ))}
-            </span>
-          </h1>
-        </div>
-
-        {/* Untertitel */}
-        <motion.div variants={einblend(0.45)} initial="versteckt" animate="sichtbar"
-          className="font-mono text-xs md:text-sm text-white/75 mb-5 tracking-[0.22em] uppercase">
+        {/* Capability-Strip */}
+        <motion.div
+          variants={einblend(0.2)} initial="versteckt" animate="sichtbar"
+          className="font-mono text-[11px] md:text-xs text-white/45 mb-5 tracking-[0.24em] uppercase"
+        >
           {PERSOENLICH.untertitel}
         </motion.div>
 
-        {/* Status Pill — jetzt UNTER dem Titel, nicht über Profilbild */}
-        <motion.div variants={einblend(0.6)} initial="versteckt" animate="sichtbar"
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-signal-gruen/25 bg-signal-gruen/6 mb-6 backdrop-blur-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-signal-gruen animate-pulse flex-shrink-0" />
-          <span className="text-xs font-mono text-signal-gruen/85 tracking-wide">
-            Verfügbar für neue Herausforderungen
+        {/* Name */}
+        <h1 className="font-display text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-[-0.03em] leading-[0.95] inline-flex flex-wrap justify-center gap-x-4 mb-6">
+          <span className="flex">
+            {vorname.split("").map((b, i) => (
+              <motion.span key={`v-${i}`} custom={i} variants={buchstabe} initial="versteckt" animate="sichtbar" className="text-white">
+                {b}
+              </motion.span>
+            ))}
           </span>
-        </motion.div>
+          <span className="flex">
+            {nachname.split("").map((b, i) => (
+              <motion.span key={`n-${i}`} custom={i + vorname.length + 2} variants={buchstabe} initial="versteckt" animate="sichtbar" className="text-akzent-verlauf">
+                {b}
+              </motion.span>
+            ))}
+          </span>
+        </h1>
 
-        {/* Kurzvorstellung */}
-        <motion.p variants={einblend(0.75)} initial="versteckt" animate="sichtbar"
-          className="text-base md:text-lg text-white/85 max-w-xl mx-auto leading-relaxed mb-7">
-          {PERSOENLICH.kurzvorstellung}
+        {/* Lead-Satz */}
+        <motion.p
+          variants={einblend(0.5)} initial="versteckt" animate="sichtbar"
+          className="text-base md:text-lg text-white/70 max-w-xl leading-relaxed mb-6"
+        >
+          {PERSOENLICH.firmaTagline}
         </motion.p>
 
-        <div className="mb-12" />
-
-        {/* Portfolio-Überblick */}
+        {/* Status-Pill */}
         <motion.div
-          variants={einblend(0.9)}
-          initial="versteckt"
-          animate="sichtbar"
-          whileHover={{ scale: 1.015, y: -3, transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] } }}
-          whileTap={{ scale: 0.99, y: 0, transition: { duration: 0.1, ease: [0.4, 0, 0.2, 1] } }}
-          className="max-w-2xl mx-auto rounded-2xl backdrop-blur-sm overflow-hidden"
-          style={{
-            background: "linear-gradient(135deg, rgba(99,102,241,0.07), rgba(6,182,212,0.04))",
-            border: "1px solid rgba(99,102,241,0.18)",
-            boxShadow: "0 0 40px rgba(99,102,241,0.07), 0 8px 32px rgba(0,0,0,0.3)",
-          }}
+          variants={einblend(0.65)} initial="versteckt" animate="sichtbar"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-signal-gruen/25 bg-signal-gruen/[0.07] backdrop-blur-sm mb-12"
         >
-          <KartenLicht lichtfarbe="99, 102, 241" intensitaet={0.1} radius={300}>
-            <p className="px-6 py-5 text-sm text-white/70 leading-relaxed text-left">
-              Für Unternehmen und Teams verbinde ich KI-Automation mit solider Technik: wiederkehrende Abläufe übernehmen Agenten und saubere Schnittstellen, sensible Daten bleiben auf Wunsch im eigenen Haus, und das Fundament – Server, Sicherheit, Backups – läuft stabil im Hintergrund. So entsteht spürbare Entlastung statt neuer Baustellen.
-            </p>
-          </KartenLicht>
+          <span className="w-1.5 h-1.5 rounded-full bg-signal-gruen animate-pulse" />
+          <span className="text-xs font-mono text-signal-gruen/85 tracking-wide">Verfügbar für neue Projekte</span>
         </motion.div>
 
-        {/* Mehrwert */}
+        {/* Produkt-Banner */}
         <motion.div
-          variants={einblend(1.05)}
-          initial="versteckt"
-          animate="sichtbar"
-          whileHover={{ scale: 1.015, y: -3, transition: { duration: 0.3, ease: EASE } }}
-          whileTap={{ scale: 0.99, y: 0, transition: { duration: 0.1, ease: [0.4, 0, 0.2, 1] } }}
-          className="max-w-2xl mx-auto mt-3 rounded-2xl backdrop-blur-sm overflow-hidden"
-          style={{
-            background: "linear-gradient(135deg, rgba(99,102,241,0.06), rgba(6,182,212,0.03))",
-            border: "1px solid rgba(99,102,241,0.14)",
-            boxShadow: "0 0 40px rgba(99,102,241,0.05), 0 8px 32px rgba(0,0,0,0.3)",
-          }}
+          variants={einblend(0.8)} initial="versteckt" animate="sichtbar"
+          className="w-full max-w-2xl flex items-center justify-between gap-3 mb-4"
         >
-          <KartenLicht lichtfarbe="99, 102, 241" intensitaet={0.08} radius={300}>
-            <p className="px-6 py-5 text-sm text-white/70 leading-relaxed text-left">
-              Was ich anbiete, betreibe ich selbst: einen produktiven KI- und Automatisierungs-Stack auf eigener, gehärteter Infrastruktur – seit Jahren live, abgesichert und sauber dokumentiert. Diesen Anspruch an Stabilität und Sicherheit bringe ich in jedes Projekt mit.
-            </p>
-          </KartenLicht>
+          <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-white/35">Bereiche entdecken</span>
+          <span className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
         </motion.div>
 
+        <div className="w-full max-w-2xl flex flex-col gap-3">
+          {BANNER.map((b, i) => (
+            <ProduktBanner key={b.pfad} banner={b} index={i} />
+          ))}
+        </div>
       </div>
     </section>
   );

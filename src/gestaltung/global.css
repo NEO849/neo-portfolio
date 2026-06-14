@@ -6,87 +6,130 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 88px; /* Offset für fixe NavBar (72px) + Luft */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: #06080f;
+  background-color: #070a12;
+  /* Ruhige, einfarbige Aurora — Tiefe statt Neon-Doppelglow.
+     Ein großer weicher Azur-Schein oben, ein sehr leiser unten. */
   background-image:
-    radial-gradient(ellipse 1200px 600px at 15% 5%, rgba(99,102,241,0.12), transparent 60%),
-    radial-gradient(ellipse 800px 800px at 85% 80%, rgba(6,182,212,0.08), transparent 60%);
+    radial-gradient(120% 85% at 50% -15%, rgba(79,124,251,0.11), transparent 60%),
+    radial-gradient(90% 70% at 88% 115%, rgba(79,124,251,0.05), transparent 55%);
   background-attachment: fixed;
+  overflow-x: hidden;
+  font-feature-settings: "cv11", "ss01";
 }
 
-/* ═══════════════ Glassmorphism ═══════════════ */
+/* Feines Film-Grain über der ganzen Seite — premium Materialität,
+   bricht flache Verläufe ohne sichtbares Muster. GPU-schonend (static). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════ Material: Glas & Flächen ═══════════════ */
 @layer components {
+  /* Frosted Glass mit feiner oberer Lichtkante (Apple-Materialität) */
   .glass {
-    @apply border border-white/10 bg-white/[0.04] backdrop-blur-xl rounded-2xl;
+    @apply relative border border-white/10 bg-white/[0.035] backdrop-blur-xl rounded-2xl;
+    box-shadow: 0 1px 0 0 rgba(255,255,255,0.05) inset, 0 12px 32px rgba(0,0,0,0.30);
   }
   .glass-stark {
-    @apply border border-white/15 bg-white/[0.08] backdrop-blur-2xl rounded-2xl shadow-2xl;
+    @apply relative border border-white/[0.14] bg-white/[0.06] backdrop-blur-2xl rounded-2xl;
+    box-shadow: 0 1px 0 0 rgba(255,255,255,0.07) inset, 0 24px 64px rgba(0,0,0,0.42);
   }
+  /* Flächen-Layering: ruhige, matte Karten ohne Glow */
+  .flaeche-1 { @apply border border-white/[0.06] bg-white/[0.024] rounded-2xl; }
+  .flaeche-2 { @apply border border-white/[0.08] bg-white/[0.045] rounded-2xl; }
+  .flaeche-3 { @apply border border-white/[0.10] bg-white/[0.072] rounded-2xl; }
 }
 
-/* ═══════════════ Akzent-Linie (animiert) ═══════════════ */
+/* Feine obere Lichtkante als Utility (auf beliebige Karten legbar) */
+.kante-licht::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding-top: 1px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.10), transparent 18%);
+  pointer-events: none;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Akzent-Text-Verlauf (monochrom-blau, kein Indigo→Cyan-Neon) */
+.text-akzent-verlauf {
+  background: linear-gradient(135deg, #ffffff 0%, #a9c4ff 55%, #7aa2ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ═══════════════ Akzent-Linie (entneont, monochrom) ═══════════════ */
 .akzent-linie {
-  background: linear-gradient(90deg, transparent, #6366f1, #06b6d4, transparent);
+  background: linear-gradient(90deg, transparent, rgba(79,124,251,0.7), transparent);
   height: 1px;
 }
 
-/* ═══════════════ Skill-Balken ═══════════════ */
+/* ═══════════════ Skill-Balken (monochrom-blau) ═══════════════ */
 .skill-balken {
-  background: linear-gradient(90deg, #6366f1, #06b6d4);
+  background: linear-gradient(90deg, #4f7cfb, #7aa2ff);
   border-radius: 4px;
-  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ═══════════════ Terminal-Effekt ═══════════════ */
+/* ═══════════════ Terminal-Cursor (nur noch wo bewusst genutzt) ═══════════════ */
 .terminal-text::after {
   content: "▋";
-  animation: blinken 1s step-end infinite;
+  animation: blinken 1.1s step-end infinite;
 }
 @keyframes blinken {
   50% { opacity: 0; }
 }
 
 /* ═══════════════ Scrollbar ═══════════════ */
-::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar { width: 7px; height: 7px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #ffffff15; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #ffffff25; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.10); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.20); }
 
-/* Scrollbar ausblenden — horizontal scrollbare Container (Tab-Leisten etc.) */
-.scrollbar-none {
-  scrollbar-width: none;          /* Firefox */
-  -ms-overflow-style: none;       /* IE/Edge Legacy */
-}
-.scrollbar-none::-webkit-scrollbar {
-  display: none;                  /* Chrome · Safari · neueres Edge */
-}
+.scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
 
 /* ═══════════════ Selection ═══════════════ */
 ::selection {
-  background: rgba(99,102,241,0.3);
+  background: rgba(79,124,251,0.30);
   color: white;
 }
 
 /* ═══════════════ Accessibility: Fokus-Ring ═══════════════ */
 :focus-visible {
-  outline: 2px solid rgba(99, 102, 241, 0.75);
+  outline: 2px solid rgba(79,124,251,0.75);
   outline-offset: 3px;
   border-radius: 6px;
 }
-/* Nur für Tastaturnavigation sichtbar — nicht bei Mausklick */
-:focus:not(:focus-visible) {
-  outline: none;
-}
+:focus:not(:focus-visible) { outline: none; }
 
-/* ═══════════════ Kein horizontales Scrollen ═══════════════ */
-body {
-  overflow-x: hidden;
+/* ═══════════════ Reduced Motion ═══════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ═══════════════ Terminal-Eingabe ═══════════════ */
-/* Überschreibt den globalen :focus-visible-Ring gezielt für Terminal-Inputs */
 .terminal-eingabe,
 .terminal-eingabe:focus,
 .terminal-eingabe:focus-visible {
@@ -99,21 +142,18 @@ body {
 }
 .terminal-eingabe {
   border-bottom: 1px solid rgba(255, 255, 255, 0.22);
-  color: rgba(255, 255, 255, 0.9);
-  caret-color: #818cf8;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  color: rgba(255, 255, 255, 0.92);
+  caret-color: #7aa2ff;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
-.terminal-eingabe::placeholder {
-  color: rgba(255, 255, 255, 0.35);
-}
+.terminal-eingabe::placeholder { color: rgba(255, 255, 255, 0.35); }
 .terminal-eingabe:focus,
 .terminal-eingabe:focus-visible {
-  border-bottom-color: #818cf8;
-  box-shadow: 0 1px 0 0 rgba(129, 140, 248, 0.35);
+  border-bottom-color: #7aa2ff;
+  box-shadow: 0 1px 0 0 rgba(122, 162, 255, 0.40);
 }
 
 /* ═══════════════ Kontaktformular-Eingabe ═══════════════ */
-/* Exakt gleicher Stil wie .terminal-eingabe — konsistentes Design */
 .formular-eingabe,
 .formular-eingabe:focus,
 .formular-eingabe:focus-visible {
@@ -131,26 +171,22 @@ body {
   max-width: 100%;
   padding-left: 0;
   padding-right: 0;
-  border-bottom: 1px solid rgba(129, 140, 248, 0.20);
+  border-bottom: 1px solid rgba(122, 162, 255, 0.22);
   color: rgba(255, 255, 255, 0.92);
-  caret-color: #818cf8;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  caret-color: #7aa2ff;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
   scroll-margin-top: 80px;
   scroll-margin-bottom: 16px;
 }
-.formular-eingabe::placeholder {
-  color: rgba(129, 140, 248, 0.45);
-}
+.formular-eingabe::placeholder { color: rgba(122, 162, 255, 0.45); }
 .formular-eingabe:focus,
 .formular-eingabe:focus-visible {
-  border-bottom-color: #818cf8;
-  box-shadow: 0 1px 0 0 rgba(129, 140, 248, 0.45);
+  border-bottom-color: #7aa2ff;
+  box-shadow: 0 1px 0 0 rgba(122, 162, 255, 0.45);
 }
-.formular-eingabe.fehler {
-  border-bottom-color: rgba(239, 68, 68, 0.5);
-}
+.formular-eingabe.fehler { border-bottom-color: rgba(241, 100, 108, 0.5); }
 .formular-eingabe.fehler:focus,
 .formular-eingabe.fehler:focus-visible {
-  border-bottom-color: rgba(239, 68, 68, 0.7);
-  box-shadow: 0 1px 0 0 rgba(239, 68, 68, 0.18);
+  border-bottom-color: rgba(241, 100, 108, 0.7);
+  box-shadow: 0 1px 0 0 rgba(241, 100, 108, 0.18);
 }
