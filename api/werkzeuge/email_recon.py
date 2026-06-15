@@ -537,9 +537,13 @@ async def _emailrep_pruefen(client: httpx.AsyncClient, email: str) -> dict:
     Stark gedrosselt ohne Key → graceful bei 429.
     """
     try:
+        headers = {"User-Agent": "neo-portfolio-osint/1.0", "Accept": "application/json"}
+        key = os.environ.get("EMAILREP_API_KEY", "").strip()
+        if key:
+            headers["Key"] = key   # optionaler Key → höhere Limits
         r = await client.get(
             f"https://emailrep.io/{quote(email)}",
-            headers={"User-Agent": "neo-portfolio-osint/1.0", "Accept": "application/json"},
+            headers=headers,
             timeout=TIMEOUT_S,
         )
         if r.status_code == 200:
