@@ -96,6 +96,91 @@ export function extrahiereSchutz(modulNummer: string, daten: object | null): Sch
   return d.schutz ?? [];
 }
 
+// ─── Dossier-Extraktion (für die zusammengeführte Forensik-Ansicht) ──
+
+export interface DossierZeitpunkt { datum: string; label: string }
+export interface DossierDaten {
+  subjekt: string;
+  namen: string[];
+  avatare: string[];
+  koordinaten: { lat: number; lon: number; label?: string } | null;
+  zeitpunkte: DossierZeitpunkt[];
+}
+
+interface DossierRoh {
+  email?: string; adresse?: string; benutzername?: string; domain?: string;
+  ip?: string; ziel?: string; nummer?: string; url?: string; analysiert_am?: string;
+  recon?: DossierRoh; basis?: DossierRoh;
+  gravatar?: { gefunden?: boolean; avatar_url?: string; profil_daten?: { anzeigename?: string | null } };
+  github?: { klarnamen?: string[]; nutzer?: Array<{ avatar?: string }> };
+  identitaet?: { anzeigenamen?: string[]; avatare?: Array<{ avatar?: string }> };
+  wer_ist_das?: Array<{ quelle: string; wert: string }>;
+  offene_plattformen?: Array<{ gefunden?: boolean; anzeigename?: string; avatar?: string }>;
+  exif?: { aufnahmedatum?: string | null; gps?: { lat?: number; lon?: number; ort_name?: string | null } | null };
+  geo?: { koordinaten?: string | null; stadt?: string | null; land?: string | null };
+  hibp?: { breaches?: Array<{ titel?: string; datum?: string }> };
+}
+
+function _coords(text?: string | null): { lat: number; lon: number } | null {
+  if (!text) return null;
+  const [a, b] = text.split(",").map((x) => parseFloat(x.trim()));
+  return Number.isFinite(a) && Number.isFinite(b) ? { lat: a, lon: b } : null;
+}
+
+/** Zieht die Dossier-Bausteine (Identität/Avatare/Ort/Zeit) modulübergreifend. */
+export function dossierExtrakt(modulNummer: string, daten: object | null): DossierDaten {
+  const leer: DossierDaten = { subjekt: "", namen: [], avatare: [], koordinaten: null, zeitpunkte: [] };
+  if (!daten) return leer;
+  const d = daten as DossierRoh;
+  const kern: DossierRoh = modulNummer === "2" ? (d.recon ?? d.basis ?? d)
+            : modulNummer === "5" ? d  // Domain-Wrapper: Subjekt steckt in d.domain (string via Cast unten)
+            : d;
+
+  const subjekt = d.email ?? d.adresse ?? d.benutzername ?? d.ip ?? d.ziel ?? d.nummer ?? d.url
+    ?? kern.email ?? kern.benutzername ?? (typeof (daten as { domain?: unknown }).domain === "string" ? (daten as { domain: string }).domain : "")
+    ?? "";
+
+  const namen = new Set<string>();
+  if (kern.gravatar?.profil_daten?.anzeigename) namen.add(kern.gravatar.profil_daten.anzeigename);
+  (kern.github?.klarnamen ?? []).forEach((n) => n && namen.add(n));
+  (kern.identitaet?.anzeigenamen ?? []).forEach((n) => n && namen.add(n));
+  (kern.offene_plattformen ?? []).forEach((p) => p.gefunden && p.anzeigename && namen.add(p.anzeigename));
+  (kern.wer_ist_das ?? []).forEach((w) => {
+    if (w.wert && !/^https?:\/\//.test(w.wert) && /name|profil/i.test(w.quelle)) namen.add(w.wert.replace(/^Name:\s*/, ""));
+  });
+
+  const avatare = new Set<string>();
+  if (kern.gravatar?.gefunden && kern.gravatar.avatar_url) avatare.add(kern.gravatar.avatar_url);
+  (kern.github?.nutzer ?? []).forEach((u) => u.avatar && avatare.add(u.avatar));
+  (kern.identitaet?.avatare ?? []).forEach((a) => a.avatar && avatare.add(a.avatar));
+  (kern.offene_plattformen ?? []).forEach((p) => p.gefunden && p.avatar && avatare.add(p.avatar));
+  if (modulNummer === "6" && d.url) avatare.add(d.url);  // das analysierte Bild selbst
+
+  let koordinaten: DossierDaten["koordinaten"] = null;
+  const gps = kern.exif?.gps;
+  if (gps && typeof gps.lat === "number" && typeof gps.lon === "number") {
+    koordinaten = { lat: gps.lat, lon: gps.lon, label: gps.ort_name ?? undefined };
+  } else if (kern.geo?.koordinaten) {
+    const c = _coords(kern.geo.koordinaten);
+    if (c) koordinaten = { ...c, label: [kern.geo.stadt, kern.geo.land].filter(Boolean).join(", ") || undefined };
+  }
+
+  const zeitpunkte: DossierZeitpunkt[] = [];
+  for (const b of (kern.hibp?.breaches ?? [])) {
+    if (b.datum) zeitpunkte.push({ datum: b.datum, label: b.titel ?? "Breach" });
+  }
+  if (kern.exif?.aufnahmedatum) zeitpunkte.push({ datum: kern.exif.aufnahmedatum, label: "Aufnahme" });
+  zeitpunkte.sort((a, b) => (a.datum < b.datum ? -1 : 1));
+
+  return {
+    subjekt: String(subjekt || ""),
+    namen: [...namen].slice(0, 6),
+    avatare: [...avatare].slice(0, 8),
+    koordinaten,
+    zeitpunkte: zeitpunkte.slice(0, 8),
+  };
+}
+
 /** Klartext-Zusammenfassung je Modul — oder null (z. B. Status-Modul). */
 export function fasseErgebnisZusammen(modulNummer: string, daten: object | null): Zusammenfassung | null {
   if (!daten) return null;

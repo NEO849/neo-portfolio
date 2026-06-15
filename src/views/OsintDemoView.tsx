@@ -21,7 +21,7 @@ import {
 import { DatenschutzModal } from "../bausteine/DatenschutzModal";
 import OsintGraph from "../bausteine/OsintGraph";
 import ErgebnisReport from "../bausteine/osint/ErgebnisReport";
-import { ErgebnisUebersicht } from "../bausteine/osint/ErgebnisUebersicht";
+import { Dossier } from "../bausteine/osint/Dossier";
 import { SchutzEmpfehlungen } from "../bausteine/osint/SchutzEmpfehlungen";
 import { fasseErgebnisZusammen, extrahiereSchutz } from "../hilfsmittel/ergebnisZusammenfassung";
 import DatenflussHinweis from "../bausteine/osint/DatenflussHinweis";
@@ -1815,9 +1815,9 @@ export default function OsintDemoView() {
             {/* Ausgabe */}
             {phase === "ausgabe" && (
               <motion.div key="ausgabe" variants={PHASEN_WECHSEL} initial="versteckt" animate="sichtbar" exit="verlassen">
-                {/* Dynamische Ergebnis-Übersicht (Verdikt + Schweregrad +
-                    Kennzahlen + nächste Schritte). */}
-                <ErgebnisUebersicht modulNummer={aktivesModul?.nummer ?? ""} daten={rohdaten} onPivot={pivotStarten} />
+                {/* Forensik-Dossier (Hero): Identität + Risiko + Kennzahl-Heatmap
+                    (Balken) + Karte + Timeline + nächste Schritte. */}
+                <Dossier modulNummer={aktivesModul?.nummer ?? ""} daten={rohdaten} onPivot={pivotStarten} />
 
                 {/* Defensiver Mehrwert: „Was kann ich dagegen tun?" — NUR wenn ein
                     echtes Sicherheitsproblem vorliegt (Schwere kritisch/auffällig),
