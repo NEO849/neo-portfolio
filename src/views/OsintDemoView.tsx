@@ -145,28 +145,36 @@ function FlowStepper({ phase }: { phase: "menue" | "eingabe" | "laden" | "ausgab
 
   return (
     <div className="flex items-center gap-1.5 sm:gap-3 w-full sm:w-auto min-w-0">
-      {FLOW_SCHRITTE.map((s, i) => (
-        <Fragment key={s}>
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-            <span
-              className={[
-                "grid place-items-center w-5 h-5 sm:w-6 sm:h-6 rounded-full text-[10px] sm:text-[11px] font-semibold transition-colors duration-300 flex-shrink-0",
-                i < aktiv ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/40"
-                : i === aktiv ? "bg-indigo-500 text-white shadow-[0_0_0_4px_rgba(99,102,241,0.18)]"
-                : "bg-white/[0.04] text-white/35 border border-white/[0.08]",
-              ].join(" ")}
-            >
-              {i < aktiv ? "✓" : i + 1}
-            </span>
-            <span className={`text-[11px] sm:text-[13px] whitespace-nowrap transition-colors duration-300 ${i === aktiv ? "text-white/90" : "text-white/40"}`}>
-              {s}
-            </span>
-          </div>
-          {i < FLOW_SCHRITTE.length - 1 && (
-            <span className={`h-px flex-1 min-w-[8px] sm:flex-none sm:w-8 transition-colors duration-300 ${i < aktiv ? "bg-indigo-500/40" : "bg-white/10"}`} />
-          )}
-        </Fragment>
-      ))}
+      {FLOW_SCHRITTE.map((s, i) => {
+        // Indigo (#6D7CFF) → Cyan (#33D6FF) → Teal (#19D3B4) — Premium-Designsystem.
+        const zustand = i < aktiv ? "erledigt" : i === aktiv ? "aktiv" : "offen";
+        const kreisStil =
+          zustand === "aktiv"
+            ? { backgroundImage: "linear-gradient(135deg, #6D7CFF, #33D6FF)", boxShadow: "0 0 0 4px rgba(51,214,255,0.12), 0 6px 18px rgba(51,214,255,0.35)" }
+            : zustand === "erledigt"
+            ? { backgroundColor: "rgba(25,211,180,0.15)", border: "1px solid rgba(25,211,180,0.45)" }
+            : { backgroundColor: "rgba(109,124,255,0.08)", border: "1px solid rgba(51,214,255,0.18)" };
+        const kreisText = zustand === "aktiv" ? "text-white" : zustand === "erledigt" ? "text-[#19D3B4]" : "text-white/55";
+        return (
+          <Fragment key={s}>
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 group">
+              <span
+                style={kreisStil}
+                className={`grid place-items-center w-5 h-5 sm:w-6 sm:h-6 rounded-full text-[10px] sm:text-[11px] font-semibold flex-shrink-0 transition-all duration-[250ms] ease-out group-hover:brightness-110 ${kreisText}`}
+              >
+                {zustand === "erledigt" ? "✓" : i + 1}
+              </span>
+              <span className={`text-[11px] sm:text-[13px] whitespace-nowrap transition-colors duration-200 ${zustand === "aktiv" ? "text-white/90" : "text-white/45"}`}>
+                {s}
+              </span>
+            </div>
+            {i < FLOW_SCHRITTE.length - 1 && (
+              <span className="h-px flex-1 min-w-[8px] sm:flex-none sm:w-8 rounded-full transition-all duration-300"
+                style={{ background: i < aktiv ? "linear-gradient(90deg, rgba(25,211,180,0.5), rgba(51,214,255,0.5))" : "rgba(51,214,255,0.12)" }} />
+            )}
+          </Fragment>
+        );
+      })}
     </div>
   );
 }
@@ -1304,10 +1312,14 @@ export default function OsintDemoView() {
     }
     setAktivesModul(modul);
     if (modul.eingabeTyp === "none") {
-      setAusgabeZeilen(erstelleDemoAusgabe(modul.nummer, ""));
-      setRohdaten({ ok: true });   // ermöglicht gestylten Status-Report (wie andere Module)
-      setAnsicht("report");
-      setPhase("ausgabe");
+      // Status-Modul: ECHTER Live-Health-Check → StatusKarte (grün/aktiv je Tool)
+      setRohdaten(null);
+      setAusgabeZeilen([]);
+      setPhase("laden");
+      void gesundheitLaden().then((g) => {
+        setRohdaten(g);
+        setPhase("ausgabe");
+      });
     } else {
       setEingabeWert(modul.beispielEingabe);
       setPhase("eingabe");
