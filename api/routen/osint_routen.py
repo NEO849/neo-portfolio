@@ -25,6 +25,7 @@ from werkzeuge.intel_aggregator import links_generieren
 from werkzeuge.orchestrator import orchestrieren
 from werkzeuge.subdomain_recon import subdomains_finden
 from werkzeuge.ip_recon import ip_intel
+from werkzeuge.soziale_konten import soziale_praesenz
 from werkzeuge.transparenz import transparenz_fuer
 from werkzeuge.pivots import extrahiere_pivots
 from werkzeuge.virustotal import vt_anreichern
@@ -537,6 +538,30 @@ async def ip_intel_route(anfrage: ShodanAnfrage, request: Request):
         raise _serverfehler("IP-Intel", e)
 
 
+@router.post("/soziale-praesenz", summary="Soziale Präsenz (offene Plattformen + Walled Gardens)")
+@limiter.limit("5/minute")
+async def soziale_praesenz_route(anfrage: BenutzerAnfrage, request: Request):
+    """
+    Zeichnet die öffentliche soziale Präsenz zu einem Benutzernamen.
+
+    **Offene Plattformen** (echte freie APIs → strukturierte Daten):
+    Bluesky, GitHub, GitLab, Reddit, Mastodon, Keybase, Hacker News, Dev.to
+    — Anzeigename, Bio, Follower, Avatar, verknüpfte Konten.
+
+    **Walled Gardens** (Login-/Anti-Bot-Wand → KEIN Scraping):
+    X/Twitter, LinkedIn, Facebook, Instagram, TikTok, YouTube — nur
+    ToS-saubere Signale (Existenz via öffentliche oEmbed-Endpunkte bei
+    YouTube/TikTok; sonst Profil-Direktlink + Google-/Bing-Dork-Links).
+
+    **Rate-Limit:** 5 Anfragen pro Minute pro IP.
+    """
+    try:
+        ergebnis = await soziale_praesenz(anfrage.benutzername)
+        return JSONResponse(content=_mit_pivots("soziale-praesenz", ergebnis))
+    except Exception as e:
+        raise _serverfehler("Soziale-Präsenz", e)
+
+
 @router.get("/transparenz", summary="Datenfluss-Transparenz (DSGVO Art. 13/14)")
 async def transparenz_route(werkzeug: str | None = None):
     """
@@ -561,8 +586,8 @@ async def gesundheitscheck():
         "werkzeuge": [
             "domain", "email", "email-recon", "benutzername", "telefon",
             "bild", "shodan", "censys", "subdomains", "ip-intel",
-            "aggregator", "orchestrator",
+            "soziale-praesenz", "aggregator", "orchestrator",
         ],
         "fundament": ["cache", "transparenz", "pivots", "geocoding", "hlr_lookup"],
-        "version": "2.4-welle4",
+        "version": "2.5-welle5-social",
     }

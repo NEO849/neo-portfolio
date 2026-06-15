@@ -120,6 +120,34 @@ def _aus_benutzername(erg: dict) -> list[dict | None]:
     return pivots
 
 
+def _aus_soziale_praesenz(erg: dict) -> list[dict | None]:
+    pivots: list[dict | None] = []
+    for plattform in erg.get("offene_plattformen", []) or []:
+        if not plattform.get("gefunden"):
+            continue
+        if plattform.get("profil_url"):
+            pivots.append(_pivot("account", plattform["profil_url"],
+                                 plattform.get("plattform", "Plattform"), "hoch",
+                                 url=plattform["profil_url"]))
+        if plattform.get("avatar"):
+            pivots.append(_pivot("image", plattform["avatar"],
+                                 f"Avatar ({plattform.get('plattform', 'Profil')})",
+                                 "mittel", url=plattform["avatar"]))
+        # Verknüpfte Konten (z.B. Keybase-Proofs) als account-Pivots
+        for vk in (plattform.get("extra") or {}).get("verknuepfte_konten", []) or []:
+            if vk.get("url"):
+                pivots.append(_pivot("account", vk["url"],
+                                     f"{plattform.get('plattform')}→{vk.get('dienst', 'Konto')}",
+                                     "hoch", url=vk["url"]))
+    # Bestätigte Walled-Garden-Profile (YouTube/TikTok via oEmbed) als account-Pivots
+    for plattform in erg.get("walled_gardens", []) or []:
+        if plattform.get("existenz") and plattform.get("profil_url"):
+            pivots.append(_pivot("account", plattform["profil_url"],
+                                 plattform.get("plattform", "Plattform"), "mittel",
+                                 url=plattform["profil_url"]))
+    return pivots
+
+
 def _aus_domain(erg: dict) -> list[dict | None]:
     pivots: list[dict | None] = []
     dns = erg.get("dns") or {}
@@ -141,6 +169,7 @@ _EXTRAKTOREN = {
     "email-recon": _aus_email_recon,
     "email": _aus_email_basis,
     "benutzername": _aus_benutzername,
+    "soziale-praesenz": _aus_soziale_praesenz,
     "domain": _aus_domain,
     "bild": _aus_bild,
 }

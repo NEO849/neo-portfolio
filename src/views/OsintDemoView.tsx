@@ -8,12 +8,14 @@ import {
   telefonAnalysieren, bildAnalysieren,
   shodanAbfragen, censysAbfragen, emailReconnaissance, orchestrator,
   benutzernameVollscan, subdomainsFinden, ipIntelAbfragen,
+  sozialePraesenzSuchen,
   Apifehler,
   type DomainErgebnis, type EmailErgebnis, type BenutzerErgebnis,
   type TelefonErgebnis, type BildErgebnis,
   type ShodanErgebnis, type CensysErgebnis, type EmailReconErgebnis,
   type OrchestratorErgebnis,
   type SubdomainErgebnis, type IpIntelErgebnis,
+  type SozialePraesenzErgebnis,
   type Pivot,
 } from "../dienste/osintApi";
 import { DatenschutzModal } from "../bausteine/DatenschutzModal";
@@ -60,6 +62,12 @@ const DEMO_MODULE: DemoModul[] = [
     eingabeLabel: "Username eingeben", beispielEingabe: "torvalds", eingabeTyp: "text",
     ziel: "Findet, auf welchen Plattformen ein Benutzername existiert — der digitale Fußabdruck einer Person. Wahlweise Schnell (~12 Top-Plattformen, Sekunden) oder Vollscan (600+).",
     beschreibung: "Schnell-Modus prüft die wichtigsten ~12 Plattformen in Sekunden; Vollscan scannt 600+ via WhatsMyName-Database (~30–60 s). Pattern-Match-Detection mit Konfidenz pro Treffer (hoch / mittel / niedrig) statt Status-Code-False-Positives.",
+  },
+  {
+    nummer: "12", name: "Soziale Präsenz", farbe: "#ec4899",
+    eingabeLabel: "Username eingeben", beispielEingabe: "torvalds", eingabeTyp: "text",
+    ziel: "Zeichnet die öffentliche Präsenz eines Benutzernamens über die großen Plattformen — mit echten Profildaten, wo die Plattform eine offene API hat.",
+    beschreibung: "Offene Plattformen mit echten Daten (Bluesky, GitHub, GitLab, Reddit, Mastodon, Keybase, Hacker News, Dev.to — Anzeigename, Bio, Follower, Avatar, verknüpfte Konten). Große Netzwerke (X, LinkedIn, Facebook, Instagram, TikTok, YouTube) login-/anti-bot-geschützt: nur ToS-sauber — Existenz via öffentliche oEmbed-Endpunkte (YouTube/TikTok) bzw. Profil-Link + Google-/Bing-Dork. Kein Scraping.",
   },
   {
     nummer: "4", name: "Telefon Analyse", farbe: "#eab308",
@@ -124,6 +132,7 @@ const MODUL_ICON: Record<string, ReactNode> = {
   "10": (<svg {...ICO}><circle cx="6" cy="18" r="2.5" /><circle cx="18" cy="6" r="2.5" /><path d="M8 16 16 8M8 8h8v8" /></svg>), // IP-Intel
   "11": (<svg {...ICO}><rect x="3" y="4" width="18" height="6" rx="1.5" /><rect x="3" y="14" width="18" height="6" rx="1.5" /><path d="M7 7h.01M7 17h.01" /></svg>), // Censys / Host
   "8": (<svg {...ICO}><circle cx="6" cy="6" r="2.2" /><circle cx="18" cy="7" r="2.2" /><circle cx="12" cy="18" r="2.2" /><path d="M7.6 7.6 11 16M16.6 8.6 13 16M8 6h8" /></svg>), // Orchestrator / Graph
+  "12": (<svg {...ICO}><circle cx="9" cy="8" r="3" /><path d="M3.5 19c0-3 2.5-4.8 5.5-4.8s5.5 1.8 5.5 4.8" /><circle cx="18" cy="9.5" r="2" /><path d="M16.5 14.5c2.2.3 3.5 1.7 3.5 3.8" /></svg>), // Soziale Präsenz (Personen-Netz)
 };
 
 // 3-Schritt-Indikator (Auswahl → Eingabe → Ergebnis). EIN responsives Layout
@@ -200,6 +209,7 @@ const ERGEBNIS_HINWEIS: Record<string, string> = {
   "10": "Zeigt Eigentümer und Routing der IP — die Basis, um Zuständigkeit und Abuse-Kontakt zu bestimmen.",
   "11": "Offene Dienste und Standort des Hosts — die autoritative Sicht, die Shodan ergänzt.",
   "8": "Unten erscheint der Beziehungs-Graph: Knoten anklicken und Verbindungen folgen — so werden die Zusammenhänge sichtbar.",
+  "12": "Offene Plattformen liefern echte Profildaten (Name/Bio/Follower). Große Netzwerke sind login-geschützt — nutze dort Profil-Link + Dork. Klicke einen Treffer, um ihn weiterzuverfolgen.",
 };
 
 // ─── Terminal-Hilfsfunktionen ─────────────────────────────────────
@@ -366,6 +376,8 @@ function erstelleDemoAusgabe(modulNummer: string, eingabe: string): string[] {
     "  ›  DNS · SPF · DMARC · Gravatar · GHunt · HIBP · XposedOrNot · LeakCheck · PGP · GitHub",
     "  [ok]  [3] Username Vollscan",
     "  ›  WhatsMyName-DB · 600+ Plattformen · Konfidenz-Score",
+    "  [ok]  [12] Soziale Präsenz",
+    "  ›  Bluesky · GitHub · Reddit · Mastodon · Keybase + Walled-Gardens",
     "  [ok]  [4] Telefon Analyse",
     "  ›  Format · Carrier · Land · Zeitzone · Suchlinks",
     "  [ok]  [5] Reverse Image",
@@ -524,6 +536,55 @@ function benutzerZuTerminal(b: BenutzerErgebnis): string[] {
     }
   }
   zeilen.push("", `  Analysiert: ${b.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
+  return zeilen;
+}
+
+// ─── Soziale Präsenz (offene Plattformen + Walled Gardens) ──────────
+
+function sozialePraesenzZuTerminal(s: SozialePraesenzErgebnis): string[] {
+  if (s.fehler) {
+    return [R, K("SOZIALE PRAESENZ -- Fehler"), R, "", `  ${trunc(s.fehler, 30)}`];
+  }
+  const z = s.zusammenfassung;
+  const zeilen: string[] = [
+    R, K(`SOZIALE PRAESENZ -- ${trunc(s.benutzername, 14)}`), R,
+  ];
+  if (z) {
+    zeilen.push("", S("ZUSAMMENFASSUNG"));
+    zeilen.push(WW("Offen", `${z.offen_gefunden}/${z.geprueft_offen} gefunden`));
+    zeilen.push(WW("Netzwerke", `${z.walled_geprueft}/${z.walled_gesamt} geprüft`));
+  }
+
+  zeilen.push("", S("OFFENE PLATTFORMEN"));
+  const offen = s.offene_plattformen ?? [];
+  const treffer = offen.filter((p) => p.gefunden);
+  if (treffer.length === 0) {
+    zeilen.push("  Keine offenen Profile gefunden");
+  } else {
+    for (const p of treffer) {
+      zeilen.push(`  [+]  ${trunc(p.plattform, 12)}${p.anzeigename ? "  " + trunc(p.anzeigename, 14) : ""}`);
+      if (typeof p.follower === "number") zeilen.push(`         ${p.follower} Follower/Karma`);
+    }
+  }
+
+  zeilen.push("", S("GROSSE NETZWERKE (login-geschützt)"));
+  for (const w of s.walled_gardens ?? []) {
+    const sym = w.existenz === true ? "[+]" : w.existenz === false ? "[-]" : "[?]";
+    const zusatz = w.existenz === true && w.anzeigename ? "  " + trunc(w.anzeigename, 14)
+      : w.existenz === null ? "  (nur Link/Dork)" : "";
+    zeilen.push(`  ${sym}  ${trunc(w.plattform, 12)}${zusatz}`);
+  }
+
+  if (s.wer_ist_das?.length) {
+    zeilen.push("", S("WER IST DAS?"));
+    for (const w of s.wer_ist_das.slice(0, 6)) {
+      const kSym = w.konfidenz === "hoch" ? "[++]" : "[+]";
+      zeilen.push(`  ${kSym}  ${trunc(w.quelle + ": " + w.wert, 28)}`);
+    }
+  }
+
+  zeilen.push(...pivotsZuTerminal(s.pivots));
+  zeilen.push("", `  Analysiert: ${s.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
   return zeilen;
 }
 
@@ -1341,6 +1402,10 @@ export default function OsintDemoView() {
       } else if (modul.nummer === "11") {
         const ergebnis = await censysAbfragen(wert);
         zeilen = censysZuTerminal(ergebnis);
+        setRohdaten(ergebnis);
+      } else if (modul.nummer === "12") {
+        const ergebnis = await sozialePraesenzSuchen(wert);
+        zeilen = sozialePraesenzZuTerminal(ergebnis);
         setRohdaten(ergebnis);
       } else {
         zeilen = erstelleDemoAusgabe(modul.nummer, wert);

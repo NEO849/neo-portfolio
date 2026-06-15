@@ -28,10 +28,11 @@ def pruefe(bedingung: bool, beschreibung: str) -> None:
 
 
 # Werkzeuge, die der gesundheit-Endpunkt als ausgeliefert meldet.
+# Spiegelt exakt die Liste in routen/osint_routen.py (gesundheitscheck).
 AUSGELIEFERTE_WERKZEUGE = {
     "domain", "email", "email-recon", "benutzername", "telefon",
-    "bild", "passwort", "shodan", "subdomains", "ip-intel",
-    "aggregator", "orchestrator",
+    "bild", "shodan", "censys", "subdomains", "ip-intel",
+    "soziale-praesenz", "aggregator", "orchestrator",
 }
 
 

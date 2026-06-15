@@ -25,6 +25,7 @@ from werkzeuge.shodan_recon      import shodan_internetdb_abfragen
 from werkzeuge.telefon_analyse   import telefon_analysieren
 from werkzeuge.subdomain_recon    import subdomains_finden
 from werkzeuge.ip_recon           import ip_intel
+from werkzeuge.soziale_konten     import soziale_praesenz
 
 
 # ─── Typ-Erkennung ──────────────────────────────────────────────────
@@ -215,8 +216,26 @@ async def _orchestriere_username(username: str, graph: dict, tiefe: int) -> dict
         )
         _edge(graph, root, plat_node, "vorhanden_auf")
 
+    # Pivot: Soziale Präsenz (offene Plattformen mit echten Daten) bei Tiefe ≥2
+    sozial = None
+    if tiefe >= 2:
+        sozial = await soziale_praesenz(username)
+        for plattform in sozial.get("offene_plattformen", []) or []:
+            if not plattform.get("gefunden"):
+                continue
+            s_node = _node(
+                graph,
+                f"account:{plattform['plattform']}:{username}",
+                plattform["plattform"],
+                "account",
+                {"url": plattform.get("profil_url"), "kategorie": "offen",
+                 "anzeigename": plattform.get("anzeigename")},
+            )
+            _edge(graph, root, s_node, "profil_auf")
+
     return {
         "username":     suche,
+        "soziale_praesenz": sozial,
         "search_links": links_generieren("username", username),
     }
 

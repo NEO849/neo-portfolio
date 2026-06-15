@@ -323,9 +323,10 @@ const BACKOFF_BASIS_MS = 500;                // 500ms → 1000ms → 2000ms
 
 // Endpoints die deutlich länger laufen — bekommen großzügiges Timeout.
 const LANGE_ENDPOINTS = new Set([
-  "/benutzername",   // 600+ Plattform-Pings, ~20–30s typisch
-  "/orchestrator",   // alle Module parallel + Graph-Aufbau
-  "/email-recon",    // 7 Quellen parallel, kann auch >15s ziehen
+  "/benutzername",      // 600+ Plattform-Pings, ~20–30s typisch
+  "/orchestrator",      // alle Module parallel + Graph-Aufbau
+  "/email-recon",       // 7 Quellen parallel, kann auch >15s ziehen
+  "/soziale-praesenz",  // ~14 Plattformen parallel (offen + walled)
 ]);
 
 function warte(ms: number): Promise<void> {
@@ -853,6 +854,62 @@ export async function subdomainsFinden(
  */
 export async function ipIntelAbfragen(ziel: string): Promise<IpIntelErgebnis> {
   return apiFetch<IpIntelErgebnis>("/ip-intel", { ziel });
+}
+
+// ─── Typen: Soziale Präsenz (Social-Media-Recon) ──────────────────
+
+export interface DorkLink {
+  name: string;
+  url: string;
+}
+
+export interface SozialesKontoOffen {
+  plattform: string;
+  kategorie: "offen";
+  gefunden: boolean;
+  profil_url: string;
+  anzeigename?: string;
+  bio?: string;
+  follower?: number;
+  avatar?: string;
+  extra?: Record<string, unknown>;
+}
+
+export interface SozialesKontoWalled {
+  plattform: string;
+  kategorie: "walled";
+  login_geschuetzt: true;
+  profil_url: string;
+  existenz: boolean | null;   // true/false via oEmbed, null = nur Link
+  anzeigename?: string;
+  dork_links: DorkLink[];
+  hinweis: string;
+}
+
+export interface SozialePraesenzErgebnis {
+  benutzername: string;
+  analysiert_am: string;
+  fehler?: string;
+  aus_cache?: boolean;
+  zusammenfassung?: {
+    offen_gefunden: number;
+    geprueft_offen: number;
+    walled_geprueft: number;
+    walled_gesamt: number;
+  };
+  offene_plattformen?: SozialesKontoOffen[];
+  walled_gardens?: SozialesKontoWalled[];
+  wer_ist_das?: Array<{ quelle: string; wert: string; konfidenz: string; url?: string }>;
+  quellen?: string[];
+  pivots?: Pivot[];
+}
+
+/**
+ * Soziale Präsenz zu einem Benutzernamen — offene Plattformen (echte Daten via
+ * freie APIs) + Walled Gardens (nur Existenz/Link/Dork, kein Scraping).
+ */
+export async function sozialePraesenzSuchen(benutzername: string): Promise<SozialePraesenzErgebnis> {
+  return apiFetch<SozialePraesenzErgebnis>("/soziale-praesenz", { benutzername });
 }
 
 // ─── Transparenz / Datenfluss (DSGVO Art. 13/14) ──────────────────

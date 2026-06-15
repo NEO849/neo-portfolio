@@ -42,7 +42,9 @@ interface RohSicht {
   gravatar?: { gefunden?: boolean };
   datenleck?: { anzahl_nutzer?: number; domain_betroffen?: boolean };
   aggregiert?: { ports_anzahl?: number; vulns_anzahl?: number };
-  zusammenfassung?: { gefunden?: number; geprueft?: number; gesamt_eindeutig?: number; live_aufgeloest?: number | null };
+  zusammenfassung?: { gefunden?: number; geprueft?: number; gesamt_eindeutig?: number; live_aufgeloest?: number | null; offen_gefunden?: number; walled_geprueft?: number };
+  offene_plattformen?: { gefunden?: boolean }[];
+  walled_gardens?: { existenz?: boolean | null }[];
   identitaet?: { profile_gefunden?: number };
   autonomes_system?: { name?: string | null; asn?: number | null; beschreibung?: string | null };
   whois_organisation?: { name?: string | null };
@@ -229,6 +231,26 @@ export function fasseErgebnisZusammen(modulNummer: string, daten: object | null)
         kernaussage: "Offene Dienste und Standort des Hosts — die autoritative Sicht, die Shodan ergänzt. Prüfe, ob die offenen Ports so gewollt sind.",
         kennzahlen: nach_schwere([
           { etikett: "Offene Dienste", wert: String(ports), schwere: ports > 0 ? "neutral" : "ok" },
+        ]),
+      };
+    }
+
+    case "12": {
+      const offen = d.zusammenfassung?.offen_gefunden
+        ?? (d.offene_plattformen ?? []).filter((p) => p.gefunden).length;
+      const walledBestaetigt = (d.walled_gardens ?? []).filter((p) => p.existenz === true).length;
+      const schwere: Schwere = offen > 0 ? "neutral" : "ok";
+      return {
+        schwere,
+        verdikt: `${offen} Profil${offen === 1 ? "" : "e"} auf offenen Plattformen`,
+        kernaussage: offen > 0
+          ? "Echte öffentliche Profile (mit Daten) auf offenen Plattformen + Treffer auf den großen Netzwerken. Walled Gardens (X/LinkedIn/…) sind login-geschützt — dort gibt es nur Profil-Link + Dork, kein Scraping."
+          : "Auf den geprüften offenen Plattformen kein Profil gefunden. Für die großen Netzwerke stehen unten Profil-Links + Dork-Suchen bereit.",
+        kennzahlen: nach_schwere([
+          { etikett: "Offene Profile", wert: String(offen), schwere: offen > 0 ? "neutral" : "ok" },
+          ...(walledBestaetigt > 0
+            ? [{ etikett: "Netzwerke bestätigt", wert: String(walledBestaetigt), schwere: "neutral" as Schwere }]
+            : []),
         ]),
       };
     }

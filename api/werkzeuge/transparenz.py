@@ -219,6 +219,46 @@ DATENFLUSS: dict[str, dict] = {
         "speicherung": SPEICHER_HINWEIS,
     },
 
+    "soziale-praesenz": {
+        "beschreibung": "Zeichnet die öffentliche soziale Präsenz zu einem Benutzernamen "
+                        "(offene Plattformen mit echten Daten + Walled Gardens nur als Link/Existenz).",
+        "sendet_an": [
+            _dienst("Bluesky (public.api.bsky.app)", "Benutzername (als Handle in der Abfrage)",
+                    "Öffentliches Profil (Name, Bio, Follower, Avatar)",
+                    "https://bsky.social/about/support/privacy-policy", "US"),
+            _dienst("GitHub", "Benutzername", "Öffentliches Profil via User-API",
+                    "https://docs.github.com/site-policy/privacy-policies", "US"),
+            _dienst("GitLab", "Benutzername", "Öffentliches Profil via User-API",
+                    "https://about.gitlab.com/privacy/", "US"),
+            _dienst("Reddit", "Benutzername", "Öffentliches Profil (about.json)",
+                    "https://www.reddit.com/policies/privacy-policy", "US"),
+            _dienst("Mastodon (mastodon.social)", "Benutzername",
+                    "Öffentliches Profil via Account-Lookup",
+                    "https://mastodon.social/privacy-policy", "EU"),
+            _dienst("Keybase", "Benutzername",
+                    "Öffentliches Profil inkl. verifizierter verknüpfter Konten",
+                    "https://keybase.io/docs/privacypolicy", "US"),
+            _dienst("Hacker News (Firebase)", "Benutzername", "Öffentliches Profil (Karma, About)",
+                    "https://www.ycombinator.com/legal/", "US"),
+            _dienst("Dev.to", "Benutzername", "Öffentliches Profil via User-API",
+                    "https://dev.to/privacy", "US"),
+            _dienst("YouTube / TikTok (oEmbed)", "Benutzername (in der oEmbed-URL)",
+                    "Existenz + Anzeigename via INTENDIERT öffentlichen oEmbed-Endpunkt "
+                    "(kein Scraping, keine Umgehung von Schutzmechanismen)",
+                    "https://policies.google.com/privacy", "US"),
+        ],
+        "nur_links": [
+            "X/Twitter, LinkedIn, Facebook, Instagram (Login-/Anti-Bot-Wand): es werden "
+            "ausschließlich Profil-Direktlinks und Google-/Bing-Dork-Links erzeugt — "
+            "es fließen KEINE Daten an diese Plattformen, bis der Nutzer selbst klickt.",
+        ],
+        "hinweis": "Bewusste Trennung: offene Plattformen liefern echte Profildaten über "
+                   "ihre freien APIs; Walled Gardens werden NICHT gescraped, sondern nur "
+                   "verlinkt bzw. (YouTube/TikTok) über öffentliche oEmbed-Endpunkte auf "
+                   "Existenz geprüft. Rechtssicher & ToS-konform.",
+        "speicherung": SPEICHER_HINWEIS,
+    },
+
     "aggregator": {
         "beschreibung": "Erzeugt kuratierte Such-Links für ein Target (IntelTechniques-Stil).",
         "sendet_an": [],
