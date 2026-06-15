@@ -250,21 +250,19 @@ export default function HeroView() {
           {PERSOENLICH.untertitel}
         </motion.div>
 
-        {/* Name — Farben bleiben (Vorname weiß, Nachname azur), zusätzlich gleitet
-            derselbe Spiegel-Reflex wie über den Überschriften darüber. Der Glanz
-            liegt auf der Wort-Hülle (durchgehender Sweep statt pro Buchstabe);
-            bei reduzierter Bewegung greifen die statischen Originalfarben. */}
+        {/* Name — Vorname weiß, Nachname im Azur-Verlauf. Pro Buchstabe mit
+            gestaffelter Einlauf-Animation (blur/slide). */}
         <h1 className="font-display text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-[-0.03em] leading-[0.95] inline-flex flex-wrap justify-center gap-x-4 mb-6">
-          <span className={`flex ${erlaubt ? "glanz-text" : "text-white"}`}>
+          <span className="flex">
             {vorname.split("").map((b, i) => (
-              <motion.span key={`v-${i}`} custom={i} variants={buchstabe} initial="versteckt" animate="sichtbar">
+              <motion.span key={`v-${i}`} custom={i} variants={buchstabe} initial="versteckt" animate="sichtbar" className="text-white">
                 {b}
               </motion.span>
             ))}
           </span>
-          <span className={`flex ${erlaubt ? "glanz-akzent-text" : "text-akzent-verlauf"}`}>
+          <span className="flex">
             {nachname.split("").map((b, i) => (
-              <motion.span key={`n-${i}`} custom={i + vorname.length + 2} variants={buchstabe} initial="versteckt" animate="sichtbar">
+              <motion.span key={`n-${i}`} custom={i + vorname.length + 2} variants={buchstabe} initial="versteckt" animate="sichtbar" className="text-akzent-verlauf">
                 {b}
               </motion.span>
             ))}

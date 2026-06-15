@@ -126,25 +126,6 @@ body::before {
   55%, 100% { background-position: -20% 0; }
 }
 
-/* Spiegel-Glanz in Akzentfarbe — für den azurfarbenen Namensteil im Hero:
-   die azurne Identität bleibt erhalten, ein heller Reflex gleitet darüber.
-   Nutzt dieselbe glanz-sweep-Animation und --glanz-dauer wie die Überschriften. */
-.glanz-akzent-text {
-  background-image: linear-gradient(
-    110deg,
-    #7aa2ff 0%, #7aa2ff 40%,
-    #c8dbff 47%, #ffffff 50%, #c8dbff 53%,
-    #7aa2ff 60%, #7aa2ff 100%
-  );
-  background-size: 220% 100%;
-  background-position: 120% 0;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  animation: glanz-sweep var(--glanz-dauer, 5.5s) cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
 /* Sanftes Glow-Atmen — für ruhende Akzent-Elemente (Status, Punkte). */
 .glow-atmen { animation: glow-atmen 4.5s ease-in-out infinite; }
 @keyframes glow-atmen {
@@ -192,7 +173,6 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   .licht-name { animation: none; background-position: 50% 0; }
   .glanz-text { animation: none; background-position: 50% 0; }
-  .glanz-akzent-text { animation: none; background-position: 50% 0; }
   .glow-atmen { animation: none; opacity: 0.9; }
   .sheen { display: none; }
   .icon-ring { animation: none; }
