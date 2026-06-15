@@ -896,9 +896,18 @@ export interface SozialesKontoWalled {
   hinweis: string;
 }
 
+// WhatsMyName-Breitentreffer (Existenz, ohne tiefe Profildaten)
+export interface SozialeWeitereTreffer {
+  plattform: string;
+  url: string;
+  kategorie?: string;
+  konfidenz?: "hoch" | "mittel" | "niedrig";
+}
+
 export interface SozialePraesenzErgebnis {
   benutzername: string;
   analysiert_am: string;
+  modus?: "schnell" | "vollscan";
   fehler?: string;
   aus_cache?: boolean;
   zusammenfassung?: {
@@ -906,9 +915,13 @@ export interface SozialePraesenzErgebnis {
     geprueft_offen: number;
     walled_geprueft: number;
     walled_gesamt: number;
+    weitere_gefunden?: number;
+    weitere_geprueft?: number;
+    vollscan?: boolean;
   };
   offene_plattformen?: SozialesKontoOffen[];
   walled_gardens?: SozialesKontoWalled[];
+  weitere_plattformen?: SozialeWeitereTreffer[];
   wer_ist_das?: Array<{ quelle: string; wert: string; konfidenz: string; url?: string }>;
   quellen?: string[];
   pivots?: Pivot[];
@@ -916,10 +929,14 @@ export interface SozialePraesenzErgebnis {
 
 /**
  * Soziale Präsenz zu einem Benutzernamen — offene Plattformen (echte Daten via
- * freie APIs) + Walled Gardens (nur Existenz/Link/Dork, kein Scraping).
+ * freie APIs) + Walled Gardens (Existenz/Link/Dork, kein Scraping) + WhatsMyName-
+ * Breitenscan. `vollscan=true` scannt 600+ Plattformen (langsamer).
  */
-export async function sozialePraesenzSuchen(benutzername: string): Promise<SozialePraesenzErgebnis> {
-  return apiFetch<SozialePraesenzErgebnis>("/soziale-praesenz", { benutzername });
+export async function sozialePraesenzSuchen(
+  benutzername: string,
+  vollscan = false,
+): Promise<SozialePraesenzErgebnis> {
+  return apiFetch<SozialePraesenzErgebnis>("/soziale-praesenz", { benutzername, vollscan });
 }
 
 // ─── Transparenz / Datenfluss (DSGVO Art. 13/14) ──────────────────

@@ -42,7 +42,7 @@ interface RohSicht {
   gravatar?: { gefunden?: boolean };
   datenleck?: { anzahl_nutzer?: number; domain_betroffen?: boolean };
   aggregiert?: { ports_anzahl?: number; vulns_anzahl?: number };
-  zusammenfassung?: { gefunden?: number; geprueft?: number; gesamt_eindeutig?: number; live_aufgeloest?: number | null; offen_gefunden?: number; walled_geprueft?: number };
+  zusammenfassung?: { gefunden?: number; geprueft?: number; gesamt_eindeutig?: number; live_aufgeloest?: number | null; offen_gefunden?: number; walled_geprueft?: number; weitere_gefunden?: number };
   offene_plattformen?: { gefunden?: boolean }[];
   walled_gardens?: { existenz?: boolean | null }[];
   identitaet?: { profile_gefunden?: number };
@@ -249,17 +249,22 @@ export function fasseErgebnisZusammen(modulNummer: string, daten: object | null)
       const offen = d.zusammenfassung?.offen_gefunden
         ?? (d.offene_plattformen ?? []).filter((p) => p.gefunden).length;
       const walledBestaetigt = (d.walled_gardens ?? []).filter((p) => p.existenz === true).length;
-      const schwere: Schwere = offen > 0 ? "neutral" : "ok";
+      const weitere = d.zusammenfassung?.weitere_gefunden ?? 0;
+      const gesamt = offen + walledBestaetigt + weitere;
+      const schwere: Schwere = gesamt > 8 ? "auffaellig" : gesamt > 0 ? "neutral" : "ok";
       return {
         schwere,
-        verdikt: `${offen} Profil${offen === 1 ? "" : "e"} auf offenen Plattformen`,
-        kernaussage: offen > 0
-          ? "Echte öffentliche Profile (mit Daten) auf offenen Plattformen + Treffer auf den großen Netzwerken. Walled Gardens (X/LinkedIn/…) sind login-geschützt — dort gibt es nur Profil-Link + Dork, kein Scraping."
-          : "Auf den geprüften offenen Plattformen kein Profil gefunden. Für die großen Netzwerke stehen unten Profil-Links + Dork-Suchen bereit.",
+        verdikt: `${gesamt} Treffer · ${offen} mit echten Daten`,
+        kernaussage: gesamt > 0
+          ? "Der digitale Fußabdruck dieses Namens: echte Profile (mit Daten) auf offenen Plattformen + Existenz auf großen Netzwerken und weiteren Seiten. Je einheitlicher der Username, desto leichter lässt sich daraus EINE Person zusammensetzen — siehe Schutz-Maßnahmen unten."
+          : "Auf den geprüften Plattformen kein Profil gefunden. Für die großen Netzwerke stehen unten Profil-Links + Dork-Suchen bereit.",
         kennzahlen: nach_schwere([
           { etikett: "Offene Profile", wert: String(offen), schwere: offen > 0 ? "neutral" : "ok" },
           ...(walledBestaetigt > 0
             ? [{ etikett: "Netzwerke bestätigt", wert: String(walledBestaetigt), schwere: "neutral" as Schwere }]
+            : []),
+          ...(weitere > 0
+            ? [{ etikett: "Weitere (WMN)", wert: String(weitere), schwere: "neutral" as Schwere }]
             : []),
         ]),
       };

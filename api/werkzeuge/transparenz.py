@@ -246,6 +246,11 @@ DATENFLUSS: dict[str, dict] = {
                     "Existenz + Anzeigename via INTENDIERT öffentlichen oEmbed-Endpunkt "
                     "(kein Scraping, keine Umgehung von Schutzmechanismen)",
                     "https://policies.google.com/privacy", "US"),
+            _dienst("Alle geprüften WhatsMyName-Plattformen (Breitenscan: GitHub, GitLab, "
+                    "Keybase, Dev.to, Steam, Telegram, … je nach Schnell/Vollscan)",
+                    "Benutzername (in der jeweiligen Profil-URL)",
+                    "Existenzprüfung eines öffentlichen Profils mit diesem Namen",
+                    "jeweilige Plattform-Datenschutzerklärung", "global"),
         ],
         "nur_links": [
             "X/Twitter, LinkedIn, Facebook, Instagram (Login-/Anti-Bot-Wand): es werden "

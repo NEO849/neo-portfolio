@@ -145,6 +145,13 @@ def _aus_soziale_praesenz(erg: dict) -> list[dict | None]:
             pivots.append(_pivot("account", plattform["profil_url"],
                                  plattform.get("plattform", "Plattform"), "mittel",
                                  url=plattform["profil_url"]))
+    # WhatsMyName-Breitentreffer (weitere Plattformen) als account-Pivots
+    for plattform in erg.get("weitere_plattformen", []) or []:
+        if plattform.get("url"):
+            pivots.append(_pivot("account", plattform["url"],
+                                 plattform.get("plattform", "Plattform"),
+                                 plattform.get("konfidenz", "mittel"),
+                                 url=plattform["url"]))
     return pivots
 
 

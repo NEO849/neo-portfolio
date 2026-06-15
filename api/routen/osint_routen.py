@@ -554,7 +554,7 @@ async def ip_intel_route(anfrage: ShodanAnfrage, request: Request):
 
 @router.post("/soziale-praesenz", summary="Soziale Präsenz (offene Plattformen + Walled Gardens)")
 @limiter.limit("5/minute")
-async def soziale_praesenz_route(anfrage: BenutzerAnfrage, request: Request):
+async def soziale_praesenz_route(anfrage: BenutzerVollscanAnfrage, request: Request):
     """
     Zeichnet die öffentliche soziale Präsenz zu einem Benutzernamen.
 
@@ -570,7 +570,12 @@ async def soziale_praesenz_route(anfrage: BenutzerAnfrage, request: Request):
     **Rate-Limit:** 5 Anfragen pro Minute pro IP.
     """
     try:
-        ergebnis = await soziale_praesenz(anfrage.benutzername)
+        if anfrage.vollscan:
+            # WhatsMyName-Vollscan (600+) → unter die Concurrency-Bremse (OOM-Schutz)
+            async with _SCHWER_SEM:
+                ergebnis = await soziale_praesenz(anfrage.benutzername, vollscan=True)
+        else:
+            ergebnis = await soziale_praesenz(anfrage.benutzername, vollscan=False)
         return JSONResponse(content=_mit_schutz("soziale-praesenz", _mit_pivots("soziale-praesenz", ergebnis)))
     except Exception as e:
         raise _serverfehler("Soziale-Präsenz", e)

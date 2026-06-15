@@ -31,6 +31,7 @@ from urllib.parse import quote
 import httpx
 
 from werkzeuge.cache import cache_schluessel, standard_cache
+from werkzeuge.benutzername_suche import benutzername_suchen
 
 TIMEOUT_S = 8
 CACHE_TTL_S = 3600  # 1h — Profil-Daten ändern sich selten
@@ -361,24 +362,34 @@ def _html_strip(text: str | None) -> str | None:
 
 # ─── Hauptfunktion ──────────────────────────────────────────────────
 
-async def soziale_praesenz(benutzername: str) -> dict:
-    """Zeichnet die öffentliche soziale Präsenz zu einem Benutzernamen (gecacht)."""
+async def soziale_praesenz(benutzername: str, *,
+                           username_scan: bool = True, vollscan: bool = False) -> dict:
+    """
+    Zeichnet die öffentliche soziale Präsenz zu einem Benutzernamen (gecacht).
+
+    Args:
+        username_scan: zusätzlich den WhatsMyName-Breitenscan ausführen
+                       (Existenz auf vielen weiteren Plattformen).
+        vollscan:      True = WhatsMyName-Vollscan (600+), False = Schnell (~Tier-1).
+                       Nur relevant, wenn username_scan=True.
+    """
     name = benutzername.strip()
     if not name:
         return {"benutzername": name, "fehler": "Leerer Benutzername",
                 "analysiert_am": datetime.utcnow().isoformat() + "Z"}
 
-    schluessel = cache_schluessel("soziale_praesenz", name.lower())
+    schluessel = cache_schluessel("soziale_praesenz", name.lower(),
+                                  f"u{int(username_scan)}", f"v{int(vollscan)}")
     gecacht = await standard_cache.holen(schluessel)
     if gecacht is not None:
         return {**gecacht, "aus_cache": True}  # type: ignore[dict-item]
 
-    ergebnis = await _berechnen(name)
+    ergebnis = await _berechnen(name, username_scan=username_scan, vollscan=vollscan)
     await standard_cache.setzen(schluessel, ergebnis, ttl_sekunden=CACHE_TTL_S)
     return ergebnis
 
 
-async def _berechnen(name: str) -> dict:
+async def _berechnen(name: str, *, username_scan: bool, vollscan: bool) -> dict:
     async with httpx.AsyncClient(verify=True, follow_redirects=True,
                                  limits=httpx.Limits(max_connections=12)) as client:
         offen_aufgaben = [
@@ -387,9 +398,12 @@ async def _berechnen(name: str) -> dict:
             _hackernews(client, name), _devto(client, name),
         ]
         walled_aufgaben = [_youtube(client, name), _tiktok(client, name)]
-        offen, walled_live = await asyncio.gather(
+        # Offene + Walled-Live + (optional) WhatsMyName-Breitenscan ALLE parallel
+        wmn_aufgabe = benutzername_suchen(name, nur_tier1=not vollscan) if username_scan else _leer()
+        offen, walled_live, wmn = await asyncio.gather(
             asyncio.gather(*offen_aufgaben),
             asyncio.gather(*walled_aufgaben),
+            wmn_aufgabe,
         )
 
     # Walled Gardens ohne freien Check → reine Link-/Dork-Einträge
@@ -399,7 +413,25 @@ async def _berechnen(name: str) -> dict:
 
     offen_gefunden = [e for e in offen if e.get("gefunden")]
 
-    # „Wer ist das?" — Anzeigenamen + verknüpfte Konten aus offenen Quellen
+    # ── WhatsMyName-Breite einfalten (dedupliziert gegen offene Plattformen) ──
+    offen_namen = {(e.get("plattform") or "").lower() for e in offen_gefunden}
+    weitere_plattformen: list[dict] = []
+    wmn_anzeigenamen: list[str] = []
+    wmn_geprueft = 0
+    if isinstance(wmn, dict) and not wmn.get("fehler"):
+        wmn_geprueft = (wmn.get("zusammenfassung") or {}).get("geprueft", 0)
+        for t in (wmn.get("plattformen") or {}).get("gefunden", []) or []:
+            if (t.get("plattform") or "").lower() in offen_namen:
+                continue  # bereits als offene Plattform mit echten Daten erfasst
+            weitere_plattformen.append({
+                "plattform": t.get("plattform"),
+                "url": t.get("url"),
+                "kategorie": t.get("kategorie"),
+                "konfidenz": t.get("konfidenz", "mittel"),
+            })
+        wmn_anzeigenamen = (wmn.get("identitaet") or {}).get("anzeigenamen", []) or []
+
+    # „Wer ist das?" — Anzeigenamen + verknüpfte Konten aus allen Quellen
     wer_ist_das: list[dict] = []
     for e in offen_gefunden:
         if e.get("anzeigename"):
@@ -413,23 +445,36 @@ async def _berechnen(name: str) -> dict:
     for e in walled_live:
         if e.get("existenz") and e.get("anzeigename"):
             wer_ist_das.append({"quelle": e["plattform"], "wert": e["anzeigename"], "konfidenz": "mittel"})
+    for nm in wmn_anzeigenamen[:6]:
+        wer_ist_das.append({"quelle": "Profilname", "wert": nm, "konfidenz": "mittel"})
 
     return {
         "benutzername": name,
         "analysiert_am": datetime.utcnow().isoformat() + "Z",
+        "modus": "vollscan" if vollscan else "schnell",
         "zusammenfassung": {
             "offen_gefunden": len(offen_gefunden),
             "geprueft_offen": len(offen),
             "walled_geprueft": sum(1 for e in walled if e.get("existenz") is not None),
             "walled_gesamt": len(walled),
+            "weitere_gefunden": len(weitere_plattformen),
+            "weitere_geprueft": wmn_geprueft,
+            "vollscan": vollscan,
         },
         "offene_plattformen": offen,
         "walled_gardens": walled,
+        "weitere_plattformen": weitere_plattformen,
         "wer_ist_das": wer_ist_das,
         "quellen": [
             "Bluesky (AT-Protocol public API)", "GitHub Public API", "GitLab Public API",
             "Reddit about.json", "Mastodon (mastodon.social) API", "Keybase API",
             "Hacker News Firebase API", "Dev.to API",
             "YouTube/TikTok oEmbed (öffentlich)",
+            *(["WhatsMyName-DB (600+ Plattformen)"] if username_scan else []),
         ],
     }
+
+
+async def _leer() -> dict:
+    """Platzhalter-Coroutine für gather, wenn der Breitenscan deaktiviert ist."""
+    return {}

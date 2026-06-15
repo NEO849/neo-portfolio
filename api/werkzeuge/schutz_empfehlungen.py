@@ -237,6 +237,14 @@ def _aus_soziale_praesenz(erg: dict) -> list[dict]:
                        "Überlege, welche Konten du öffentlich (z. B. via Keybase/Profil-Links) miteinander verknüpfst.",
                        "Verifizierte Verknüpfungen machen das Aggregieren deiner Identität trivial.",
                        "mittel", "Verkettung"))
+
+    weitere = erg.get("weitere_plattformen") or []
+    gesamt_treffer = len(offen) + len(walled) + len(weitere)
+    if gesamt_treffer >= 6 or len(weitere) >= 3:
+        empf.append(_e("Alte/ungenutzte Konten löschen",
+                       "Schließe Profile, die du nicht mehr brauchst (justdeleteme.xyz hilft beim Finden der Löschwege).",
+                       f"Der Name wurde auf {gesamt_treffer} Plattform(en) gefunden — verwaiste Konten bleiben durchsuchbar und sind ein bevorzugtes Übernahme-Ziel.",
+                       "mittel", "Konten-Hygiene"))
     empf.append(_e("Bio & Standort minimieren",
                    "Entferne Klarnamen, Arbeitgeber, Heimatort und Geburtsdatum aus öffentlichen Bios, wo nicht nötig.",
                    "Diese Felder sind oft Antworten auf Sicherheitsfragen oder Bausteine für gezieltes Phishing.",

@@ -4,13 +4,13 @@ import { PHASEN_WECHSEL, FEDERN } from "../bewegung/varianten";
 import { GlanzUeberschrift } from "../bewegung/GlanzUeberschrift";
 import { KnopfAktion } from "../bausteine/KnopfAktion";
 import {
-  domainAnalysieren, emailAnalysieren, benutzernameSuchen,
+  domainAnalysieren, emailAnalysieren,
   telefonAnalysieren, bildAnalysieren,
   shodanAbfragen, censysAbfragen, emailReconnaissance, orchestrator,
-  benutzernameVollscan, subdomainsFinden, ipIntelAbfragen,
+  subdomainsFinden, ipIntelAbfragen,
   sozialePraesenzSuchen,
   Apifehler,
-  type DomainErgebnis, type EmailErgebnis, type BenutzerErgebnis,
+  type DomainErgebnis, type EmailErgebnis,
   type TelefonErgebnis, type BildErgebnis,
   type ShodanErgebnis, type CensysErgebnis, type EmailReconErgebnis,
   type OrchestratorErgebnis,
@@ -59,16 +59,10 @@ const DEMO_MODULE: DemoModul[] = [
     beschreibung: "Aggregiert MX / SPF / DMARC, HIBP, XposedOrNot, LeakCheck, Gravatar, Google-GAIA, GitHub-Discovery und PGP-Keyserver parallel. Liefert einen konsolidierten Risk-Score über alle Quellen.",
   },
   {
-    nummer: "3", name: "Username-Suche", farbe: "#c084fc",
+    nummer: "12", name: "Soziale Präsenz", farbe: "#c084fc",
     eingabeLabel: "Username eingeben", beispielEingabe: "torvalds", eingabeTyp: "text",
-    ziel: "Findet, auf welchen Plattformen ein Benutzername existiert — der digitale Fußabdruck einer Person. Wahlweise Schnell (~12 Top-Plattformen, Sekunden) oder Vollscan (600+).",
-    beschreibung: "Schnell-Modus prüft die wichtigsten ~12 Plattformen in Sekunden; Vollscan scannt 600+ via WhatsMyName-Database (~30–60 s). Pattern-Match-Detection mit Konfidenz pro Treffer (hoch / mittel / niedrig) statt Status-Code-False-Positives.",
-  },
-  {
-    nummer: "12", name: "Soziale Präsenz", farbe: "#ec4899",
-    eingabeLabel: "Username eingeben", beispielEingabe: "torvalds", eingabeTyp: "text",
-    ziel: "Zeichnet die öffentliche Präsenz eines Benutzernamens über die großen Plattformen — mit echten Profildaten, wo die Plattform eine offene API hat.",
-    beschreibung: "Offene Plattformen mit echten Daten (Bluesky, GitHub, GitLab, Reddit, Mastodon, Keybase, Hacker News, Dev.to — Anzeigename, Bio, Follower, Avatar, verknüpfte Konten). Große Netzwerke (X, LinkedIn, Facebook, Instagram, TikTok, YouTube) login-/anti-bot-geschützt: nur ToS-sauber — Existenz via öffentliche oEmbed-Endpunkte (YouTube/TikTok) bzw. Profil-Link + Google-/Bing-Dork. Kein Scraping.",
+    ziel: "Findet den kompletten digitalen Fußabdruck eines Benutzernamens — echte Profildaten auf offenen Plattformen + Existenz auf den großen Netzwerken und Hunderten weiteren Seiten.",
+    beschreibung: "Offene Plattformen mit echten Daten (Bluesky, GitHub, GitLab, Reddit, Mastodon, Keybase, Hacker News, Dev.to — Anzeigename, Bio, Follower, Avatar, verknüpfte Konten) + Breitenscan über WhatsMyName (Schnell ~12 / Vollscan 600+, Konfidenz pro Treffer). Große Netzwerke (X, LinkedIn, Facebook, Instagram, TikTok, YouTube) login-/anti-bot-geschützt: nur ToS-sauber — Existenz via öffentliche oEmbed-Endpunkte (YouTube/TikTok) bzw. Profil-Link + Google-/Bing-Dork. Kein Scraping.",
   },
   {
     nummer: "4", name: "Telefon Analyse", farbe: "#eab308",
@@ -375,10 +369,8 @@ function erstelleDemoAusgabe(modulNummer: string, eingabe: string): string[] {
     "", S("IDENTITAET / PERSON"),
     "  [ok]  [2] E-Mail Vollanalyse",
     "  ›  DNS · SPF · DMARC · Gravatar · GHunt · HIBP · XposedOrNot · LeakCheck · PGP · GitHub",
-    "  [ok]  [3] Username Vollscan",
-    "  ›  WhatsMyName-DB · 600+ Plattformen · Konfidenz-Score",
     "  [ok]  [12] Soziale Präsenz",
-    "  ›  Bluesky · GitHub · Reddit · Mastodon · Keybase + Walled-Gardens",
+    "  ›  Bluesky · GitHub · Reddit · Mastodon · Keybase + Netzwerke + WhatsMyName 600+",
     "  [ok]  [4] Telefon Analyse",
     "  ›  Format · Carrier · Land · Zeitzone · Suchlinks",
     "  [ok]  [5] Reverse Image",
@@ -515,31 +507,6 @@ function emailZuTerminal(e: EmailErgebnis): string[] {
   return zeilen;
 }
 
-function benutzerZuTerminal(b: BenutzerErgebnis): string[] {
-  if (b.fehler) {
-    return [R, K("USERNAME SUCHE -- Fehler"), R, "", `  ${trunc(b.fehler, 30)}`];
-  }
-  const s = b.zusammenfassung!;
-  const zeilen: string[] = [
-    R, K(`USERNAME -- ${trunc(b.benutzername ?? "", 20)}`), R,
-    "", S("ZUSAMMENFASSUNG"),
-    WW("Geprueft",  `${s.geprueft} Plattformen`),
-    WW("Gefunden",  `${s.gefunden} Treffer`),
-    WW("Rate",      `${s.treffer_rate}%`),
-  ];
-  if (b.nach_kategorie && Object.keys(b.nach_kategorie).length > 0) {
-    zeilen.push("", S("VERIFIZIERTE TREFFER"));
-    for (const [kategorie, plattformen] of Object.entries(b.nach_kategorie)) {
-      zeilen.push(`  ${kategorie.charAt(0).toUpperCase() + kategorie.slice(1)}`);
-      for (const p of plattformen) {
-        zeilen.push(`    [+]  ${trunc(p.plattform, 26)}`);
-      }
-    }
-  }
-  zeilen.push("", `  Analysiert: ${b.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
-  return zeilen;
-}
-
 // ─── Soziale Präsenz (offene Plattformen + Walled Gardens) ──────────
 
 function sozialePraesenzZuTerminal(s: SozialePraesenzErgebnis): string[] {
@@ -552,8 +519,12 @@ function sozialePraesenzZuTerminal(s: SozialePraesenzErgebnis): string[] {
   ];
   if (z) {
     zeilen.push("", S("ZUSAMMENFASSUNG"));
+    zeilen.push(WW("Modus", s.modus === "vollscan" ? "Vollscan (600+)" : "Schnell"));
     zeilen.push(WW("Offen", `${z.offen_gefunden}/${z.geprueft_offen} gefunden`));
     zeilen.push(WW("Netzwerke", `${z.walled_geprueft}/${z.walled_gesamt} geprüft`));
+    if ((z.weitere_geprueft ?? 0) > 0) {
+      zeilen.push(WW("Weitere", `${z.weitere_gefunden}/${z.weitere_geprueft} (WhatsMyName)`));
+    }
   }
 
   zeilen.push("", S("OFFENE PLATTFORMEN"));
@@ -574,6 +545,16 @@ function sozialePraesenzZuTerminal(s: SozialePraesenzErgebnis): string[] {
     const zusatz = w.existenz === true && w.anzeigename ? "  " + trunc(w.anzeigename, 14)
       : w.existenz === null ? "  (nur Link/Dork)" : "";
     zeilen.push(`  ${sym}  ${trunc(w.plattform, 12)}${zusatz}`);
+  }
+
+  const weitere = s.weitere_plattformen ?? [];
+  if (weitere.length) {
+    zeilen.push("", S("WEITERE PLATTFORMEN (WhatsMyName)"));
+    for (const w of weitere.slice(0, 20)) {
+      const kSym = w.konfidenz === "hoch" ? "[++]" : w.konfidenz === "mittel" ? "[+]" : "[?]";
+      zeilen.push(`  ${kSym}  ${trunc(w.plattform ?? "", 26)}`);
+    }
+    if (weitere.length > 20) zeilen.push(`  ... +${weitere.length - 20} weitere`);
   }
 
   if (s.wer_ist_das?.length) {
@@ -775,48 +756,6 @@ function emailVollZuTerminal(e: EmailErgebnis, r: EmailReconErgebnis | null): st
 }
 
 // ─── Username Vollscan (WhatsMyName 600+) ───────────────────────
-
-function vollscanZuTerminal(b: BenutzerErgebnis): string[] {
-  if (b.fehler) return [R, K("VOLLSCAN -- Fehler"), R, "", `  ${trunc(b.fehler, 30)}`];
-  const s = b.zusammenfassung!;
-  const zeilen: string[] = [
-    R, K(`VOLLSCAN -- ${trunc(b.benutzername ?? "", 19)}`), R,
-    "", S("ZUSAMMENFASSUNG"),
-    WW("Geprueft",   `${s.geprueft} Plattformen`),
-    WW("Gefunden",   `${s.gefunden} Treffer (${s.treffer_rate}%)`),
-    WW("Konf. hoch", String(s.konfidenz_hoch ?? 0)),
-    WW("Konf. mitt", String(s.konfidenz_mittel ?? 0)),
-    WW("Konf. nied", String(s.konfidenz_niedrig ?? 0)),
-    WW("Fehler",     String(s.fehler)),
-  ];
-  if (b.identitaet && b.identitaet.profile_gefunden > 0) {
-    zeilen.push("", S("IDENTITAET"));
-    if (b.identitaet.anzeigenamen.length) {
-      zeilen.push("  Namen:");
-      for (const n of b.identitaet.anzeigenamen.slice(0, 4)) zeilen.push(`    [+]  ${trunc(n, 26)}`);
-    }
-    for (const p of b.identitaet.profile.filter((x) => x.beschreibung).slice(0, 3)) {
-      zeilen.push(`  ${trunc(p.plattform, 12)}:`);
-      zeilen.push(...wrap(p.beschreibung ?? "", 30));
-    }
-    if (b.identitaet.avatare.length) zeilen.push(`  Avatare: ${b.identitaet.avatare.length} gefunden`);
-  }
-  if (b.nach_kategorie && Object.keys(b.nach_kategorie).length > 0) {
-    zeilen.push("", S("TREFFER NACH KATEGORIE"));
-    for (const [kat, plattformen] of Object.entries(b.nach_kategorie)) {
-      zeilen.push(`  ${kat.charAt(0).toUpperCase() + kat.slice(1)} (${plattformen.length})`);
-      for (const p of plattformen.slice(0, 8)) {
-        const kSym = p.konfidenz === "hoch" ? "[++]" : p.konfidenz === "mittel" ? "[+]" : "[?]";
-        zeilen.push(`    ${kSym}  ${trunc(p.plattform, 22)}`);
-      }
-      if (plattformen.length > 8) zeilen.push(`    ... +${plattformen.length - 8} weitere`);
-    }
-  }
-  zeilen.push(...pivotsZuTerminal(b.pivots));
-  zeilen.push("", `  WhatsMyName-DB (${b.modus})`,
-              `  Analysiert: ${b.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
-  return zeilen;
-}
 
 // ─── Domain & Shodan VOLLANALYSE: merge DNS/WHOIS/HTTP + Shodan ─
 
@@ -1198,7 +1137,7 @@ function downloadDatei(dateiname: string, inhalt: string, mimeType: string): voi
 export default function OsintDemoView() {
   const [phase, setPhase] = useState<"menue" | "eingabe" | "laden" | "ausgabe">("menue");
   const [ansicht, setAnsicht] = useState<"report" | "raw">("report");
-  const [schnellModus, setSchnellModus] = useState(true); // Modul 3: Schnell (~12) vs Vollscan (600+)
+  const [schnellModus, setSchnellModus] = useState(true); // Soziale Präsenz: Schnell (~12) vs Vollscan (600+)
   const [aktivesModul, setAktivesModul] = useState<DemoModul | null>(null);
   const [eingabeWert, setEingabeWert] = useState("");
   const [ausgabeZeilen, setAusgabeZeilen] = useState<string[]>([]);
@@ -1364,11 +1303,6 @@ export default function OsintDemoView() {
         if (!basisOk) throw basis.status === "rejected" ? basis.reason : new Apifehler("Basis-Email-Check fehlgeschlagen");
         zeilen = emailVollZuTerminal(basisOk, reconOk);
         setRohdaten({ basis: basisOk, recon: reconOk });
-      } else if (modul.nummer === "3") {
-        // Username: Schnell (~12 Tier-1-Plattformen) oder Vollscan (600+)
-        const ergebnis = schnell ? await benutzernameSuchen(wert) : await benutzernameVollscan(wert);
-        zeilen = vollscanZuTerminal(ergebnis);
-        setRohdaten(ergebnis);
       } else if (modul.nummer === "4") {
         const ergebnis = await telefonAnalysieren(wert);
         zeilen = telefonZuTerminal(ergebnis);
@@ -1405,7 +1339,8 @@ export default function OsintDemoView() {
         zeilen = censysZuTerminal(ergebnis);
         setRohdaten(ergebnis);
       } else if (modul.nummer === "12") {
-        const ergebnis = await sozialePraesenzSuchen(wert);
+        // Schnell (~12 WMN + offene APIs) oder Vollscan (600+); schnell=true → kein Vollscan
+        const ergebnis = await sozialePraesenzSuchen(wert, !schnell);
         zeilen = sozialePraesenzZuTerminal(ergebnis);
         setRohdaten(ergebnis);
       } else {
@@ -1445,7 +1380,7 @@ export default function OsintDemoView() {
 
   const eingabeAbsenden = useCallback(() => {
     if (!aktivesModul || !eingabeWert.trim()) return;
-    void ausfuehren(aktivesModul, eingabeWert.trim(), aktivesModul.nummer === "3" ? schnellModus : false);
+    void ausfuehren(aktivesModul, eingabeWert.trim(), aktivesModul.nummer === "12" ? schnellModus : false);
   }, [aktivesModul, eingabeWert, ausfuehren, schnellModus]);
 
   // Pivot: aus einem Ergebnis direkt das passende Werkzeug mit dem Wert starten.
@@ -1721,8 +1656,8 @@ export default function OsintDemoView() {
                   <KnopfAktion beimKlick={eingabeAbsenden} kinder="Jetzt prüfen →" />
                 )}
 
-                {/* Modul 3: Schnell-/Vollscan-Umschalter */}
-                {aktivesModul.nummer === "3" && (
+                {/* Soziale Präsenz: Schnell-/Vollscan-Umschalter */}
+                {aktivesModul.nummer === "12" && (
                   <div className="mt-4 flex items-center gap-2 text-[12px] flex-wrap">
                     <span className="text-white/45 mr-0.5">Tiefe:</span>
                     <div className="inline-flex rounded-xl border border-white/[0.08] bg-white/[0.02] p-0.5">

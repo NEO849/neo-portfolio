@@ -219,7 +219,9 @@ async def _orchestriere_username(username: str, graph: dict, tiefe: int) -> dict
     # Pivot: Soziale Präsenz (offene Plattformen mit echten Daten) bei Tiefe ≥2
     sozial = None
     if tiefe >= 2:
-        sozial = await soziale_praesenz(username)
+        # username_scan=False: der WhatsMyName-Scan läuft hier bereits separat
+        # (benutzername_suchen oben) → kein Doppel-Scan im Orchestrator.
+        sozial = await soziale_praesenz(username, username_scan=False)
         for plattform in sozial.get("offene_plattformen", []) or []:
             if not plattform.get("gefunden"):
                 continue

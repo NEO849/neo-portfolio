@@ -16,6 +16,7 @@ import type {
   DomainErgebnis, EmailErgebnis, EmailReconErgebnis, BenutzerErgebnis,
   TelefonErgebnis, BildErgebnis, ShodanErgebnis, CensysErgebnis,
   OrchestratorErgebnis, SubdomainErgebnis, IpIntelErgebnis,
+  SozialePraesenzErgebnis,
   Pivot, PivotTyp, VtReputation,
 } from "../../dienste/osintApi";
 
@@ -734,6 +735,100 @@ function ReportUsername({ b, onPivot }: { b: BenutzerErgebnis; onPivot?: PivotHa
   );
 }
 
+// ─── Soziale Präsenz (offene Plattformen + Netzwerke + WhatsMyName) ──
+
+function ReportSoziale({ s, onPivot }: { s: SozialePraesenzErgebnis; onPivot?: PivotHandler }) {
+  if (s.fehler) return <FehlerHinweis text={s.fehler} />;
+  const z = s.zusammenfassung;
+  const offen = (s.offene_plattformen ?? []).filter((p) => p.gefunden);
+  const walledBestaetigt = (s.walled_gardens ?? []).filter((w) => w.existenz === true).length;
+  const weitere = s.weitere_plattformen ?? [];
+  const gesamt = offen.length + walledBestaetigt + weitere.length;
+
+  return (
+    <div>
+      {z && (
+        <Verdikt titel="Digitaler Fußabdruck"
+          stufe={gesamt > 8 ? "Mittel" : gesamt > 0 ? "Gering" : "Keines"}
+          wert={gesamt} max={Math.max((z.geprueft_offen ?? 0) + (z.walled_gesamt ?? 0) + (z.weitere_geprueft ?? 0), 1)}
+          hinweis={`@${s.benutzername} · Modus: ${s.modus === "vollscan" ? "Vollscan 600+" : "Schnell"}`}
+          deutung="Wie sichtbar dieser Name im Netz ist. Je einheitlicher der Username, desto leichter lässt sich daraus EINE Person zusammensetzen — siehe Schutz-Maßnahmen." />
+      )}
+      {z && (
+        <div className="flex flex-wrap gap-1.5 mt-3 mb-1">
+          <Marke text={`${offen.length} mit echten Daten`} farbe={C.gruen} gefuellt />
+          {walledBestaetigt > 0 && <Marke text={`${walledBestaetigt} Netzwerke bestätigt`} farbe={C.gelb} />}
+          {weitere.length > 0 && <Marke text={`${weitere.length} weitere (WMN)`} farbe={C.cyber} />}
+        </div>
+      )}
+
+      <Sektion titel="Offene Plattformen — echte Daten" farbe={C.gruen}
+        rechts={<span className="font-mono text-[10px] text-white/50">{offen.length} gefunden</span>}>
+        {offen.length === 0 ? (
+          <div className="font-mono text-[12px] text-white/55 py-2">Keine offenen Profile gefunden.</div>
+        ) : offen.map((p, i) => (
+          <div key={`${p.plattform}-${i}`} className="mb-2.5 last:mb-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <LinkChip name={p.plattform} url={p.profil_url} farbe={C.gruen} />
+              {p.anzeigename && <span className="text-white/85 text-[12.5px] font-medium">{p.anzeigename}</span>}
+              {typeof p.follower === "number" && (
+                <span className="font-mono text-[10px] text-white/45">{p.follower.toLocaleString("de-DE")} Follower/Karma</span>
+              )}
+            </div>
+            {p.bio && <div className="font-mono text-[11.5px] text-white/60 mt-1 leading-snug">{p.bio}</div>}
+          </div>
+        ))}
+      </Sektion>
+
+      {s.wer_ist_das && s.wer_ist_das.length > 0 && (
+        <Sektion titel="Wer ist das?" farbe={C.lila}>
+          {s.wer_ist_das.slice(0, 8).map((w, i) => (
+            <Feld key={i} label={w.quelle}>{w.wert}</Feld>
+          ))}
+        </Sektion>
+      )}
+
+      <Sektion titel="Große Netzwerke — login-geschützt" farbe={C.gelb}
+        rechts={<span className="font-mono text-[10px] text-white/50">{walledBestaetigt} bestätigt</span>}>
+        {(s.walled_gardens ?? []).map((w, i) => {
+          const farbe = w.existenz === true ? C.gruen : w.existenz === false ? C.cyber : C.gelb;
+          const status = w.existenz === true ? "vorhanden" : w.existenz === false ? "nicht gefunden" : "nur Link/Dork";
+          return (
+            <div key={`${w.plattform}-${i}`} className="mb-2 last:mb-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Marke text={w.plattform} farbe={farbe} gefuellt={w.existenz === true} />
+                <span className="font-mono text-[10px] text-white/45">{status}</span>
+                {w.anzeigename && <span className="text-white/80 text-[12px]">{w.anzeigename}</span>}
+              </div>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                <LinkChip name="Profil" url={w.profil_url} farbe={C.cyber} />
+                {(w.dork_links ?? []).map((d, j) => (
+                  <LinkChip key={j} name={d.name} url={d.url} farbe={C.gelb} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </Sektion>
+
+      {weitere.length > 0 && (
+        <Sektion titel="Weitere Plattformen — WhatsMyName" farbe={C.cyber}
+          rechts={<span className="font-mono text-[10px] text-white/50">{weitere.length} Treffer</span>}>
+          <div className="flex flex-wrap gap-1.5">
+            {weitere.slice(0, 60).map((w, i) => {
+              const farbe = w.konfidenz === "hoch" ? C.gruen : w.konfidenz === "mittel" ? C.gelb : C.cyber;
+              return <LinkChip key={`${w.plattform}-${i}`} name={w.plattform} url={w.url} farbe={farbe} />;
+            })}
+          </div>
+        </Sektion>
+      )}
+
+      <PivotSektion pivots={s.pivots} onPivot={onPivot} />
+      <FussZeile iso={s.analysiert_am} />
+    </div>
+  );
+}
+
 // ─── Domain & Shodan ────────────────────────────────────────────────
 
 // ─── VirusTotal-Reputation (geteilt: Domain + IP) ───────────────────
@@ -1368,6 +1463,7 @@ export default function ErgebnisReport({ modulNummer, daten, onPivot }: { modulN
     case "9": inhalt = <ReportSubdomains s={daten as SubdomainErgebnis} />; break;
     case "10": inhalt = <ReportIpIntel r={daten as IpIntelErgebnis} />; break;
     case "11": inhalt = <ReportCensys c={daten as CensysErgebnis} />; break;
+    case "12": inhalt = <ReportSoziale s={daten as SozialePraesenzErgebnis} onPivot={onPivot} />; break;
     default: return null;
   }
   const klar = klartextFuer(modulNummer, daten);
