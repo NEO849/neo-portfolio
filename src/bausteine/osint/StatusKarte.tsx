@@ -6,7 +6,8 @@
 // Konsistent zum dunklen Premium-Stil.
 // ═══════════════════════════════════════════════════════════════════
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { GesundheitErgebnis } from "../../dienste/osintApi";
 
 interface ToolDef { key: string; name: string; quelle: string }
@@ -61,26 +62,43 @@ function AnimiertesHaken({ verzoegerung }: { verzoegerung: number }) {
 }
 
 function ToolZeile({ tool, ok, index }: { tool: ToolDef; ok: boolean; index: number }) {
+  const [offen, setOffen] = useState(false);
   return (
     <motion.div
       initial={{ opacity: 0, x: -10, filter: "blur(4px)" }}
       animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
       transition={{ duration: 0.4, delay: 0.06 * index, ease: [0.16, 1, 0.3, 1] }}
-      className={`flex items-start gap-2.5 rounded-xl border px-3 py-2 ${
+      className={`rounded-xl border overflow-hidden ${
         ok ? "border-white/[0.06] bg-white/[0.02]" : "border-signal-rot/30 bg-signal-rot/[0.06]"
       }`}
     >
-      {ok ? <AnimiertesHaken verzoegerung={0.06 * index + 0.15} />
-          : <span className="w-[15px] h-[15px] grid place-items-center text-signal-rot flex-shrink-0">✕</span>}
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="text-[13px] text-white/85 font-medium truncate">{tool.name}</span>
-          <span className={`ml-auto font-mono text-[9px] uppercase tracking-wider flex-shrink-0 ${ok ? "text-signal-gruen/80" : "text-signal-rot"}`}>
-            {ok ? "live" : "offline"}
-          </span>
-        </div>
-        <div className="text-[10.5px] text-white/40 leading-snug mt-0.5 truncate">{tool.quelle}</div>
-      </div>
+      {/* Kopf: Name + Live — Klick zeigt die Quellen */}
+      <button type="button" onClick={() => setOffen((o) => !o)} aria-expanded={offen}
+        className="w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-white/[0.02]">
+        {ok ? <AnimiertesHaken verzoegerung={0.06 * index + 0.15} />
+            : <span className="w-[15px] h-[15px] grid place-items-center text-signal-rot flex-shrink-0">✕</span>}
+        <span className="text-[13px] text-white/85 font-medium truncate flex-1">{tool.name}</span>
+        <span className={`font-mono text-[9px] uppercase tracking-wider flex-shrink-0 ${ok ? "text-signal-gruen/80" : "text-signal-rot"}`}>
+          {ok ? "live" : "offline"}
+        </span>
+        <span className="flex-shrink-0 text-white/35" aria-hidden>
+          {offen ? (
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+          )}
+        </span>
+      </button>
+      {/* Aufklappbar: Datenquellen des Werkzeugs */}
+      <AnimatePresence initial={false}>
+        {offen && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2, ease: "easeOut" }}
+            className="overflow-hidden">
+            <div className="px-3 pb-2.5 pl-[42px] text-[11px] text-white/50 leading-relaxed">{tool.quelle}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

@@ -1198,7 +1198,6 @@ export default function OsintDemoView() {
   const [phase, setPhase] = useState<"menue" | "eingabe" | "laden" | "ausgabe">("menue");
   const [ansicht, setAnsicht] = useState<"report" | "raw">("report");
   const [schnellModus, setSchnellModus] = useState(true); // Soziale Präsenz: Schnell (~12) vs Vollscan (600+)
-  const [offenesModul, setOffenesModul] = useState<string | null>(null); // aufgeklappte Auswahl-Karte
   const [aktivesModul, setAktivesModul] = useState<DemoModul | null>(null);
   const [eingabeWert, setEingabeWert] = useState("");
   const [ausgabeZeilen, setAusgabeZeilen] = useState<string[]>([]);
@@ -1597,20 +1596,20 @@ export default function OsintDemoView() {
                   {DEMO_MODULE.map((modul, i) => {
                     const istWarnung = modul.nummer === "4" || modul.nummer === "6";
                     const istLive = modul.eingabeTyp === "text";
-                    const offen = offenesModul === modul.nummer;
                     return (
-                      <motion.div
+                      <motion.button
                         key={modul.nummer}
+                        type="button"
+                        onClick={() => modulStarten(modul)}
                         initial={{ opacity: 0, y: 14, filter: "blur(8px)" }}
                         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                         transition={{ delay: 0.03 * i, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                        className={`group relative rounded-2xl border p-4 transition-colors duration-300 overflow-hidden ${
-                          offen ? "border-akzent-500/40 bg-white/[0.045]" : "border-white/[0.07] bg-white/[0.025] hover:bg-white/[0.05] hover:border-white/[0.16]"
-                        }`}
+                        whileHover={{ y: -3, transition: FEDERN.weich }}
+                        className="group relative text-left rounded-2xl border border-white/[0.07] bg-white/[0.025] hover:bg-white/[0.05] hover:border-white/[0.16] p-4 transition-colors duration-300 overflow-hidden focus:outline-none focus-visible:border-akzent-500/50"
                       >
                         <span aria-hidden className="sheen" />
                         <div className="flex items-start gap-3.5">
-                          {/* Icon-Plättchen — identisch zum Hero: Azur-Glas mit Tiefe */}
+                          {/* Icon-Plättchen — Azur-Glas mit Tiefe (wie Hero) */}
                           <span
                             className="relative grid place-items-center w-10 h-10 rounded-xl2 flex-shrink-0 border border-akzent-500/25 group-hover:border-akzent-500/45 transition-all duration-300 group-hover:scale-105"
                             style={{
@@ -1623,14 +1622,7 @@ export default function OsintDemoView() {
                             <span aria-hidden className="icon-ring opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             <span className="relative drop-shadow-[0_1px_3px_rgba(79,124,251,0.35)]">{MODUL_ICON[modul.nummer] ?? null}</span>
                           </span>
-
-                          {/* Titel + Badge — Klick klappt auf/zu */}
-                          <button
-                            type="button"
-                            onClick={() => setOffenesModul(offen ? null : modul.nummer)}
-                            aria-expanded={offen}
-                            className="min-w-0 flex-1 text-left focus:outline-none self-center"
-                          >
+                          <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 flex-wrap">
                               <h4 className="font-display font-semibold text-white text-[15px] leading-tight">{modul.name}</h4>
                               {istWarnung ? (
@@ -1641,50 +1633,13 @@ export default function OsintDemoView() {
                                 <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-white/45">Check</span>
                               )}
                             </div>
-                          </button>
-
-                          {/* Aufklapp-Steuerung: ✕ wenn offen, sonst Chevron */}
-                          <button
-                            type="button"
-                            onClick={() => setOffenesModul(offen ? null : modul.nummer)}
-                            aria-label={offen ? "Details schließen" : "Details anzeigen"}
-                            className="flex-shrink-0 self-center grid place-items-center w-7 h-7 rounded-lg text-white/40 hover:text-white hover:bg-white/[0.06] transition-colors"
-                          >
-                            {offen ? (
-                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
-                            ) : (
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m6 9 6 6 6-6" /></svg>
-                            )}
-                          </button>
+                            <p className="text-[13px] text-white/55 leading-snug mt-1.5 line-clamp-2">{modul.ziel}</p>
+                          </div>
+                          <span className="flex-shrink-0 mt-1 text-white/20 group-hover:text-akzent-300 group-hover:translate-x-0.5 transition-all duration-300">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                          </span>
                         </div>
-
-                        {/* Aufklappbarer Detail-Bereich */}
-                        <AnimatePresence initial={false}>
-                          {offen && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.22, ease: "easeOut" }}
-                              className="overflow-hidden"
-                            >
-                              <div className="pt-3 pl-[54px]">
-                                <p className="text-[13px] text-white/70 leading-relaxed">{modul.ziel}</p>
-                                {modul.beschreibung && (
-                                  <p className="text-[12px] text-white/45 leading-relaxed mt-1.5">{modul.beschreibung}</p>
-                                )}
-                                <button
-                                  type="button"
-                                  onClick={() => modulStarten(modul)}
-                                  className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-akzent-500/30 bg-akzent-500/[0.1] px-3 py-1.5 font-mono text-[12px] text-akzent-200 hover:text-white hover:bg-akzent-500/[0.18] hover:border-akzent-500/50 transition-colors"
-                                >
-                                  {modul.eingabeTyp === "none" ? "Jetzt prüfen" : "Werkzeug öffnen"} →
-                                </button>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </motion.div>
+                      </motion.button>
                     );
                   })}
                 </div>
