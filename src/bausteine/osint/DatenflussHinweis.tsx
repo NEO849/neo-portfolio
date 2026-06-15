@@ -96,7 +96,7 @@ export default function DatenflussHinweis({ nummer }: { nummer: string }) {
             className="overflow-hidden">
             <div className="mt-2 rounded-lg border p-3.5 space-y-3"
               style={{ borderColor: `${INDIGO}1f`, background: `${INDIGO}06` }}>
-              <p className="text-[11px] text-white/55 leading-relaxed">{wz.beschreibung}</p>
+              <p className="text-[11px] text-white/65 leading-relaxed">{wz.beschreibung}</p>
 
               {lokal ? (
                 <div className="flex items-start gap-2 text-[11px] leading-relaxed"
@@ -106,7 +106,7 @@ export default function DatenflussHinweis({ nummer }: { nummer: string }) {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <div className="text-[9.5px] tracking-[0.16em] uppercase text-white/40">Daten gehen an</div>
+                  <div className="text-[9.5px] tracking-[0.16em] uppercase text-white/50">Daten gehen an</div>
                   {wz.sendet_an.map((d, i) => (
                     <div key={i} className="flex items-start gap-2.5 pl-2.5 border-l"
                       style={{ borderColor: `${INDIGO}40` }}>
@@ -115,10 +115,10 @@ export default function DatenflussHinweis({ nummer }: { nummer: string }) {
                           <a href={d.datenschutz_url} target="_blank" rel="noopener noreferrer"
                             className="text-[12px] hover:underline underline-offset-2 break-all"
                             style={{ color: INDIGO }}>{d.dienst}</a>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded-full shrink-0 text-white/55"
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full shrink-0 text-white/65"
                             style={{ border: `1px solid ${INDIGO}33` }}>{d.region}</span>
                         </div>
-                        <div className="text-[10.5px] text-white/45 leading-snug mt-0.5">{d.uebermittelte_daten}</div>
+                        <div className="text-[10.5px] text-white/55 leading-snug mt-0.5">{d.uebermittelte_daten}</div>
                       </div>
                     </div>
                   ))}
@@ -126,10 +126,10 @@ export default function DatenflussHinweis({ nummer }: { nummer: string }) {
               )}
 
               {wz.hinweis && (
-                <p className="text-[10.5px] text-white/50 leading-relaxed border-t pt-2.5"
+                <p className="text-[10.5px] text-white/60 leading-relaxed border-t pt-2.5"
                   style={{ borderColor: "rgba(255,255,255,0.06)" }}>{wz.hinweis}</p>
               )}
-              <p className="text-[9.5px] text-white/35 leading-relaxed flex items-start gap-1.5">
+              <p className="text-[9.5px] text-white/45 leading-relaxed flex items-start gap-1.5">
                 <span style={{ color: `${INDIGO}99` }}>●</span>{wz.speicherung}
               </p>
             </div>

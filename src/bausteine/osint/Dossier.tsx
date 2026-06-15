@@ -54,7 +54,7 @@ export function Dossier({ modulNummer, daten, onPivot }: DossierProps) {
         )}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">Dossier</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/45">Dossier</span>
             <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 ${stil.text}`}
               style={{ borderColor: "currentColor" }}>
               <span className={`w-1.5 h-1.5 rounded-full ${stil.punkt}`} />
@@ -67,12 +67,12 @@ export function Dossier({ modulNummer, daten, onPivot }: DossierProps) {
             </div>
           )}
           {ex.namen.length > 0 && (
-            <div className="text-[12.5px] text-white/55 mt-0.5">
-              <span className="text-white/35">Namen/Aliase: </span>{ex.namen.join(" · ")}
+            <div className="text-[12.5px] text-white/65 mt-0.5">
+              <span className="text-white/45">Namen/Aliase: </span>{ex.namen.join(" · ")}
             </div>
           )}
           <div className="font-display font-semibold text-white/90 text-[14px] mt-2">{z.verdikt}</div>
-          <p className="text-[13px] text-white/60 leading-relaxed mt-1 max-w-2xl">{z.kernaussage}</p>
+          <p className="text-[13px] text-white/70 leading-relaxed mt-1 max-w-2xl">{z.kernaussage}</p>
         </div>
       </div>
 
@@ -84,7 +84,7 @@ export function Dossier({ modulNummer, daten, onPivot }: DossierProps) {
             return (
               <div key={k.etikett}>
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-[12px] text-white/55 truncate">{k.etikett}</span>
+                  <span className="text-[12px] text-white/65 truncate">{k.etikett}</span>
                   <span className={`font-mono text-[13px] font-semibold ${ks.text}`}>{k.wert}</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-white/[0.06] mt-1 overflow-hidden">
@@ -100,9 +100,9 @@ export function Dossier({ modulNummer, daten, onPivot }: DossierProps) {
       {ex.koordinaten && (
         <div className="px-5 pb-4">
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">Standort</span>
-            {ex.koordinaten.label && <span className="text-[12px] text-white/60">{ex.koordinaten.label}</span>}
-            <span className="font-mono text-[11px] text-white/35 ml-auto">{ex.koordinaten.lat.toFixed(4)}, {ex.koordinaten.lon.toFixed(4)}</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/50">Standort</span>
+            {ex.koordinaten.label && <span className="text-[12px] text-white/70">{ex.koordinaten.label}</span>}
+            <span className="font-mono text-[11px] text-white/45 ml-auto">{ex.koordinaten.lat.toFixed(4)}, {ex.koordinaten.lon.toFixed(4)}</span>
           </div>
           <div className="rounded-xl overflow-hidden border border-white/10">
             <iframe
@@ -119,7 +119,7 @@ export function Dossier({ modulNummer, daten, onPivot }: DossierProps) {
       {/* ── Timeline (datierte Funde) ── */}
       {ex.zeitpunkte.length > 0 && (
         <div className="px-5 pb-4">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-white/40 mb-2">Zeitleiste</span>
+          <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-white/50 mb-2">Zeitleiste</span>
           <div className="flex items-stretch gap-1.5 overflow-x-auto scrollbar-none">
             {ex.zeitpunkte.map((t, i) => (
               <div key={i} className="flex-shrink-0 rounded-lg border border-white/[0.08] bg-white/[0.02] px-2.5 py-1.5 min-w-[92px]">
@@ -134,7 +134,7 @@ export function Dossier({ modulNummer, daten, onPivot }: DossierProps) {
       {/* ── Nächste Schritte (Pivots) ── */}
       {pivots.length > 0 && onPivot && (
         <div className="px-5 pb-4 pt-1 border-t border-white/[0.06]">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-white/40 mb-2 mt-3">Nächste Schritte</span>
+          <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-white/50 mb-2 mt-3">Nächste Schritte</span>
           <div className="flex flex-wrap gap-2">
             {pivots.map((p, i) => (
               <button key={`${p.typ}-${i}`} type="button" onClick={() => onPivot(p.typ, p.wert)}

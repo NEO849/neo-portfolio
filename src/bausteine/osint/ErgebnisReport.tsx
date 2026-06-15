@@ -129,7 +129,7 @@ function Feld({ label, children, copy, href, copyId, kopiertId, onCopy }: {
 }) {
   return (
     <div className="flex items-baseline gap-2 py-[3px] font-mono text-[12.5px] group">
-      <span className="text-white/55 min-w-[96px] shrink-0">{label}</span>
+      <span className="text-white/65 min-w-[96px] shrink-0">{label}</span>
       <span className="text-white/85 break-all flex-1">
         {href ? (
           <a href={href} target="_blank" rel="noopener noreferrer"
@@ -138,7 +138,7 @@ function Feld({ label, children, copy, href, copyId, kopiertId, onCopy }: {
       </span>
       {copy !== undefined && onCopy && (
         <button onClick={() => onCopy(copy, copyId ?? label)}
-          className="shrink-0 text-[10px] px-1.5 py-0.5 rounded border border-white/10 text-white/55
+          className="shrink-0 text-[10px] px-1.5 py-0.5 rounded border border-white/10 text-white/65
                      hover:text-white/80 hover:border-white/25 transition opacity-0 group-hover:opacity-100"
           title="Kopieren">
           {kopiertId === (copyId ?? label) ? "✓" : "copy"}
@@ -171,7 +171,7 @@ function Messleiste({ wert, max, stufe }: { wert: number; max: number; stufe: st
       <span className="font-mono text-[12px] font-bold tracking-wide" style={{ color: farbe }}>
         {stufe.toUpperCase()}
       </span>
-      <span className="font-mono text-[11px] text-white/55">{wert}/{max}</span>
+      <span className="font-mono text-[11px] text-white/65">{wert}/{max}</span>
     </div>
   );
 }
@@ -187,12 +187,12 @@ function Verdikt({ titel, stufe, wert, max, hinweis, deutung }: {
       className="rounded-lg border p-3.5 mb-1"
       style={{ borderColor: `${farbe}33`, background: `${farbe}0d` }}>
       <div className="flex items-center justify-between gap-3 mb-2.5">
-        <span className="font-mono text-[11px] tracking-wider uppercase text-white/55">{titel}</span>
-        {hinweis && <span className="font-mono text-[10px] text-white/50">{hinweis}</span>}
+        <span className="font-mono text-[11px] tracking-wider uppercase text-white/65">{titel}</span>
+        {hinweis && <span className="font-mono text-[10px] text-white/60">{hinweis}</span>}
       </div>
       <Messleiste wert={wert} max={max} stufe={stufe} />
       {deutung && (
-        <p className="font-mono text-[10.5px] text-white/60 mt-2.5 leading-snug">{deutung}</p>
+        <p className="font-mono text-[10.5px] text-white/70 mt-2.5 leading-snug">{deutung}</p>
       )}
     </motion.div>
   );
@@ -242,7 +242,7 @@ function LinkRaster({ gruppen, farbe = C.cyber }: {
     <div className="space-y-3">
       {Object.entries(gruppen).map(([kat, links]) => (
         <div key={kat}>
-          <div className="font-mono text-[10px] text-white/50 mb-1.5 tracking-wider">{kat} ({links.length})</div>
+          <div className="font-mono text-[10px] text-white/60 mb-1.5 tracking-wider">{kat} ({links.length})</div>
           <div className="flex flex-wrap gap-1.5">
             {links.map((l, i) => <LinkChip key={`${l.name}-${i}`} name={l.name} url={l.url} farbe={farbe} />)}
           </div>
@@ -277,7 +277,7 @@ function Aufklappbar({ label, kinderAnzahl, children }: {
     <div>
       {offen && <div className="mb-2">{children}</div>}
       <button onClick={() => setOffen(!offen)}
-        className="font-mono text-[11px] text-white/60 hover:text-white/75 transition">
+        className="font-mono text-[11px] text-white/70 hover:text-white/75 transition">
         {offen ? "▲ weniger anzeigen" : `▼ ${label}`}
       </button>
     </div>
@@ -310,7 +310,7 @@ function PivotSektion({ pivots, onPivot }: { pivots?: Pivot[]; onPivot?: PivotHa
   if (!pivots || pivots.length === 0) return null;
   return (
     <Sektion titel="Weiter analysieren" farbe={C.lila}
-      rechts={<span className="font-mono text-[10px] text-white/50">{pivots.length} Datenpunkte</span>}>
+      rechts={<span className="font-mono text-[10px] text-white/60">{pivots.length} Datenpunkte</span>}>
       <div className="flex flex-wrap gap-1.5">
         {pivots.map((p, i) => {
           const ikon = PIVOT_IKON[p.typ] ?? "•";
@@ -334,7 +334,7 @@ function PivotSektion({ pivots, onPivot }: { pivots?: Pivot[]; onPivot?: PivotHa
           return <Marke key={`${p.typ}-${i}`} text={label} />;
         })}
       </div>
-      <p className="font-mono text-[10px] text-white/45 mt-2 leading-snug">
+      <p className="font-mono text-[10px] text-white/55 mt-2 leading-snug">
         Verknüpfte Datenpunkte aus diesem Ergebnis — ein Klick startet die nächste Analyse.
       </p>
     </Sektion>
@@ -365,7 +365,7 @@ function ReportTelefon({ t }: { t: TelefonErgebnis }) {
       </Sektion>
       {t.live_status?.aktiv && (
         <Sektion titel="Live-Status (HLR)" farbe={C.gruen}
-          rechts={<span className="font-mono text-[10px] text-white/50">Echtzeit · {t.live_status.quelle}</span>}>
+          rechts={<span className="font-mono text-[10px] text-white/60">Echtzeit · {t.live_status.quelle}</span>}>
           <div className="flex flex-wrap gap-1.5 mb-2">
             <Marke text={t.live_status.status_text ?? t.live_status.status ?? "—"}
               farbe={t.live_status.erreichbar ? C.gruen : C.gelb} gefuellt />
@@ -378,7 +378,7 @@ function ReportTelefon({ t }: { t: TelefonErgebnis }) {
       )}
       {t.numverify?.geprueft && (
         <Sektion titel="Live-Carrier · NumVerify" farbe={C.cyber}
-          rechts={<span className="font-mono text-[10px] text-white/50">{t.numverify.quelle}</span>}>
+          rechts={<span className="font-mono text-[10px] text-white/60">{t.numverify.quelle}</span>}>
           {t.numverify.valid === false ? (
             <Item stufe="mittel">{t.numverify.hinweis ?? "Nummer nicht zustellbar"}</Item>
           ) : (
@@ -394,7 +394,7 @@ function ReportTelefon({ t }: { t: TelefonErgebnis }) {
         </Sektion>
       )}
       {t.suchlinks?.nach_kategorie && (
-        <Sektion titel="Suchlinks" farbe={C.cyber} rechts={<span className="font-mono text-[10px] text-white/50">{t.suchlinks.gesamt} Quellen · klickbar</span>}>
+        <Sektion titel="Suchlinks" farbe={C.cyber} rechts={<span className="font-mono text-[10px] text-white/60">{t.suchlinks.gesamt} Quellen · klickbar</span>}>
           <LinkRaster gruppen={t.suchlinks.nach_kategorie} />
         </Sektion>
       )}
@@ -488,7 +488,7 @@ function ReportBild({ b, onPivot }: { b: BildErgebnis; onPivot?: PivotHandler })
           <Feld label="Größe">{b.bild?.groesse_kb} KB</Feld>
         </div>
       </Sektion>
-      <Sektion titel="Hashes" rechts={<span className="font-mono text-[10px] text-white/50">copy → reverse-DB</span>}>
+      <Sektion titel="Hashes" rechts={<span className="font-mono text-[10px] text-white/60">copy → reverse-DB</span>}>
         <Feld label="MD5"    copy={b.hashes?.md5}   copyId="md5"   kopiertId={kid} onCopy={copy}>{b.hashes?.md5}</Feld>
         <Feld label="SHA256" copy={b.hashes?.sha256} copyId="sha"  kopiertId={kid} onCopy={copy}>{b.hashes?.sha256}</Feld>
         <Feld label="pHash"  copy={b.hashes?.phash}  copyId="ph"   kopiertId={kid} onCopy={copy}>{b.hashes?.phash}</Feld>
@@ -511,12 +511,12 @@ function ReportBild({ b, onPivot }: { b: BildErgebnis; onPivot?: PivotHandler })
           </Feld>}
           {gps && <GpsKarte lat={gps.lat} lon={gps.lon} />}
         </Sektion>
-      ) : <div className="font-mono text-[12px] text-white/55 mt-4">Keine EXIF-Metadaten vorhanden — gut für die Privatsphäre.</div>}
+      ) : <div className="font-mono text-[12px] text-white/65 mt-4">Keine EXIF-Metadaten vorhanden — gut für die Privatsphäre.</div>}
       {bw && bw.befunde.length > 0 && (
         <Sektion titel="Befunde" farbe={C.gelb}>
           {bw.befunde.map((h, i) => (
             <Item key={i} stufe={h.stufe === "hoch" ? "hoch" : h.stufe === "mittel" ? "mittel" : "info"}>
-              {h.kategorie ? <span className="text-white/45">[{h.kategorie}] </span> : null}{h.meldung}
+              {h.kategorie ? <span className="text-white/55">[{h.kategorie}] </span> : null}{h.meldung}
             </Item>
           ))}
         </Sektion>
@@ -532,7 +532,7 @@ function ReportBild({ b, onPivot }: { b: BildErgebnis; onPivot?: PivotHandler })
         </Sektion>
       )}
       {!!b.suchlinks?.length && (
-        <Sektion titel="Reverse-Image-Suche" farbe={C.gruen} rechts={<span className="font-mono text-[10px] text-white/50">{b.suchlinks.length} Engines · klickbar</span>}>
+        <Sektion titel="Reverse-Image-Suche" farbe={C.gruen} rechts={<span className="font-mono text-[10px] text-white/60">{b.suchlinks.length} Engines · klickbar</span>}>
           <div className="flex flex-wrap gap-1.5">
             {b.suchlinks.map((l, i) => <LinkChip key={i} name={l.name} url={l.url} farbe={C.gruen} />)}
           </div>
@@ -592,7 +592,7 @@ function ReportEmail({ basis, recon, onPivot }: { basis: EmailErgebnis; recon: E
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
           <div className="font-mono text-[12px]">
             <div className="text-white/85">{gravatar.profil_daten?.anzeigename ?? "Gravatar-Profil"}</div>
-            {gravatar.profil_daten?.benutzername && <div className="text-white/60">@{gravatar.profil_daten.benutzername}</div>}
+            {gravatar.profil_daten?.benutzername && <div className="text-white/70">@{gravatar.profil_daten.benutzername}</div>}
           </div>
         </div>
       )}
@@ -685,7 +685,7 @@ function ReportEmail({ basis, recon, onPivot }: { basis: EmailErgebnis; recon: E
       )}
       {recon?.exponierte_datenklassen && recon.exponierte_datenklassen.length > 0 && (
         <Sektion titel="Exponierte Datenklassen" farbe={C.rot}
-          rechts={<span className="font-mono text-[10px] text-white/50">{recon.exponierte_datenklassen.length}</span>}>
+          rechts={<span className="font-mono text-[10px] text-white/60">{recon.exponierte_datenklassen.length}</span>}>
           <div className="flex flex-wrap gap-1.5">
             {recon.exponierte_datenklassen.map((k, i) => <Marke key={i} text={k} farbe={C.rot} />)}
           </div>
@@ -743,7 +743,7 @@ function ReportUsername({ b, onPivot }: { b: BenutzerErgebnis; onPivot?: PivotHa
       )}
       {b.identitaet && b.identitaet.profile_gefunden > 0 && (
         <Sektion titel="Identität" farbe={C.lila}
-          rechts={<span className="font-mono text-[10px] text-white/50">{b.identitaet.profile_gefunden} Profil(e)</span>}>
+          rechts={<span className="font-mono text-[10px] text-white/60">{b.identitaet.profile_gefunden} Profil(e)</span>}>
           {b.identitaet.anzeigenamen.length > 0 && (
             <Feld label="Namen">{b.identitaet.anzeigenamen.join(" · ")}</Feld>
           )}
@@ -758,7 +758,7 @@ function ReportUsername({ b, onPivot }: { b: BenutzerErgebnis; onPivot?: PivotHa
           )}
           {b.identitaet.profile.filter((p) => p.beschreibung).slice(0, 3).map((p, i) => (
             <div key={i} className="font-mono text-[11.5px] text-white/65 mt-2 leading-snug">
-              <span className="text-white/45">{p.plattform}: </span>{p.beschreibung}
+              <span className="text-white/55">{p.plattform}: </span>{p.beschreibung}
             </div>
           ))}
         </Sektion>
@@ -766,10 +766,10 @@ function ReportUsername({ b, onPivot }: { b: BenutzerErgebnis; onPivot?: PivotHa
       <Sektion titel="Verifizierte Profile" farbe={C.gruen}
         rechts={<Filter wert={filter} setWert={setFilter} platzhalter="filter…" />}>
         {Object.keys(gefiltert).length === 0 ? (
-          <div className="font-mono text-[12px] text-white/55 py-2">Keine Treffer{filter ? " für diesen Filter" : ""}.</div>
+          <div className="font-mono text-[12px] text-white/65 py-2">Keine Treffer{filter ? " für diesen Filter" : ""}.</div>
         ) : Object.entries(gefiltert).map(([kat, plats]) => (
           <div key={kat} className="mb-3">
-            <div className="font-mono text-[10px] text-white/50 mb-1.5 tracking-wider uppercase">{kat} ({plats.length})</div>
+            <div className="font-mono text-[10px] text-white/60 mb-1.5 tracking-wider uppercase">{kat} ({plats.length})</div>
             <div className="flex flex-wrap gap-1.5">
               {plats.map((p, i) => {
                 const farbe = p.konfidenz === "hoch" ? C.gruen : p.konfidenz === "mittel" ? C.gelb : C.cyber;
@@ -780,7 +780,7 @@ function ReportUsername({ b, onPivot }: { b: BenutzerErgebnis; onPivot?: PivotHa
         ))}
       </Sektion>
       <PivotSektion pivots={b.pivots} onPivot={onPivot} />
-      <div className="font-mono text-[10px] text-white/50 mt-2">WhatsMyName-DB · Modus: {b.modus}</div>
+      <div className="font-mono text-[10px] text-white/60 mt-2">WhatsMyName-DB · Modus: {b.modus}</div>
       <FussZeile iso={b.analysiert_am} />
     </div>
   );
@@ -814,19 +814,19 @@ function ReportSoziale({ s, onPivot }: { s: SozialePraesenzErgebnis; onPivot?: P
       )}
 
       <Sektion titel="Offene Plattformen — echte Daten" farbe={C.gruen}
-        rechts={<span className="font-mono text-[10px] text-white/50">{offen.length} gefunden</span>}>
+        rechts={<span className="font-mono text-[10px] text-white/60">{offen.length} gefunden</span>}>
         {offen.length === 0 ? (
-          <div className="font-mono text-[12px] text-white/55 py-2">Keine offenen Profile gefunden.</div>
+          <div className="font-mono text-[12px] text-white/65 py-2">Keine offenen Profile gefunden.</div>
         ) : offen.map((p, i) => (
           <div key={`${p.plattform}-${i}`} className="mb-2.5 last:mb-0">
             <div className="flex items-center gap-2 flex-wrap">
               <LinkChip name={p.plattform} url={p.profil_url} farbe={C.gruen} />
               {p.anzeigename && <span className="text-white/85 text-[12.5px] font-medium">{p.anzeigename}</span>}
               {typeof p.follower === "number" && (
-                <span className="font-mono text-[10px] text-white/45">{p.follower.toLocaleString("de-DE")} Follower/Karma</span>
+                <span className="font-mono text-[10px] text-white/55">{p.follower.toLocaleString("de-DE")} Follower/Karma</span>
               )}
             </div>
-            {p.bio && <div className="font-mono text-[11.5px] text-white/60 mt-1 leading-snug">{p.bio}</div>}
+            {p.bio && <div className="font-mono text-[11.5px] text-white/70 mt-1 leading-snug">{p.bio}</div>}
           </div>
         ))}
       </Sektion>
@@ -840,7 +840,7 @@ function ReportSoziale({ s, onPivot }: { s: SozialePraesenzErgebnis; onPivot?: P
       )}
 
       <Sektion titel="Große Netzwerke — login-geschützt" farbe={C.gelb}
-        rechts={<span className="font-mono text-[10px] text-white/50">{walledBestaetigt} bestätigt</span>}>
+        rechts={<span className="font-mono text-[10px] text-white/60">{walledBestaetigt} bestätigt</span>}>
         {(s.walled_gardens ?? []).map((w, i) => {
           const farbe = w.existenz === true ? C.gruen : w.existenz === false ? C.cyber : C.gelb;
           const status = w.existenz === true ? "vorhanden" : w.existenz === false ? "nicht gefunden" : "nur Link/Dork";
@@ -848,7 +848,7 @@ function ReportSoziale({ s, onPivot }: { s: SozialePraesenzErgebnis; onPivot?: P
             <div key={`${w.plattform}-${i}`} className="mb-2 last:mb-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <Marke text={w.plattform} farbe={farbe} gefuellt={w.existenz === true} />
-                <span className="font-mono text-[10px] text-white/45">{status}</span>
+                <span className="font-mono text-[10px] text-white/55">{status}</span>
                 {w.anzeigename && <span className="text-white/80 text-[12px]">{w.anzeigename}</span>}
               </div>
               <div className="flex flex-wrap gap-1.5 mt-1">
@@ -864,7 +864,7 @@ function ReportSoziale({ s, onPivot }: { s: SozialePraesenzErgebnis; onPivot?: P
 
       {weitere.length > 0 && (
         <Sektion titel="Weitere Plattformen — WhatsMyName" farbe={C.cyber}
-          rechts={<span className="font-mono text-[10px] text-white/50">{weitere.length} Treffer</span>}>
+          rechts={<span className="font-mono text-[10px] text-white/60">{weitere.length} Treffer</span>}>
           <div className="flex flex-wrap gap-1.5">
             {weitere.slice(0, 60).map((w, i) => {
               const farbe = w.konfidenz === "hoch" ? C.gruen : w.konfidenz === "mittel" ? C.gelb : C.cyber;
@@ -900,12 +900,12 @@ function VtSektion({ vt }: { vt?: VtReputation }) {
             <Marke text={vt.stufe ?? "Unbekannt"} farbe={farbe}
               gefuellt={vt.stufe === "Schädlich" || vt.stufe === "Verdächtig"} />
             {typeof vt.gesamt_engines === "number" && vt.gesamt_engines > 0 && (
-              <span className="font-mono text-[11px] text-white/55">
+              <span className="font-mono text-[11px] text-white/65">
                 {vt.malicious ?? 0} / {vt.gesamt_engines} Engines melden „schädlich"
               </span>
             )}
             {typeof vt.reputation === "number" && (
-              <span className="font-mono text-[11px] text-white/45">Reputation {vt.reputation}</span>
+              <span className="font-mono text-[11px] text-white/55">Reputation {vt.reputation}</span>
             )}
           </div>
           {vt.hinweis && <Item stufe="info">{vt.hinweis}</Item>}
@@ -1013,7 +1013,7 @@ function ReportOrchestrator({ o }: { o: OrchestratorErgebnis }) {
           {(o.zusammenfassung?.module_ausgefuehrt ?? []).map((m, i) => <Marke key={i} text={m} farbe={C.gruen} />)}
         </div>
       </Sektion>
-      <div className="font-mono text-[11px] text-white/50 mt-4">↓ Interaktiver Graph unterhalb des Terminals</div>
+      <div className="font-mono text-[11px] text-white/60 mt-4">↓ Interaktiver Graph unterhalb des Terminals</div>
       <FussZeile iso={o.analysiert_am} />
     </div>
   );
@@ -1032,12 +1032,12 @@ function ResolveBalken({ gesamt, geprueft, live }: { gesamt: number; geprueft: n
       <div className="flex items-end justify-between mb-2.5 font-mono gap-4">
         <div>
           <div className="text-[24px] font-bold leading-none tabular-nums" style={{ color: C.cyber }}>{gesamtAnim}</div>
-          <div className="text-[10px] text-white/55 mt-1.5 tracking-[0.15em]">EINDEUTIGE SUBDOMAINS</div>
+          <div className="text-[10px] text-white/65 mt-1.5 tracking-[0.15em]">EINDEUTIGE SUBDOMAINS</div>
         </div>
         {geprueft > 0 && (
           <div className="text-right">
             <div className="text-[24px] font-bold leading-none tabular-nums" style={{ color: C.gruen }}>{liveAnim}</div>
-            <div className="text-[10px] text-white/55 mt-1.5 tracking-[0.15em]">LIVE · {geprueft} GEPRÜFT</div>
+            <div className="text-[10px] text-white/65 mt-1.5 tracking-[0.15em]">LIVE · {geprueft} GEPRÜFT</div>
           </div>
         )}
       </div>
@@ -1090,13 +1090,13 @@ function ReportSubdomains({ s }: { s: SubdomainErgebnis }) {
           <div className="flex items-center gap-2">
             <Filter wert={filter} setWert={setFilter} platzhalter="filter…" />
             <button onClick={() => copy(subs.map(d => d.host).join("\n"), "all")}
-              className="font-mono text-[10px] px-1.5 py-0.5 rounded border border-white/10 text-white/60 hover:text-white/80 hover:border-white/25 transition">
+              className="font-mono text-[10px] px-1.5 py-0.5 rounded border border-white/10 text-white/70 hover:text-white/80 hover:border-white/25 transition">
               {kid === "all" ? "✓ kopiert" : "copy alle"}
             </button>
           </div>
         }>
         {sichtbar.length === 0 ? (
-          <div className="font-mono text-[12px] text-white/55 py-2">Keine Subdomains{filter ? " für diesen Filter" : ""}.</div>
+          <div className="font-mono text-[12px] text-white/65 py-2">Keine Subdomains{filter ? " für diesen Filter" : ""}.</div>
         ) : (
           <div className="space-y-1">
             {sichtbar.map((d) => <SubZeile key={d.host} d={d} />)}
@@ -1124,7 +1124,7 @@ function SubZeile({ d }: { d: { host: string; quellen: string[]; aktiv: boolean 
       )}
       <a href={`https://${d.host}`} target="_blank" rel="noopener noreferrer"
         className="text-white/80 hover:text-cyber-400 transition break-all">{d.host}</a>
-      {d.ip && <span className="text-white/50 text-[11px]">{d.ip}</span>}
+      {d.ip && <span className="text-white/60 text-[11px]">{d.ip}</span>}
       <span className="ml-auto flex gap-1 shrink-0">
         {d.quellen.map((q) => (
           <span key={q} className="w-1.5 h-1.5 rounded-full" title={q} style={{ background: QUELLE_FARBE[q] ?? C.cyber }} />
@@ -1141,7 +1141,7 @@ function ReportCensys({ c }: { c: CensysErgebnis }) {
   if (c.fehler) return <FehlerHinweis text={c.fehler} />;
   if (c.verfuegbar === false) {
     return (
-      <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4 font-mono text-[12px] text-white/60 leading-relaxed">
+      <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4 font-mono text-[12px] text-white/70 leading-relaxed">
         {c.hinweis ?? "Censys ist derzeit nicht aktiviert."}
       </div>
     );
@@ -1173,7 +1173,7 @@ function ReportCensys({ c }: { c: CensysErgebnis }) {
 
           {!!h.dienste?.length && (
             <Sektion titel="Dienste / Ports" farbe={C.rot}
-              rechts={<span className="font-mono text-[10px] text-white/50">{h.ports_anzahl} offen</span>}>
+              rechts={<span className="font-mono text-[10px] text-white/60">{h.ports_anzahl} offen</span>}>
               <div className="flex flex-wrap gap-1.5">
                 {h.dienste.map((d, i) => (
                   <Marke key={i}
@@ -1203,9 +1203,9 @@ function ReportCensys({ c }: { c: CensysErgebnis }) {
       ))}
 
       {treffer.length === 0 && (
-        <div className="font-mono text-[12px] text-white/55 mt-4">Kein Censys-Datensatz für dieses Ziel gefunden.</div>
+        <div className="font-mono text-[12px] text-white/65 mt-4">Kein Censys-Datensatz für dieses Ziel gefunden.</div>
       )}
-      <div className="font-mono text-[10px] text-white/45 mt-3">{c.quelle}</div>
+      <div className="font-mono text-[10px] text-white/55 mt-3">{c.quelle}</div>
       <FussZeile iso={c.analysiert_am} />
     </div>
   );
@@ -1287,7 +1287,7 @@ function FehlerHinweis({ text }: { text: string }) {
 }
 
 function FussZeile({ iso }: { iso?: string }) {
-  return <div className="font-mono text-[10px] text-white/45 mt-5 pt-3 border-t border-white/[0.05]">analysiert: {zeit(iso)} UTC</div>;
+  return <div className="font-mono text-[10px] text-white/55 mt-5 pt-3 border-t border-white/[0.05]">analysiert: {zeit(iso)} UTC</div>;
 }
 
 // ─── System-Status (Modul 1) ────────────────────────────────────────
@@ -1310,7 +1310,7 @@ function ReportStatus() {
   return (
     <div>
       <Sektion titel="Analyse-Werkzeuge"
-        rechts={<span className="font-mono text-[10px] text-white/50">{werkzeuge.length} aktiv</span>}>
+        rechts={<span className="font-mono text-[10px] text-white/60">{werkzeuge.length} aktiv</span>}>
         {werkzeuge.map((w) => <Item key={w} stufe="ok">{w}</Item>)}
       </Sektion>
       <Sektion titel="Infrastruktur (Contabo VPS)">

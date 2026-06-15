@@ -49,7 +49,7 @@ export function SchutzEmpfehlungen({ empfehlungen }: { empfehlungen: readonly Sc
         <SchildIkon />
         <span className="font-display font-semibold text-white text-[15px]">So schützt du dich</span>
         <span className="ml-auto flex items-center gap-2.5">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-white/45">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-white/55">
             {empfehlungen.length} Maßnahme{empfehlungen.length === 1 ? "" : "n"}
             {dringend > 0 ? ` · ${dringend} dringend` : ""}
           </span>
@@ -77,10 +77,10 @@ export function SchutzEmpfehlungen({ empfehlungen }: { empfehlungen: readonly Sc
                         <span className={`font-mono text-[9px] uppercase tracking-wider ${p.text}`}>{p.etikett}</span>
                       </span>
                       <span className="font-medium text-white text-[13.5px]">{e.titel}</span>
-                      <span className="ml-auto font-mono text-[10px] text-white/35">{e.kategorie}</span>
+                      <span className="ml-auto font-mono text-[10px] text-white/45">{e.kategorie}</span>
                     </div>
                     <p className="text-[13px] text-white/75 leading-relaxed mt-1.5">{e.was}</p>
-                    <p className="text-[12px] text-white/45 leading-relaxed mt-1">
+                    <p className="text-[12px] text-white/55 leading-relaxed mt-1">
                       <span className="text-white/30">Warum: </span>{e.warum}
                     </p>
                   </li>

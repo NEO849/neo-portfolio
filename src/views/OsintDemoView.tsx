@@ -154,7 +154,7 @@ function FlowStepper({ phase }: { phase: "menue" | "eingabe" | "laden" | "ausgab
             : zustand === "erledigt"
             ? { backgroundColor: "rgba(25,211,180,0.15)", border: "1px solid rgba(25,211,180,0.45)" }
             : { backgroundColor: "rgba(109,124,255,0.08)", border: "1px solid rgba(51,214,255,0.18)" };
-        const kreisText = zustand === "aktiv" ? "text-white" : zustand === "erledigt" ? "text-[#19D3B4]" : "text-white/55";
+        const kreisText = zustand === "aktiv" ? "text-white" : zustand === "erledigt" ? "text-[#19D3B4]" : "text-white/65";
         return (
           <Fragment key={s}>
             <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 group">
@@ -164,7 +164,7 @@ function FlowStepper({ phase }: { phase: "menue" | "eingabe" | "laden" | "ausgab
               >
                 {zustand === "erledigt" ? "✓" : i + 1}
               </span>
-              <span className={`text-[11px] sm:text-[13px] whitespace-nowrap transition-colors duration-200 ${zustand === "aktiv" ? "text-white/90" : "text-white/45"}`}>
+              <span className={`text-[11px] sm:text-[13px] whitespace-nowrap transition-colors duration-200 ${zustand === "aktiv" ? "text-white/90" : "text-white/55"}`}>
                 {s}
               </span>
             </div>
@@ -1486,15 +1486,15 @@ export default function OsintDemoView() {
     if (zeile.includes("[ok]")) return "text-signal-gruen";
     if (zeile.includes("[!]")) return "text-signal-gelb";
     if (zeile.includes("[+]")) return "text-cyber-400";
-    if (zeile.includes("[--]")) return "text-white/55";
-    if (zeile.startsWith("+--")) return "text-white/55";
+    if (zeile.includes("[--]")) return "text-white/65";
+    if (zeile.startsWith("+--")) return "text-white/65";
     if (zeile.startsWith("|")) return "text-white/65";
     if (zeile.startsWith("---")) return "text-akzent-400/70";
     if (zeile.includes("  Score") || zeile.includes("  Risiko") || zeile.includes("  Erreichbar")) return "text-white";
-    if (zeile.includes("Analysiert:")) return "text-white/50";
+    if (zeile.includes("Analysiert:")) return "text-white/60";
     if (zeile.match(/^\s{2}[A-Z][A-Za-z-]+\s+:/)) return "text-white/72";
-    if (zeile.match(/^\s{2}(Social|Development|Gaming|Beruf|Sicherheit|Sonstige)/)) return "text-white/55";
-    if (zeile.includes("->")) return "text-white/55";
+    if (zeile.match(/^\s{2}(Social|Development|Gaming|Beruf|Sicherheit|Sonstige)/)) return "text-white/65";
+    if (zeile.includes("->")) return "text-white/65";
     return "text-white/72";
   };
 
@@ -1561,7 +1561,7 @@ export default function OsintDemoView() {
           kinder="OSINT Analyseplattform"
           klassen="font-display font-semibold tracking-[-0.01em] leading-snug text-xl md:text-2xl max-w-2xl mb-3"
         />
-        <p className="text-white/60 text-[15px] leading-relaxed max-w-2xl">
+        <p className="text-white/70 text-[15px] leading-relaxed max-w-2xl">
           E-Mails, Domains, Usernames, Telefonnummern und mehr — live gegen öffentliche Datenquellen geprüft.
           Funde und ihre Beziehungen erscheinen als übersichtliche Karten und Graph. Transparent, kontrolliert,
           ohne dauerhafte Speicherung.
@@ -1588,7 +1588,7 @@ export default function OsintDemoView() {
             {/* Menü — Modul-Auswahl als Premium-Karten */}
             {phase === "menue" && (
               <motion.div key="menue" variants={PHASEN_WECHSEL} initial="versteckt" animate="sichtbar" exit="verlassen">
-                <p className="text-[13px] text-white/45 mb-5">
+                <p className="text-[13px] text-white/55 mb-5">
                   Wähle ein Werkzeug. Du gibst ein Ziel ein — wir prüfen es live und bündeln die Funde verständlich.
                 </p>
 
@@ -1630,10 +1630,10 @@ export default function OsintDemoView() {
                               ) : istLive ? (
                                 <span className="inline-flex items-center gap-1 rounded-full border border-signal-gruen/25 bg-signal-gruen/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-signal-gruen/85">Live</span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-white/45">Check</span>
+                                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-white/55">Check</span>
                               )}
                             </div>
-                            <p className="text-[13px] text-white/55 leading-snug mt-1.5 line-clamp-2">{modul.ziel}</p>
+                            <p className="text-[13px] text-white/65 leading-snug mt-1.5 line-clamp-2">{modul.ziel}</p>
                           </div>
                           <span className="flex-shrink-0 mt-1 text-white/20 group-hover:text-akzent-300 group-hover:translate-x-0.5 transition-all duration-300">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
@@ -1646,7 +1646,7 @@ export default function OsintDemoView() {
 
                 {/* Projekt unterstützen — dezent */}
                 <div className="mt-7 pt-5 border-t border-white/[0.06] flex items-center justify-between gap-3 flex-wrap">
-                  <span className="text-[12px] text-white/35">Frei nutzbar · keine Anmeldung · keine Speicherung</span>
+                  <span className="text-[12px] text-white/45">Frei nutzbar · keine Anmeldung · keine Speicherung</span>
                   <KnopfAktion
                     beimKlick={btcAdresseKopieren}
                     klassen="select-none !px-3.5 !py-1.5 !text-[11.5px] !rounded-md"
@@ -1661,7 +1661,7 @@ export default function OsintDemoView() {
               <motion.div key="eingabe" variants={PHASEN_WECHSEL} initial="versteckt" animate="sichtbar" exit="verlassen" className="w-full min-w-0">
                 {/* Zurück + Modul-Kopf */}
                 <button onClick={zurueckSetzen}
-                  className="inline-flex items-center gap-1.5 text-[12px] text-white/45 hover:text-white/80 transition mb-4">
+                  className="inline-flex items-center gap-1.5 text-[12px] text-white/55 hover:text-white/80 transition mb-4">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6 6 6" /></svg>
                   Auswahl
                 </button>
@@ -1682,7 +1682,7 @@ export default function OsintDemoView() {
                   <div className="mb-5 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4">
                     <p className="text-white/85 text-sm leading-relaxed">{aktivesModul.ziel}</p>
                     {aktivesModul.beschreibung && (
-                      <p className="mt-2.5 text-white/50 text-[13px] leading-relaxed">{aktivesModul.beschreibung}</p>
+                      <p className="mt-2.5 text-white/60 text-[13px] leading-relaxed">{aktivesModul.beschreibung}</p>
                     )}
                   </div>
                 )}
@@ -1690,7 +1690,7 @@ export default function OsintDemoView() {
                 {/* Premium-Eingabefeld */}
                 {aktivesModul.eingabeTyp === "text" && (
                   <div>
-                    <label className="block font-mono text-[11px] uppercase tracking-[0.18em] text-white/45 mb-2">
+                    <label className="block font-mono text-[11px] uppercase tracking-[0.18em] text-white/55 mb-2">
                       {aktivesModul.eingabeLabel}
                     </label>
                     <div className="flex flex-col sm:flex-row gap-2.5">
@@ -1722,7 +1722,7 @@ export default function OsintDemoView() {
                 {/* Soziale Präsenz: Schnell-/Vollscan-Umschalter */}
                 {aktivesModul.nummer === "12" && (
                   <div className="mt-4 flex items-center gap-2 text-[12px] flex-wrap">
-                    <span className="text-white/45 mr-0.5">Tiefe:</span>
+                    <span className="text-white/55 mr-0.5">Tiefe:</span>
                     <div className="inline-flex rounded-xl border border-white/[0.08] bg-white/[0.02] p-0.5">
                       {([
                         { schnell: true, label: "Schnell · ~12" },
@@ -1735,14 +1735,14 @@ export default function OsintDemoView() {
                           className={`px-3 py-1.5 rounded-lg transition ${
                             schnellModus === o.schnell
                               ? "bg-akzent-500/20 text-akzent-300"
-                              : "text-white/50 hover:text-white/75"
+                              : "text-white/60 hover:text-white/75"
                           }`}
                         >
                           {o.label}
                         </button>
                       ))}
                     </div>
-                    <span className="text-white/35 ml-1">{schnellModus ? "Sekunden" : "~30–60 s"}</span>
+                    <span className="text-white/45 ml-1">{schnellModus ? "Sekunden" : "~30–60 s"}</span>
                   </div>
                 )}
 
@@ -1759,9 +1759,9 @@ export default function OsintDemoView() {
                 {aktivesModul?.nummer === "6" && (
                   <div className="mt-5 border-t border-white/[0.06] pt-4 text-[11px] font-mono leading-relaxed">
                     <div className="text-akzent-400/65 mb-2.5">[?] Bild-URL erforderlich — Anleitung</div>
-                    <div className="space-y-1 text-white/55">
+                    <div className="space-y-1 text-white/65">
                       <div>
-                        <span className="text-white/55">[1]</span>{" "}
+                        <span className="text-white/65">[1]</span>{" "}
                         <a
                           href="https://imgur.com/upload"
                           target="_blank"
@@ -1773,16 +1773,16 @@ export default function OsintDemoView() {
                         <span className="text-white/48">öffnen — kostenlos, kein Account nötig</span>
                       </div>
                       <div>
-                        <span className="text-white/55">[2]</span>{" "}
+                        <span className="text-white/65">[2]</span>{" "}
                         Bild per Drag &amp; Drop oder Datei hochladen
                       </div>
                       <div>
-                        <span className="text-white/55">[3]</span>{" "}
+                        <span className="text-white/65">[3]</span>{" "}
                         Nach dem Upload: Rechtsklick auf das Bild{" "}
                         <span className="text-signal-gruen/65">→ Bildadresse kopieren</span>
                       </div>
                       <div>
-                        <span className="text-white/55">[4]</span>{" "}
+                        <span className="text-white/65">[4]</span>{" "}
                         URL oben einfügen und Enter drücken
                       </div>
                     </div>
@@ -1812,7 +1812,7 @@ export default function OsintDemoView() {
                   </span>
                 </div>
                 <p className="font-display font-semibold text-white text-[15px] mb-1.5">Analyse läuft</p>
-                <p className="text-white/45 text-[13px] max-w-xs">
+                <p className="text-white/55 text-[13px] max-w-xs">
                   Öffentliche Datenquellen werden live geprüft und zusammengeführt …
                 </p>
                 {/* feiner Fortschritts-Shimmer */}
@@ -1831,7 +1831,7 @@ export default function OsintDemoView() {
               <motion.div key="ausgabe" variants={PHASEN_WECHSEL} initial="versteckt" animate="sichtbar" exit="verlassen">
                 {/* Zurück zur Modul-Auswahl — immer verfügbar */}
                 <button onClick={zurueckSetzen}
-                  className="inline-flex items-center gap-1.5 text-[12px] text-white/45 hover:text-white/80 transition-colors mb-4">
+                  className="inline-flex items-center gap-1.5 text-[12px] text-white/55 hover:text-white/80 transition-colors mb-4">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6 6 6" /></svg>
                   Zurück zur Auswahl
                 </button>
@@ -1880,7 +1880,7 @@ export default function OsintDemoView() {
                           key={v}
                           onClick={() => setAnsicht(v)}
                           className={`px-3 py-1.5 rounded-lg transition ${
-                            ansicht === v ? "bg-akzent-500/20 text-akzent-300" : "text-white/50 hover:text-white/75"
+                            ansicht === v ? "bg-akzent-500/20 text-akzent-300" : "text-white/60 hover:text-white/75"
                           }`}
                         >
                           {label}
@@ -1906,7 +1906,7 @@ export default function OsintDemoView() {
                     return (
                       <div
                         key={index}
-                        className="text-white/60 text-[11px] leading-snug pl-[58px] pr-2 break-words whitespace-normal -mt-0.5 mb-1"
+                        className="text-white/70 text-[11px] leading-snug pl-[58px] pr-2 break-words whitespace-normal -mt-0.5 mb-1"
                       >
                         {inhalt}
                       </div>
@@ -1937,7 +1937,7 @@ export default function OsintDemoView() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="6" cy="6" r="2.2" /><circle cx="18" cy="7" r="2.2" /><circle cx="12" cy="18" r="2.2" /><path d="M7.6 7.6 11 16M16.6 8.6 13 16M8 6h8" /></svg>
             </span>
             <span className="font-display font-semibold text-white text-sm">Beziehungs-Graph</span>
-            <span className="ml-auto font-mono text-[11px] text-white/45">
+            <span className="ml-auto font-mono text-[11px] text-white/55">
               {(rohdaten as OrchestratorErgebnis).graph!.statistik.knoten_gesamt} Knoten · {(rohdaten as OrchestratorErgebnis).graph!.statistik.kanten_gesamt} Kanten
             </span>
           </div>
@@ -1950,7 +1950,7 @@ export default function OsintDemoView() {
         </motion.div>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[12px] text-white/40">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[12px] text-white/50">
         <span className="inline-flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-signal-gruen animate-pulse" />
           Live-Checks aktiv

@@ -81,7 +81,7 @@ function ToolZeile({ tool, ok, index }: { tool: ToolDef; ok: boolean; index: num
         <span className={`font-mono text-[9px] uppercase tracking-wider flex-shrink-0 ${ok ? "text-signal-gruen/80" : "text-signal-rot"}`}>
           {ok ? "live" : "offline"}
         </span>
-        <span className="flex-shrink-0 text-white/35" aria-hidden>
+        <span className="flex-shrink-0" style={{ color: "#6D7CFF" }} aria-hidden>
           {offen ? (
             <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
           ) : (
@@ -95,7 +95,7 @@ function ToolZeile({ tool, ok, index }: { tool: ToolDef; ok: boolean; index: num
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2, ease: "easeOut" }}
             className="overflow-hidden">
-            <div className="px-3 pb-2.5 pl-[42px] text-[11px] text-white/50 leading-relaxed">{tool.quelle}</div>
+            <div className="px-3 pb-2.5 pl-[42px] text-[11px] text-white/60 leading-relaxed">{tool.quelle}</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -111,7 +111,7 @@ export function StatusKarte({ daten }: { daten: GesundheitErgebnis | null }) {
           <span className="w-2 h-2 rounded-full bg-signal-rot" />
           <span className="font-display font-semibold text-white text-[15px]">API nicht erreichbar</span>
         </div>
-        <p className="text-[13px] text-white/55 mt-1">Der Live-Status konnte nicht geladen werden. Bitte später erneut prüfen.</p>
+        <p className="text-[13px] text-white/65 mt-1">Der Live-Status konnte nicht geladen werden. Bitte später erneut prüfen.</p>
       </div>
     );
   }
@@ -152,7 +152,7 @@ export function StatusKarte({ daten }: { daten: GesundheitErgebnis | null }) {
             className={`font-mono text-[11px] ${allesOk ? "text-signal-gruen/90" : "text-signal-gelb/90"}`}>
             {aktiv}/{gesamt} Werkzeuge live
           </motion.span>
-          <span className="font-mono text-[10px] text-white/40 rounded-full border border-white/10 px-2 py-0.5">v{daten.version}</span>
+          <span className="font-mono text-[10px] text-white/50 rounded-full border border-white/10 px-2 py-0.5">v{daten.version}</span>
         </span>
       </div>
 
@@ -160,7 +160,7 @@ export function StatusKarte({ daten }: { daten: GesundheitErgebnis | null }) {
       <div className="relative px-5 pb-2 space-y-4">
         {GRUPPEN.map((gruppe) => (
           <div key={gruppe.titel}>
-            <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-white/35 mb-1.5">{gruppe.titel}</span>
+            <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-white/45 mb-1.5">{gruppe.titel}</span>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
               {gruppe.tools.map((tool) => (
                 <ToolZeile key={tool.key} tool={tool} ok={live.has(tool.key)} index={laufindex++} />
@@ -173,7 +173,7 @@ export function StatusKarte({ daten }: { daten: GesundheitErgebnis | null }) {
       {/* Fundament */}
       {(daten.fundament?.length ?? 0) > 0 && (
         <div className="relative px-5 pb-4 pt-2 border-t border-white/[0.06]">
-          <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-white/35 mb-2 mt-2">Fundament</span>
+          <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-white/45 mb-2 mt-2">Fundament</span>
           <div className="flex flex-wrap gap-1.5">
             {daten.fundament.map((f, i) => (
               <motion.span key={f}
@@ -181,7 +181,7 @@ export function StatusKarte({ daten }: { daten: GesundheitErgebnis | null }) {
                 transition={{ delay: 0.5 + i * 0.05 }}
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-2 py-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-signal-gruen animate-pulse" />
-                <span className="font-mono text-[10.5px] text-white/60">{FUNDAMENT[f] ?? f}</span>
+                <span className="font-mono text-[10.5px] text-white/70">{FUNDAMENT[f] ?? f}</span>
               </motion.span>
             ))}
           </div>
