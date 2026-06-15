@@ -9,6 +9,7 @@ import {
   shodanAbfragen, censysAbfragen, emailReconnaissance, orchestrator,
   subdomainsFinden, ipIntelAbfragen,
   sozialePraesenzSuchen,
+  gesundheitLaden,
   Apifehler,
   type DomainErgebnis, type EmailErgebnis,
   type TelefonErgebnis, type BildErgebnis,
@@ -16,12 +17,14 @@ import {
   type OrchestratorErgebnis,
   type SubdomainErgebnis, type IpIntelErgebnis,
   type SozialePraesenzErgebnis,
+  type GesundheitErgebnis,
   type Pivot,
 } from "../dienste/osintApi";
 import { DatenschutzModal } from "../bausteine/DatenschutzModal";
 import OsintGraph from "../bausteine/OsintGraph";
 import ErgebnisReport from "../bausteine/osint/ErgebnisReport";
 import { Dossier } from "../bausteine/osint/Dossier";
+import { StatusKarte } from "../bausteine/osint/StatusKarte";
 import { SchutzEmpfehlungen } from "../bausteine/osint/SchutzEmpfehlungen";
 import { fasseErgebnisZusammen, extrahiereSchutz } from "../hilfsmittel/ergebnisZusammenfassung";
 import DatenflussHinweis from "../bausteine/osint/DatenflussHinweis";
@@ -148,8 +151,8 @@ function FlowStepper({ phase }: { phase: "menue" | "eingabe" | "laden" | "ausgab
             <span
               className={[
                 "grid place-items-center w-5 h-5 sm:w-6 sm:h-6 rounded-full text-[10px] sm:text-[11px] font-semibold transition-colors duration-300 flex-shrink-0",
-                i < aktiv ? "bg-akzent-500/20 text-akzent-300 border border-akzent-500/30"
-                : i === aktiv ? "bg-akzent-500 text-white shadow-aura"
+                i < aktiv ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/40"
+                : i === aktiv ? "bg-indigo-500 text-white shadow-[0_0_0_4px_rgba(99,102,241,0.18)]"
                 : "bg-white/[0.04] text-white/35 border border-white/[0.08]",
               ].join(" ")}
             >
@@ -160,7 +163,7 @@ function FlowStepper({ phase }: { phase: "menue" | "eingabe" | "laden" | "ausgab
             </span>
           </div>
           {i < FLOW_SCHRITTE.length - 1 && (
-            <span className={`h-px flex-1 min-w-[8px] sm:flex-none sm:w-8 transition-colors duration-300 ${i < aktiv ? "bg-akzent-500/40" : "bg-white/10"}`} />
+            <span className={`h-px flex-1 min-w-[8px] sm:flex-none sm:w-8 transition-colors duration-300 ${i < aktiv ? "bg-indigo-500/40" : "bg-white/10"}`} />
           )}
         </Fragment>
       ))}
@@ -1204,7 +1207,8 @@ export default function OsintDemoView() {
   const ersterRender = useRef(true);
 
   // Report-Ansicht verfügbar, sobald Rohdaten vorliegen (inkl. Status-Modul).
-  const reportVerfuegbar = !!rohdaten && !!aktivesModul;
+  // Status-Modul (1) hat eine eigene StatusKarte → kein Karten/Roh-Umschalter.
+  const reportVerfuegbar = !!rohdaten && !!aktivesModul && aktivesModul.nummer !== "1";
   const zeigeReport = reportVerfuegbar && ansicht === "report";
 
   // ─── Download-Funktionen ──────────────────────────────────────
@@ -1392,6 +1396,11 @@ export default function OsintDemoView() {
         const ergebnis = await sozialePraesenzSuchen(wert, !schnell);
         zeilen = sozialePraesenzZuTerminal(ergebnis);
         setRohdaten(ergebnis);
+      } else if (modul.nummer === "1") {
+        // Status: echter Live-Health-Check → hochwertige StatusKarte (kein Terminal)
+        const g = await gesundheitLaden();
+        setRohdaten(g);
+        zeilen = [];
       } else {
         zeilen = erstelleDemoAusgabe(modul.nummer, wert);
       }
@@ -1538,7 +1547,7 @@ export default function OsintDemoView() {
         <GlanzUeberschrift
           element="h2"
           kinder="OSINT Analyseplattform"
-          klassen="font-display text-3xl md:text-4xl font-bold tracking-[-0.02em] leading-tight mb-3"
+          klassen="font-display font-semibold tracking-[-0.01em] leading-snug text-xl md:text-2xl max-w-2xl mb-3"
         />
         <p className="text-white/60 text-[15px] leading-relaxed max-w-2xl">
           E-Mails, Domains, Usernames, Telefonnummern und mehr — live gegen öffentliche Datenquellen geprüft.
@@ -1819,6 +1828,9 @@ export default function OsintDemoView() {
                     (Balken) + Karte + Timeline + nächste Schritte. */}
                 <Dossier modulNummer={aktivesModul?.nummer ?? ""} daten={rohdaten} onPivot={pivotStarten} />
 
+                {/* Status-Modul: hochwertige Live-Status-Karte */}
+                {aktivesModul?.nummer === "1" && <StatusKarte daten={rohdaten as GesundheitErgebnis | null} />}
+
                 {/* Defensiver Mehrwert: „Was kann ich dagegen tun?" — NUR wenn ein
                     echtes Sicherheitsproblem vorliegt (Schwere kritisch/auffällig),
                     als EINE ausklappbare Card (IT-Forensik-Rolle). */}
@@ -1832,7 +1844,7 @@ export default function OsintDemoView() {
 
                 {/* Statischer Führungs-Hinweis nur als Fallback, wenn sich keine
                     dynamische Übersicht ableiten lässt (z. B. Status-Modul). */}
-                {aktivesModul && !fasseErgebnisZusammen(aktivesModul.nummer, rohdaten) && ERGEBNIS_HINWEIS[aktivesModul.nummer] && (
+                {aktivesModul && aktivesModul.nummer !== "1" && !fasseErgebnisZusammen(aktivesModul.nummer, rohdaten) && ERGEBNIS_HINWEIS[aktivesModul.nummer] && (
                   <div className="mb-5 flex items-start gap-3 rounded-2xl border border-akzent-500/20 bg-akzent-500/[0.05] px-4 py-3">
                     <span className="flex-shrink-0 mt-0.5 text-akzent-300">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6M10 21h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2h6c0-.8.4-1.5 1-2A7 7 0 0 0 12 2Z" /></svg>
@@ -1873,7 +1885,7 @@ export default function OsintDemoView() {
                   </>
                 )}
 
-                {!zeigeReport && (
+                {!zeigeReport && aktivesModul?.nummer !== "1" && (
                   <div className="font-mono text-[13px] leading-relaxed rounded-xl border border-white/[0.06] bg-grund-950/50 p-4 overflow-x-auto">
                   {ausgabeZeilen.slice(0, zeilenIndex + 1).map((zeile, index) => {
                   // Subline-Marker "  \u203A" \u2014 dezent, kleiner, hanging-indent, wrappable

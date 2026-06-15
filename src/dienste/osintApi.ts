@@ -1037,6 +1037,30 @@ export interface TransparenzUebersicht {
  */
 let _transparenzCache: TransparenzUebersicht | null = null;
 
+// ─── Systemstatus (Live-Health) ───────────────────────────────────
+
+export interface GesundheitErgebnis {
+  status: string;
+  werkzeuge: string[];
+  fundament: string[];
+  version: string;
+}
+
+/** Live-Status der OSINT-API (welche Werkzeuge sind ausgeliefert/aktiv). */
+export async function gesundheitLaden(): Promise<GesundheitErgebnis | null> {
+  const abbrecher = new AbortController();
+  const timeoutId = setTimeout(() => abbrecher.abort(), 8_000);
+  try {
+    const antwort = await fetch(`${API_PFAD}/gesundheit`, { signal: abbrecher.signal });
+    clearTimeout(timeoutId);
+    if (!antwort.ok) return null;
+    return (await antwort.json()) as GesundheitErgebnis;
+  } catch {
+    clearTimeout(timeoutId);
+    return null;
+  }
+}
+
 export async function transparenzLaden(): Promise<TransparenzUebersicht | null> {
   if (_transparenzCache) return _transparenzCache;
   const abbrecher = new AbortController();
