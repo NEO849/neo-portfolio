@@ -1635,14 +1635,15 @@ export default function OsintDemoView() {
                               {istWarnung ? (
                                 <span className="inline-flex items-center gap-1 rounded-full border border-signal-gelb/30 bg-signal-gelb/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-signal-gelb/90">Live · sensibel</span>
                               ) : istLive ? (
-                                <span className="inline-flex items-center gap-1 rounded-full border border-signal-gruen/25 bg-signal-gruen/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-signal-gruen/85">Live</span>
+                                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.05] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-white/55">Live</span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-white/45">Check</span>
                               )}
                             </div>
-                            <p className="text-[13px] text-white/55 leading-snug mt-1.5 line-clamp-2">{modul.ziel}</p>
+                            {/* Beschreibung bewusst kompakt: Details (ziel + beschreibung)
+                                erscheinen beim Klick auf dem Eingabe-Screen. */}
                           </div>
-                          <span className="flex-shrink-0 mt-1 text-white/20 group-hover:text-akzent-300 group-hover:translate-x-0.5 transition-all duration-300">
+                          <span className="flex-shrink-0 self-center text-white/20 group-hover:text-akzent-300 group-hover:translate-x-0.5 transition-all duration-300">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                           </span>
                         </div>
