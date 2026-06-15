@@ -40,9 +40,11 @@ interface Banner {
 }
 
 // Einheitliche Icon-Geometrie — etwas kräftiger gezeichnet für mehr Präsenz.
+// Strich als hell→azur-Verlauf (Def in HeroView, einmal pro Seite) statt flacher
+// Einfarbigkeit — gibt den Symbolen Tiefe und edlen Metallic-Look.
 const ICON_PROPS = {
   width: 23, height: 23, viewBox: "0 0 24 24", fill: "none",
-  stroke: "currentColor", strokeWidth: 1.7,
+  stroke: "url(#hero-icon-grad)", strokeWidth: 1.7,
   strokeLinecap: "round" as const, strokeLinejoin: "round" as const,
 };
 
@@ -104,24 +106,29 @@ function ProduktBanner({ banner, index }: { banner: Banner; index: number }) {
             {/* Hover-Sheen — feiner Lichtstreif, der durchläuft */}
             <span aria-hidden className="sheen" />
 
-            {/* Icon-Plättchen — Glas mit Tiefe, Akzent-Glow bei Hover */}
+            {/* Icon-Plättchen — Glas mit Tiefe, Verlaufs-Icon, blühender
+                Radial-Glow + rotierender Lichtring bei Hover (alles azur). */}
             <span
-              className={[
-                "relative flex-shrink-0 grid place-items-center w-12 h-12 rounded-2xl2 border transition-all duration-300 group-hover:scale-[1.06]",
-                banner.featured
-                  ? "text-akzent-200 border-akzent-500/30"
-                  : "text-white/75 border-white/[0.09] group-hover:text-akzent-200 group-hover:border-akzent-500/30",
-              ].join(" ")}
+              className="relative flex-shrink-0 grid place-items-center w-12 h-12 rounded-2xl2 border border-akzent-500/25 group-hover:border-akzent-500/45 transition-all duration-300 group-hover:scale-[1.06]"
               style={{
                 background: banner.featured
-                  ? "linear-gradient(140deg, rgba(79,124,251,0.24), rgba(79,124,251,0.04))"
-                  : "linear-gradient(140deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015))",
+                  ? "linear-gradient(140deg, rgba(79,124,251,0.26), rgba(79,124,251,0.05))"
+                  : "linear-gradient(140deg, rgba(79,124,251,0.16), rgba(79,124,251,0.03))",
                 boxShadow: banner.featured
-                  ? "inset 0 1px 0 rgba(255,255,255,0.14), 0 8px 20px rgba(79,124,251,0.16)"
-                  : "inset 0 1px 0 rgba(255,255,255,0.06)",
+                  ? "inset 0 1px 0 rgba(255,255,255,0.16), 0 10px 26px rgba(79,124,251,0.18)"
+                  : "inset 0 1px 0 rgba(255,255,255,0.12), 0 8px 20px rgba(79,124,251,0.10)",
               }}
             >
-              {banner.icon}
+              {/* Radial-Glow hinter dem Icon — ruht dezent, blüht bei Hover auf */}
+              <span
+                aria-hidden
+                className="absolute inset-0 rounded-2xl2 opacity-50 group-hover:opacity-100 transition-opacity duration-500"
+                style={{ background: "radial-gradient(circle at 50% 42%, rgba(122,162,255,0.40), transparent 70%)" }}
+              />
+              {/* Rotierender Conic-Lichtring — nur bei Hover sichtbar */}
+              <span aria-hidden className="icon-ring opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              {/* Icon selbst — über den Effekten, mit feinem Glow */}
+              <span className="relative drop-shadow-[0_1px_3px_rgba(79,124,251,0.35)]">{banner.icon}</span>
             </span>
 
             {/* Text — Bereichsname prominent, Nutzen darunter */}
@@ -182,6 +189,17 @@ export default function HeroView() {
       onMouseMove={beiMausBewegung}
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-28 pb-16 px-6"
     >
+      {/* Verlaufs-Strich für die Bereichs-Icons (hell oben → azur unten) — einmal pro Seite */}
+      <svg width="0" height="0" aria-hidden className="absolute pointer-events-none">
+        <defs>
+          <linearGradient id="hero-icon-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#dbe6ff" />
+            <stop offset="55%" stopColor="#9bbcff" />
+            <stop offset="100%" stopColor="#5c87f7" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       {/* Ruhige Premium-Tiefe — weiche, träge auf die Maus reagierende Lichtfelder */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Dezenter Code-Schleier (Azur, niedrige Deckkraft) — Tech-Anmutung ohne Klischee */}
@@ -277,10 +295,11 @@ export default function HeroView() {
         {/* Produkt-Banner */}
         <motion.div
           variants={einblend(0.8)} initial="versteckt" animate="sichtbar"
-          className="w-full max-w-2xl flex items-center justify-between gap-3 mb-4"
+          className="w-full max-w-2xl flex items-center gap-2.5 mb-4"
         >
-          <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-white/35">Bereiche entdecken</span>
-          <span className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
+          <span className="h-px w-7 flex-shrink-0 bg-gradient-to-r from-akzent-500/0 via-akzent-500/80 to-akzent-500/0" />
+          <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-akzent-400/90 flex-shrink-0">Bereiche entdecken</span>
+          <span className="h-px flex-1 bg-gradient-to-r from-akzent-500/30 to-transparent" />
         </motion.div>
 
         <div className="w-full max-w-2xl flex flex-col gap-3">

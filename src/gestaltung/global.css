@@ -145,12 +145,37 @@ body::before {
 }
 .group:hover .sheen { transform: translateX(120%); }
 
+/* Icon-Aura: feiner, rotierender Conic-Lichtring um das Icon-Plättchen.
+   Als 1px-Ring maskiert (content-box xor), dezent azur — kein Neon. Nur bei
+   Hover eingeblendet (Opacity via group-hover), rotiert ruhig im Hintergrund. */
+.icon-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(122,162,255,0) 0deg,
+    rgba(122,162,255,0) 210deg,
+    rgba(199,217,255,0.9) 300deg,
+    rgba(122,162,255,0) 360deg
+  );
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: icon-ring-dreh 4.5s linear infinite;
+}
+@keyframes icon-ring-dreh { to { transform: rotate(360deg); } }
+
 /* Reduced-Motion: alle Endlos-/Sweep-Animationen einfrieren (Text voll lesbar). */
 @media (prefers-reduced-motion: reduce) {
   .licht-name { animation: none; background-position: 50% 0; }
   .glanz-text { animation: none; background-position: 50% 0; }
   .glow-atmen { animation: none; opacity: 0.9; }
   .sheen { display: none; }
+  .icon-ring { animation: none; }
 }
 
 /* ═══════════════ Akzent-Linie (entneont, monochrom) ═══════════════ */
