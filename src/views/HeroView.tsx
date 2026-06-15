@@ -7,6 +7,7 @@ import { KURVEN, FEDERN } from "../bewegung/varianten";
 import { useBewegungErlaubt } from "../bewegung/hooks/useBewegungErlaubt";
 import { MatrixSchleier } from "../bewegung/MatrixSchleier";
 import { LaufBanner } from "../bausteine/LaufBanner";
+import { Augenbraue } from "../bausteine/Augenbraue";
 
 // ═══════════════════════════════════════════════════════════════════
 // VIEW: Hero — Premium-Einstieg & Produkt-Inszenierung
@@ -249,18 +250,21 @@ export default function HeroView() {
           {PERSOENLICH.untertitel}
         </motion.div>
 
-        {/* Name */}
+        {/* Name — Farben bleiben (Vorname weiß, Nachname azur), zusätzlich gleitet
+            derselbe Spiegel-Reflex wie über den Überschriften darüber. Der Glanz
+            liegt auf der Wort-Hülle (durchgehender Sweep statt pro Buchstabe);
+            bei reduzierter Bewegung greifen die statischen Originalfarben. */}
         <h1 className="font-display text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-[-0.03em] leading-[0.95] inline-flex flex-wrap justify-center gap-x-4 mb-6">
-          <span className="flex">
+          <span className={`flex ${erlaubt ? "glanz-text" : "text-white"}`}>
             {vorname.split("").map((b, i) => (
-              <motion.span key={`v-${i}`} custom={i} variants={buchstabe} initial="versteckt" animate="sichtbar" className="text-white">
+              <motion.span key={`v-${i}`} custom={i} variants={buchstabe} initial="versteckt" animate="sichtbar">
                 {b}
               </motion.span>
             ))}
           </span>
-          <span className="flex">
+          <span className={`flex ${erlaubt ? "glanz-akzent-text" : "text-akzent-verlauf"}`}>
             {nachname.split("").map((b, i) => (
-              <motion.span key={`n-${i}`} custom={i + vorname.length + 2} variants={buchstabe} initial="versteckt" animate="sichtbar" className="text-akzent-verlauf">
+              <motion.span key={`n-${i}`} custom={i + vorname.length + 2} variants={buchstabe} initial="versteckt" animate="sichtbar">
                 {b}
               </motion.span>
             ))}
@@ -292,14 +296,12 @@ export default function HeroView() {
           <LaufBanner />
         </motion.div>
 
-        {/* Produkt-Banner */}
+        {/* Produkt-Banner — Eyebrow exakt wie die Abschnittstitel (gemeinsame Augenbraue) */}
         <motion.div
           variants={einblend(0.8)} initial="versteckt" animate="sichtbar"
-          className="w-full max-w-2xl flex items-center gap-2.5 mb-4"
+          className="w-full max-w-2xl mb-4"
         >
-          <span className="h-px w-7 flex-shrink-0 bg-gradient-to-r from-akzent-500/0 via-akzent-500/80 to-akzent-500/0" />
-          <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-akzent-400/90 flex-shrink-0">Bereiche entdecken</span>
-          <span className="h-px flex-1 bg-gradient-to-r from-akzent-500/30 to-transparent" />
+          <Augenbraue text="Bereiche entdecken" />
         </motion.div>
 
         <div className="w-full max-w-2xl flex flex-col gap-3">

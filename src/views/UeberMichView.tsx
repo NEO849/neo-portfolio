@@ -69,7 +69,7 @@ export default function UeberMichView() {
       >
         <GlanzUeberschrift
           element="h3"
-          dauerSekunden={8}
+          dauerSekunden={6.5}
           klassen="font-display font-semibold text-xl md:text-[26px] leading-snug tracking-[-0.01em]"
           kinder="Eine seltene Kombination: über 15 Jahre IT-Systeme aufgebaut — heute entwickle ich die Software für die Hardware. Das gibt mir einen besonderen Blick fürs große Ganze."
         />

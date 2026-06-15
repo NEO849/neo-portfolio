@@ -17,7 +17,7 @@ interface GlanzUeberschriftProps {
   element?: Markierung;
   /** Shine-Sweep an/aus (Standard an). */
   glanzAktiv?: boolean;
-  /** Dauer eines Durchlaufs in Sekunden (Standard 7 — ruhig, nicht hektisch). */
+  /** Dauer eines Durchlaufs in Sekunden (Standard 5.5 — ruhig, aber lebendig). */
   dauerSekunden?: number;
   /** Akzentfarbe des Reflex-Bands; Standard aus Theme-Akzent (Azur). */
   akzentFarbe?: string;
@@ -28,7 +28,7 @@ export function GlanzUeberschrift({
   kinder,
   element = "h2",
   glanzAktiv = true,
-  dauerSekunden = 7,
+  dauerSekunden = 5.5,
   akzentFarbe,
   klassen = "",
 }: GlanzUeberschriftProps) {
