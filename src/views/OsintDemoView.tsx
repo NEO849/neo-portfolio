@@ -1198,6 +1198,7 @@ export default function OsintDemoView() {
   const [phase, setPhase] = useState<"menue" | "eingabe" | "laden" | "ausgabe">("menue");
   const [ansicht, setAnsicht] = useState<"report" | "raw">("report");
   const [schnellModus, setSchnellModus] = useState(true); // Soziale Präsenz: Schnell (~12) vs Vollscan (600+)
+  const [offenesModul, setOffenesModul] = useState<string | null>(null); // aufgeklappte Auswahl-Karte
   const [aktivesModul, setAktivesModul] = useState<DemoModul | null>(null);
   const [eingabeWert, setEingabeWert] = useState("");
   const [ausgabeZeilen, setAusgabeZeilen] = useState<string[]>([]);
@@ -1596,21 +1597,20 @@ export default function OsintDemoView() {
                   {DEMO_MODULE.map((modul, i) => {
                     const istWarnung = modul.nummer === "4" || modul.nummer === "6";
                     const istLive = modul.eingabeTyp === "text";
+                    const offen = offenesModul === modul.nummer;
                     return (
-                      <motion.button
+                      <motion.div
                         key={modul.nummer}
-                        type="button"
-                        onClick={() => modulStarten(modul)}
                         initial={{ opacity: 0, y: 14, filter: "blur(8px)" }}
                         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                         transition={{ delay: 0.03 * i, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                        whileHover={{ y: -3, transition: FEDERN.weich }}
-                        className="group relative text-left rounded-2xl border border-white/[0.07] bg-white/[0.025] hover:bg-white/[0.05] hover:border-white/[0.16] p-4 transition-colors duration-300 overflow-hidden focus:outline-none focus-visible:border-akzent-500/50"
+                        className={`group relative rounded-2xl border p-4 transition-colors duration-300 overflow-hidden ${
+                          offen ? "border-akzent-500/40 bg-white/[0.045]" : "border-white/[0.07] bg-white/[0.025] hover:bg-white/[0.05] hover:border-white/[0.16]"
+                        }`}
                       >
                         <span aria-hidden className="sheen" />
                         <div className="flex items-start gap-3.5">
-                          {/* Icon-Plättchen — identisch zum Hero: Azur-Glas mit Tiefe,
-                              Verlaufs-Icon, blühender Radial-Glow + Lichtring bei Hover */}
+                          {/* Icon-Plättchen — identisch zum Hero: Azur-Glas mit Tiefe */}
                           <span
                             className="relative grid place-items-center w-10 h-10 rounded-xl2 flex-shrink-0 border border-akzent-500/25 group-hover:border-akzent-500/45 transition-all duration-300 group-hover:scale-105"
                             style={{
@@ -1618,36 +1618,73 @@ export default function OsintDemoView() {
                               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12), 0 6px 16px rgba(79,124,251,0.10)",
                             }}
                           >
-                            {/* Radial-Glow hinter dem Icon */}
-                            <span
-                              aria-hidden
-                              className="absolute inset-0 rounded-xl2 opacity-50 group-hover:opacity-100 transition-opacity duration-500"
-                              style={{ background: "radial-gradient(circle at 50% 42%, rgba(122,162,255,0.40), transparent 70%)" }}
-                            />
-                            {/* Rotierender Conic-Lichtring — nur bei Hover */}
+                            <span aria-hidden className="absolute inset-0 rounded-xl2 opacity-50 group-hover:opacity-100 transition-opacity duration-500"
+                              style={{ background: "radial-gradient(circle at 50% 42%, rgba(122,162,255,0.40), transparent 70%)" }} />
                             <span aria-hidden className="icon-ring opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            {/* Icon selbst — über den Effekten, mit feinem Glow */}
                             <span className="relative drop-shadow-[0_1px_3px_rgba(79,124,251,0.35)]">{MODUL_ICON[modul.nummer] ?? null}</span>
                           </span>
-                          <div className="min-w-0 flex-1">
+
+                          {/* Titel + Badge — Klick klappt auf/zu */}
+                          <button
+                            type="button"
+                            onClick={() => setOffenesModul(offen ? null : modul.nummer)}
+                            aria-expanded={offen}
+                            className="min-w-0 flex-1 text-left focus:outline-none self-center"
+                          >
                             <div className="flex items-center gap-2 flex-wrap">
                               <h4 className="font-display font-semibold text-white text-[15px] leading-tight">{modul.name}</h4>
                               {istWarnung ? (
                                 <span className="inline-flex items-center gap-1 rounded-full border border-signal-gelb/30 bg-signal-gelb/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-signal-gelb/90">Live · sensibel</span>
                               ) : istLive ? (
-                                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.05] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-white/55">Live</span>
+                                <span className="inline-flex items-center gap-1 rounded-full border border-signal-gruen/25 bg-signal-gruen/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-signal-gruen/85">Live</span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-white/45">Check</span>
                               )}
                             </div>
-                            {/* Beschreibung bewusst kompakt: Details (ziel + beschreibung)
-                                erscheinen beim Klick auf dem Eingabe-Screen. */}
-                          </div>
-                          <span className="flex-shrink-0 self-center text-white/20 group-hover:text-akzent-300 group-hover:translate-x-0.5 transition-all duration-300">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                          </span>
+                          </button>
+
+                          {/* Aufklapp-Steuerung: ✕ wenn offen, sonst Chevron */}
+                          <button
+                            type="button"
+                            onClick={() => setOffenesModul(offen ? null : modul.nummer)}
+                            aria-label={offen ? "Details schließen" : "Details anzeigen"}
+                            className="flex-shrink-0 self-center grid place-items-center w-7 h-7 rounded-lg text-white/40 hover:text-white hover:bg-white/[0.06] transition-colors"
+                          >
+                            {offen ? (
+                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
+                            ) : (
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m6 9 6 6 6-6" /></svg>
+                            )}
+                          </button>
                         </div>
-                      </motion.button>
+
+                        {/* Aufklappbarer Detail-Bereich */}
+                        <AnimatePresence initial={false}>
+                          {offen && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.22, ease: "easeOut" }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pt-3 pl-[54px]">
+                                <p className="text-[13px] text-white/70 leading-relaxed">{modul.ziel}</p>
+                                {modul.beschreibung && (
+                                  <p className="text-[12px] text-white/45 leading-relaxed mt-1.5">{modul.beschreibung}</p>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => modulStarten(modul)}
+                                  className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-akzent-500/30 bg-akzent-500/[0.1] px-3 py-1.5 font-mono text-[12px] text-akzent-200 hover:text-white hover:bg-akzent-500/[0.18] hover:border-akzent-500/50 transition-colors"
+                                >
+                                  {modul.eingabeTyp === "none" ? "Jetzt prüfen" : "Werkzeug öffnen"} →
+                                </button>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
                     );
                   })}
                 </div>
@@ -1837,6 +1874,13 @@ export default function OsintDemoView() {
             {/* Ausgabe */}
             {phase === "ausgabe" && (
               <motion.div key="ausgabe" variants={PHASEN_WECHSEL} initial="versteckt" animate="sichtbar" exit="verlassen">
+                {/* Zurück zur Modul-Auswahl — immer verfügbar */}
+                <button onClick={zurueckSetzen}
+                  className="inline-flex items-center gap-1.5 text-[12px] text-white/45 hover:text-white/80 transition-colors mb-4">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6 6 6" /></svg>
+                  Zurück zur Auswahl
+                </button>
+
                 {/* Forensik-Dossier (Hero): Identität + Risiko + Kennzahl-Heatmap
                     (Balken) + Karte + Timeline + nächste Schritte. */}
                 <Dossier modulNummer={aktivesModul?.nummer ?? ""} daten={rohdaten} onPivot={pivotStarten} />

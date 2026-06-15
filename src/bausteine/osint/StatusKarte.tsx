@@ -106,13 +106,13 @@ export function StatusKarte({ daten }: { daten: GesundheitErgebnis | null }) {
   let laufindex = 0;
 
   return (
-    <div className="relative overflow-hidden rounded-2xl2 border border-signal-gruen/25 bg-signal-gruen/[0.04] mb-5 kante-licht">
-      <span aria-hidden className="absolute inset-x-0 top-0 h-0.5 bg-signal-gruen/70" />
+    <div className="relative overflow-hidden rounded-2xl2 border border-white/[0.08] bg-white/[0.03] mb-5 kante-licht">
+      <span aria-hidden className="absolute inset-x-0 top-0 h-0.5 bg-white/20" />
 
-      {/* Einmalige Scan-Linie beim Laden */}
+      {/* Einmalige Scan-Linie beim Laden (dezent) */}
       <motion.span aria-hidden
         className="absolute inset-x-0 h-16 pointer-events-none"
-        style={{ background: "linear-gradient(180deg, transparent, rgba(52,211,153,0.10), transparent)" }}
+        style={{ background: "linear-gradient(180deg, transparent, rgba(255,255,255,0.06), transparent)" }}
         initial={{ top: "-20%", opacity: 0 }}
         animate={{ top: "120%", opacity: [0, 1, 1, 0] }}
         transition={{ duration: 1.1, ease: "easeInOut" }}
