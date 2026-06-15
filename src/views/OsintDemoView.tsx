@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, type ReactNode } from "react";
+import { useState, useEffect, useRef, useCallback, Fragment, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PHASEN_WECHSEL, FEDERN } from "../bewegung/varianten";
 import { GlanzUeberschrift } from "../bewegung/GlanzUeberschrift";
@@ -124,61 +124,41 @@ const MODUL_ICON: Record<string, ReactNode> = {
   "8": (<svg {...ICO}><circle cx="6" cy="6" r="2.2" /><circle cx="18" cy="7" r="2.2" /><circle cx="12" cy="18" r="2.2" /><path d="M7.6 7.6 11 16M16.6 8.6 13 16M8 6h8" /></svg>), // Orchestrator / Graph
 };
 
-// 3-Schritt-Indikator (responsive, Mobile-First). Kurze, nie abgeschnittene
-// Labels. Mobile: Fortschritts-Punkte + „Schritt X/3 · Label" (passt auf jedes
-// Smartphone). Desktop: voller Stepper mit Kreisen + Verbindern.
+// 3-Schritt-Indikator (Auswahl → Eingabe → Ergebnis). EIN responsives Layout
+// für alle Größen: die vollen nummerierten Schritte + Labels bleiben immer
+// sichtbar — auf Mobile nur kompakter dimensioniert (kleinere Kreise/Labels,
+// Verbinder schrumpfen via flex-1). Schritte selbst sind flex-shrink-0, werden
+// also nie abgeschnitten. Kein horizontaler Scroll, kein Cutoff.
 const FLOW_SCHRITTE = ["Auswahl", "Eingabe", "Ergebnis"] as const;
 
 function FlowStepper({ phase }: { phase: "menue" | "eingabe" | "laden" | "ausgabe" }) {
   const aktiv = phase === "menue" ? 0 : phase === "eingabe" ? 1 : 2;
 
   return (
-    <>
-      {/* Mobile: kompakt — kein Umbruch, kein Abschneiden, kein Scroll */}
-      <div className="flex sm:hidden items-center gap-2.5 min-w-0">
-        <div className="flex items-center gap-1.5 flex-shrink-0" aria-hidden>
-          {FLOW_SCHRITTE.map((s, i) => (
+    <div className="flex items-center gap-1.5 sm:gap-3 w-full sm:w-auto min-w-0">
+      {FLOW_SCHRITTE.map((s, i) => (
+        <Fragment key={s}>
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             <span
-              key={s}
               className={[
-                "h-1.5 rounded-full transition-all duration-300",
-                i === aktiv ? "w-5 bg-akzent-500" : i < aktiv ? "w-1.5 bg-akzent-500/50" : "w-1.5 bg-white/15",
+                "grid place-items-center w-5 h-5 sm:w-6 sm:h-6 rounded-full text-[10px] sm:text-[11px] font-semibold transition-colors duration-300 flex-shrink-0",
+                i < aktiv ? "bg-akzent-500/20 text-akzent-300 border border-akzent-500/30"
+                : i === aktiv ? "bg-akzent-500 text-white shadow-aura"
+                : "bg-white/[0.04] text-white/35 border border-white/[0.08]",
               ].join(" ")}
-            />
-          ))}
-        </div>
-        <span className="text-[13px] truncate">
-          <span className="text-white/40">Schritt {aktiv + 1}/3 · </span>
-          <span className="text-white/90 font-medium">{FLOW_SCHRITTE[aktiv]}</span>
-        </span>
-      </div>
-
-      {/* Desktop: voller Stepper */}
-      <div className="hidden sm:flex items-center gap-3">
-        {FLOW_SCHRITTE.map((s, i) => (
-          <div key={s} className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span
-                className={[
-                  "grid place-items-center w-6 h-6 rounded-full text-[11px] font-semibold transition-colors duration-300 flex-shrink-0",
-                  i < aktiv ? "bg-akzent-500/20 text-akzent-300 border border-akzent-500/30"
-                  : i === aktiv ? "bg-akzent-500 text-white shadow-aura"
-                  : "bg-white/[0.04] text-white/35 border border-white/[0.08]",
-                ].join(" ")}
-              >
-                {i < aktiv ? "✓" : i + 1}
-              </span>
-              <span className={`text-[13px] transition-colors duration-300 ${i === aktiv ? "text-white/90" : "text-white/40"}`}>
-                {s}
-              </span>
-            </div>
-            {i < FLOW_SCHRITTE.length - 1 && (
-              <span className={`h-px w-8 transition-colors duration-300 ${i < aktiv ? "bg-akzent-500/40" : "bg-white/10"}`} />
-            )}
+            >
+              {i < aktiv ? "✓" : i + 1}
+            </span>
+            <span className={`text-[11px] sm:text-[13px] whitespace-nowrap transition-colors duration-300 ${i === aktiv ? "text-white/90" : "text-white/40"}`}>
+              {s}
+            </span>
           </div>
-        ))}
-      </div>
-    </>
+          {i < FLOW_SCHRITTE.length - 1 && (
+            <span className={`h-px flex-1 min-w-[8px] sm:flex-none sm:w-8 transition-colors duration-300 ${i < aktiv ? "bg-akzent-500/40" : "bg-white/10"}`} />
+          )}
+        </Fragment>
+      ))}
+    </div>
   );
 }
 
