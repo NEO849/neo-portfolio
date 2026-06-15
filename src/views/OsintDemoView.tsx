@@ -80,7 +80,7 @@ const DEMO_MODULE: DemoModul[] = [
     beschreibung: "Parallel: DNS (A / AAAA / MX / NS / SPF / DMARC), WHOIS, ASN via Team Cymru, HTTP-Security-Header-Audit und Shodan InternetDB (offene Ports, bekannte CVEs, Tags). Liefert zwei Risk-Scores: HTTP-Sec und Network-Exposure.",
   },
   {
-    nummer: "9", name: "Subdomain-Recon (3 Quellen)", farbe: "#2dd4bf",
+    nummer: "9", name: "Subdomain-Recon", farbe: "#2dd4bf",
     eingabeLabel: "Domain eingeben", beispielEingabe: "github.com", eingabeTyp: "text",
     ziel: "Deckt versteckte Subdomains einer Domain auf — die oft übersehene, eigentliche Angriffsfläche.",
     beschreibung: "Sammelt Subdomains aus drei unabhängigen keyless-Quellen parallel — Certificate-Transparency (crt.sh), Wayback Machine und CommonCrawl — und führt sie dedupliziert zusammen, mit Quellen-Herkunft pro Treffer und optionalem Live-Resolve (A-Record-Check). Jede Quelle ist fehler-isoliert: fällt eine aus, liefern die anderen weiter.",
@@ -124,35 +124,61 @@ const MODUL_ICON: Record<string, ReactNode> = {
   "8": (<svg {...ICO}><circle cx="6" cy="6" r="2.2" /><circle cx="18" cy="7" r="2.2" /><circle cx="12" cy="18" r="2.2" /><path d="M7.6 7.6 11 16M16.6 8.6 13 16M8 6h8" /></svg>), // Orchestrator / Graph
 };
 
-// 3-Schritt-Indikator: spiegelt die phase-State-Machine als Premium-Stepper.
+// 3-Schritt-Indikator (responsive, Mobile-First). Kurze, nie abgeschnittene
+// Labels. Mobile: Fortschritts-Punkte + „Schritt X/3 · Label" (passt auf jedes
+// Smartphone). Desktop: voller Stepper mit Kreisen + Verbindern.
+const FLOW_SCHRITTE = ["Auswahl", "Eingabe", "Ergebnis"] as const;
+
 function FlowStepper({ phase }: { phase: "menue" | "eingabe" | "laden" | "ausgabe" }) {
   const aktiv = phase === "menue" ? 0 : phase === "eingabe" ? 1 : 2;
-  const schritte = ["Was analysieren?", "Eingabe", "Ergebnisse"];
+
   return (
-    <div className="flex items-center gap-2 sm:gap-3">
-      {schritte.map((s, i) => (
-        <div key={s} className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="flex items-center gap-2 min-w-0">
+    <>
+      {/* Mobile: kompakt — kein Umbruch, kein Abschneiden, kein Scroll */}
+      <div className="flex sm:hidden items-center gap-2.5 min-w-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0" aria-hidden>
+          {FLOW_SCHRITTE.map((s, i) => (
             <span
+              key={s}
               className={[
-                "grid place-items-center w-6 h-6 rounded-full text-[11px] font-semibold transition-colors duration-300 flex-shrink-0",
-                i < aktiv ? "bg-akzent-500/20 text-akzent-300 border border-akzent-500/30"
-                : i === aktiv ? "bg-akzent-500 text-white shadow-aura"
-                : "bg-white/[0.04] text-white/35 border border-white/[0.08]",
+                "h-1.5 rounded-full transition-all duration-300",
+                i === aktiv ? "w-5 bg-akzent-500" : i < aktiv ? "w-1.5 bg-akzent-500/50" : "w-1.5 bg-white/15",
               ].join(" ")}
-            >
-              {i < aktiv ? "✓" : i + 1}
-            </span>
-            <span className={`text-xs sm:text-[13px] truncate transition-colors duration-300 ${i === aktiv ? "text-white/90" : "text-white/40"}`}>
-              {s}
-            </span>
-          </div>
-          {i < schritte.length - 1 && (
-            <span className={`h-px w-4 sm:w-8 transition-colors duration-300 ${i < aktiv ? "bg-akzent-500/40" : "bg-white/10"}`} />
-          )}
+            />
+          ))}
         </div>
-      ))}
-    </div>
+        <span className="text-[13px] truncate">
+          <span className="text-white/40">Schritt {aktiv + 1}/3 · </span>
+          <span className="text-white/90 font-medium">{FLOW_SCHRITTE[aktiv]}</span>
+        </span>
+      </div>
+
+      {/* Desktop: voller Stepper */}
+      <div className="hidden sm:flex items-center gap-3">
+        {FLOW_SCHRITTE.map((s, i) => (
+          <div key={s} className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span
+                className={[
+                  "grid place-items-center w-6 h-6 rounded-full text-[11px] font-semibold transition-colors duration-300 flex-shrink-0",
+                  i < aktiv ? "bg-akzent-500/20 text-akzent-300 border border-akzent-500/30"
+                  : i === aktiv ? "bg-akzent-500 text-white shadow-aura"
+                  : "bg-white/[0.04] text-white/35 border border-white/[0.08]",
+                ].join(" ")}
+              >
+                {i < aktiv ? "✓" : i + 1}
+              </span>
+              <span className={`text-[13px] transition-colors duration-300 ${i === aktiv ? "text-white/90" : "text-white/40"}`}>
+                {s}
+              </span>
+            </div>
+            {i < FLOW_SCHRITTE.length - 1 && (
+              <span className={`h-px w-8 transition-colors duration-300 ${i < aktiv ? "bg-akzent-500/40" : "bg-white/10"}`} />
+            )}
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -1686,9 +1712,6 @@ export default function OsintDemoView() {
                         <span className="text-white/55">[4]</span>{" "}
                         URL oben einfügen und Enter drücken
                       </div>
-                    </div>
-                    <div className="mt-2.5 text-white/45">
-                      Beispiel: i.imgur.com/AbCdEfG.jpg
                     </div>
                   </div>
                 )}

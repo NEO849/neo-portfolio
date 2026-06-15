@@ -55,17 +55,16 @@ export function LaufBanner({ tempoSekunden = 44, klassen = "" }: LaufBannerProps
 
   return (
     <div
-      className={`group glass rounded-full py-2.5 overflow-hidden ${klassen}`}
+      className={`glass rounded-full py-2.5 overflow-hidden ${klassen}`}
       style={{ maskImage: randMaske, WebkitMaskImage: randMaske }}
       role="group"
       aria-label="Aktuelle Infrastruktur- und Projekt-Highlights"
-      tabIndex={0}
     >
       {/* Sichtbare Laufspur — rein dekorativ (verdoppelt), daher vor AT verborgen.
-          Läuft durchgehend; pausiert nur bei Tastaturfokus (A11y), nicht bei Hover. */}
+          Läuft durchgehend; reagiert bewusst auf keinen Klick/Hover/Fokus. */}
       <div
         aria-hidden="true"
-        className="flex w-max animate-band-laufen group-focus-within:[animation-play-state:paused] motion-reduce:animate-none"
+        className="flex w-max animate-band-laufen motion-reduce:animate-none select-none"
         style={{ animationDuration: `${tempoSekunden}s` }}
       >
         {sequenz.map((eintrag, index) => (
