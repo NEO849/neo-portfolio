@@ -86,12 +86,25 @@ def _aus_email(erg: dict, recon: dict | None = None) -> list[dict]:
             "mittel", "Datenlecks"))
 
     exposed = (r.get("xposedornot") or {}).get("exposed_fields") or []
-    if any("password" in str(f).lower() for f in exposed):
+    klassen = [str(k).lower() for k in (r.get("exponierte_datenklassen") or [])]
+    if any("password" in str(f).lower() for f in exposed) or any("password" in k for k in klassen):
         empf.append(_e(
             "Wiederverwendete Passwörter ersetzen",
             "Wenn das geleakte Passwort noch irgendwo aktiv ist: überall ersetzen.",
             "In den Leaks wurden Passwort-Daten exponiert — diese kursieren in Angreifer-Listen.",
             "hoch", "Passwörter"))
+    if any(any(t in k for t in ("credit", "bank", "payment", "iban", "financial")) for k in klassen):
+        empf.append(_e(
+            "Zahlungsdaten überwachen",
+            "Karten-/Kontoumsätze prüfen, Benachrichtigungen aktivieren, im Zweifel Karte sperren lassen.",
+            "In den Leaks wurden Zahlungs-/Finanzdaten exponiert — direktes Betrugsrisiko.",
+            "hoch", "Finanzen"))
+    if any(any(t in k for t in ("address", "phone", "geo", "physical")) for k in klassen):
+        empf.append(_e(
+            "Identitäts-/Adressdaten als kompromittiert behandeln",
+            "Wachsam bei gezieltem Phishing/Vishing sein; Adresse/Telefon nicht erneut breit streuen.",
+            "Geleakte Adress-/Kontaktdaten ermöglichen glaubwürdiges, personalisiertes Social-Engineering.",
+            "mittel", "Identität"))
 
     if (r.get("gravatar") or {}).get("gefunden"):
         empf.append(_e(

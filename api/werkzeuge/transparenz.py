@@ -94,6 +94,10 @@ DATENFLUSS: dict[str, dict] = {
                     "Verknüpfte GitHub-Konten via öffentliche User- UND Commit-Such-API "
                     "(findet in alten Commits hinterlegte Adressen → Konto, Klarname, Repos)",
                     "https://docs.github.com/site-policy/privacy-policies", "US"),
+            _dienst("EmailRep.io (Sublime Security)", "E-Mail-Adresse",
+                    "Reputations-/Risiko-Signale (Breach/Leak gesehen, Zustellbarkeit, "
+                    "Spoofbarkeit) + verknüpfte öffentliche Profile",
+                    "https://emailrep.io/key", "US"),
         ],
         "nur_links": [
             "Google Maps/YouTube/Drive (nur Such-Links, falls Gmail-Adresse)",

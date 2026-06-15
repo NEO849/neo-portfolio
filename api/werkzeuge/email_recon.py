@@ -22,6 +22,7 @@ import hashlib
 import os
 import re
 from datetime import datetime
+from urllib.parse import quote
 
 import httpx
 
@@ -527,6 +528,47 @@ async def _plattform_email_pruefen(client: httpx.AsyncClient, email: str) -> dic
     }
 
 
+# ─── EmailRep.io — Reputations-/Profil-Aggregator (keyless) ─────────
+
+async def _emailrep_pruefen(client: httpx.AsyncClient, email: str) -> dict:
+    """
+    EmailRep.io (Sublime) — keyless Reputations-API: Breach-/Leak-Signale,
+    Zustellbarkeit, Spoofbarkeit, verknüpfte öffentliche Profile.
+    Stark gedrosselt ohne Key → graceful bei 429.
+    """
+    try:
+        r = await client.get(
+            f"https://emailrep.io/{quote(email)}",
+            headers={"User-Agent": "neo-portfolio-osint/1.0", "Accept": "application/json"},
+            timeout=TIMEOUT_S,
+        )
+        if r.status_code == 200:
+            d = r.json()
+            det = d.get("details") or {}
+            return {
+                "geprueft": True,
+                "reputation": d.get("reputation"),
+                "verdaechtig": bool(d.get("suspicious")),
+                "referenzen": d.get("references"),
+                "credentials_leaked": det.get("credentials_leaked"),
+                "data_breach": det.get("data_breach"),
+                "zuletzt_gesehen": det.get("last_seen"),
+                "wegwerf": det.get("disposable"),
+                "frei_provider": det.get("free_provider"),
+                "zustellbar": det.get("deliverable"),
+                "spoofbar": det.get("spoofable"),
+                "spf_strikt": det.get("spf_strict"),
+                "dmarc_erzwungen": det.get("dmarc_enforced"),
+                "boesartige_aktivitaet": det.get("malicious_activity"),
+                "profile": det.get("profiles") or [],
+            }
+        if r.status_code == 429:
+            return {"geprueft": False, "hinweis": "EmailRep rate-limited (keyless)"}
+    except Exception:
+        pass
+    return {"geprueft": False, "hinweis": "EmailRep nicht erreichbar"}
+
+
 # ─── Hashes (für Crawler/Recon-Tools) ───────────────────────────────
 
 def _hashes_berechnen(email: str) -> dict:
@@ -576,7 +618,7 @@ async def _email_recon_compute(email: str) -> dict:
     domain = email.split("@")[1]
 
     async with httpx.AsyncClient(verify=True) as client:
-        gravatar, google_id, hibp, github, xposedornot, leakcheck, pgp = await asyncio.gather(
+        gravatar, google_id, hibp, github, xposedornot, leakcheck, pgp, emailrep = await asyncio.gather(
             _gravatar_pruefen(client, email),
             _google_id_pruefen(client, email),
             _hibp_passwort_pruefen(client, email),
@@ -584,6 +626,7 @@ async def _email_recon_compute(email: str) -> dict:
             _xposedornot_pruefen(client, email),
             _leakcheck_pruefen(client, email),
             _pgp_pruefen(client, email),
+            _emailrep_pruefen(client, email),
         )
 
     # Aggregiertes "wer-ist-das"
@@ -620,6 +663,8 @@ async def _email_recon_compute(email: str) -> dict:
             "wert": f"{pgp['anzahl']} PGP-Key(s) - sicherheitsaffiner User",
             "konfidenz": "hoch",
         })
+    for prof in (emailrep.get("profile") or [])[:8]:
+        wer_ist_das.append({"quelle": f"EmailRep→{prof}", "wert": str(prof), "konfidenz": "mittel"})
 
     # Risiko
     risiko_punkte = 0
@@ -648,6 +693,20 @@ async def _email_recon_compute(email: str) -> dict:
     if pgp.get("hat_pgp_key"):
         risiko_punkte += 1
         risiko_details.append("PGP-Key öffentlich - User ist sicherheitsbewusst")
+    if emailrep.get("data_breach") or emailrep.get("credentials_leaked"):
+        risiko_punkte += 2
+        risiko_details.append("EmailRep: in Breach-/Leak-Daten gesehen")
+    if emailrep.get("boesartige_aktivitaet"):
+        risiko_punkte += 3
+        risiko_details.append("EmailRep: bösartige Aktivität gemeldet")
+
+    # Exponierte Datenklassen über alle Breach-Quellen aggregieren
+    # (was wurde konkret geleakt? → treibt die Schutz-Empfehlungen)
+    _klassen: list[str] = []
+    for b in (hibp.get("breaches") or []):
+        _klassen.extend(b.get("datenklassen") or [])
+    _klassen.extend(xposedornot.get("exposed_fields") or [])
+    exponierte_datenklassen = sorted({str(x).strip() for x in _klassen if x})[:20]
 
     stufe = ("Hoch" if risiko_punkte >= 6 else
              "Mittel" if risiko_punkte >= 3 else
@@ -666,6 +725,8 @@ async def _email_recon_compute(email: str) -> dict:
         "xposedornot": xposedornot,
         "leakcheck": leakcheck,
         "pgp": pgp,
+        "emailrep": emailrep,
+        "exponierte_datenklassen": exponierte_datenklassen,
         "wer_ist_das": wer_ist_das,
         "risiko": {
             "stufe": stufe,
@@ -680,5 +741,6 @@ async def _email_recon_compute(email: str) -> dict:
             "keys.openpgp.org HKP",
             "GitHub Public Search API",
             "Google Public Endpoints (Maps/Calendar/Drive)",
+            "EmailRep.io (Reputation/Profile)",
         ],
     }

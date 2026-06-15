@@ -254,7 +254,7 @@ function telefonZuTerminal(t: TelefonErgebnis): string[] {
     WW("National",  t.format?.national ?? ""),
     WW("E.164",     t.format?.e164 ?? ""),
     "", S("METADATEN"),
-    WW("Land",    `${t.metadaten?.land_code} — ${trunc(t.metadaten?.region ?? "", 18)}`),
+    WW("Land",    `${t.metadaten?.land_code} (${t.metadaten?.laendervorwahl ?? ""}) ${trunc(t.metadaten?.region ?? "", 12)}`),
     WW("Typ",     t.metadaten?.leitungstyp ?? ""),
     WW("Carrier", trunc(t.metadaten?.carrier ?? "", 20)),
     WW("Zeitzone",trunc((t.metadaten?.zeitzonen ?? []).join(", "), 20)),
@@ -341,6 +341,22 @@ function bildZuTerminal(b: BildErgebnis): string[] {
   if (b.bewertung?.empfehlungen.length) {
     zeilen.push("", S("HANDLUNGSEMPFEHLUNGEN"));
     for (const e of b.bewertung.empfehlungen) zeilen.push(...wrap(e, 30, "  - "));
+  }
+  // Senior-Forensik 2026: Herkunft (C2PA), KI-Erzeugung, versteckte Daten
+  const cc = b.content_credentials;
+  if (cc?.hat_manifest) {
+    zeilen.push("", S("HERKUNFT (C2PA)"));
+    if (cc.erzeugt_von)   zeilen.push(WW("Erzeugt von", trunc(cc.erzeugt_von, 20)));
+    if (cc.signiert_von)  zeilen.push(WW("Signiert", trunc(cc.signiert_von, 20)));
+    if (cc.aktionen?.length) zeilen.push(WW("Aktionen", trunc(cc.aktionen.join(", "), 20)));
+  }
+  if (b.xmp?.ki_erzeugt) {
+    zeilen.push("", S("AUTHENTIZITÄT"));
+    zeilen.push("  [!]  Als KI-/algorithmisch erzeugt markiert");
+  }
+  if (b.versteckte_daten?.hat_trailing_data) {
+    zeilen.push("", S("VERSTECKTE DATEN"));
+    zeilen.push(`  [!]  ${b.versteckte_daten.trailing_bytes} Byte nach Datei-Ende`);
   }
   if (b.suchlinks?.length) {
     zeilen.push("", S("REVERSE IMAGE LINKS"));
@@ -748,6 +764,22 @@ function emailVollZuTerminal(e: EmailErgebnis, r: EmailReconErgebnis | null): st
     zeilen.push(`  ${String(stufe).toUpperCase()} (${total} Punkte gesamt)`);
     for (const d of e.risiko?.details ?? [])    zeilen.push(`  [!]  ${trunc(d, 26)}`);
     for (const d of r?.risiko?.details ?? [])   zeilen.push(`  [!]  ${trunc(d, 26)}`);
+  }
+
+  // EmailRep.io — Reputation + verknüpfte Profile
+  if (r?.emailrep?.geprueft) {
+    zeilen.push("", S("EMAILREP REPUTATION"));
+    if (r.emailrep.reputation) zeilen.push(WW("Reputation", String(r.emailrep.reputation)));
+    if (r.emailrep.data_breach || r.emailrep.credentials_leaked)
+      zeilen.push("  [!]  In Breach-/Leak-Daten gesehen");
+    if (r.emailrep.boesartige_aktivitaet) zeilen.push("  [!]  Bösartige Aktivität gemeldet");
+    for (const p of (r.emailrep.profile ?? []).slice(0, 6)) zeilen.push(`  [+]  Profil: ${trunc(String(p), 22)}`);
+  }
+
+  // Exponierte Datenklassen (was wurde konkret geleakt?)
+  if (r?.exponierte_datenklassen?.length) {
+    zeilen.push("", S("EXPONIERTE DATENKLASSEN"));
+    for (const k of r.exponierte_datenklassen.slice(0, 12)) zeilen.push(`  [!]  ${trunc(k, 28)}`);
   }
 
   zeilen.push(...pivotsZuTerminal(r?.pivots));
@@ -1586,7 +1618,7 @@ export default function OsintDemoView() {
                   <span className="text-[12px] text-white/35">Frei nutzbar · keine Anmeldung · keine Speicherung</span>
                   <KnopfAktion
                     beimKlick={btcAdresseKopieren}
-                    klassen="select-none"
+                    klassen="select-none !px-3.5 !py-1.5 !text-[11.5px] !rounded-md"
                     kinder={btcKopiert === "success" ? "BTC-Adresse kopiert ✓" : btcKopiert === "error" ? "Kopieren fehlgeschlagen" : "Projekt unterstützen · BTC"}
                   />
                 </div>
@@ -1770,9 +1802,16 @@ export default function OsintDemoView() {
                     Kennzahlen + nächste Schritte). */}
                 <ErgebnisUebersicht modulNummer={aktivesModul?.nummer ?? ""} daten={rohdaten} onPivot={pivotStarten} />
 
-                {/* Defensiver Mehrwert: „Was kann ich dagegen tun?" — priorisierte
-                    Schutz-Maßnahmen aus den Funden (IT-Forensik-Rolle). */}
-                <SchutzEmpfehlungen empfehlungen={extrahiereSchutz(aktivesModul?.nummer ?? "", rohdaten)} />
+                {/* Defensiver Mehrwert: „Was kann ich dagegen tun?" — NUR wenn ein
+                    echtes Sicherheitsproblem vorliegt (Schwere kritisch/auffällig),
+                    als EINE ausklappbare Card (IT-Forensik-Rolle). */}
+                {(() => {
+                  const zus = fasseErgebnisZusammen(aktivesModul?.nummer ?? "", rohdaten);
+                  const problem = !!zus && (zus.schwere === "kritisch" || zus.schwere === "auffaellig");
+                  return problem
+                    ? <SchutzEmpfehlungen empfehlungen={extrahiereSchutz(aktivesModul?.nummer ?? "", rohdaten)} />
+                    : null;
+                })()}
 
                 {/* Statischer Führungs-Hinweis nur als Fallback, wenn sich keine
                     dynamische Übersicht ableiten lässt (z. B. Status-Modul). */}

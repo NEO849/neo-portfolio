@@ -22,3 +22,5 @@ phonenumbers>=9.0,<10.0
 # Bild-Analyse (EXIF + Perceptual Hash)
 Pillow>=12.0,<13.0
 ImageHash>=4.3,<5.0
+c2pa-python>=0.34,<1.0   # Content Credentials (Bild-Herkunft/Authentizität) — optional, graceful
+defusedxml>=0.7   # sicheres XMP-Parsing (Pillow getxmp) — KI-Herkunft/Bearbeitungs-Historie

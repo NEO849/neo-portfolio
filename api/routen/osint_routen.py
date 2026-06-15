@@ -119,11 +119,12 @@ class BenutzerAnfrage(BaseModel):
     def benutzername_pruefen(cls, v: str) -> str:
         v = v.strip()
         if len(v) < 2:
-            raise ValueError("Benutzername zu kurz (min. 2 Zeichen)")
-        if len(v) > 50:
-            raise ValueError("Benutzername zu lang (max. 50 Zeichen)")
-        if not re.match(r'^[a-zA-Z0-9_\-\.]+$', v):
-            raise ValueError("Benutzername darf nur Buchstaben, Zahlen, _, - und . enthalten")
+            raise ValueError("Eingabe zu kurz (min. 2 Zeichen)")
+        if len(v) > 64:
+            raise ValueError("Eingabe zu lang (max. 64 Zeichen)")
+        # Username ODER echter Name (mit Leerzeichen/Umlauten/Apostroph) erlaubt.
+        if not re.match(r"^[\w\s.\-']+$", v, re.UNICODE):
+            raise ValueError("Erlaubt sind Buchstaben, Zahlen, Leerzeichen und . _ - '")
         return v
 
 
@@ -185,10 +186,11 @@ class BenutzerVollscanAnfrage(BaseModel):
     @classmethod
     def benutzername_pruefen(cls, v: str) -> str:
         v = v.strip()
-        if len(v) < 2 or len(v) > 50:
-            raise ValueError("Benutzername muss 2-50 Zeichen lang sein")
-        if not re.match(r'^[a-zA-Z0-9_\-\.]+$', v):
-            raise ValueError("Benutzername darf nur Buchstaben, Zahlen, _, - und . enthalten")
+        if len(v) < 2 or len(v) > 64:
+            raise ValueError("Eingabe muss 2-64 Zeichen lang sein")
+        # Username ODER echter Name (mit Leerzeichen/Umlauten/Apostroph) erlaubt.
+        if not re.match(r"^[\w\s.\-']+$", v, re.UNICODE):
+            raise ValueError("Erlaubt sind Buchstaben, Zahlen, Leerzeichen und . _ - '")
         return v
 
 

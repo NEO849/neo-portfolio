@@ -70,6 +70,8 @@ async def telefon_analysieren(nummer_eingabe: str) -> dict:
     region = geocoder.description_for_number(parsed, "de") or "Unbekannt"
     carrier_name = carrier.name_for_number(parsed, "de") or "Unbekannt"
     zeitzonen = list(timezone.time_zones_for_number(parsed))
+    laendervorwahl = parsed.country_code
+    nsn = phonenumbers.national_significant_number(parsed)
 
     # Risikobewertung
     risiko_details = []
@@ -93,6 +95,21 @@ async def telefon_analysieren(nummer_eingabe: str) -> dict:
         {"name": "WhatsApp",   "kategorie": "Messenger",     "url": f"https://wa.me/{nummer_ohne_plus}"},
         {"name": "Telegram",   "kategorie": "Messenger",     "url": f"https://t.me/+{nummer_ohne_plus}"},
     ]
+
+    # Region-gezielte Reverse-Lookup-Verzeichnisse (nur Links, kein Scraping)
+    if land_code == "DE":
+        suchlinks.append({"name": "Das Telefonbuch", "kategorie": "Reverse Lookup",
+                          "url": f"https://www.dastelefonbuch.de/R%C3%BCckw%C3%A4rtssuche/{nationale_clean}"})
+    elif land_code == "GB":
+        suchlinks.append({"name": "who-called.co.uk", "kategorie": "Reputation",
+                          "url": f"https://who-called.co.uk/Number/{nationale_clean}"})
+    elif land_code == "US":
+        suchlinks.append({"name": "800notes", "kategorie": "Reputation",
+                          "url": f"https://800notes.com/Phone.aspx/{nummer_ohne_plus}"})
+    # Behördlich/autoritativ nur für gebührenfreie/Premium-Nummern in DE
+    if land_code == "DE" and number_type(parsed) in (PhoneNumberType.TOLL_FREE, PhoneNumberType.PREMIUM_RATE):
+        suchlinks.append({"name": "Bundesnetzagentur", "kategorie": "Behörde",
+                          "url": "https://www.bundesnetzagentur.de/DE/Vportal/TK/Auskunftsdienste/start.html"})
 
     # Nach Kategorie gruppieren
     nach_kategorie: dict[str, list] = {}
@@ -123,9 +140,12 @@ async def telefon_analysieren(nummer_eingabe: str) -> dict:
         },
         "metadaten": {
             "land_code": land_code,
+            "laendervorwahl": f"+{laendervorwahl}",
+            "nationale_nummer": nsn,
             "leitungstyp": leitungstyp,
             "region": region,
             "carrier": carrier_name,
+            "carrier_hinweis": "Ursprünglicher Zuteilungs-Carrier (vor evtl. Portierung)",
             "zeitzonen": zeitzonen,
         },
         "suchlinks": {

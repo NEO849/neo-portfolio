@@ -13,6 +13,7 @@
 import httpx
 import hashlib
 import io
+import json
 from datetime import datetime
 from PIL import Image, ExifTags
 from PIL.ExifTags import TAGS, GPSTAGS
@@ -233,6 +234,99 @@ def _privacy_bewertung(exif: dict) -> dict:
     }
 
 
+# ─── Senior-Forensik 2026: versteckte Daten, KI-Herkunft, C2PA ──────
+
+def _versteckte_daten(bild_bytes: bytes, format_name: str) -> dict:
+    """
+    Erkennt an das offizielle Datei-Ende ANGEHÄNGTE Daten — ein klassischer
+    Träger für versteckte Inhalte (Stego/Polyglot) oder Reste. Reiner Byte-
+    Check, kein Extrahieren (keine ToS-/Sicherheitsfläche).
+    """
+    try:
+        marker = (b"\xff\xd9" if format_name == "JPEG"
+                  else b"\x49\x45\x4e\x44\xae\x42\x60\x82" if format_name == "PNG"
+                  else None)
+        if not marker:
+            return {"geprueft": False}
+        idx = bild_bytes.rfind(marker)
+        if idx == -1:
+            return {"geprueft": True, "hat_trailing_data": False}
+        trailing = len(bild_bytes) - (idx + len(marker))
+        return {
+            "geprueft": True,
+            "hat_trailing_data": trailing > 32,   # kleine Reste sind normal
+            "trailing_bytes": max(0, trailing),
+            "hinweis": ("Daten nach dem regulären Datei-Ende gefunden — möglicher "
+                        "versteckter Container / angehängter Payload.") if trailing > 32 else None,
+        }
+    except Exception:
+        return {"geprueft": False}
+
+
+def _xmp_auswerten(bild: Image.Image) -> dict:
+    """
+    Liest XMP-Metadaten (Pillow, offline): KI-Herkunft (IPTC DigitalSourceType)
+    + Hinweis auf Bearbeitungs-Historie. Wichtig fürs Deepfake-/Echtheits-Thema.
+    """
+    try:
+        xmp = bild.getxmp()
+    except Exception:
+        return {"vorhanden": False}
+    if not xmp:
+        return {"vorhanden": False}
+    roh = json.dumps(xmp, default=str).lower()
+    ki = any(s in roh for s in (
+        "trainedalgorithmicmedia", "algorithmicmedia", "compositewithtrainedalgorithmicmedia",
+        "ai-generated", "genai", "generativeai",
+    ))
+    return {
+        "vorhanden": True,
+        "ki_erzeugt": ki,
+        "hat_bearbeitungs_historie": ("history" in roh or "documentid" in roh),
+        "hinweis": ("XMP kennzeichnet das Bild als KI-/algorithmisch erzeugt (DigitalSourceType)."
+                    if ki else None),
+    }
+
+
+def _content_credentials(bild_bytes: bytes, content_type: str) -> dict:
+    """
+    C2PA / Content Credentials — verifizierbares Herkunfts-Manifest (Adobe, Leica,
+    Sony, OpenAI, …). 2026-Industriestandard für Bild-Authentizität. Optionale
+    Abhängigkeit: ohne installierte Lib graceful deaktiviert.
+    """
+    try:
+        from c2pa import Reader  # optional
+    except Exception:
+        return {"verfuegbar": False, "hinweis": "C2PA-Prüfung nicht aktiviert (Bibliothek fehlt)"}
+    try:
+        mime = (content_type.split(";")[0].strip() or "image/jpeg")
+        if not mime.startswith("image/"):
+            mime = "image/jpeg"
+        reader = Reader(mime, io.BytesIO(bild_bytes))
+        manifest = json.loads(reader.json())
+        aktiv = manifest.get("active_manifest")
+        store = (manifest.get("manifests") or {}).get(aktiv, {}) if aktiv else {}
+        sig = store.get("signature_info") or {}
+        aktionen: list[str] = []
+        for a in store.get("assertions", []) or []:
+            if a.get("label") == "c2pa.actions":
+                for act in (a.get("data") or {}).get("actions", []) or []:
+                    if act.get("action"):
+                        aktionen.append(str(act["action"]).replace("c2pa.", ""))
+        return {
+            "verfuegbar": True,
+            "hat_manifest": bool(aktiv),
+            "erzeugt_von": (store.get("claim_generator") or "").split("(")[0].strip() or None,
+            "signiert_von": sig.get("issuer"),
+            "signatur_zeit": sig.get("time"),
+            "aktionen": list(dict.fromkeys(aktionen))[:8],
+            "hinweis": "Verifizierbare Herkunfts-Signatur (C2PA) vorhanden." if aktiv else
+                       "Kein C2PA-Manifest — Herkunft nicht kryptografisch belegt (≠ unecht).",
+        }
+    except Exception:
+        return {"verfuegbar": True, "hat_manifest": False}
+
+
 async def bild_analysieren(bild_url: str) -> dict:
     """
     Hauptfunktion: Lädt Bild von URL, extrahiert Metadaten, berechnet Hashes,
@@ -352,8 +446,34 @@ async def bild_analysieren(bild_url: str) -> dict:
         {"name": "PicTriev",      "kategorie": "Celebrity",   "url": "http://www.pictriev.com"},
     ]
 
+    # Senior-Forensik 2026: versteckte Daten, KI-Herkunft (XMP), C2PA-Herkunft
+    versteckte_daten = _versteckte_daten(bild_bytes, format_name)
+    xmp = _xmp_auswerten(bild)
+    content_credentials = _content_credentials(bild_bytes, content_type)
+
     # Privacy-Verdikt + konkrete Handlungsempfehlungen (Welle 1)
     bewertung = _privacy_bewertung(exif)
+
+    # Forensik-Befunde additiv ergänzen (Authentizität / versteckte Daten)
+    if xmp.get("ki_erzeugt"):
+        bewertung["befunde"].append({
+            "stufe": "mittel", "kategorie": "Authentizität",
+            "meldung": "Metadaten kennzeichnen das Bild als KI-/algorithmisch erzeugt (DigitalSourceType).",
+        })
+    if content_credentials.get("hat_manifest"):
+        bewertung["befunde"].append({
+            "stufe": "info", "kategorie": "Herkunft (C2PA)",
+            "meldung": f"Verifizierbares Herkunfts-Manifest vorhanden"
+                       + (f" — erzeugt von {content_credentials['erzeugt_von']}" if content_credentials.get("erzeugt_von") else "") + ".",
+        })
+    if versteckte_daten.get("hat_trailing_data"):
+        bewertung["befunde"].append({
+            "stufe": "mittel", "kategorie": "Versteckte Daten",
+            "meldung": f"{versteckte_daten.get('trailing_bytes')} Byte nach dem Datei-Ende — "
+                       "möglicher versteckter/angehängter Inhalt.",
+        })
+        bewertung["empfehlungen"].append(
+            "Bild über einen Re-Encoder neu speichern — entfernt angehängte Daten und Metadaten.")
 
     # Backward-Compat: flache Hinweis-Liste (alte UI-Form {stufe, meldung}),
     # abgeleitet aus den Verdikt-Befunden.
@@ -382,6 +502,9 @@ async def bild_analysieren(bild_url: str) -> dict:
             "dhash": dhash,
         },
         "exif": exif,
+        "versteckte_daten": versteckte_daten,
+        "xmp": xmp,
+        "content_credentials": content_credentials,
         "suchlinks": suchlinks,
         "bewertung": bewertung,
         "sicherheits_hinweise": sicherheits_hinweise,

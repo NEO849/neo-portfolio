@@ -538,6 +538,25 @@ function ReportBild({ b, onPivot }: { b: BildErgebnis; onPivot?: PivotHandler })
           </div>
         </Sektion>
       )}
+      {(b.content_credentials?.hat_manifest || b.xmp?.ki_erzeugt || b.versteckte_daten?.hat_trailing_data) && (
+        <Sektion titel="Authentizität & Forensik (2026)" farbe={C.lila}>
+          {b.content_credentials?.hat_manifest && (
+            <>
+              <Feld label="Herkunft (C2PA)">Verifizierbares Manifest vorhanden{b.content_credentials.erzeugt_von ? ` — ${b.content_credentials.erzeugt_von}` : ""}</Feld>
+              {b.content_credentials.signiert_von && <Feld label="Signiert von">{b.content_credentials.signiert_von}</Feld>}
+              {b.content_credentials.aktionen && b.content_credentials.aktionen.length > 0 && (
+                <Feld label="Aktionen">{b.content_credentials.aktionen.join(" · ")}</Feld>
+              )}
+            </>
+          )}
+          {b.xmp?.ki_erzeugt && (
+            <div className="mt-1"><Marke text="Als KI-erzeugt markiert" farbe={C.gelb} gefuellt /></div>
+          )}
+          {b.versteckte_daten?.hat_trailing_data && (
+            <div className="mt-2"><Item stufe="mittel">{b.versteckte_daten.trailing_bytes} Byte nach dem Datei-Ende — möglicher versteckter/angehängter Inhalt.</Item></div>
+          )}
+        </Sektion>
+      )}
       <PivotSektion pivots={b.pivots} onPivot={onPivot} />
       <FussZeile iso={b.analysiert_am} />
     </div>
@@ -652,6 +671,28 @@ function ReportEmail({ basis, recon, onPivot }: { basis: EmailErgebnis; recon: E
         <Sektion titel="Hashes (Cross-Ref)">
           <Feld label="MD5"  copy={recon.hashes.md5}  copyId="m" kopiertId={kid} onCopy={copy}>{recon.hashes.md5}</Feld>
           <Feld label="SHA-1" copy={recon.hashes.sha1} copyId="s" kopiertId={kid} onCopy={copy}>{recon.hashes.sha1}</Feld>
+        </Sektion>
+      )}
+      {recon?.exponierte_datenklassen && recon.exponierte_datenklassen.length > 0 && (
+        <Sektion titel="Exponierte Datenklassen" farbe={C.rot}
+          rechts={<span className="font-mono text-[10px] text-white/50">{recon.exponierte_datenklassen.length}</span>}>
+          <div className="flex flex-wrap gap-1.5">
+            {recon.exponierte_datenklassen.map((k, i) => <Marke key={i} text={k} farbe={C.rot} />)}
+          </div>
+        </Sektion>
+      )}
+      {recon?.emailrep?.geprueft && (
+        <Sektion titel="EmailRep — Reputation" farbe={C.cyber}>
+          {recon.emailrep.reputation && <Feld label="Reputation">{recon.emailrep.reputation}</Feld>}
+          <div className="flex flex-wrap gap-1.5 mt-1">
+            {(recon.emailrep.data_breach || recon.emailrep.credentials_leaked) && <Marke text="in Leak gesehen" farbe={C.rot} gefuellt />}
+            {recon.emailrep.boesartige_aktivitaet && <Marke text="bösartige Aktivität" farbe={C.rot} gefuellt />}
+            {recon.emailrep.spoofbar && <Marke text="spoofbar" farbe={C.gelb} />}
+            {recon.emailrep.zustellbar && <Marke text="zustellbar" farbe={C.gruen} />}
+          </div>
+          {recon.emailrep.profile && recon.emailrep.profile.length > 0 && (
+            <Feld label="Profile">{recon.emailrep.profile.join(" · ")}</Feld>
+          )}
         </Sektion>
       )}
       <PivotSektion pivots={recon?.pivots} onPivot={onPivot} />

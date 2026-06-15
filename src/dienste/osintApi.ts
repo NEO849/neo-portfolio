@@ -198,9 +198,12 @@ export interface TelefonErgebnis {
   };
   metadaten?: {
     land_code: string;
+    laendervorwahl?: string;
+    nationale_nummer?: string;
     leitungstyp: string;
     region: string;
     carrier: string;
+    carrier_hinweis?: string;
     zeitzonen: string[];
   };
   suchlinks?: {
@@ -295,6 +298,27 @@ export interface BildErgebnis {
   };
   suchlinks?: Array<{ name: string; url: string; kategorie?: string }>;
   sicherheits_hinweise?: Array<{ stufe: string; meldung: string }>;
+  versteckte_daten?: {
+    geprueft: boolean;
+    hat_trailing_data?: boolean;
+    trailing_bytes?: number;
+    hinweis?: string | null;
+  };
+  xmp?: {
+    vorhanden: boolean;
+    ki_erzeugt?: boolean;
+    hat_bearbeitungs_historie?: boolean;
+    hinweis?: string | null;
+  };
+  content_credentials?: {
+    verfuegbar: boolean;
+    hat_manifest?: boolean;
+    erzeugt_von?: string | null;
+    signiert_von?: string | null;
+    signatur_zeit?: string | null;
+    aktionen?: string[];
+    hinweis?: string;
+  };
   pivots?: Pivot[];
 }
 
@@ -615,6 +639,21 @@ export interface EmailReconErgebnis {
     keys?: Array<{ fingerprint: string; created: string }>;
     hinweis?: string;
   };
+  emailrep?: {
+    geprueft: boolean;
+    reputation?: string;
+    verdaechtig?: boolean;
+    referenzen?: number;
+    credentials_leaked?: boolean;
+    data_breach?: boolean;
+    zuletzt_gesehen?: string;
+    zustellbar?: boolean;
+    spoofbar?: boolean;
+    boesartige_aktivitaet?: boolean;
+    profile?: string[];
+    hinweis?: string;
+  };
+  exponierte_datenklassen?: string[];
   wer_ist_das?: Array<{ quelle: string; wert: string; konfidenz: string; url?: string }>;
   risiko?: {
     stufe: string;
