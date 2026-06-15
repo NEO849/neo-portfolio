@@ -251,19 +251,21 @@ export default function HeroView() {
         </motion.div>
 
         {/* Name — Vorname weiß, Nachname im Azur-Verlauf. Pro Buchstabe mit
-            gestaffelter Einlauf-Animation (blur/slide). */}
+            gestaffelter Einlauf-Animation (blur/slide) am äußeren Span; die Farbe
+            + ein dezenter, synchroner Schimmer-Glint liegen auf dem inneren Span,
+            damit nichts am Text-Clipping bricht und der Name sichtbar bleibt. */}
         <h1 className="font-display text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-[-0.03em] leading-[0.95] inline-flex flex-wrap justify-center gap-x-4 mb-6">
           <span className="flex">
             {vorname.split("").map((b, i) => (
-              <motion.span key={`v-${i}`} custom={i} variants={buchstabe} initial="versteckt" animate="sichtbar" className="text-white">
-                {b}
+              <motion.span key={`v-${i}`} custom={i} variants={buchstabe} initial="versteckt" animate="sichtbar">
+                <span className={`text-white ${erlaubt ? "name-schimmer" : ""}`}>{b}</span>
               </motion.span>
             ))}
           </span>
           <span className="flex">
             {nachname.split("").map((b, i) => (
-              <motion.span key={`n-${i}`} custom={i + vorname.length + 2} variants={buchstabe} initial="versteckt" animate="sichtbar" className="text-akzent-verlauf">
-                {b}
+              <motion.span key={`n-${i}`} custom={i + vorname.length + 2} variants={buchstabe} initial="versteckt" animate="sichtbar">
+                <span className={`text-akzent-verlauf ${erlaubt ? "name-schimmer" : ""}`}>{b}</span>
               </motion.span>
             ))}
           </span>

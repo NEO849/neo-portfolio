@@ -98,7 +98,7 @@ const DEMO_MODULE: DemoModul[] = [
     beschreibung: "Censys Platform: Services (Port/Protokoll/Transport), Standort (Stadt/Land/Koordinaten), Autonomous System, WHOIS-Organisation inkl. Abuse-Kontakt und Reverse-DNS. Akzeptiert IP oder Domain (wird aufgelöst).",
   },
   {
-    nummer: "8", name: "Vollanalyse Orchestrator", farbe: "#10b981",
+    nummer: "8", name: "Orchestrator", farbe: "#10b981",
     eingabeLabel: "Beliebiges Target", beispielEingabe: "cloudflare.com", eingabeTyp: "text",
     ziel: "Führt alle passenden Module automatisch zusammen und zeigt die gefundenen Verbindungen als interaktiven Graph.",
     beschreibung: "SpiderFoot-Style Orchestrator: erkennt Typ automatisch, führt alle relevanten Module parallel aus und entdeckt Pivots (E-Mail → Domain → ASN → IP → CVE). Visualisiert alle Beziehungen als Maltego-Style Graph mit interaktiver Detail-Anzeige.",
@@ -378,7 +378,7 @@ function erstelleDemoAusgabe(modulNummer: string, eingabe: string): string[] {
     "  [ok]  [8] IP-Intel (RIPEstat)",
     "  ›  ASN · Prefix · AS-Holder · Abuse-Kontakt",
     "", S("AGGREGATION / META"),
-    "  [ok]  [9] Vollanalyse Orchestrator",
+    "  [ok]  [9] Orchestrator",
     "  ›  Auto-Pivot · Subdomains · Maltego-Graph",
   ];
 

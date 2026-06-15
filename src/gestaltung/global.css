@@ -126,6 +126,19 @@ body::before {
   55%, 100% { background-position: -20% 0; }
 }
 
+/* Namens-Schimmer (Hero): dezenter, synchroner Glint pro Buchstabe — ein ruhiger
+   Azur-Glow atmet auf und ab. Liegt auf einem INNEREN Span, damit die
+   pro-Buchstaben-Einlauf-Animation (Transform/Blur am äußeren Span) unberührt
+   bleibt und der Name immer sichtbar ist (kein Text-Clipping am animierten Span). */
+.name-schimmer {
+  display: inline-block;
+  animation: name-schimmer 3.6s ease-in-out infinite;
+}
+@keyframes name-schimmer {
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(122,162,255,0)) brightness(1); }
+  50%      { filter: drop-shadow(0 0 7px rgba(122,162,255,0.55)) brightness(1.12); }
+}
+
 /* Sanftes Glow-Atmen — für ruhende Akzent-Elemente (Status, Punkte). */
 .glow-atmen { animation: glow-atmen 4.5s ease-in-out infinite; }
 @keyframes glow-atmen {
@@ -176,6 +189,7 @@ body::before {
   .glow-atmen { animation: none; opacity: 0.9; }
   .sheen { display: none; }
   .icon-ring { animation: none; }
+  .name-schimmer { animation: none; filter: none; }
 }
 
 /* ═══════════════ Akzent-Linie (entneont, monochrom) ═══════════════ */
