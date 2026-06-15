@@ -22,7 +22,8 @@ import { DatenschutzModal } from "../bausteine/DatenschutzModal";
 import OsintGraph from "../bausteine/OsintGraph";
 import ErgebnisReport from "../bausteine/osint/ErgebnisReport";
 import { ErgebnisUebersicht } from "../bausteine/osint/ErgebnisUebersicht";
-import { fasseErgebnisZusammen } from "../hilfsmittel/ergebnisZusammenfassung";
+import { SchutzEmpfehlungen } from "../bausteine/osint/SchutzEmpfehlungen";
+import { fasseErgebnisZusammen, extrahiereSchutz } from "../hilfsmittel/ergebnisZusammenfassung";
 import DatenflussHinweis from "../bausteine/osint/DatenflussHinweis";
 
 // ═══════════════════════════════════════════════════════
@@ -1833,6 +1834,10 @@ export default function OsintDemoView() {
                 {/* Dynamische Ergebnis-Übersicht (Verdikt + Schweregrad +
                     Kennzahlen + nächste Schritte). */}
                 <ErgebnisUebersicht modulNummer={aktivesModul?.nummer ?? ""} daten={rohdaten} onPivot={pivotStarten} />
+
+                {/* Defensiver Mehrwert: „Was kann ich dagegen tun?" — priorisierte
+                    Schutz-Maßnahmen aus den Funden (IT-Forensik-Rolle). */}
+                <SchutzEmpfehlungen empfehlungen={extrahiereSchutz(aktivesModul?.nummer ?? "", rohdaten)} />
 
                 {/* Statischer Führungs-Hinweis nur als Fallback, wenn sich keine
                     dynamische Übersicht ableiten lässt (z. B. Status-Modul). */}

@@ -28,6 +28,7 @@ from werkzeuge.ip_recon import ip_intel
 from werkzeuge.soziale_konten import soziale_praesenz
 from werkzeuge.transparenz import transparenz_fuer
 from werkzeuge.pivots import extrahiere_pivots
+from werkzeuge.schutz_empfehlungen import schutz_empfehlungen
 from werkzeuge.virustotal import vt_anreichern
 from werkzeuge.numverify import numverify_anreichern
 
@@ -60,6 +61,15 @@ def _mit_pivots(typ: str, ergebnis: dict) -> dict:
         pivots = extrahiere_pivots(typ, ergebnis)
         if pivots:
             ergebnis["pivots"] = pivots
+    return ergebnis
+
+
+def _mit_schutz(typ: str, ergebnis: dict, *, zusatz: dict | None = None) -> dict:
+    """Hängt priorisierte Schutz-Empfehlungen additiv an ('was kann ich dagegen tun?')."""
+    if isinstance(ergebnis, dict) and not ergebnis.get("fehler"):
+        empf = schutz_empfehlungen(typ, ergebnis, zusatz=zusatz)
+        if empf:
+            ergebnis["schutz"] = empf
     return ergebnis
 
 
@@ -138,6 +148,7 @@ async def domain_analyse(anfrage: DomainAnfrage, request: Request):
         ergebnis = await domain_analysieren(anfrage.domain)
         ergebnis = _mit_pivots("domain", ergebnis)
         ergebnis = await vt_anreichern("domain", ergebnis)
+        ergebnis = _mit_schutz("domain", ergebnis)
         return JSONResponse(content=ergebnis)
     except Exception as e:
         raise _serverfehler("Domain-Analyse", e)
@@ -160,6 +171,7 @@ async def email_analyse(anfrage: EmailAnfrage, request: Request):
     """
     try:
         ergebnis = await email_analysieren(anfrage.email)
+        ergebnis = _mit_schutz("email", ergebnis)
         return JSONResponse(content=ergebnis)
     except Exception as e:
         raise _serverfehler("E-Mail-Analyse", e)
@@ -203,7 +215,7 @@ async def benutzername_analyse(anfrage: BenutzerVollscanAnfrage, request: Reques
                 ergebnis = await benutzername_suchen(anfrage.benutzername, nur_tier1=False)
         else:
             ergebnis = await benutzername_suchen(anfrage.benutzername, nur_tier1=True)
-        return JSONResponse(content=_mit_pivots("benutzername", ergebnis))
+        return JSONResponse(content=_mit_schutz("benutzername", _mit_pivots("benutzername", ergebnis)))
     except Exception as e:
         raise _serverfehler("Benutzersuche", e)
 
@@ -254,6 +266,7 @@ async def telefon_analyse(anfrage: TelefonAnfrage, request: Request):
     try:
         ergebnis = await telefon_analysieren(anfrage.nummer)
         ergebnis = await numverify_anreichern(ergebnis)
+        ergebnis = _mit_schutz("telefon", ergebnis)
         return JSONResponse(content=ergebnis)
     except Exception as e:
         raise _serverfehler("Telefon-Analyse", e)
@@ -270,7 +283,7 @@ async def bild_analyse(anfrage: BildAnfrage, request: Request):
     """
     try:
         ergebnis = await bild_analysieren(anfrage.url)
-        return JSONResponse(content=_mit_pivots("bild", ergebnis))
+        return JSONResponse(content=_mit_schutz("bild", _mit_pivots("bild", ergebnis)))
     except Exception as e:
         raise _serverfehler("Bild-Analyse", e)
 
@@ -376,7 +389,7 @@ async def email_recon_route(anfrage: EmailReconAnfrage, request: Request):
     """
     try:
         ergebnis = await email_recon(anfrage.email)
-        return JSONResponse(content=_mit_pivots("email-recon", ergebnis))
+        return JSONResponse(content=_mit_schutz("email-recon", _mit_pivots("email-recon", ergebnis)))
     except Exception as e:
         raise _serverfehler("E-Mail-Recon", e)
 
@@ -533,6 +546,7 @@ async def ip_intel_route(anfrage: ShodanAnfrage, request: Request):
     try:
         ergebnis = await ip_intel(anfrage.ziel)
         ergebnis = await vt_anreichern("ip", ergebnis)
+        ergebnis = _mit_schutz("ip-intel", ergebnis)
         return JSONResponse(content=ergebnis)
     except Exception as e:
         raise _serverfehler("IP-Intel", e)
@@ -557,7 +571,7 @@ async def soziale_praesenz_route(anfrage: BenutzerAnfrage, request: Request):
     """
     try:
         ergebnis = await soziale_praesenz(anfrage.benutzername)
-        return JSONResponse(content=_mit_pivots("soziale-praesenz", ergebnis))
+        return JSONResponse(content=_mit_schutz("soziale-praesenz", _mit_pivots("soziale-praesenz", ergebnis)))
     except Exception as e:
         raise _serverfehler("Soziale-Präsenz", e)
 

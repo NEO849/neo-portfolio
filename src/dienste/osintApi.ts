@@ -123,6 +123,16 @@ export interface Pivot {
   url?: string | null;
 }
 
+// ─── Typ: Schutz-Empfehlung ("was kann ich dagegen tun?") ──────────
+
+export interface SchutzEmpfehlung {
+  titel: string;
+  was: string;          // konkrete Handlung
+  warum: string;        // das Risiko / der Grund
+  prioritaet: "hoch" | "mittel" | "niedrig";
+  kategorie: string;    // Themen-Label (Passwörter, Privatsphäre, …)
+}
+
 export interface ProfilDaten {
   anzeigename?: string;
   beschreibung?: string;

@@ -8,7 +8,7 @@
 // liefert { domain, shodan }, alle übrigen das jeweilige Ergebnis direkt.
 // ═══════════════════════════════════════════════════════════════════
 
-import type { Pivot } from "../dienste/osintApi";
+import type { Pivot, SchutzEmpfehlung } from "../dienste/osintApi";
 
 export type Schwere = "kritisch" | "auffaellig" | "neutral" | "ok";
 
@@ -54,6 +54,7 @@ interface RohSicht {
   gps?: unknown;
   graph?: { statistik?: { knoten_gesamt?: number; kanten_gesamt?: number } };
   pivots?: Pivot[];
+  schutz?: SchutzEmpfehlung[];
 }
 
 const RANG: Record<Schwere, number> = { kritisch: 0, auffaellig: 1, neutral: 2, ok: 3 };
@@ -84,6 +85,15 @@ export function extrahierePivots(modulNummer: string, daten: object | null): Piv
   if (modulNummer === "2") return d.recon?.pivots ?? d.basis?.pivots ?? [];
   if (modulNummer === "5") return d.domain?.pivots ?? [];
   return d.pivots ?? [];
+}
+
+/** Schutz-Empfehlungen an der modul-spezifisch richtigen Stelle einsammeln. */
+export function extrahiereSchutz(modulNummer: string, daten: object | null): SchutzEmpfehlung[] {
+  if (!daten) return [];
+  const d = daten as RohSicht;
+  if (modulNummer === "2") return d.recon?.schutz ?? d.basis?.schutz ?? [];
+  if (modulNummer === "5") return d.domain?.schutz ?? [];
+  return d.schutz ?? [];
 }
 
 /** Klartext-Zusammenfassung je Modul — oder null (z. B. Status-Modul). */
