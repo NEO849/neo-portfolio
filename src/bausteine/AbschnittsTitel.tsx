@@ -9,6 +9,7 @@
 import { motion } from "framer-motion";
 import { EINBLENDEN } from "../bewegung/varianten";
 import { GlanzUeberschrift } from "../bewegung/GlanzUeberschrift";
+import { Augenbraue } from "./Augenbraue";
 
 interface AbschnittsTitelProps {
   prefix: string;
@@ -36,13 +37,8 @@ export function AbschnittsTitel({
       whileInView="sichtbar"
       viewport={{ once: true, margin: "-80px" }}
     >
-      {/* Eyebrow: feine Akzentlinie + ruhiges Mono-Kategorie-Label */}
-      <span className={`flex items-center gap-2.5 mb-4 ${zentriert ? "justify-center" : ""}`}>
-        <span className="h-px w-7 bg-gradient-to-r from-akzent-500/0 via-akzent-500/80 to-akzent-500/0" />
-        <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-akzent-400/90">
-          {label}
-        </span>
-      </span>
+      {/* Eyebrow: gemeinsame Augenbraue-Komponente (eine Quelle der Wahrheit) */}
+      <Augenbraue text={label} zentriert={zentriert} klassen="mb-4" />
       {untertitel && (
         <GlanzUeberschrift
           element="h2"
