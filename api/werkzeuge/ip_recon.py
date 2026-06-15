@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import asyncio
 import ipaddress
+import os
 import socket
 from datetime import datetime
 
@@ -57,6 +58,47 @@ async def _domain_zu_ip(domain: str) -> str | None:
         return await loop.run_in_executor(None, socket.gethostbyname, domain)
     except Exception:
         return None
+
+
+async def _ipinfo(client: httpx.AsyncClient, ip: str, token: str) -> dict:
+    """
+    IPinfo-Anreicherung (key-gated): Geo, Org/ASN, Firma, Abuse + die
+    forensisch wertvollen Anonymitäts-Flags (VPN/Proxy/Tor/Hosting).
+    Graceful: ohne Token / bei Fehler → {geprueft: False}.
+    """
+    if not token:
+        return {"geprueft": False, "hinweis": "IPinfo nicht konfiguriert"}
+    try:
+        r = await client.get(f"https://ipinfo.io/{ip}",
+                             params={"token": token},
+                             headers={"Accept": "application/json"}, timeout=TIMEOUT_S)
+        if r.status_code == 200:
+            d = r.json()
+            priv = d.get("privacy") or {}
+            anonym = any(priv.get(k) for k in ("vpn", "proxy", "tor", "relay")) if priv else None
+            return {
+                "geprueft": True,
+                "stadt": d.get("city"),
+                "region": d.get("region"),
+                "land": d.get("country"),
+                "koordinaten": d.get("loc"),
+                "plz": d.get("postal"),
+                "zeitzone": d.get("timezone"),
+                "hostname": d.get("hostname"),
+                "org": d.get("org"),
+                "firma": (d.get("company") or {}).get("name"),
+                "vpn": priv.get("vpn"),
+                "proxy": priv.get("proxy"),
+                "tor": priv.get("tor"),
+                "hosting": priv.get("hosting"),
+                "anonymisiert": anonym,
+                "abuse_email": (d.get("abuse") or {}).get("email"),
+            }
+        if r.status_code in (401, 403):
+            return {"geprueft": False, "hinweis": "IPinfo-Token ungültig/limitiert"}
+    except Exception:
+        pass
+    return {"geprueft": False, "hinweis": "IPinfo nicht erreichbar"}
 
 
 async def ip_intel(ziel: str) -> dict:
@@ -102,7 +144,9 @@ async def ip_intel(ziel: str) -> dict:
         as_call = _ripe(client, "as-overview", f"AS{asns[0]}") if asns else _leer()
         prefix_call = _ripe(client, "prefix-overview", prefix) if prefix else _leer()
         abuse_call = _ripe(client, "abuse-contact-finder", ip)
-        as_data, prefix_data, abuse_data = await asyncio.gather(as_call, prefix_call, abuse_call)
+        ipinfo_call = _ipinfo(client, ip, os.environ.get("IPINFO_TOKEN", "").strip())
+        as_data, prefix_data, abuse_data, geo = await asyncio.gather(
+            as_call, prefix_call, abuse_call, ipinfo_call)
 
     # Aufbereiten
     abuse_kontakte = abuse_data.get("abuse_contacts", []) if abuse_data else []
@@ -127,11 +171,13 @@ async def ip_intel(ziel: str) -> dict:
             "announced": as_data.get("announced") if as_data else None,
         },
         "abuse_kontakte": abuse_kontakte,
+        "geo": geo,
         "links": {
             "ripestat": f"https://stat.ripe.net/{ip}",
             "bgp_he": f"https://bgp.he.net/ip/{ip}",
         },
-        "quelle": "RIPEstat Data API (RIPE NCC, kostenlos, keyless)",
+        "quelle": "RIPEstat Data API (RIPE NCC, keyless)"
+                  + (" + IPinfo (Geo/Anonymität)" if geo.get("geprueft") else ""),
     }
 
 

@@ -234,6 +234,62 @@ def _privacy_bewertung(exif: dict) -> dict:
     }
 
 
+# ─── Tiefen-Forensik: ELA + JPEG-Quantisierung (offline, Pillow/numpy) ──
+
+def _ela(bild: Image.Image, format_name: str) -> dict:
+    """
+    Error-Level-Analysis (nur JPEG): das Bild wird mit fester Qualität neu
+    komprimiert und die Differenz gemessen. Lokale Abweichungs-Spitzen bei
+    sonst niedrigem Mittel deuten auf nachträglich eingefügte/bearbeitete
+    Bereiche hin. SUGGESTIV (Indiz), nicht beweisend.
+    """
+    if format_name != "JPEG":
+        return {"anwendbar": False, "hinweis": "ELA nur für JPEG aussagekräftig"}
+    try:
+        from PIL import ImageChops
+        import numpy as np
+        rgb = bild.convert("RGB")
+        puffer = io.BytesIO()
+        rgb.save(puffer, "JPEG", quality=90)
+        puffer.seek(0)
+        wieder = Image.open(puffer).convert("RGB")
+        diff = ImageChops.difference(rgb, wieder)
+        arr = np.asarray(diff, dtype="float32")
+        max_abw = int(arr.max())
+        mittel = float(arr.mean())
+        verdacht = max_abw >= 45 and mittel < 9.0
+        return {
+            "anwendbar": True,
+            "max_abweichung": max_abw,
+            "mittlere_abweichung": round(mittel, 2),
+            "verdacht_auf_bearbeitung": verdacht,
+            "hinweis": ("Lokale Kompressions-Anomalien — mögliche nachträgliche Bearbeitung (Indiz)."
+                        if verdacht else
+                        "Gleichmäßiges Kompressionsmuster — keine ELA-Auffälligkeit."),
+        }
+    except Exception:
+        return {"anwendbar": False}
+
+
+def _quant_fingerprint(bild: Image.Image, format_name: str) -> dict:
+    """
+    JPEG-Quantisierungstabellen-Fingerprint: identifiziert die Kompressions-
+    Signatur (Kamera vs. Bildbearbeitungs-Software). Eine untypische Tabelle
+    ist ein Hinweis auf Re-Encoding (z. B. durch Photoshop/Export).
+    """
+    if format_name != "JPEG":
+        return {"anwendbar": False}
+    try:
+        q = getattr(bild, "quantization", None)
+        if not q:
+            return {"anwendbar": False}
+        flat = ",".join(str(v) for tbl in q.values() for v in tbl)
+        signatur = hashlib.md5(flat.encode()).hexdigest()[:16]
+        return {"anwendbar": True, "tabellen": len(q), "signatur": signatur}
+    except Exception:
+        return {"anwendbar": False}
+
+
 # ─── Senior-Forensik 2026: versteckte Daten, KI-Herkunft, C2PA ──────
 
 def _versteckte_daten(bild_bytes: bytes, format_name: str) -> dict:
@@ -450,6 +506,10 @@ async def bild_analysieren(bild_url: str) -> dict:
     versteckte_daten = _versteckte_daten(bild_bytes, format_name)
     xmp = _xmp_auswerten(bild)
     content_credentials = _content_credentials(bild_bytes, content_type)
+    tiefenforensik = {
+        "ela": _ela(bild, format_name),
+        "quantisierung": _quant_fingerprint(bild, format_name),
+    }
 
     # Privacy-Verdikt + konkrete Handlungsempfehlungen (Welle 1)
     bewertung = _privacy_bewertung(exif)
@@ -474,6 +534,12 @@ async def bild_analysieren(bild_url: str) -> dict:
         })
         bewertung["empfehlungen"].append(
             "Bild über einen Re-Encoder neu speichern — entfernt angehängte Daten und Metadaten.")
+    if tiefenforensik["ela"].get("verdacht_auf_bearbeitung"):
+        bewertung["befunde"].append({
+            "stufe": "info", "kategorie": "Bild-Forensik (ELA)",
+            "meldung": "Error-Level-Analysis zeigt lokale Kompressions-Anomalien — "
+                       "mögliche nachträgliche Bearbeitung (Indiz, nicht beweisend).",
+        })
 
     # Backward-Compat: flache Hinweis-Liste (alte UI-Form {stufe, meldung}),
     # abgeleitet aus den Verdikt-Befunden.
@@ -505,6 +571,7 @@ async def bild_analysieren(bild_url: str) -> dict:
         "versteckte_daten": versteckte_daten,
         "xmp": xmp,
         "content_credentials": content_credentials,
+        "tiefenforensik": tiefenforensik,
         "suchlinks": suchlinks,
         "bewertung": bewertung,
         "sicherheits_hinweise": sicherheits_hinweise,

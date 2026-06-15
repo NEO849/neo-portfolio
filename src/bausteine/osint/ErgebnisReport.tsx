@@ -538,7 +538,7 @@ function ReportBild({ b, onPivot }: { b: BildErgebnis; onPivot?: PivotHandler })
           </div>
         </Sektion>
       )}
-      {(b.content_credentials?.hat_manifest || b.xmp?.ki_erzeugt || b.versteckte_daten?.hat_trailing_data) && (
+      {(b.content_credentials?.hat_manifest || b.xmp?.ki_erzeugt || b.versteckte_daten?.hat_trailing_data || b.tiefenforensik?.ela?.anwendbar) && (
         <Sektion titel="Authentizität & Forensik (2026)" farbe={C.lila}>
           {b.content_credentials?.hat_manifest && (
             <>
@@ -554,6 +554,16 @@ function ReportBild({ b, onPivot }: { b: BildErgebnis; onPivot?: PivotHandler })
           )}
           {b.versteckte_daten?.hat_trailing_data && (
             <div className="mt-2"><Item stufe="mittel">{b.versteckte_daten.trailing_bytes} Byte nach dem Datei-Ende — möglicher versteckter/angehängter Inhalt.</Item></div>
+          )}
+          {b.tiefenforensik?.ela?.anwendbar && (
+            <div className="mt-2">
+              <Feld label="ELA (Error-Level-Analysis)">
+                Ø-Abweichung {b.tiefenforensik.ela.mittlere_abweichung} · {b.tiefenforensik.ela.verdacht_auf_bearbeitung ? "Hinweis auf Bearbeitung (Indiz)" : "unauffällig"}
+              </Feld>
+              {b.tiefenforensik.quantisierung?.signatur && (
+                <Feld label="JPEG-Quant-Signatur">{b.tiefenforensik.quantisierung.signatur}</Feld>
+              )}
+            </div>
           )}
         </Sektion>
       )}
@@ -1227,6 +1237,24 @@ function ReportIpIntel({ r }: { r: IpIntelErgebnis }) {
           {r.as?.asn != null && <Feld label="ASN">AS{r.as.asn}</Feld>}
           {r.as?.holder && <Feld label="Betreiber">{r.as.holder}</Feld>}
           {r.as?.typ && <Feld label="Typ">{r.as.typ}</Feld>}
+        </Sektion>
+      )}
+      {r.geo?.geprueft && (
+        <Sektion titel="Geo & Anonymität (IPinfo)" farbe={C.cyber}>
+          {(r.geo.stadt || r.geo.region || r.geo.land) && (
+            <Feld label="Standort">{[r.geo.stadt, r.geo.region, r.geo.land].filter(Boolean).join(", ")}</Feld>
+          )}
+          {(r.geo.firma || r.geo.org) && <Feld label="Organisation">{r.geo.firma ?? r.geo.org}</Feld>}
+          {r.geo.hostname && <Feld label="Hostname">{r.geo.hostname}</Feld>}
+          {r.geo.zeitzone && <Feld label="Zeitzone">{r.geo.zeitzone}</Feld>}
+          <div className="flex flex-wrap gap-1.5 mt-1.5">
+            {r.geo.vpn && <Marke text="VPN" farbe={C.orange} gefuellt />}
+            {r.geo.proxy && <Marke text="Proxy" farbe={C.orange} gefuellt />}
+            {r.geo.tor && <Marke text="Tor" farbe={C.rot} gefuellt />}
+            {r.geo.hosting && <Marke text="Hosting/RZ" farbe={C.gelb} />}
+            {r.geo.anonymisiert === false && !r.geo.hosting && <Marke text="keine Anonymisierung" farbe={C.gruen} />}
+          </div>
+          {r.geo.abuse_email && <Feld label="Abuse" href={`mailto:${r.geo.abuse_email}`}>{r.geo.abuse_email}</Feld>}
         </Sektion>
       )}
       {!!r.abuse_kontakte?.length && (

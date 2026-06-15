@@ -358,6 +358,12 @@ function bildZuTerminal(b: BildErgebnis): string[] {
     zeilen.push("", S("VERSTECKTE DATEN"));
     zeilen.push(`  [!]  ${b.versteckte_daten.trailing_bytes} Byte nach Datei-Ende`);
   }
+  const ela = b.tiefenforensik?.ela;
+  if (ela?.anwendbar) {
+    zeilen.push("", S("TIEFEN-FORENSIK (ELA)"));
+    zeilen.push(WW("Ø-Abweichung", String(ela.mittlere_abweichung)));
+    if (ela.verdacht_auf_bearbeitung) zeilen.push("  [!]  Hinweis auf Bearbeitung");
+  }
   if (b.suchlinks?.length) {
     zeilen.push("", S("REVERSE IMAGE LINKS"));
     for (const link of b.suchlinks) zeilen.push(`  [+]  ${trunc(link.name, 26)}`);
@@ -1113,11 +1119,22 @@ function ipIntelZuTerminal(r: IpIntelErgebnis): string[] {
     if (r.as?.holder) zeilen.push(WW("Betreiber", trunc(r.as.holder, 20)));
     if (r.as?.typ) zeilen.push(WW("Typ", r.as.typ));
   }
+  const g = r.geo;
+  if (g?.geprueft) {
+    zeilen.push("", S("GEO / IPINFO"));
+    const ort = [g.stadt, g.region, g.land].filter(Boolean).join(", ");
+    if (ort) zeilen.push(WW("Standort", trunc(ort, 20)));
+    if (g.firma || g.org) zeilen.push(WW("Org", trunc(String(g.firma ?? g.org), 20)));
+    if (g.hostname) zeilen.push(WW("Hostname", trunc(g.hostname, 20)));
+    const flags = [g.vpn && "VPN", g.proxy && "Proxy", g.tor && "Tor", g.hosting && "Hosting"].filter(Boolean);
+    if (flags.length) zeilen.push(`  [!]  Anonymisiert: ${flags.join(", ")}`);
+    if (g.abuse_email) zeilen.push(WW("Abuse", trunc(g.abuse_email, 20)));
+  }
   if (r.abuse_kontakte?.length) {
     zeilen.push("", S("ABUSE-KONTAKT"));
     for (const m of r.abuse_kontakte.slice(0, 4)) zeilen.push(`  [@]  ${trunc(m, 28)}`);
   }
-  zeilen.push("", `  Quelle: RIPEstat (RIPE NCC)`,
+  zeilen.push("", `  Quelle: RIPEstat${r.geo?.geprueft ? " + IPinfo" : ""}`,
               `  Analysiert: ${r.analysiert_am.replace("T", " ").substring(0, 19)} UTC`);
   return zeilen;
 }

@@ -319,6 +319,16 @@ export interface BildErgebnis {
     aktionen?: string[];
     hinweis?: string;
   };
+  tiefenforensik?: {
+    ela?: {
+      anwendbar: boolean;
+      max_abweichung?: number;
+      mittlere_abweichung?: number;
+      verdacht_auf_bearbeitung?: boolean;
+      hinweis?: string;
+    };
+    quantisierung?: { anwendbar: boolean; tabellen?: number; signatur?: string };
+  };
   pivots?: Pivot[];
 }
 
@@ -881,6 +891,25 @@ export interface IpIntelErgebnis {
     announced: boolean | null;
   };
   abuse_kontakte?: string[];
+  geo?: {
+    geprueft: boolean;
+    stadt?: string | null;
+    region?: string | null;
+    land?: string | null;
+    koordinaten?: string | null;
+    plz?: string | null;
+    zeitzone?: string | null;
+    hostname?: string | null;
+    org?: string | null;
+    firma?: string | null;
+    vpn?: boolean | null;
+    proxy?: boolean | null;
+    tor?: boolean | null;
+    hosting?: boolean | null;
+    anonymisiert?: boolean | null;
+    abuse_email?: string | null;
+    hinweis?: string;
+  };
   links?: { ripestat: string; bgp_he: string };
   quelle?: string;
   vt?: VtReputation;

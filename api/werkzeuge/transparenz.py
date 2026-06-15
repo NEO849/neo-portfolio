@@ -218,6 +218,10 @@ DATENFLUSS: dict[str, dict] = {
             _dienst("VirusTotal", "IP-Adresse — NUR wenn VirusTotal aktiviert",
                     "Reputations-Check (wie viele Engines die IP als schädlich melden)",
                     "https://docs.virustotal.com/docs/privacy-policy", "US"),
+            _dienst("IPinfo", "IP-Adresse — NUR wenn IPinfo aktiviert",
+                    "Geo (Stadt/Region/Land), Org/ASN, Firma, Abuse-Kontakt und "
+                    "Anonymitäts-Flags (VPN/Proxy/Tor/Hosting)",
+                    "https://ipinfo.io/privacy-policy", "US"),
         ],
         "nur_links": [],
         "speicherung": SPEICHER_HINWEIS,
