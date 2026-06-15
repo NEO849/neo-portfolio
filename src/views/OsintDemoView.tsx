@@ -106,9 +106,11 @@ const DEMO_MODULE: DemoModul[] = [
 ];
 
 // ─── Premium-UI: Icons je Modul (schlanke Inline-SVGs, keine Dependency) ──
+// Strich als hell→azur-Verlauf (Def in der Section, einmal pro Seite) statt
+// flacher Einfarbigkeit — identisch zu den Bereichs-Icons im Hero.
 const ICO = {
   width: 20, height: 20, viewBox: "0 0 24 24", fill: "none",
-  stroke: "currentColor", strokeWidth: 1.6,
+  stroke: "url(#osint-icon-grad)", strokeWidth: 1.6,
   strokeLinecap: "round" as const, strokeLinejoin: "round" as const,
 };
 const MODUL_ICON: Record<string, ReactNode> = {
@@ -1460,6 +1462,16 @@ export default function OsintDemoView() {
 
   return (
     <section id="osint" className="py-16 px-6 max-w-5xl mx-auto">
+      {/* Verlaufs-Strich für die Modul-Icons (hell oben → azur unten) — wie im Hero */}
+      <svg width="0" height="0" aria-hidden className="absolute pointer-events-none">
+        <defs>
+          <linearGradient id="osint-icon-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#dbe6ff" />
+            <stop offset="55%" stopColor="#9bbcff" />
+            <stop offset="100%" stopColor="#5c87f7" />
+          </linearGradient>
+        </defs>
+      </svg>
       <DatenschutzModal
         offen={modalOffen}
         modulName={wartendesModul?.name ?? ""}
@@ -1526,11 +1538,25 @@ export default function OsintDemoView() {
                       >
                         <span aria-hidden className="sheen" />
                         <div className="flex items-start gap-3.5">
+                          {/* Icon-Plättchen — identisch zum Hero: Azur-Glas mit Tiefe,
+                              Verlaufs-Icon, blühender Radial-Glow + Lichtring bei Hover */}
                           <span
-                            className="grid place-items-center w-10 h-10 rounded-xl2 flex-shrink-0 border transition-transform duration-300 group-hover:scale-105"
-                            style={{ color: modul.farbe, borderColor: `${modul.farbe}33`, background: `${modul.farbe}14` }}
+                            className="relative grid place-items-center w-10 h-10 rounded-xl2 flex-shrink-0 border border-akzent-500/25 group-hover:border-akzent-500/45 transition-all duration-300 group-hover:scale-105"
+                            style={{
+                              background: "linear-gradient(140deg, rgba(79,124,251,0.18), rgba(79,124,251,0.03))",
+                              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12), 0 6px 16px rgba(79,124,251,0.10)",
+                            }}
                           >
-                            {MODUL_ICON[modul.nummer] ?? null}
+                            {/* Radial-Glow hinter dem Icon */}
+                            <span
+                              aria-hidden
+                              className="absolute inset-0 rounded-xl2 opacity-50 group-hover:opacity-100 transition-opacity duration-500"
+                              style={{ background: "radial-gradient(circle at 50% 42%, rgba(122,162,255,0.40), transparent 70%)" }}
+                            />
+                            {/* Rotierender Conic-Lichtring — nur bei Hover */}
+                            <span aria-hidden className="icon-ring opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            {/* Icon selbst — über den Effekten, mit feinem Glow */}
+                            <span className="relative drop-shadow-[0_1px_3px_rgba(79,124,251,0.35)]">{MODUL_ICON[modul.nummer] ?? null}</span>
                           </span>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 flex-wrap">
@@ -1577,8 +1603,11 @@ export default function OsintDemoView() {
                 </button>
 
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="grid place-items-center w-10 h-10 rounded-xl2 flex-shrink-0 border"
-                    style={{ color: aktivesModul.farbe, borderColor: `${aktivesModul.farbe}33`, background: `${aktivesModul.farbe}14` }}>
+                  <span className="relative grid place-items-center w-10 h-10 rounded-xl2 flex-shrink-0 border border-akzent-500/25"
+                    style={{
+                      background: "linear-gradient(140deg, rgba(79,124,251,0.18), rgba(79,124,251,0.03))",
+                      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12)",
+                    }}>
                     {MODUL_ICON[aktivesModul.nummer] ?? null}
                   </span>
                   <h3 className="font-display font-semibold text-white text-lg leading-tight">{aktivesModul.name}</h3>
