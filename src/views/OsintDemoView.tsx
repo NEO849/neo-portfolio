@@ -1562,9 +1562,9 @@ export default function OsintDemoView() {
           klassen="font-display font-semibold tracking-[-0.01em] leading-snug text-xl md:text-2xl max-w-2xl mb-3"
         />
         <p className="text-white/70 text-[15px] leading-relaxed max-w-2xl">
-          E-Mails, Domains, Usernames, Telefonnummern und mehr — live gegen öffentliche Datenquellen geprüft.
-          Funde und ihre Beziehungen erscheinen als übersichtliche Karten und Graph. Transparent, kontrolliert,
-          ohne dauerhafte Speicherung.
+          Selbst entwickelte Analyse-Werkzeuge, gehostet auf meinem eigenen Server — live gegen öffentliche
+          Datenquellen geprüft. Funde und ihre Beziehungen erscheinen als übersichtliche Karten und Graph.
+          Transparent, kontrolliert, ohne dauerhafte Speicherung.
         </p>
       </motion.div>
 
