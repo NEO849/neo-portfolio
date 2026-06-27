@@ -10,14 +10,16 @@
 //   · Fokus-Falle (Tab/Shift+Tab zirkulär), Fokus-Rückgabe an den Auslöser
 //   · prefers-reduced-motion respektiert (Framer Motion automatisch)
 //
-// Darin das UNVERÄNDERTE BilderKarussell mit dem Kategorie-Akzent.
+// Darin dasselbe PeekKarussell wie in der Auswahl — hier für ALLE Fotos
+// des Projekts (kein onOeffnen = reines Durchblättern). So sehen Auswahl
+// und Fotos identisch aus (konsistenter Flow).
 // ═══════════════════════════════════════════════════════════════════
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ProjektModel } from "../models/typen";
 import { kategorieKonfig } from "../models/kategorieKonfiguration";
-import { BilderKarussell } from "./BilderKarussell";
+import { PeekKarussell, type PeekEintrag } from "./PeekKarussell";
 import { SchliessenKnopf } from "./SchliessenKnopf";
 
 interface BilderLightboxProps {
@@ -95,6 +97,17 @@ export function BilderLightbox({ projekt, onSchliessen }: BilderLightboxProps) {
 
   const konfig = projekt ? kategorieKonfig(projekt.kategorie) : null;
 
+  // Foto-Einträge: jedes Bild des Projekts mit dem Kategorie-Akzent.
+  const fotoEintraege = useMemo<PeekEintrag[]>(() => {
+    if (!projekt?.bilder || !konfig) return [];
+    return projekt.bilder.map((bild) => ({
+      quelle: bild.quelle,
+      titel: bild.titel,
+      untertitel: bild.text,
+      akzentFarbe: konfig.akzentFarbe,
+    }));
+  }, [projekt, konfig]);
+
   return (
     <AnimatePresence>
       {offen && projekt && projekt.bilder && konfig && (
@@ -154,9 +167,13 @@ export function BilderLightbox({ projekt, onSchliessen }: BilderLightboxProps) {
 
               <div className="border-t border-white/[0.05] flex-shrink-0" />
 
-              {/* Scrollbarer Inhalt: das unveränderte Karussell */}
+              {/* Scrollbarer Inhalt: dasselbe Peek-Karussell, hier für alle
+                  Fotos des Projekts (reines Blättern, kein onOeffnen). */}
               <div className="overflow-y-auto px-5 sm:px-7 py-5 flex-1">
-                <BilderKarussell bilder={projekt.bilder} akzentFarbe={konfig.akzentFarbe} />
+                <PeekKarussell
+                  eintraege={fotoEintraege}
+                  ariaLabel={`Fotos von ${projekt.titel} durchblättern`}
+                />
               </div>
             </div>
           </motion.div>

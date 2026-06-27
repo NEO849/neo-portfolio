@@ -15,8 +15,9 @@
 import { useMemo, useState } from "react";
 import { PROJEKTE } from "../models/daten";
 import type { ProjektModel } from "../models/typen";
+import { kategorieKonfig } from "../models/kategorieKonfiguration";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
-import { GalerieBanner } from "../bausteine/GalerieBanner";
+import { PeekKarussell, type PeekEintrag } from "../bausteine/PeekKarussell";
 import { BilderLightbox } from "../bausteine/BilderLightbox";
 
 // ─── Daten-Selektor (Adapter-Trennstelle) ─────────────────────────
@@ -38,6 +39,23 @@ interface BildergalerieViewProps {
 export default function BildergalerieView({ startSlug, onLightboxSchliessen }: BildergalerieViewProps) {
   const galerien = useMemo(() => galerienLaden(), []);
   const [offenesProjekt, setOffenesProjekt] = useState<ProjektModel | null>(null);
+
+  // Peek-Einträge je Projekt: Cover-Bild + Titel + Kategorie · n Bilder.
+  // Akzentfarbe aus der Kategorie-Konfig (Single Source of Truth).
+  const projektEintraege = useMemo<PeekEintrag[]>(
+    () =>
+      galerien.map((projekt) => {
+        const konfig = kategorieKonfig(projekt.kategorie);
+        const anzahl = projekt.bilder?.length ?? 0;
+        return {
+          quelle: projekt.bilder?.[0]?.quelle ?? "",
+          titel: projekt.titel,
+          untertitel: `${konfig.label} · ${anzahl} ${anzahl === 1 ? "Bild" : "Bilder"}`,
+          akzentFarbe: konfig.akzentFarbe,
+        };
+      }),
+    [galerien],
+  );
 
   // Deep-Link: das per startSlug referenzierte Projekt öffnen.
   // Über useMemo abgeleitet — kein Effect-State-Echo, kein History-Spam.
@@ -62,9 +80,14 @@ export default function BildergalerieView({ startSlug, onLightboxSchliessen }: B
         klassen="mb-8"
       />
 
-      {/* Premium-Karussell — edle Einzel-Frame-Auswahl zwischen den Galerien */}
+      {/* Peek-Karussell — mittiges Projekt prominent, Nachbarn angeschnitten.
+          Tap/Enter auf die Mitte öffnet die Foto-Lightbox dieses Projekts. */}
       {galerien.length > 0 ? (
-        <GalerieBanner galerien={galerien} onOeffnen={setOffenesProjekt} />
+        <PeekKarussell
+          eintraege={projektEintraege}
+          onOeffnen={(index) => setOffenesProjekt(galerien[index] ?? null)}
+          ariaLabel="Projekt-Galerien durchblättern"
+        />
       ) : (
         <p className="text-sm text-white/40 font-mono">Noch keine Galerien verfügbar.</p>
       )}

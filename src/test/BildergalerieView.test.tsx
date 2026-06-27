@@ -37,30 +37,30 @@ describe("galerienLaden — dynamische Ableitung aus PROJEKTE", () => {
   });
 });
 
-describe("BildergalerieView — Cover-Flow Auswahl", () => {
-  it("rendert die Fokus-Galerie als öffenbare Karte; Bilderzähler steht in der Caption", () => {
+describe("BildergalerieView — Peek-Auswahl", () => {
+  it("rendert die mittige Galerie als öffenbares Item; Bilderzähler steht in der Caption", () => {
     renderView();
-    // Cover-Flow startet auf der ersten Galerie. Nur die Fokus-Karte ist
-    // ein öffenbarer Button (Nachbarn sind aria-hidden / nicht öffnend).
+    // Peek-Karussell startet auf der ersten Galerie. Nur das mittige Item
+    // ist „öffnen"; Nachbarn sind „wechseln".
     const fokus = galerienLaden()[0];
     const karte = screen.getByRole("button", {
-      name: new RegExp(`Galerie öffnen: ${fokus.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+      name: new RegExp(`Öffnen: ${fokus.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
     });
     expect(karte).toBeInTheDocument();
-    // Der Bilderzähler liegt jetzt im Caption-Block über der Bühne (nicht mehr auf der Karte).
+    // Untertitel der Caption enthält den Bilderzähler (Label · n Bilder).
     const anzahl = fokus.bilder?.length ?? 0;
-    expect(screen.getByText(`${anzahl} Bilder`)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`·\\s*${anzahl}\\s*Bilder`))).toBeInTheDocument();
   });
 
   it("bietet je Galerie einen Auswahl-Punkt (Dot)", () => {
     renderView();
     const galerien = galerienLaden();
-    // Wrap-around/Dots existieren erst ab ≥2 Galerien.
+    // Dots existieren erst ab ≥2 Galerien.
     if (galerien.length > 1) {
       for (const p of galerien) {
         expect(
           screen.getByRole("button", {
-            name: new RegExp(`Galerie \\d+: ${p.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+            name: new RegExp(`Zu \\d+: ${p.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
           }),
         ).toBeInTheDocument();
       }
@@ -74,12 +74,12 @@ describe("BildergalerieView — Cover-Flow Auswahl", () => {
 });
 
 describe("BildergalerieView — Lightbox öffnen/schließen", () => {
-  it("öffnet die Lightbox per Klick auf die Fokus-Karte und zeigt das Karussell", async () => {
+  it("öffnet die Lightbox per Klick auf das mittige Item und zeigt die Fotos", async () => {
     const projekt = galerienLaden()[0];
     renderView();
 
     const karte = screen.getByRole("button", {
-      name: new RegExp(`Galerie öffnen: ${projekt.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+      name: new RegExp(`Öffnen: ${projekt.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
     });
     fireEvent.click(karte);
 
@@ -88,8 +88,10 @@ describe("BildergalerieView — Lightbox öffnen/schließen", () => {
     expect(dialog).toHaveAttribute("aria-modal", "true");
     // Titel des Projekts steht als Dialog-Überschrift.
     expect(within(dialog).getByRole("heading", { name: projekt.titel })).toBeInTheDocument();
-    // Erstes Karussell-Bild (Caption) ist sichtbar.
-    expect(within(dialog).getByText(projekt.bilder![0].titel)).toBeInTheDocument();
+    // Erstes Foto (Caption-Heading des aktiven Items) ist sichtbar.
+    expect(
+      within(dialog).getByRole("heading", { name: projekt.bilder![0].titel }),
+    ).toBeInTheDocument();
   });
 
   it("schließt die Lightbox per Schließen-Knopf", async () => {
@@ -98,7 +100,7 @@ describe("BildergalerieView — Lightbox öffnen/schließen", () => {
 
     fireEvent.click(
       screen.getByRole("button", {
-        name: new RegExp(`Galerie öffnen: ${projekt.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+        name: new RegExp(`Öffnen: ${projekt.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
       }),
     );
     await screen.findByRole("dialog");

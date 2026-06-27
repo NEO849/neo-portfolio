@@ -51,3 +51,7 @@ Object.defineProperty(window, 'matchMedia', {
 
 // scrollTo stub (manche Komponenten triggern beim Mount)
 window.scrollTo = vi.fn();
+
+// scrollIntoView gibt's in jsdom nicht — das PeekKarussell ruft es beim
+// programmatischen Zentrieren (Dot/Pfeil/Nachbar-Tap) auf.
+Element.prototype.scrollIntoView = vi.fn();

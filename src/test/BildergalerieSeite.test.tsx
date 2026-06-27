@@ -33,9 +33,9 @@ describe("BildergalerieSeite — Routing", () => {
   it("rendert die Übersicht unter /bilder", () => {
     renderMitRoute("/bilder");
     expect(screen.getByTestId("pfad")).toHaveTextContent("/bilder");
-    // Filter-Tabs gibt es nicht mehr — die Übersicht zeigt direkt den Cover-Flow
-    // mit der öffenbaren Fokus-Karte.
-    expect(screen.getByRole("button", { name: /Galerie öffnen:/ })).toBeInTheDocument();
+    // Filter-Tabs gibt es nicht mehr — die Übersicht zeigt direkt das
+    // Peek-Karussell mit dem öffenbaren mittigen Item.
+    expect(screen.getByRole("button", { name: /Öffnen:/ })).toBeInTheDocument();
   });
 
   it("öffnet bei gültigem Deep-Link die Galerie", () => {
