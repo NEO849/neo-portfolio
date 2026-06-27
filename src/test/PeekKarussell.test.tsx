@@ -68,9 +68,15 @@ describe("PeekKarussell — Render", () => {
     expect(screen.getByText("1 von 3: Alpha")).toBeInTheDocument();
   });
 
-  it("zeigt einen i/n-Zähler (Kopfzeile + aktive Caption)", () => {
+  it("zeigt einen i/n-Zähler in der Kopfzeile", () => {
     render(<PeekKarussell eintraege={EINTRAEGE} ariaLabel="Test-Karussell" />);
-    expect(screen.getAllByText(/01\s*\/\s*03/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/01\s*\/\s*03/)).toBeInTheDocument();
+  });
+
+  it("zeigt KEINE Caption-Texte im Bild (Titel steht unter der Bühne als Heading)", () => {
+    render(<PeekKarussell eintraege={EINTRAEGE} ariaLabel="Test-Karussell" />);
+    // Genau EINE Titel-Überschrift (die Caption unter der Bühne, aktives Item).
+    expect(screen.getAllByRole("heading", { name: "Alpha" })).toHaveLength(1);
   });
 
   it("respektiert startIndex (Item wird zum aktiven/mittigen)", () => {
@@ -153,16 +159,37 @@ describe("PeekKarussell — Steuerung", () => {
   it("blendet Pfeile + Dots bei einem einzigen Eintrag aus (kein Crash)", () => {
     render(<PeekKarussell eintraege={[EINTRAEGE[0]]} ariaLabel="Test-Karussell" />);
     expect(screen.getByRole("heading", { name: "Alpha" })).toBeInTheDocument();
-    expect(screen.queryByLabelText("Nächstes Bild")).toBeNull();
+    expect(screen.queryByLabelText("Weiter")).toBeNull();
     expect(screen.queryByRole("button", { name: /^Zu 1:/ })).toBeNull();
   });
 
-  it("der erste Pfeil (zurück) ist am Anfang disabled", () => {
+  it("Pfeile sind nie disabled (es loopt) und beide vorhanden", () => {
     render(<PeekKarussell eintraege={EINTRAEGE} ariaLabel="Test-Karussell" />);
     // Pfeile rendern desktop-seitig (matchMedia-Stub → istMobile=false).
-    const zurueck = screen.getByLabelText("Vorheriges Bild");
-    expect(zurueck).toBeDisabled();
-    expect(screen.getByLabelText("Nächstes Bild")).not.toBeDisabled();
+    expect(screen.getByLabelText("Zurück")).not.toBeDisabled();
+    expect(screen.getByLabelText("Weiter")).not.toBeDisabled();
+  });
+
+  it("LOOP: Pfeil-zurück auf dem ersten Item springt ans Ende (Index 3/3)", async () => {
+    render(<PeekKarussell eintraege={EINTRAEGE} ariaLabel="Test-Karussell" />);
+    // #1: scrolleZu setzt den Index DIREKT → in jsdom ohne Observer prüfbar.
+    // Der Zähler aktualisiert sofort; die Caption wechselt via AnimatePresence.
+    fireEvent.click(screen.getByLabelText("Zurück"));
+    expect(screen.getByText(/03\s*\/\s*03/)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Gamma" })).toBeInTheDocument();
+  });
+
+  it("Pfeil-weiter schaltet zuverlässig zum nächsten Item (Index 2/3)", async () => {
+    render(<PeekKarussell eintraege={EINTRAEGE} ariaLabel="Test-Karussell" />);
+    fireEvent.click(screen.getByLabelText("Weiter"));
+    expect(screen.getByText(/02\s*\/\s*03/)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Beta" })).toBeInTheDocument();
+  });
+
+  it("Dot schaltet den aktiven Eintrag direkt um", async () => {
+    render(<PeekKarussell eintraege={EINTRAEGE} ariaLabel="Test-Karussell" />);
+    fireEvent.click(screen.getByRole("button", { name: "Zu 3: Gamma" }));
+    expect(await screen.findByRole("heading", { name: "Gamma" })).toBeInTheDocument();
   });
 });
 

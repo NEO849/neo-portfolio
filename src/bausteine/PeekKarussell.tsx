@@ -17,22 +17,31 @@
 //   Hintergrund FÜLLT das aspect-[3/4]-Item, das scharfe Bild liegt
 //   CONTAINED darüber. So kein hässlicher Crop, trotzdem volle Bühne.
 //   Item-Breiten an Portrait angepasst (Mitte breit, Nachbarn schmal
-//   genug zum sauberen Anschneiden).
+//   genug zum sauberen Anschneiden). Die Bild-Items sind TEXTFREI; der
+//   Titel/Untertitel steht als ruhiger Caption-Block UNTER der Bühne.
+//
+// Zentrierung (auch erstes/letztes Item): das nötige Innen-Padding wird
+// GEMESSEN — (Scrollerbreite − Breite des aktiven Items) / 2 — und live
+// gesetzt (mount + ResizeObserver). So snappt jedes Item exakt in die
+// Mitte, selbst wenn das Item breiter ist als die Bühne minus festem %.
+//
+// Loop: nach dem letzten Item kommt wieder das erste (Pfeile/Tastatur).
 //
 // A11y: role="region" + aria-roledescription="Karussell", aria-current
 // am aktiven Item, Live-Region (i/n + Titel), Dots (aktiv = Akzent-
-// Pille), Pfeile (Desktop, Ränder disabled), Tastatur ←/→, sichtbarer
-// Fokus-Ring, ≥44px Touch-Targets. prefers-reduced-motion → flach.
+// Pille), Pfeile (Desktop), Tastatur ←/→, sichtbarer Fokus-Ring,
+// ≥44px Touch-Targets. prefers-reduced-motion → flach.
 // ═══════════════════════════════════════════════════════════════════
 
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 // ─── Daten-Vertrag ──────────────────────────────────────────────────
 
@@ -43,7 +52,7 @@ export interface PeekEintrag {
   readonly titel: string;
   /** Optionaler Untertitel (eine Zeile Kontext). */
   readonly untertitel?: string;
-  /** Hex-Akzentfarbe (für Glow, Eyebrow-Pille, aktiven Dot). */
+  /** Hex-Akzentfarbe (für Glow, aktiven Dot). */
   readonly akzentFarbe: string;
 }
 
@@ -116,6 +125,9 @@ export function PeekKarussell({
   const itemRefs = useRef<Array<HTMLLIElement | null>>([]);
   const [aktiverIndex, setAktiverIndex] = useState(sicherStart);
   const [istMobile, setIstMobile] = useState(false);
+  // Gemessenes seitliches Innen-Padding (px), damit erstes/letztes Item
+  // exakt zentriert. 0 = noch nicht gemessen (initial px-[10%]-Fallback).
+  const [seitenPadding, setSeitenPadding] = useState(0);
   const headerId = useMemo(
     () => `peek-karussell-${Math.random().toString(36).slice(2, 8)}`,
     [],
@@ -131,10 +143,48 @@ export function PeekKarussell({
     return () => mql.removeEventListener("change", sync);
   }, []);
 
+  // ─── #4b ZENTRIERUNG PER MESSUNG ──────────────────────────────────
+  // Innen-Padding = (Scrollerbreite − aktive Item-Breite) / 2. Damit
+  // kann auch das erste UND letzte Item exakt in die Mitte snappen. Wird
+  // beim Mount und bei jeder Größenänderung neu gemessen (responsive).
+  const messePadding = useCallback(() => {
+    const scroller = scrollerRef.current;
+    const item = itemRefs.current[aktiverIndex] ?? itemRefs.current[0];
+    if (!scroller || !item) return;
+    const padding = Math.max(0, (scroller.clientWidth - item.clientWidth) / 2);
+    setSeitenPadding(padding);
+    scroller.style.scrollPaddingInline = `${padding}px`;
+  }, [aktiverIndex]);
+
+  useLayoutEffect(() => {
+    messePadding();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", messePadding);
+      return () => window.removeEventListener("resize", messePadding);
+    }
+    const ro = new ResizeObserver(() => messePadding());
+    if (scrollerRef.current) ro.observe(scrollerRef.current);
+    return () => ro.disconnect();
+  }, [messePadding, anzahl]);
+
+  // ─── #4c START AUF DEM ERSTEN/Start-ITEM (ohne Animation) ──────────
+  // Nachdem das Padding steht, das sicherStart-Item sofort (behavior:auto)
+  // zentrieren — sonst startet es scheinbar beim zweiten Bild.
+  const startZentriert = useRef(false);
+  useLayoutEffect(() => {
+    if (startZentriert.current || anzahl === 0) return;
+    const node = itemRefs.current[sicherStart];
+    if (!node) return;
+    // Erst nachdem das Padding gemessen wurde (seitenPadding gesetzt ODER
+    // wir warten auf den nächsten Layout-Tick).
+    node.scrollIntoView({ inline: "center", block: "nearest", behavior: "auto" });
+    startZentriert.current = true;
+    // seitenPadding als Dependency: läuft erneut, sobald gemessen wurde.
+  }, [sicherStart, anzahl, seitenPadding]);
+
   // ─── IntersectionObserver: das mittige Item bestimmt aktiverIndex ──
   // root = Scroller, schmaler zentraler Trigger-Streifen (-45% L/R),
-  // höchste Ratio gewinnt. Reduced-Motion deaktiviert den Stagger nicht,
-  // braucht den aktiven Index aber weiterhin für Dots/Pfeile/A11y.
+  // höchste Ratio gewinnt. Hält den Index beim manuellen Wischen in Sync.
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller || anzahl === 0) return;
@@ -172,12 +222,17 @@ export function PeekKarussell({
     setAktiverIndex((alt) => Math.max(0, Math.min(alt, anzahl - 1)));
   }, [anzahl]);
 
-  // ─── Programmatisch zur Mitte scrollen ────────────────────────────
+  // ─── #1 Programmatisch zur Mitte scrollen — Index DIREKT setzen ────
+  // Der ziel-Index ist bereits gültig (gewrappt vom Aufrufer); der Clamp
+  // ist nur ein Sicherheitsnetz. setAktiverIndex DIREKT, damit Pfeile/Dots
+  // zuverlässig weiterschalten (nicht aufs Observer-Timing warten). Der
+  // Observer hält den Index beim manuellen Wischen weiter in Sync.
   const scrolleZu = useCallback(
     (index: number) => {
-      const ziel = Math.max(0, Math.min(index, anzahl - 1));
+      const ziel = ((index % anzahl) + anzahl) % anzahl;
       const node = itemRefs.current[ziel];
       if (!node) return;
+      setAktiverIndex(ziel);
       node.scrollIntoView({
         behavior: "smooth",
         inline: "center",
@@ -187,13 +242,14 @@ export function PeekKarussell({
     [anzahl],
   );
 
+  // ─── #4a LOOP: Pfeile/Tastatur wrappen am Rand ────────────────────
   const handleZurueck = useCallback(
-    () => scrolleZu(aktiverIndex - 1),
-    [aktiverIndex, scrolleZu],
+    () => scrolleZu((aktiverIndex - 1 + anzahl) % anzahl),
+    [aktiverIndex, anzahl, scrolleZu],
   );
   const handleWeiter = useCallback(
-    () => scrolleZu(aktiverIndex + 1),
-    [aktiverIndex, scrolleZu],
+    () => scrolleZu((aktiverIndex + 1) % anzahl),
+    [aktiverIndex, anzahl, scrolleZu],
   );
 
   // ─── Tastatur ←/→ (hinter offenem modalem Dialog gesperrt, außer wir
@@ -216,12 +272,14 @@ export function PeekKarussell({
     return () => window.removeEventListener("keydown", onKey);
   }, [anzahl, onOeffnen, handleWeiter, handleZurueck]);
 
-  // ─── Nachbar-Bilder vorladen (ruckelfreies Wischen) ───────────────
+  // ─── Nachbar-Bilder vorladen (ruckelfreies Wischen, inkl. Loop-Rand) ─
   useEffect(() => {
     if (!mehrere) return;
-    const nachbarn = [aktiverIndex - 1, aktiverIndex + 1];
+    const nachbarn = [
+      (aktiverIndex - 1 + anzahl) % anzahl,
+      (aktiverIndex + 1) % anzahl,
+    ];
     nachbarn.forEach((i) => {
-      if (i < 0 || i >= anzahl) return;
       const quelle = eintraege[i]?.quelle;
       if (quelle) {
         const bild = new Image();
@@ -245,6 +303,12 @@ export function PeekKarussell({
   if (anzahl === 0) return null;
 
   const aktiv = eintraege[aktiverIndex];
+  // Inline-Style fürs gemessene Padding; vor der ersten Messung
+  // greift der px-[10%]-Klassen-Fallback (seitenPadding === 0).
+  const listenStil =
+    seitenPadding > 0
+      ? { paddingLeft: `${seitenPadding}px`, paddingRight: `${seitenPadding}px` }
+      : undefined;
 
   return (
     <section
@@ -274,18 +338,8 @@ export function PeekKarussell({
         )}
         {mehrere && !istMobile && (
           <div className="flex gap-2">
-            <NavPfeil
-              richtung="zurueck"
-              onClick={handleZurueck}
-              disabled={aktiverIndex === 0}
-              label="Vorheriges Bild"
-            />
-            <NavPfeil
-              richtung="weiter"
-              onClick={handleWeiter}
-              disabled={aktiverIndex === anzahl - 1}
-              label="Nächstes Bild"
-            />
+            <NavPfeil richtung="zurueck" onClick={handleZurueck} label="Zurück" />
+            <NavPfeil richtung="weiter" onClick={handleWeiter} label="Weiter" />
           </div>
         )}
       </div>
@@ -295,19 +349,24 @@ export function PeekKarussell({
         ref={scrollerRef}
         aria-labelledby={headerId}
         className="scrollbar-none overflow-x-auto snap-x snap-mandatory scroll-smooth"
-        style={{ scrollPaddingInline: "10%" }}
       >
-        <ul className="flex gap-4 md:gap-6 px-[10%] py-4 m-0 list-none">
+        <ul
+          className={`flex gap-4 md:gap-6 py-4 m-0 list-none ${
+            listenStil ? "" : "px-[10%]"
+          }`}
+          style={listenStil}
+        >
           {eintraege.map((eintrag, index) => {
             const distanz = Math.abs(index - aktiverIndex);
             const stil = staggerFuer(distanz, reduziert);
             const schatten = schattenFuer(distanz, eintrag.akzentFarbe, reduziert);
             const istAktiv = index === aktiverIndex;
             const eager = Math.abs(index - sicherStart) <= 1;
-            // Portrait-Breiten: Mitte prominent, Nachbarn schneiden schön an.
+            // #2 Kleinere Vorschaubilder: Mitte prominent, mehr Nachbarn
+            //    lugen heraus. Mit gemessenem Padding zentriert alles korrekt.
             const breite = istAktiv
-              ? "w-[72%] sm:w-[54%] md:w-[44%] lg:w-[36%]"
-              : "w-[64%] sm:w-[48%] md:w-[40%] lg:w-[33%]";
+              ? "w-[58%] sm:w-[42%] md:w-[34%] lg:w-[28%]"
+              : "w-[50%] sm:w-[38%] md:w-[30%] lg:w-[25%]";
             // Tap-Label spiegelt das Verhalten (öffnen vs. zentrieren).
             const tapLabel = istAktiv
               ? onOeffnen
@@ -325,6 +384,8 @@ export function PeekKarussell({
                 className={`snap-center shrink-0 ${breite}`}
                 aria-current={istAktiv ? "true" : undefined}
               >
+                {/* #3 TEXTFREIES Bild-Item — sauber, nur App-Store-Bild +
+                    dezenter Akzent-Schimmer. Caption steht unter der Bühne. */}
                 <motion.figure
                   className="relative m-0 overflow-hidden rounded-3xl border border-white/12 bg-grund-900"
                   animate={{
@@ -373,7 +434,7 @@ export function PeekKarussell({
                       className="absolute inset-0 h-full w-full object-contain
                                  drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)]"
                     />
-                    {/* Akzent-Schimmer oben + Bottom-Vignette für Lesbarkeit. */}
+                    {/* Dezenter Akzent-Schimmer oben (kein Text mehr im Bild). */}
                     <div
                       aria-hidden="true"
                       className="pointer-events-none absolute inset-x-0 top-0 h-1/3"
@@ -381,29 +442,7 @@ export function PeekKarussell({
                         background: `linear-gradient(to bottom, ${eintrag.akzentFarbe}1f, transparent)`,
                       }}
                     />
-                    <div
-                      aria-hidden="true"
-                      className="pointer-events-none absolute inset-0 bg-gradient-to-t
-                                 from-grund-950/90 via-grund-950/15 to-transparent"
-                    />
                   </button>
-
-                  {/* Caption nur am aktiven (mittigen) Item — ruhig, kein Gewimmel. */}
-                  <figcaption
-                    className={`pointer-events-none absolute inset-x-0 bottom-0 p-4 sm:p-5
-                                transition-opacity duration-500 ${
-                                  istAktiv ? "opacity-100" : "opacity-0"
-                                }`}
-                  >
-                    <h3 className="font-display font-bold text-white text-base sm:text-lg leading-tight text-balance">
-                      {eintrag.titel}
-                    </h3>
-                    {eintrag.untertitel && (
-                      <p className="mt-1 text-xs sm:text-sm text-white/75 leading-snug text-pretty line-clamp-2">
-                        {eintrag.untertitel}
-                      </p>
-                    )}
-                  </figcaption>
                 </motion.figure>
               </li>
             );
@@ -411,9 +450,35 @@ export function PeekKarussell({
         </ul>
       </div>
 
+      {/* ─── #3 Caption UNTER der Bühne — nur der aktive Eintrag, ruhig ──
+          Konsistent über beide Ebenen: gleiche Schriftfarbe/-größe,
+          zentriert, feste Mindesthöhe (kein Layout-Shift), sanfter
+          Wechsel (reduced-motion = reines Fade). */}
+      <div className="mt-5 min-h-[4.25rem] flex items-start justify-center text-center px-4">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={aktiverIndex}
+            initial={reduziert ? { opacity: 0 } : { opacity: 0, y: 6 }}
+            animate={reduziert ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            exit={reduziert ? { opacity: 0 } : { opacity: 0, y: -4 }}
+            transition={{ duration: reduziert ? 0.2 : 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="max-w-md"
+          >
+            <h3 className="font-display font-bold text-white text-base sm:text-lg leading-tight text-balance">
+              {aktiv.titel}
+            </h3>
+            {aktiv.untertitel && (
+              <p className="mt-1 text-sm text-white/60 leading-snug text-pretty">
+                {aktiv.untertitel}
+              </p>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
       {/* ─── Dots (aktiv = Akzent-Pille mit Glow) ─────────────────────── */}
       {mehrere && (
-        <div className="mt-4 flex flex-wrap items-center justify-center max-w-full overflow-hidden">
+        <div className="mt-2 flex flex-wrap items-center justify-center max-w-full overflow-hidden">
           {eintraege.map((eintrag, index) => {
             const aktivDot = index === aktiverIndex;
             return (
@@ -446,29 +511,25 @@ export function PeekKarussell({
   );
 }
 
-// ─── Navigations-Pfeil (≥44px Touch-Target, Rand disabled) ──────────
+// ─── Navigations-Pfeil (≥44px Touch-Target; loopt, daher nie disabled) ─
 
 function NavPfeil({
   richtung,
   onClick,
-  disabled,
   label,
 }: {
   readonly richtung: "zurueck" | "weiter";
   readonly onClick: () => void;
-  readonly disabled: boolean;
   readonly label: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      disabled={disabled}
       aria-label={label}
       className="grid h-11 w-11 place-items-center rounded-full border border-white/10
                  bg-grund-950/70 text-white/70 backdrop-blur-sm transition-all
                  hover:border-white/25 hover:text-white
-                 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-white/10 disabled:hover:text-white/70
                  focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
     >
       <svg
