@@ -20,10 +20,11 @@
 //   genug zum sauberen Anschneiden). Die Bild-Items sind TEXTFREI; der
 //   Titel/Untertitel steht als ruhiger Caption-Block UNTER der Bühne.
 //
-// Zentrierung (auch erstes/letztes Item): das nötige Innen-Padding wird
-// GEMESSEN — (Scrollerbreite − Breite des aktiven Items) / 2 — und live
-// gesetzt (mount + ResizeObserver). So snappt jedes Item exakt in die
-// Mitte, selbst wenn das Item breiter ist als die Bühne minus festem %.
+// Zentrierung (auch erstes/letztes Item): leere Spacer-<li> links/rechts
+// mit Breite = (100 − Item-Breite)/2 je Breakpoint. So snappt das erste
+// Item bereits bei scrollLeft 0 in die Mitte — ohne Mess-Logik, ohne
+// Rückkopplungs-Kreis. Alle Items sind gleich breit (kein Layout-Reflow),
+// die Mitte wirkt allein über scale/opacity/blur prominent.
 //
 // Loop: nach dem letzten Item kommt wieder das erste (Pfeile/Tastatur).
 //
@@ -36,7 +37,6 @@
 import {
   useCallback,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -125,9 +125,6 @@ export function PeekKarussell({
   const itemRefs = useRef<Array<HTMLLIElement | null>>([]);
   const [aktiverIndex, setAktiverIndex] = useState(sicherStart);
   const [istMobile, setIstMobile] = useState(false);
-  // Gemessenes seitliches Innen-Padding (px), damit erstes/letztes Item
-  // exakt zentriert. 0 = noch nicht gemessen (initial px-[10%]-Fallback).
-  const [seitenPadding, setSeitenPadding] = useState(0);
   const headerId = useMemo(
     () => `peek-karussell-${Math.random().toString(36).slice(2, 8)}`,
     [],
@@ -143,44 +140,16 @@ export function PeekKarussell({
     return () => mql.removeEventListener("change", sync);
   }, []);
 
-  // ─── #4b ZENTRIERUNG PER MESSUNG ──────────────────────────────────
-  // Innen-Padding = (Scrollerbreite − aktive Item-Breite) / 2. Damit
-  // kann auch das erste UND letzte Item exakt in die Mitte snappen. Wird
-  // beim Mount und bei jeder Größenänderung neu gemessen (responsive).
-  const messePadding = useCallback(() => {
-    const scroller = scrollerRef.current;
-    const item = itemRefs.current[aktiverIndex] ?? itemRefs.current[0];
-    if (!scroller || !item) return;
-    const padding = Math.max(0, (scroller.clientWidth - item.clientWidth) / 2);
-    setSeitenPadding(padding);
-    scroller.style.scrollPaddingInline = `${padding}px`;
-  }, [aktiverIndex]);
-
-  useLayoutEffect(() => {
-    messePadding();
-    if (typeof ResizeObserver === "undefined") {
-      window.addEventListener("resize", messePadding);
-      return () => window.removeEventListener("resize", messePadding);
-    }
-    const ro = new ResizeObserver(() => messePadding());
-    if (scrollerRef.current) ro.observe(scrollerRef.current);
-    return () => ro.disconnect();
-  }, [messePadding, anzahl]);
-
-  // ─── #4c START AUF DEM ERSTEN/Start-ITEM (ohne Animation) ──────────
-  // Nachdem das Padding steht, das sicherStart-Item sofort (behavior:auto)
-  // zentrieren — sonst startet es scheinbar beim zweiten Bild.
-  const startZentriert = useRef(false);
-  useLayoutEffect(() => {
-    if (startZentriert.current || anzahl === 0) return;
+  // ─── Start-Position: erstes Item ist via Spacer schon bei scrollLeft 0
+  //     zentriert; nur bei startIndex > 0 einmal hinscrollen. ──────────
+  const startGesetzt = useRef(false);
+  useEffect(() => {
+    if (startGesetzt.current || sicherStart === 0) return;
     const node = itemRefs.current[sicherStart];
     if (!node) return;
-    // Erst nachdem das Padding gemessen wurde (seitenPadding gesetzt ODER
-    // wir warten auf den nächsten Layout-Tick).
     node.scrollIntoView({ inline: "center", block: "nearest", behavior: "auto" });
-    startZentriert.current = true;
-    // seitenPadding als Dependency: läuft erneut, sobald gemessen wurde.
-  }, [sicherStart, anzahl, seitenPadding]);
+    startGesetzt.current = true;
+  }, [sicherStart]);
 
   // ─── IntersectionObserver: das mittige Item bestimmt aktiverIndex ──
   // root = Scroller, schmaler zentraler Trigger-Streifen (-45% L/R),
@@ -303,12 +272,9 @@ export function PeekKarussell({
   if (anzahl === 0) return null;
 
   const aktiv = eintraege[aktiverIndex];
-  // Inline-Style fürs gemessene Padding; vor der ersten Messung
-  // greift der px-[10%]-Klassen-Fallback (seitenPadding === 0).
-  const listenStil =
-    seitenPadding > 0
-      ? { paddingLeft: `${seitenPadding}px`, paddingRight: `${seitenPadding}px` }
-      : undefined;
+  // Spacer-Breiten = (100 − Item-Breite)/2 je Breakpoint → erstes/letztes
+  // Item exakt zentriert, ohne Padding-Mess-Kreis. Passt zu `breite`.
+  const spacerBreite = "w-[20%] sm:w-[28%] md:w-[32%] lg:w-[35%]";
 
   return (
     <section
@@ -350,12 +316,9 @@ export function PeekKarussell({
         aria-labelledby={headerId}
         className="scrollbar-none overflow-x-auto snap-x snap-mandatory scroll-smooth"
       >
-        <ul
-          className={`flex gap-4 md:gap-6 py-4 m-0 list-none ${
-            listenStil ? "" : "px-[10%]"
-          }`}
-          style={listenStil}
-        >
+        <ul className="flex gap-4 md:gap-6 py-4 m-0 list-none">
+          {/* Leading-Spacer: zentriert das erste Item (kein Mess-Padding). */}
+          <li aria-hidden="true" className={`shrink-0 ${spacerBreite}`} />
           {eintraege.map((eintrag, index) => {
             const distanz = Math.abs(index - aktiverIndex);
             const stil = staggerFuer(distanz, reduziert);
@@ -364,9 +327,9 @@ export function PeekKarussell({
             const eager = Math.abs(index - sicherStart) <= 1;
             // #2 Kleinere Vorschaubilder: Mitte prominent, mehr Nachbarn
             //    lugen heraus. Mit gemessenem Padding zentriert alles korrekt.
-            const breite = istAktiv
-              ? "w-[58%] sm:w-[42%] md:w-[34%] lg:w-[28%]"
-              : "w-[50%] sm:w-[38%] md:w-[30%] lg:w-[25%]";
+            // Alle Items gleich breit → kein Layout-Reflow beim Blättern;
+            // die Prominenz der Mitte kommt allein über scale/opacity/blur.
+            const breite = "w-[60%] sm:w-[44%] md:w-[36%] lg:w-[30%]";
             // Tap-Label spiegelt das Verhalten (öffnen vs. zentrieren).
             const tapLabel = istAktiv
               ? onOeffnen
@@ -447,6 +410,8 @@ export function PeekKarussell({
               </li>
             );
           })}
+          {/* Trailing-Spacer: zentriert das letzte Item. */}
+          <li aria-hidden="true" className={`shrink-0 ${spacerBreite}`} />
         </ul>
       </div>
 
