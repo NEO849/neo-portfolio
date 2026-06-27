@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // VIEW: BildergalerieView
-// Übersicht aller Projekt-Bildergalerien als filmischer Cover-Flow.
+// Übersicht aller Projekt-Bildergalerien als edles Einzel-Frame-Karussell.
 //
 // Galerien werden DYNAMISCH aus PROJEKTE abgeleitet (galerieSlug + Bilder
 // vorhanden) — nichts hartkodiert. Klick auf die Fokus-Karte öffnet das
@@ -16,7 +16,7 @@ import { useMemo, useState } from "react";
 import { PROJEKTE } from "../models/daten";
 import type { ProjektModel } from "../models/typen";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
-import { GalerieCoverflow } from "../bausteine/GalerieCoverflow";
+import { GalerieBanner } from "../bausteine/GalerieBanner";
 import { BilderLightbox } from "../bausteine/BilderLightbox";
 
 // ─── Daten-Selektor (Adapter-Trennstelle) ─────────────────────────
@@ -62,9 +62,9 @@ export default function BildergalerieView({ startSlug, onLightboxSchliessen }: B
         klassen="mb-8"
       />
 
-      {/* Cover-Flow — filmische Auswahl zwischen den Galerien */}
+      {/* Premium-Karussell — edle Einzel-Frame-Auswahl zwischen den Galerien */}
       {galerien.length > 0 ? (
-        <GalerieCoverflow galerien={galerien} onOeffnen={setOffenesProjekt} />
+        <GalerieBanner galerien={galerien} onOeffnen={setOffenesProjekt} />
       ) : (
         <p className="text-sm text-white/40 font-mono">Noch keine Galerien verfügbar.</p>
       )}
