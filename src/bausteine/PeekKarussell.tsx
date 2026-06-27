@@ -43,6 +43,10 @@ import {
 } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
+// Lila-Akzent für die Navigation (Dots + Pfeile) — bewusst durchgehend,
+// unabhängig von der Projekt-Kategorie, für einen einheitlichen Steuer-Akzent.
+const LILA = "#a78bfa";
+
 // ─── Daten-Vertrag ──────────────────────────────────────────────────
 
 export interface PeekEintrag {
@@ -463,8 +467,8 @@ export function PeekKarussell({
                   className="block h-1.5 rounded-full transition-all duration-200"
                   style={{
                     width: aktivDot ? 26 : 6,
-                    background: aktivDot ? eintrag.akzentFarbe : "rgba(255,255,255,0.22)",
-                    boxShadow: aktivDot ? `0 0 12px ${eintrag.akzentFarbe}88` : undefined,
+                    background: aktivDot ? LILA : "rgba(167,139,250,0.30)",
+                    boxShadow: aktivDot ? `0 0 12px ${LILA}aa` : undefined,
                   }}
                 />
               </button>
@@ -492,9 +496,9 @@ function NavPfeil({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="grid h-11 w-11 place-items-center rounded-full border border-white/10
-                 bg-grund-950/70 text-white/70 backdrop-blur-sm transition-all
-                 hover:border-white/25 hover:text-white
+      className="grid h-11 w-11 place-items-center rounded-full border border-[#a78bfa]/30
+                 bg-grund-950/70 text-[#a78bfa] backdrop-blur-sm transition-all
+                 hover:border-[#a78bfa]/60 hover:text-[#c4b5fd]
                  focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
     >
       <svg

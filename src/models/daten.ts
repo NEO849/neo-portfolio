@@ -98,6 +98,12 @@ export const PROJEKTE: ProjektModel[] = [
       "Als App installierbar, Aufnahme startet per Leertaste",
     ],
     linkDemo: "/voice-demo",
+    galerieSlug: "voice-bridge",
+    bilder: [
+      { quelle: "/projekte/voice-bridge/voice_aufnahme.webp", titel: "Befehl per Stimme", text: "Eingesprochener Befehl wird transkribiert und landet direkt in der Claude-Session — sichtbar als grüner Status." },
+      { quelle: "/projekte/voice-bridge/voice_bereit.webp", titel: "Oberfläche auf Apple-Niveau", text: "Ruhige, native UI: Mikro-Orb, Session-Auswahl, Sprache (DE/EN/AUTO) und auto-Enter auf einen Blick." },
+      { quelle: "/projekte/voice-bridge/voice_einstellungen.webp", titel: "Einstellungen", text: "Default-Sprache, auto-Enter und Session-Routing — alles direkt steuerbar." },
+    ],
     zeitraum: "2025 – heute",
     status: "aktiv",
   },
