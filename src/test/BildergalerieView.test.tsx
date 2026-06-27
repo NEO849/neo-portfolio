@@ -42,7 +42,8 @@ describe("BildergalerieView — Peek-Auswahl", () => {
     renderView();
     // Peek-Karussell startet auf der ersten Galerie. Nur das mittige Item
     // ist „öffnen"; Nachbarn sind „wechseln". A11y-Label trägt den vollen Titel.
-    const fokus = galerienLaden()[0];
+    // Auswahl startet auf dem 2. Projekt (startIndex=1) → das ist das aktive Item.
+    const fokus = galerienLaden()[1];
     const karte = screen.getByRole("button", {
       name: new RegExp(`Öffnen: ${fokus.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
     });
@@ -75,7 +76,7 @@ describe("BildergalerieView — Peek-Auswahl", () => {
 
 describe("BildergalerieView — Lightbox öffnen/schließen", () => {
   it("öffnet die Lightbox per Klick auf das mittige Item und zeigt die Fotos", async () => {
-    const projekt = galerienLaden()[0];
+    const projekt = galerienLaden()[1]; // mittiges Item = 2. Projekt (startIndex=1)
     renderView();
 
     const karte = screen.getByRole("button", {
@@ -95,7 +96,7 @@ describe("BildergalerieView — Lightbox öffnen/schließen", () => {
   });
 
   it("schließt die Lightbox per Schließen-Knopf", async () => {
-    const projekt = galerienLaden()[0];
+    const projekt = galerienLaden()[1]; // mittiges Item = 2. Projekt (startIndex=1)
     renderView();
 
     fireEvent.click(

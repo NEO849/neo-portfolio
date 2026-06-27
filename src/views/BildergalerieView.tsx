@@ -87,6 +87,7 @@ export default function BildergalerieView({ startSlug, onLightboxSchliessen }: B
       {galerien.length > 0 ? (
         <PeekKarussell
           eintraege={projektEintraege}
+          startIndex={galerien.length > 1 ? 1 : 0}
           onOeffnen={(index) => setOffenesProjekt(galerien[index] ?? null)}
           ariaLabel="Projekt-Galerien durchblättern"
           titelOben
