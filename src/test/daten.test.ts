@@ -37,7 +37,7 @@ describe('daten.ts — Senior-Elite Invarianten', () => {
   describe('Projekte', () => {
     it('hat mindestens die 4 neuen Senior-Elite-Projekte', () => {
       const titel = PROJEKTE.map((p) => p.titel);
-      expect(titel.some((t) => t.includes('Memory System v2'))).toBe(true);
+      expect(titel.some((t) => t.includes('markmem'))).toBe(true);
       expect(titel.some((t) => t.includes('claude-bus'))).toBe(true);
       expect(titel.some((t) => t.includes('voice-bridge'))).toBe(true);
       expect(titel.some((t) => t.includes('bb_recon'))).toBe(true);

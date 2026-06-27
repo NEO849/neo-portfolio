@@ -13,7 +13,7 @@ export default function LaborSeite() {
     <>
       <SeitenMeta
         titel="Labor — Senior-Elite Architektur"
-        beschreibung="Selbst-lernendes Memory-System v2 · 25 MCP-Server · 32 Pentest-Agents · 11 Skills · 11 Slash-Commands · 12 systemd-Workflows · 12 Hard-Gates. Architektur-Manifest eines Senior-Security-Engineering-Setups."
+        beschreibung="markmem — selbst-lernendes KI-Gedächtnis (Open Source, MIT) · 22 MCP-Server · 32 Pentest-Agents · 11 Skills · 11 Slash-Commands · 12 systemd-Workflows · 12 Hard-Gates. Architektur-Manifest eines Senior-Security-Engineering-Setups."
         pfad="/labor"
       />
       <motion.div

@@ -26,6 +26,7 @@ import { AbzeichenStatus, TechTag } from "../bausteine/AbzeichenStatus";
 import { AusklappKarte } from "../bausteine/AusklappKarte";
 import { AufklappIndikator } from "../bausteine/AufklappIndikator";
 import { GlassTabs } from "../bausteine/GlassTabs";
+import { KnopfSekundaer } from "../bausteine/KnopfSekundaer";
 
 type LaborTab = "memory" | "mcps" | "workflows" | "commands";
 
@@ -156,16 +157,26 @@ function MemoryAct() {
     <div className="space-y-6">
       <header>
         <h3 className="font-display text-lg font-bold text-white mb-1.5">
-          Selbst-lernendes Memory-System
+          markmem — selbst-lernendes KI-Gedächtnis
         </h3>
         <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
           Damit der KI-Assistent zwischen Sitzungen dazulernt statt jedes Mal von vorn zu beginnen, habe
           ich ihm ein gestaffeltes Gedächtnis gegeben – angelehnt an Forschung wie MemGPT und A-MEM.
-          Drei Hooks erfassen Korrekturen und Verläufe automatisch; neue Beobachtungen werden erst nach
-          manueller Prüfung dauerhaft übernommen, und eine tägliche Routine hält alles konsistent und
-          sichert es in Git.
+          Das hier öffentlich als <span className="text-akzent-400 font-semibold">markmem</span> auf GitHub —
+          ein KI-Gedächtnis auf Markdown + git, dessen Live-Zustand das Dashboard
+          {" "}<span className="text-cyber-400 font-semibold">memDash</span> zeigt. Markdown + git bleiben
+          die einzige Quelle der Wahrheit; der Abruf ist HybridRAG, eine echte Lern-Schleife und ein
+          Self-Tuning-Eval-Harness halten das System ehrlich.
         </p>
-        <p className="text-[11px] text-white/45 font-mono mt-2">
+        <div className="flex items-center gap-3 mt-4 flex-wrap">
+          <KnopfSekundaer zuUrl="https://github.com/NEO849/markmem" klassen="px-4 py-2 text-[13px]">
+            GitHub →
+          </KnopfSekundaer>
+          <span className="font-mono text-[10px] px-2 py-1 rounded-md border border-emerald-400/25 bg-emerald-400/10 text-emerald-400 uppercase tracking-wider leading-none">
+            Open Source · MIT
+          </span>
+        </div>
+        <p className="text-[11px] text-white/45 font-mono mt-3">
           Klicke eine Karte an, um zu sehen, welche Rolle diese Schicht im Gesamtsystem spielt.
         </p>
       </header>
@@ -223,11 +234,12 @@ function MemoryAct() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 pt-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
         {[
-          { titel: "Drei Lifecycle-Hooks",   bsp: "Fangen Korrekturen ein, schreiben Session-Zusammenfassungen und melden offene Einträge.", rgb: "122, 162, 255" },
-          { titel: "A-MEM Auto-Linker",      bsp: "Erkennt verwandte Memories und schlägt bidirektionale Verlinkung vor",        rgb: "167, 139, 250" },
-          { titel: "Confidence-Decay",       bsp: "Submit-Outcome aktualisiert die Vertrauens-Werte zitierter Memories",          rgb: "34, 197, 94" },
+          { titel: "HybridRAG-Abruf",  bsp: "BM25-Volltext, Wissens-Graph und Vektor-Embeddings (bge-m3), fusioniert per gewichtetem Reciprocal Rank Fusion — plus optionalem Cross-Encoder-Rerank.", rgb: "79, 124, 251" },
+          { titel: "Lern-Schleife",    bsp: "Lernt aus stillen Korrekturen, kalibriert die eigene Zuversicht und hemmt aktiv bekannte Sackgassen.",                                                  rgb: "167, 139, 250" },
+          { titel: "Self-Tuning",      bsp: "Ein Eval-Harness misst die Trefferquote (Recall@1); eine Grid-Search optimiert die Such-Gewichte automatisch.",                                          rgb: "34, 197, 94" },
+          { titel: "memDash",          bsp: "Responsives Terminal-Dashboard (Mac-Querformat bis iPhone-Hochformat) — macht den Live-Zustand des Gedächtnisses Unicode-korrekt sichtbar.",            rgb: "138, 160, 200" },
         ].map((meta, i) => (
           <motion.div
             key={meta.titel}

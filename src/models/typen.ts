@@ -79,7 +79,7 @@ export interface ScoringKategorie {
 }
 
 // ═══════════════════════════════════════════════════════
-// SENIOR-ELITE: Selbst-lernendes Memory-System v2 (5-Tier)
+// SENIOR-ELITE: markmem — selbst-lernendes KI-Gedächtnis (5-Tier-Laden)
 // ═══════════════════════════════════════════════════════
 
 export interface MemoryTierModel {
