@@ -7,19 +7,12 @@ import { AbzeichenStatus, TechTag } from "../bausteine/AbzeichenStatus";
 import { AusklappKarte } from "../bausteine/AusklappKarte";
 import { KnopfSekundaer } from "../bausteine/KnopfSekundaer";
 import { GlassTabs, type GlassTab } from "../bausteine/GlassTabs";
+import { KATEGORIE_KONFIGURATION, kategorieKonfig } from "../models/kategorieKonfiguration";
+import { galeriePfad } from "../hilfsmittel/galeriePfad";
 
 // ─── Kategorie-Konfiguration ──────────────────────────────────────
-
-const KATEGORIE_KONFIGURATION: Record<string, {
-  lichtfarbe: string;
-  akzentFarbe: string;
-  variante: "aktiv" | "akzent" | "cyber";
-  label: string;
-}> = {
-  security:    { lichtfarbe: "148, 163, 184", akzentFarbe: "#94a3b8", variante: "aktiv",   label: "Security"    },
-  development: { lichtfarbe: "79, 124, 251",  akzentFarbe: "#4f7cfb", variante: "akzent",  label: "Mobil"       },
-  tooling:     { lichtfarbe: "138, 160, 200",  akzentFarbe: "#8aa0c8", variante: "cyber",   label: "Tooling"     },
-};
+// Akzentfarben + Labels kommen aus der gemeinsamen Quelle
+// (models/kategorieKonfiguration) — keine Doppelpflege mehr.
 
 const FILTER_TABS: GlassTab[] = [
   { id: "alle",        label: "Alle" },
@@ -32,7 +25,7 @@ const FILTER_TABS: GlassTab[] = [
 
 function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
   const [offen, setOffen] = useState(false);
-  const cfg = KATEGORIE_KONFIGURATION[projekt.kategorie] ?? KATEGORIE_KONFIGURATION.development;
+  const cfg = kategorieKonfig(projekt.kategorie);
 
   return (
     <AusklappKarte
@@ -97,7 +90,7 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
                 </KnopfSekundaer>
               )}
               {projekt.galerieSlug && (projekt.bilder?.length ?? 0) > 0 && (
-                <KnopfSekundaer zuRoute={`/projekte/${projekt.galerieSlug}/bilder`} klassen="text-xs">
+                <KnopfSekundaer zuRoute={galeriePfad(projekt.galerieSlug)} klassen="text-xs">
                   Bilder →
                 </KnopfSekundaer>
               )}

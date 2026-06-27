@@ -1,0 +1,127 @@
+// ═══════════════════════════════════════════════════════════════════
+// TEST: BildergalerieView — Ableitung, Übersicht, Lightbox, Deep-Link
+// ═══════════════════════════════════════════════════════════════════
+
+import { describe, it, expect } from "vitest";
+import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import BildergalerieView, { galerienLaden } from "../views/BildergalerieView";
+import { PROJEKTE } from "../models/daten";
+
+function renderView(props: Parameters<typeof BildergalerieView>[0] = {}) {
+  return render(
+    <MemoryRouter initialEntries={["/bilder"]}>
+      <BildergalerieView {...props} />
+    </MemoryRouter>,
+  );
+}
+
+describe("galerienLaden — dynamische Ableitung aus PROJEKTE", () => {
+  it("liefert nur Projekte mit galerieSlug UND mindestens einem Bild", () => {
+    const galerien = galerienLaden();
+    expect(galerien.length).toBeGreaterThan(0);
+    for (const p of galerien) {
+      expect(p.galerieSlug).toBeTruthy();
+      expect(p.bilder?.length ?? 0).toBeGreaterThan(0);
+    }
+    // Exakt so viele wie im Datensatz die Kriterien erfüllen.
+    const erwartet = PROJEKTE.filter((p) => p.galerieSlug && (p.bilder?.length ?? 0) > 0);
+    expect(galerien).toHaveLength(erwartet.length);
+  });
+
+  it("schließt Projekte ohne Galerie aus", () => {
+    const slugs = galerienLaden().map((p) => p.galerieSlug);
+    const ohneGalerie = PROJEKTE.find((p) => !p.galerieSlug);
+    expect(ohneGalerie).toBeDefined();
+    expect(slugs).not.toContain(ohneGalerie?.galerieSlug);
+  });
+});
+
+describe("BildergalerieView — Übersicht", () => {
+  it("rendert eine Kachel je Galerie mit Bilderzähler", () => {
+    renderView();
+    const galerien = galerienLaden();
+    for (const p of galerien) {
+      const kachel = screen.getByRole("button", {
+        name: new RegExp(`Bildergalerie öffnen: ${p.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+      });
+      expect(kachel).toBeInTheDocument();
+      const anzahl = p.bilder?.length ?? 0;
+      expect(within(kachel).getByText(`${anzahl} Bilder`)).toBeInTheDocument();
+    }
+  });
+
+  it("zeigt die 4 Filter-Tabs", () => {
+    renderView();
+    expect(screen.getByRole("tab", { name: "Alle" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Security" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Mobil" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Tooling" })).toBeInTheDocument();
+  });
+
+  it("startet ohne geöffnete Lightbox (kein dialog)", () => {
+    renderView();
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+});
+
+describe("BildergalerieView — Lightbox öffnen/schließen", () => {
+  it("öffnet die Lightbox per Kachel-Klick und zeigt das Karussell des Projekts", async () => {
+    const projekt = galerienLaden()[0];
+    renderView();
+
+    const kachel = screen.getByRole("button", {
+      name: new RegExp(`Bildergalerie öffnen: ${projekt.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+    });
+    fireEvent.click(kachel);
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toBeInTheDocument();
+    expect(dialog).toHaveAttribute("aria-modal", "true");
+    // Titel des Projekts steht als Dialog-Überschrift.
+    expect(within(dialog).getByRole("heading", { name: projekt.titel })).toBeInTheDocument();
+    // Erstes Karussell-Bild (Caption) ist sichtbar.
+    expect(within(dialog).getByText(projekt.bilder![0].titel)).toBeInTheDocument();
+  });
+
+  it("schließt die Lightbox per Schließen-Knopf", async () => {
+    const projekt = galerienLaden()[0];
+    renderView();
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: new RegExp(`Bildergalerie öffnen: ${projekt.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+      }),
+    );
+    await screen.findByRole("dialog");
+
+    fireEvent.click(screen.getByLabelText("Demo schließen"));
+    // AnimatePresence-Exit: warten bis Dialog vollständig weg ist.
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  });
+});
+
+describe("BildergalerieView — Deep-Link", () => {
+  it("öffnet automatisch die zum startSlug passende Galerie", () => {
+    const projekt = galerienLaden()[1] ?? galerienLaden()[0];
+    render(
+      <MemoryRouter initialEntries={[`/bilder/${projekt.galerieSlug}`]}>
+        <BildergalerieView startSlug={projekt.galerieSlug} />
+      </MemoryRouter>,
+    );
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByRole("heading", { name: projekt.titel })).toBeInTheDocument();
+  });
+
+  it("ruft onLightboxSchliessen beim Schließen auf", async () => {
+    const projekt = galerienLaden()[0];
+    let geschlossen = false;
+    render(
+      <MemoryRouter initialEntries={[`/bilder/${projekt.galerieSlug}`]}>
+        <BildergalerieView startSlug={projekt.galerieSlug} onLightboxSchliessen={() => { geschlossen = true; }} />
+      </MemoryRouter>,
+    );
+    fireEvent.click(screen.getByLabelText("Demo schließen"));
+    expect(geschlossen).toBe(true);
+  });
+});
