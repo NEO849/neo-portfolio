@@ -37,17 +37,32 @@ describe("galerienLaden — dynamische Ableitung aus PROJEKTE", () => {
   });
 });
 
-describe("BildergalerieView — Übersicht", () => {
-  it("rendert eine Kachel je Galerie mit Bilderzähler", () => {
+describe("BildergalerieView — Cover-Flow Auswahl", () => {
+  it("rendert die Fokus-Galerie als öffenbare Karte mit Bilderzähler", () => {
+    renderView();
+    // Cover-Flow startet auf der ersten Galerie. Nur die Fokus-Karte ist
+    // ein öffenbarer Button (Nachbarn sind aria-hidden / nicht öffnend).
+    const fokus = galerienLaden()[0];
+    const karte = screen.getByRole("button", {
+      name: new RegExp(`Galerie öffnen: ${fokus.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+    });
+    expect(karte).toBeInTheDocument();
+    const anzahl = fokus.bilder?.length ?? 0;
+    expect(within(karte).getByText(`${anzahl} Bilder`)).toBeInTheDocument();
+  });
+
+  it("bietet je Galerie einen Auswahl-Punkt (Dot)", () => {
     renderView();
     const galerien = galerienLaden();
-    for (const p of galerien) {
-      const kachel = screen.getByRole("button", {
-        name: new RegExp(`Bildergalerie öffnen: ${p.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
-      });
-      expect(kachel).toBeInTheDocument();
-      const anzahl = p.bilder?.length ?? 0;
-      expect(within(kachel).getByText(`${anzahl} Bilder`)).toBeInTheDocument();
+    // Wrap-around/Dots existieren erst ab ≥2 Galerien.
+    if (galerien.length > 1) {
+      for (const p of galerien) {
+        expect(
+          screen.getByRole("button", {
+            name: new RegExp(`Galerie \\d+: ${p.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+          }),
+        ).toBeInTheDocument();
+      }
     }
   });
 
@@ -66,14 +81,14 @@ describe("BildergalerieView — Übersicht", () => {
 });
 
 describe("BildergalerieView — Lightbox öffnen/schließen", () => {
-  it("öffnet die Lightbox per Kachel-Klick und zeigt das Karussell des Projekts", async () => {
+  it("öffnet die Lightbox per Klick auf die Fokus-Karte und zeigt das Karussell", async () => {
     const projekt = galerienLaden()[0];
     renderView();
 
-    const kachel = screen.getByRole("button", {
-      name: new RegExp(`Bildergalerie öffnen: ${projekt.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+    const karte = screen.getByRole("button", {
+      name: new RegExp(`Galerie öffnen: ${projekt.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
     });
-    fireEvent.click(kachel);
+    fireEvent.click(karte);
 
     const dialog = await screen.findByRole("dialog");
     expect(dialog).toBeInTheDocument();
@@ -90,7 +105,7 @@ describe("BildergalerieView — Lightbox öffnen/schließen", () => {
 
     fireEvent.click(
       screen.getByRole("button", {
-        name: new RegExp(`Bildergalerie öffnen: ${projekt.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
+        name: new RegExp(`Galerie öffnen: ${projekt.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
       }),
     );
     await screen.findByRole("dialog");
