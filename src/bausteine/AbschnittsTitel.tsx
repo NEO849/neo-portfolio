@@ -42,7 +42,7 @@ export function AbschnittsTitel({
       {untertitel && (
         <GlanzUeberschrift
           element="h2"
-          klassen="font-display font-semibold tracking-[-0.01em] leading-snug text-xl md:text-2xl max-w-2xl"
+          klassen="font-display font-semibold tracking-[-0.01em] leading-snug text-lg md:text-xl max-w-2xl opacity-90"
           kinder={untertitel}
         />
       )}
