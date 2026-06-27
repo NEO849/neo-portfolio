@@ -54,6 +54,8 @@ export interface PeekEintrag {
   readonly quelle: string;
   /** Titel (Caption-Überschrift + A11y-Label). */
   readonly titel: string;
+  /** Optionaler Kurzname fürs Köpfchen (titelOben) — fällt auf titel zurück. */
+  readonly kopfzeile?: string;
   /** Optionaler Untertitel (eine Zeile Kontext). */
   readonly untertitel?: string;
   /** Hex-Akzentfarbe (für Glow, aktiven Dot). */
@@ -73,6 +75,12 @@ interface PeekKarussellProps {
   readonly onOeffnen?: (index: number) => void;
   /** Pflicht-Label der Karussell-Region (Screenreader). */
   readonly ariaLabel: string;
+  /**
+   * "oben": aktiver Titel mittig in der Kopfzeile (auf Höhe des Zählers) statt
+   * Caption unter der Bühne — für die Projekt-Auswahl, deren Klick ohnehin in
+   * die erklärende Detailview führt. Default = Caption unten (Foto-Ebene).
+   */
+  readonly titelOben?: boolean;
 }
 
 // ─── Stagger-Stufen (Yormas-Rezept, in Akzentfarbe getönt) ──────────
@@ -118,6 +126,7 @@ export function PeekKarussell({
   startIndex = 0,
   onOeffnen,
   ariaLabel,
+  titelOben = false,
 }: PeekKarussellProps) {
   const reduziert = useReducedMotion() ?? false;
   const anzahl = eintraege.length;
@@ -296,8 +305,8 @@ export function PeekKarussell({
         {`${aktiverIndex + 1} von ${anzahl}: ${aktiv.titel}`}
       </p>
 
-      {/* Kopfzeile: Zähler (links) + Pfeile (Desktop, rechts). */}
-      <div className="flex items-center justify-between gap-4 mb-3 px-1">
+      {/* Kopfzeile: Zähler (links) · optional Projektname (mittig) · Pfeile (rechts). */}
+      <div className="relative flex items-center justify-between gap-4 mb-3 px-1 min-h-[2.75rem]">
         {mehrere ? (
           <p className="font-mono text-[11px] text-white/45 tracking-wide">
             {String(aktiverIndex + 1).padStart(2, "0")} /{" "}
@@ -305,6 +314,22 @@ export function PeekKarussell({
           </p>
         ) : (
           <span />
+        )}
+        {titelOben && (
+          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[56%] sm:max-w-[62%]">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.h3
+                key={aktiverIndex}
+                initial={reduziert ? { opacity: 0 } : { opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduziert ? { opacity: 0 } : { opacity: 0, y: -3 }}
+                transition={{ duration: reduziert ? 0.2 : 0.28, ease: [0.16, 1, 0.3, 1] }}
+                className="truncate text-center font-display font-semibold text-sm sm:text-base text-white"
+              >
+                {aktiv.kopfzeile ?? aktiv.titel}
+              </motion.h3>
+            </AnimatePresence>
+          </div>
         )}
         {mehrere && !istMobile && (
           <div className="flex gap-2">
@@ -419,31 +444,32 @@ export function PeekKarussell({
         </ul>
       </div>
 
-      {/* ─── #3 Caption UNTER der Bühne — nur der aktive Eintrag, ruhig ──
-          Konsistent über beide Ebenen: gleiche Schriftfarbe/-größe,
-          zentriert, feste Mindesthöhe (kein Layout-Shift), sanfter
-          Wechsel (reduced-motion = reines Fade). */}
-      <div className="mt-5 min-h-[4.25rem] flex items-start justify-center text-center px-4">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={aktiverIndex}
-            initial={reduziert ? { opacity: 0 } : { opacity: 0, y: 6 }}
-            animate={reduziert ? { opacity: 1 } : { opacity: 1, y: 0 }}
-            exit={reduziert ? { opacity: 0 } : { opacity: 0, y: -4 }}
-            transition={{ duration: reduziert ? 0.2 : 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="max-w-md"
-          >
-            <h3 className="font-display font-bold text-white text-base sm:text-lg leading-tight text-balance">
-              {aktiv.titel}
-            </h3>
-            {aktiv.untertitel && (
-              <p className="mt-1 text-sm text-white/60 leading-snug text-pretty">
-                {aktiv.untertitel}
-              </p>
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+      {/* ─── Caption UNTER der Bühne — nur die Foto-Ebene. Auf der Projekt-
+          Auswahl (titelOben) steht der Name oben, und der Klick führt in die
+          erklärende Detailview — daher hier keine Caption. ─────────────── */}
+      {!titelOben && (
+        <div className="mt-5 min-h-[4.25rem] flex items-start justify-center text-center px-4">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={aktiverIndex}
+              initial={reduziert ? { opacity: 0 } : { opacity: 0, y: 6 }}
+              animate={reduziert ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              exit={reduziert ? { opacity: 0 } : { opacity: 0, y: -4 }}
+              transition={{ duration: reduziert ? 0.2 : 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="max-w-md"
+            >
+              <h3 className="font-display font-bold text-white text-base sm:text-lg leading-tight text-balance">
+                {aktiv.titel}
+              </h3>
+              {aktiv.untertitel && (
+                <p className="mt-1 text-sm text-white/60 leading-snug text-pretty">
+                  {aktiv.untertitel}
+                </p>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      )}
 
       {/* ─── Dots (aktiv = Akzent-Pille mit Glow) ─────────────────────── */}
       {mehrere && (

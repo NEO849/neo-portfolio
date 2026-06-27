@@ -50,6 +50,8 @@ export default function BildergalerieView({ startSlug, onLightboxSchliessen }: B
         return {
           quelle: projekt.bilder?.[0]?.quelle ?? "",
           titel: projekt.titel,
+          // Kurzname (alles vor der Tagline „ – / — ") fürs mittige Köpfchen.
+          kopfzeile: projekt.titel.split(/\s+[–—-]\s+/)[0].trim(),
           untertitel: `${konfig.label} · ${anzahl} ${anzahl === 1 ? "Bild" : "Bilder"}`,
           akzentFarbe: konfig.akzentFarbe,
         };
@@ -87,6 +89,7 @@ export default function BildergalerieView({ startSlug, onLightboxSchliessen }: B
           eintraege={projektEintraege}
           onOeffnen={(index) => setOffenesProjekt(galerien[index] ?? null)}
           ariaLabel="Projekt-Galerien durchblättern"
+          titelOben
         />
       ) : (
         <p className="text-sm text-white/40 font-mono">Noch keine Galerien verfügbar.</p>

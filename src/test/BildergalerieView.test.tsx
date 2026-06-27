@@ -38,18 +38,18 @@ describe("galerienLaden — dynamische Ableitung aus PROJEKTE", () => {
 });
 
 describe("BildergalerieView — Peek-Auswahl", () => {
-  it("rendert die mittige Galerie als öffenbares Item; Bilderzähler steht in der Caption", () => {
+  it("rendert die mittige Galerie als öffenbares Item; der Projektname steht im Köpfchen", () => {
     renderView();
     // Peek-Karussell startet auf der ersten Galerie. Nur das mittige Item
-    // ist „öffnen"; Nachbarn sind „wechseln".
+    // ist „öffnen"; Nachbarn sind „wechseln". A11y-Label trägt den vollen Titel.
     const fokus = galerienLaden()[0];
     const karte = screen.getByRole("button", {
       name: new RegExp(`Öffnen: ${fokus.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
     });
     expect(karte).toBeInTheDocument();
-    // Untertitel der Caption enthält den Bilderzähler (Label · n Bilder).
-    const anzahl = fokus.bilder?.length ?? 0;
-    expect(screen.getByText(new RegExp(`·\\s*${anzahl}\\s*Bilder`))).toBeInTheDocument();
+    // Projektname (Kurzform vor der Tagline) steht mittig im Köpfchen.
+    const kurz = fokus.titel.split(/\s+[–—-]\s+/)[0].trim();
+    expect(screen.getByRole("heading", { name: kurz })).toBeInTheDocument();
   });
 
   it("bietet je Galerie einen Auswahl-Punkt (Dot)", () => {
