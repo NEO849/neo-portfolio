@@ -395,13 +395,7 @@ export function PeekKarussell({
                                   istAktiv ? "opacity-100" : "opacity-0"
                                 }`}
                   >
-                    <span
-                      className="inline-block font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.18em]"
-                      style={{ color: eintrag.akzentFarbe }}
-                    >
-                      {String(index + 1).padStart(2, "0")} / {String(anzahl).padStart(2, "0")}
-                    </span>
-                    <h3 className="mt-1 font-display font-bold text-white text-base sm:text-lg leading-tight text-balance">
+                    <h3 className="font-display font-bold text-white text-base sm:text-lg leading-tight text-balance">
                       {eintrag.titel}
                     </h3>
                     {eintrag.untertitel && (
