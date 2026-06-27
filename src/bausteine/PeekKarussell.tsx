@@ -43,9 +43,9 @@ import {
 } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
-// Lila-Akzent für die Navigation (Dots + Pfeile) — bewusst durchgehend,
-// unabhängig von der Projekt-Kategorie, für einen einheitlichen Steuer-Akzent.
-const LILA = "#a78bfa";
+// Navigations-Akzent (Dots + Pfeile) — exakt der Logo-Ton von „Solutions"
+// (akzent-400 #7aa2ff), durchgehend, unabhängig von der Projekt-Kategorie.
+const AKZENT = "#7aa2ff";
 
 // ─── Daten-Vertrag ──────────────────────────────────────────────────
 
@@ -467,8 +467,8 @@ export function PeekKarussell({
                   className="block h-1.5 rounded-full transition-all duration-200"
                   style={{
                     width: aktivDot ? 26 : 6,
-                    background: aktivDot ? LILA : "rgba(167,139,250,0.30)",
-                    boxShadow: aktivDot ? `0 0 12px ${LILA}aa` : undefined,
+                    background: aktivDot ? AKZENT : "rgba(122,162,255,0.30)",
+                    boxShadow: aktivDot ? `0 0 12px ${AKZENT}aa` : undefined,
                   }}
                 />
               </button>
@@ -496,9 +496,9 @@ function NavPfeil({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="grid h-11 w-11 place-items-center rounded-full border border-[#a78bfa]/30
-                 bg-grund-950/70 text-[#a78bfa] backdrop-blur-sm transition-all
-                 hover:border-[#a78bfa]/60 hover:text-[#c4b5fd]
+      className="grid h-11 w-11 place-items-center rounded-full border border-akzent-400/30
+                 bg-grund-950/70 text-akzent-400 backdrop-blur-sm transition-all
+                 hover:border-akzent-400/60 hover:text-akzent-300
                  focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
     >
       <svg

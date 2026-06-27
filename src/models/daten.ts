@@ -100,9 +100,10 @@ export const PROJEKTE: ProjektModel[] = [
     linkDemo: "/voice-demo",
     galerieSlug: "voice-bridge",
     bilder: [
-      { quelle: "/projekte/voice-bridge/voice_aufnahme.webp", titel: "Befehl per Stimme", text: "Eingesprochener Befehl wird transkribiert und landet direkt in der Claude-Session — sichtbar als grüner Status." },
-      { quelle: "/projekte/voice-bridge/voice_bereit.webp", titel: "Oberfläche auf Apple-Niveau", text: "Ruhige, native UI: Mikro-Orb, Session-Auswahl, Sprache (DE/EN/AUTO) und auto-Enter auf einen Blick." },
-      { quelle: "/projekte/voice-bridge/voice_einstellungen.webp", titel: "Einstellungen", text: "Default-Sprache, auto-Enter und Session-Routing — alles direkt steuerbar." },
+      { quelle: "/projekte/voice-bridge/voice_sprechen.webp", titel: "Sprechen & Transkribieren", text: "Tippen, sprechen, nochmal tippen zum Senden — der Live-Ring zeigt die Aufnahme, danach läuft die lokale Transkription." },
+      { quelle: "/projekte/voice-bridge/voice_eingefuegt.webp", titel: "Direkt in Claude eingefügt", text: "Das Transkript landet sofort in der gewählten Arbeitssitzung — mit Bestätigung und Latenz-Anzeige." },
+      { quelle: "/projekte/voice-bridge/voice_session.webp", titel: "Session-Routing", text: "Per Auswahl landet der Befehl in der richtigen Sitzung — mehrere Sessions parallel, eine Stimme." },
+      { quelle: "/projekte/voice-bridge/voice_server.webp", titel: "Auf dem Server", text: "Die Gegenseite: Claude Code auf dem eigenen Server empfängt den eingesprochenen Befehl (Inhalt unkenntlich gemacht)." },
     ],
     zeitraum: "2025 – heute",
     status: "aktiv",
