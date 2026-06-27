@@ -52,9 +52,9 @@ export const PROJEKTE: ProjektModel[] = [
     linkGithub: "https://github.com/NEO849/markmem",
     galerieSlug: "markmem",
     bilder: [
-      { quelle: "/projekte/markmem/markmem_memdash_0.webp", titel: "memDash — Breit-Modus", text: "Voller Live-Zustand des Gedächtnisses am Desktop: Korpus, Tiers, Recall-Qualität, Lern-Schicht und Verdichtungs-Inbox." },
-      { quelle: "/projekte/markmem/markmem_memdash_1.webp", titel: "memDash — Mittel-Modus", text: "Kompaktes Layout für schmalere Fenster — dieselben Daten, automatisch neu umgebrochen." },
-      { quelle: "/projekte/markmem/markmem_memdash_2.webp", titel: "memDash — Schmal-Modus (Mobil)", text: "iPhone-Hochformat über SSH: gestapelt, ohne Rahmen, jede Zeile bleibt im Fenster." },
+      { quelle: "/projekte/markmem/markmem_real_1.png", titel: "Live-Zustand", text: "Echter Screenshot (iPhone über SSH): Korpus nach Typ, Transformation, Tiers gegen das Lade-Limit und die Recall-Qualität auf einen Blick." },
+      { quelle: "/projekte/markmem/markmem_real_2.png", titel: "Engine, Lern-Schicht & Verdichtung", text: "Such-Gewichte (BM25/Vektor/Entity), die Lern-Schicht und die Verdichtungs-Inbox. Die Karten-Namen sind aus Vertraulichkeitsgründen unkenntlich gemacht." },
+      { quelle: "/projekte/markmem/markmem_real_0.png", titel: "Start-Animation", text: "Der animierte Auftakt des Live-Dashboards beim Start." },
     ],
     zeitraum: "2026 – heute",
     status: "aktiv",
