@@ -52,9 +52,14 @@ export const PROJEKTE: ProjektModel[] = [
     linkGithub: "https://github.com/NEO849/markmem",
     galerieSlug: "markmem",
     bilder: [
-      { quelle: "/projekte/markmem/markmem_real_1.png", titel: "Live-Zustand", text: "Echter Screenshot (iPhone über SSH): Korpus nach Typ, Transformation, Tiers gegen das Lade-Limit und die Recall-Qualität auf einen Blick." },
+      // Echte Screenshots (iPhone über SSH)
+      { quelle: "/projekte/markmem/markmem_real_0.png", titel: "Start-Animation", text: "Echter Screenshot (iPhone über SSH): der animierte Auftakt des Live-Dashboards beim Start." },
+      { quelle: "/projekte/markmem/markmem_real_1.png", titel: "Live-Zustand", text: "Korpus nach Typ, Transformation, Tiers gegen das Lade-Limit und die Recall-Qualität auf einen Blick." },
       { quelle: "/projekte/markmem/markmem_real_2.png", titel: "Engine, Lern-Schicht & Verdichtung", text: "Such-Gewichte (BM25/Vektor/Entity), die Lern-Schicht und die Verdichtungs-Inbox. Die Karten-Namen sind aus Vertraulichkeitsgründen unkenntlich gemacht." },
-      { quelle: "/projekte/markmem/markmem_real_0.png", titel: "Start-Animation", text: "Der animierte Auftakt des Live-Dashboards beim Start." },
+      // Synthetischer Demo-Korpus — dieselbe Oberfläche, responsiv über drei Fensterbreiten
+      { quelle: "/projekte/markmem/markmem_memdash_0.webp", titel: "Demo — Breit-Modus", text: "Synthetischer Demo-Korpus, Breit-Modus (Desktop): voller Live-Zustand mit allen Panels." },
+      { quelle: "/projekte/markmem/markmem_memdash_1.webp", titel: "Demo — Mittel-Modus", text: "Dieselben Demo-Daten in kompakterem Layout für schmalere Fenster." },
+      { quelle: "/projekte/markmem/markmem_memdash_2.webp", titel: "Demo — Schmal-Modus", text: "Schmal-Modus (Mobil): gestapelt, ohne Rahmen — jede Zeile bleibt im Fenster." },
     ],
     zeitraum: "2026 – heute",
     status: "aktiv",
