@@ -700,7 +700,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     cadence: "täglich 04:15",
     output: "Git-Repository + rsync-Snapshot",
     farbeRgb: "122, 162, 255",
-    details: "Sichert das Memory-Verzeichnis, alle Research-Notizen und die DATEV-Reports jede Nacht. Drei-Tier-Backup: Git-Repo, lokaler Snapshot, externer Sync. Bei Datenverlust ist alles in unter einer Minute wiederherstellbar.",
+    details: "Sichert das Memory-Verzeichnis, alle Research-Notizen und Security-Berichte jede Nacht. Drei-Tier-Backup: Git-Repo, lokaler Snapshot, externer Sync. Bei Datenverlust ist alles in unter einer Minute wiederherstellbar.",
   },
   {
     name: "claude-bus-mobile-rotate.timer",
