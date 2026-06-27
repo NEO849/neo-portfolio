@@ -200,7 +200,6 @@ export const PROJEKTE: ProjektModel[] = [
       { quelle: "/projekte/sports-almanach/sport_historie_8.webp",      titel: "Historie",         text: "Formkurven und Trends als Swift Charts." },
     ],
     zeitraum: "2024 – 2025",
-    status: "abgeschlossen",
   },
   {
     titel: "Z Almanach – Dragon Ball Z Kompendium",

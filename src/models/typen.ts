@@ -28,7 +28,7 @@ export interface ProjektModel {
   /** Screenshots für die Bildergalerie (gleiche Bilder wie im README). */
   readonly bilder?: ProjektBild[];
   readonly zeitraum: string;
-  readonly status: "aktiv" | "abgeschlossen" | "in-entwicklung";
+  readonly status?: "aktiv" | "abgeschlossen" | "in-entwicklung";
 }
 
 export interface SkillModel {
