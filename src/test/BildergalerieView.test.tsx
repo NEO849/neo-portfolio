@@ -38,7 +38,7 @@ describe("galerienLaden — dynamische Ableitung aus PROJEKTE", () => {
 });
 
 describe("BildergalerieView — Cover-Flow Auswahl", () => {
-  it("rendert die Fokus-Galerie als öffenbare Karte mit Bilderzähler", () => {
+  it("rendert die Fokus-Galerie als öffenbare Karte; Bilderzähler steht in der Caption", () => {
     renderView();
     // Cover-Flow startet auf der ersten Galerie. Nur die Fokus-Karte ist
     // ein öffenbarer Button (Nachbarn sind aria-hidden / nicht öffnend).
@@ -47,8 +47,9 @@ describe("BildergalerieView — Cover-Flow Auswahl", () => {
       name: new RegExp(`Galerie öffnen: ${fokus.titel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
     });
     expect(karte).toBeInTheDocument();
+    // Der Bilderzähler liegt jetzt im Caption-Block über der Bühne (nicht mehr auf der Karte).
     const anzahl = fokus.bilder?.length ?? 0;
-    expect(within(karte).getByText(`${anzahl} Bilder`)).toBeInTheDocument();
+    expect(screen.getByText(`${anzahl} Bilder`)).toBeInTheDocument();
   });
 
   it("bietet je Galerie einen Auswahl-Punkt (Dot)", () => {
@@ -64,14 +65,6 @@ describe("BildergalerieView — Cover-Flow Auswahl", () => {
         ).toBeInTheDocument();
       }
     }
-  });
-
-  it("zeigt die 4 Filter-Tabs", () => {
-    renderView();
-    expect(screen.getByRole("tab", { name: "Alle" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Security" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Mobil" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Tooling" })).toBeInTheDocument();
   });
 
   it("startet ohne geöffnete Lightbox (kein dialog)", () => {

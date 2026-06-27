@@ -169,11 +169,13 @@ describe("GalerieCoverflow — Akzentfarbe folgt dem Fokus", () => {
     expect(eyebrow).toHaveStyle({ color: securityAkzent });
   });
 
-  it("wechselt die Akzentfarbe beim Blättern zur development-Galerie", () => {
+  it("wechselt die Akzentfarbe beim Blättern zur development-Galerie", async () => {
     render(<GalerieCoverflow galerien={DREI} onOeffnen={() => {}} />);
     fireEvent.click(screen.getByLabelText("Nächste Galerie"));
     const devAkzent = kategorieKonfig("development").akzentFarbe;
-    const eyebrow = screen.getByText(kategorieKonfig("development").label);
+    // Caption-Block wechselt via AnimatePresence mode="wait" — auf den neuen
+    // Eyebrow warten (alter muss erst ausblenden).
+    const eyebrow = await screen.findByText(kategorieKonfig("development").label);
     expect(eyebrow).toHaveStyle({ color: devAkzent });
   });
 });

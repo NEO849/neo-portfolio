@@ -160,6 +160,47 @@ export function GalerieCoverflow({ galerien, onOeffnen, startIndex = 0 }: Galeri
         />
       </div>
 
+      {/* ─── Caption-Block über der Bühne (wechselt beim Blättern) ──
+          Bewusst VOM Cover-Bild gelöst und sauber zentriert darüber
+          gesetzt — Muster wie die Caption im BilderKarussell. Feste
+          Mindesthöhe gegen Layout-Shift. */}
+      <div className="relative z-30 min-h-[6.5rem] flex flex-col items-center justify-end text-center px-4 mb-5">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={fokus.galerieSlug ?? index}
+            initial={reduziert ? { opacity: 0 } : { opacity: 0, y: 8 }}
+            animate={reduziert ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            exit={reduziert ? { opacity: 0 } : { opacity: 0, y: -6 }}
+            transition={{ duration: reduziert ? 0.2 : 0.32, ease: KURVEN.expressiv }}
+          >
+            <span
+              className="font-mono text-[10px] tracking-[0.24em] uppercase"
+              style={{ color: konfig.akzentFarbe }}
+            >
+              {konfig.label}
+            </span>
+            <h3 className="font-display text-lg sm:text-xl font-bold text-white leading-snug mt-1.5">
+              <span style={{ color: konfig.akzentFarbe }} className="font-mono text-sm">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span className="text-white/30"> · </span>
+              {fokus.titel}
+            </h3>
+            <span className="mt-2 inline-flex items-center gap-1.5 font-mono text-[11px] text-white/50">
+              <span>{`${fokus.bilder?.length ?? 0} ${(fokus.bilder?.length ?? 0) === 1 ? "Bild" : "Bilder"}`}</span>
+              <span className="text-white/25" aria-hidden="true">·</span>
+              <span className="inline-flex items-center gap-1 text-white/55">
+                Galerie öffnen
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </span>
+            </span>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
       {/* ─── Zähler oben links ───────────────────────────────────── */}
       {mehrere && (
         <div className="absolute top-0 left-0 z-30 font-mono text-[11px] text-white/45 tracking-wide">
@@ -217,7 +258,6 @@ export function GalerieCoverflow({ galerien, onOeffnen, startIndex = 0 }: Galeri
         <div className="mt-6 flex items-center justify-center gap-2">
           {galerien.map((p, i) => {
             const aktiv = i === index;
-            const akz = kategorieKonfig(p.kategorie).akzentFarbe;
             return (
               <button
                 key={p.galerieSlug ?? i}
@@ -266,7 +306,6 @@ function KartenSchicht({
   onDragEnd,
   onAktivieren,
 }: KartenSchichtProps) {
-  const konfig = kategorieKonfig(projekt.kategorie);
   const cover = projekt.bilder?.[0];
   const anzahlBilder = projekt.bilder?.length ?? 0;
 
@@ -363,6 +402,8 @@ function KartenSchicht({
         <div className="relative aspect-[16/10] bg-grund-900 overflow-hidden"
           style={istFokus ? { boxShadow: "0 24px 64px rgba(0,0,0,0.55), 0 8px 20px rgba(0,0,0,0.35)" } : undefined}
         >
+          {/* Sauberes Cover — Text steht jetzt im Caption-Block über der
+              Bühne, daher kein Overlay/Scrim mehr auf dem Bild. */}
           <img
             src={cover.quelle}
             alt={istFokus ? `Vorschau ${projekt.titel}: ${cover.titel}` : ""}
@@ -373,50 +414,6 @@ function KartenSchicht({
                        transition-transform duration-500 ease-out
                        group-hover:scale-[1.03]"
           />
-
-          {/* Verlaufs-Scrim unten für Kontrast der Overlay-Texte */}
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to top, rgba(7,10,18,0.85) 0%, rgba(7,10,18,0) 55%)",
-            }}
-            aria-hidden="true"
-          />
-
-          {istFokus && (
-            <>
-              {/* Bilderzähler oben rechts */}
-              <span className="absolute top-3 right-3 z-10 font-mono text-[11px] px-2 py-1 rounded-md
-                               bg-grund-950/70 border border-white/10 text-white/75 backdrop-blur-sm">
-                {anzahlBilder} {anzahlBilder === 1 ? "Bild" : "Bilder"}
-              </span>
-
-              {/* Overlay unten links: Eyebrow · Titel · CTA */}
-              <div className="absolute inset-x-0 bottom-0 z-10 p-5">
-                <span
-                  className="font-mono text-[10px] tracking-[0.22em] uppercase"
-                  style={{ color: konfig.akzentFarbe }}
-                >
-                  {konfig.label}
-                </span>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-white leading-snug mt-1">
-                  {projekt.titel}
-                </h3>
-                <span
-                  className="mt-2 inline-flex items-center gap-1.5 font-mono text-[11px]
-                             text-white/55 transition-colors duration-200
-                             group-hover:text-white/90 group-focus-visible:text-white/90"
-                >
-                  Galerie öffnen
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M5 12h14M13 6l6 6-6 6" />
-                  </svg>
-                </span>
-              </div>
-            </>
-          )}
         </div>
       </motion.button>
     </motion.div>
