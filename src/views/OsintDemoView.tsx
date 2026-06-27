@@ -1559,7 +1559,7 @@ export default function OsintDemoView() {
         <GlanzUeberschrift
           element="h2"
           kinder="OSINT Analyseplattform"
-          klassen="font-display font-semibold tracking-[-0.01em] leading-snug text-xl md:text-2xl max-w-2xl mb-3"
+          klassen="font-display font-semibold tracking-[-0.01em] leading-snug text-lg md:text-xl max-w-2xl mb-3 opacity-90"
         />
         <p className="text-white/70 text-[15px] leading-relaxed max-w-2xl">
           Selbst entwickelte Analyse-Werkzeuge, gehostet auf meinem eigenen Server — live gegen öffentliche

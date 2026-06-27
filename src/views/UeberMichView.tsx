@@ -70,7 +70,7 @@ export default function UeberMichView() {
         <GlanzUeberschrift
           element="h3"
           dauerSekunden={6.5}
-          klassen="font-display font-semibold text-xl md:text-[26px] leading-snug tracking-[-0.01em]"
+          klassen="font-display font-semibold text-lg md:text-xl leading-snug tracking-[-0.01em] opacity-90"
           kinder="Eine seltene Kombination: über 15 Jahre IT-Systeme aufgebaut — heute entwickle ich die Software für die Hardware. Das gibt mir einen besonderen Blick fürs große Ganze."
         />
       </motion.div>
