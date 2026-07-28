@@ -74,8 +74,11 @@ jobs:
 
       # Harter Gate: NUR Production-Deps (das, was an Nutzer ausgeliefert wird).
       # Bricht bei High/Critical — Dev-Tooling-Advisories blockieren das Deploy nicht.
+      # Dokumentierte Ausnahmen (geprüft & nicht anwendbar) in scripts/audit-gate.mjs.
       - name: Audit production dependencies (fail on high/critical)
-        run: npm audit --omit=dev --audit-level=high
+        run: |
+          npm audit --omit=dev --json > audit.json || true
+          node scripts/audit-gate.mjs audit.json
 
       # Voller Audit inkl. Dev-Deps — nur informativ, blockiert nicht.
       - name: Full audit (informational)
