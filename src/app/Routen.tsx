@@ -20,6 +20,7 @@ const StartSeite      = lazyMitNeuversuch(() => import("../seiten/StartSeite"));
 const UeberMichSeite  = lazyMitNeuversuch(() => import("../seiten/UeberMichSeite"));
 const ProjekteSeite   = lazyMitNeuversuch(() => import("../seiten/ProjekteSeite"));
 const SecuritySeite   = lazyMitNeuversuch(() => import("../seiten/SecuritySeite"));
+const SecurityProgrammSeite = lazyMitNeuversuch(() => import("../seiten/SecurityProgrammSeite"));
 const LaborSeite      = lazyMitNeuversuch(() => import("../seiten/LaborSeite"));
 const OsintToolSeite  = lazyMitNeuversuch(() => import("../seiten/OsintToolSeite"));
 const KontaktSeite    = lazyMitNeuversuch(() => import("../seiten/KontaktSeite"));
@@ -78,6 +79,7 @@ function useRoutenVorladen() {
       void import("../seiten/UeberMichSeite");
       void import("../seiten/ProjekteSeite");
       void import("../seiten/SecuritySeite");
+      void import("../seiten/SecurityProgrammSeite");
       void import("../seiten/LaborSeite");
       void import("../seiten/OsintToolSeite");
       void import("../seiten/KontaktSeite");
@@ -126,6 +128,7 @@ export function Routen() {
           <Route path="/bilder/:slug"  element={<BildergalerieSeite />} />
           {/* Alt-Route dauerhaft auf den neuen Deep-Link umgeleitet */}
           <Route path="/projekte/:slug/bilder" element={<AlteGalerieUmleitung />} />
+          <Route path="/security-programm" element={<SecurityProgrammSeite />} />
           <Route path="*"              element={<NichtGefundenSeite />} />
         </Routes>
       </Suspense>
