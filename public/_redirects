@@ -14,5 +14,11 @@
 # Alte Vercel-Pfad-Reste auffangen (Defense-in-Depth, falls Crawler darauf landen)
 /_vercel/*  /  301
 
+# Veraltete/fehlende gehashte Assets sauber auf 404 (statt SPA-HTML 200) — verhindert,
+# dass ein Client mit altem Cache CSS/JS als text/html serviert bekommt (nosniff → Weißbild).
+# Existierende Assets werden von Pages VOR _redirects direkt ausgeliefert; nur wirklich
+# fehlende Hashes treffen diese Regel → sauberer 404 → App-Chunk-Selbstheilung greift.
+/assets/*  /404.html  404
+
 # SPA-Fallback — MUSS letzte Regel sein
 /*  /index.html  200
