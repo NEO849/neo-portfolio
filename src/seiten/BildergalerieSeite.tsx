@@ -27,7 +27,7 @@ export default function BildergalerieSeite() {
     <>
       <SeitenMeta
         titel="Bilder"
-        beschreibung="Bildergalerien meiner Projekte: Screenshots und Einblicke aus iOS- und Android-Apps sowie eigenen Security- und KI-Tools — markmem, Sports Almanach, Z Almanach."
+        beschreibung="Bildergalerien meiner Projekte: Screenshots und Einblicke aus iOS- und Android-Apps sowie eigenen Security- und KI-Tools (markmem, Sports Almanach, Z Almanach)."
         pfad={GALERIE_BASIS}
       />
       <motion.div

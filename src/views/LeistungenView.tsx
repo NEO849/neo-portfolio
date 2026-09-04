@@ -14,7 +14,7 @@ import { zahlwort, grossErsterBuchstabe } from "../hilfsmittel/formatierung";
 // Anzahl der Schwerpunkte direkt aus den Daten ableiten — so können Untertitel
 // und Karten nie auseinanderlaufen (Single Source of Truth).
 const LEISTUNGEN_UNTERTITEL =
-  `${grossErsterBuchstabe(zahlwort(LEISTUNGEN.length))} Schwerpunkte – Stabil, Sicher, ` +
+  `${grossErsterBuchstabe(zahlwort(LEISTUNGEN.length))} Schwerpunkte: Stabil, Sicher, ` +
   `Effizient und Modular/Wartbar. Keine Werkzeug-Show, sondern Systeme und ` +
   `Sicherheit, die im Alltag tragen.`;
 

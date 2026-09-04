@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, Fragment, type ReactNode } fr
 import { motion, AnimatePresence } from "framer-motion";
 import { PHASEN_WECHSEL, FEDERN } from "../bewegung/varianten";
 import { GlanzUeberschrift } from "../bewegung/GlanzUeberschrift";
-import { KnopfAktion } from "../bausteine/KnopfAktion";
+import { Knopf } from "../bausteine/Knopf";
 import {
   domainAnalysieren, emailAnalysieren,
   telefonAnalysieren, bildAnalysieren,
@@ -53,7 +53,7 @@ const DEMO_MODULE: DemoModul[] = [
     nummer: "1", name: "Status pruefen", farbe: "#9ca3af",
     eingabeLabel: "", beispielEingabe: "", eingabeTyp: "none",
     ziel: "Prüft auf einen Blick, ob alle 8 Analyse-Werkzeuge gerade live und einsatzbereit sind.",
-    beschreibung: "Liveness-Check für FastAPI, dnspython, httpx (mit SSRF-Guard), WhatsMyName-DB, Shodan InternetDB, RIPEstat und die CT/Archiv-Quellen (crt.sh/Wayback/CommonCrawl) — bestätigt dass alle 8 Analyse-Werkzeuge live und produktiv sind.",
+    beschreibung: "Liveness-Check für FastAPI, dnspython, httpx (mit SSRF-Guard), WhatsMyName-DB, Shodan InternetDB, RIPEstat und die CT/Archiv-Quellen (crt.sh/Wayback/CommonCrawl). Bestätigt, dass alle 8 Analyse-Werkzeuge live und produktiv sind.",
   },
   {
     nummer: "2", name: "E-Mail Vollanalyse", farbe: "#7aa2ff",
@@ -64,19 +64,19 @@ const DEMO_MODULE: DemoModul[] = [
   {
     nummer: "12", name: "Soziale Präsenz", farbe: "#c084fc",
     eingabeLabel: "Username eingeben", beispielEingabe: "torvalds", eingabeTyp: "text",
-    ziel: "Findet den kompletten digitalen Fußabdruck eines Benutzernamens — echte Profildaten auf offenen Plattformen + Existenz auf den großen Netzwerken und Hunderten weiteren Seiten.",
-    beschreibung: "Offene Plattformen mit echten Daten (Bluesky, GitHub, GitLab, Reddit, Mastodon, Keybase, Hacker News, Dev.to — Anzeigename, Bio, Follower, Avatar, verknüpfte Konten) + Breitenscan über WhatsMyName (Schnell ~12 / Vollscan 600+, Konfidenz pro Treffer). Große Netzwerke (X, LinkedIn, Facebook, Instagram, TikTok, YouTube) login-/anti-bot-geschützt: nur ToS-sauber — Existenz via öffentliche oEmbed-Endpunkte (YouTube/TikTok) bzw. Profil-Link + Google-/Bing-Dork. Kein Scraping.",
+    ziel: "Findet den kompletten digitalen Fußabdruck eines Benutzernamens (echte Profildaten auf offenen Plattformen + Existenz auf den großen Netzwerken und Hunderten weiteren Seiten).",
+    beschreibung: "Offene Plattformen mit echten Daten (Bluesky, GitHub, GitLab, Reddit, Mastodon, Keybase, Hacker News, Dev.to, jeweils mit Anzeigename, Bio, Follower, Avatar, verknüpften Konten) + Breitenscan über WhatsMyName (Schnell ~12 / Vollscan 600+, Konfidenz pro Treffer). Große Netzwerke (X, LinkedIn, Facebook, Instagram, TikTok, YouTube) login-/anti-bot-geschützt: nur ToS-sauber, Existenz via öffentliche oEmbed-Endpunkte (YouTube/TikTok) bzw. Profil-Link + Google-/Bing-Dork. Kein Scraping.",
   },
   {
     nummer: "4", name: "Telefon Analyse", farbe: "#eab308",
     eingabeLabel: "Telefonnummer", beispielEingabe: "+12025550143", eingabeTyp: "text",
     ziel: "Verrät Land, Anbieter und Leitungstyp hinter einer Telefonnummer und bündelt seriöse Such-Quellen dazu.",
-    beschreibung: "Validiert Format via libphonenumber, ermittelt Land, Carrier, Leitungstyp und Zeitzone. Generiert kuratierte Suchlinks zu Truecaller, Tellows, sync.me, WhatsApp und Telegram — kein automatischer Aufruf.",
+    beschreibung: "Validiert Format via libphonenumber, ermittelt Land, Carrier, Leitungstyp und Zeitzone. Generiert kuratierte Suchlinks zu Truecaller, Tellows, sync.me, WhatsApp und Telegram (kein automatischer Aufruf).",
   },
   {
     nummer: "6", name: "Reverse Image", farbe: "#22c55e",
     eingabeLabel: "Bild-URL", beispielEingabe: "https://upload.wikimedia.org/wikipedia/commons/7/79/Tesla_circa_1890.jpeg", eingabeTyp: "text",
-    ziel: "Liest versteckte Foto-Daten (inkl. GPS-Aufnahmeort) aus und liefert Reverse-Image-Suchen, um die Bildquelle zu finden. (Beispiel: Porträt von Nikola Tesla — die Reverse-Suchen finden zahlreiche Fundstellen.)",
+    ziel: "Liest versteckte Foto-Daten (inkl. GPS-Aufnahmeort) aus und liefert Reverse-Image-Suchen, um die Bildquelle zu finden. (Beispiel: Porträt von Nikola Tesla. Die Reverse-Suchen finden zahlreiche Fundstellen.)",
     beschreibung: "Extrahiert EXIF-Metadaten und GPS-Koordinaten, berechnet pHash / aHash / dHash. Generiert 14 Suchlinks über 5 Kategorien: Mainstream (Google Lens / TinEye / Bing), Regional (Yandex / Baidu), Face (PimEyes / FaceCheck / Search4Faces), Art (SauceNAO / IQDB) und Celebrity (PicTriev).",
   },
   {
@@ -88,8 +88,8 @@ const DEMO_MODULE: DemoModul[] = [
   {
     nummer: "9", name: "Subdomain-Recon", farbe: "#2dd4bf",
     eingabeLabel: "Domain eingeben", beispielEingabe: "github.com", eingabeTyp: "text",
-    ziel: "Deckt versteckte Subdomains einer Domain auf — die oft übersehene, eigentliche Angriffsfläche.",
-    beschreibung: "Sammelt Subdomains aus drei unabhängigen keyless-Quellen parallel — Certificate-Transparency (crt.sh), Wayback Machine und CommonCrawl — und führt sie dedupliziert zusammen, mit Quellen-Herkunft pro Treffer und optionalem Live-Resolve (A-Record-Check). Jede Quelle ist fehler-isoliert: fällt eine aus, liefern die anderen weiter.",
+    ziel: "Deckt versteckte Subdomains einer Domain auf (die oft übersehene, eigentliche Angriffsfläche).",
+    beschreibung: "Sammelt Subdomains parallel aus drei unabhängigen keyless-Quellen (Certificate-Transparency/crt.sh, Wayback Machine, CommonCrawl) und führt sie dedupliziert zusammen, mit Quellen-Herkunft pro Treffer und optionalem Live-Resolve (A-Record-Check). Jede Quelle ist fehler-isoliert: fällt eine aus, liefern die anderen weiter.",
   },
   {
     nummer: "10", name: "IP-Intel (RIPEstat)", farbe: "#fbbf24",
@@ -100,7 +100,7 @@ const DEMO_MODULE: DemoModul[] = [
   {
     nummer: "11", name: "Censys Host-Intel", farbe: "#38bdf8",
     eingabeLabel: "IP oder Domain", beispielEingabe: "8.8.8.8", eingabeTyp: "text",
-    ziel: "Zeigt, welche Dienste ein Server nach außen offen hat, wo er steht und wem er gehört — die autoritative Host-Sicht, die Shodan ergänzt.",
+    ziel: "Zeigt, welche Dienste ein Server nach außen offen hat, wo er steht und wem er gehört (die autoritative Host-Sicht, die Shodan ergänzt).",
     beschreibung: "Censys Platform: Services (Port/Protokoll/Transport), Standort (Stadt/Land/Koordinaten), Autonomous System, WHOIS-Organisation inkl. Abuse-Kontakt und Reverse-DNS. Akzeptiert IP oder Domain (wird aufgelöst).",
   },
   {
@@ -185,15 +185,15 @@ const DATENSCHUTZ_HINWEISE: Record<string, string[]> = {
   "4": [
     "Die Telefonnummer wird zur Analyse einmalig an den Server übertragen.",
     "Es werden ausschließlich öffentliche Metadaten ausgewertet (Format, Land, Carrier-Typ).",
-    "Suchlinks werden generiert aber nicht automatisch aufgerufen — du entscheidest, welche du öffnest.",
-    "Keine Datenspeicherung — die Nummer wird nach der Analyse nicht aufbewahrt.",
+    "Suchlinks werden generiert aber nicht automatisch aufgerufen, du entscheidest, welche du öffnest.",
+    "Keine Datenspeicherung. Die Nummer wird nach der Analyse nicht aufbewahrt.",
     "Nutze dieses Tool nur für Nummern, für deren Analyse du berechtigt bist.",
   ],
   "6": [
     "Die Bild-URL wird einmalig an den Server übertragen, um das Bild herunterzuladen.",
     "Das Bild wird zur EXIF-Analyse und Hash-Berechnung temporär im Arbeitsspeicher verarbeitet.",
-    "GPS-Koordinaten im Bild können den Aufnahmeort preisgeben — überprüfe sensible Bilder mit Bedacht.",
-    "Keine Speicherung — weder URL noch Bilddaten werden dauerhaft aufbewahrt.",
+    "GPS-Koordinaten im Bild können den Aufnahmeort preisgeben, überprüfe sensible Bilder mit Bedacht.",
+    "Keine Speicherung. Weder URL noch Bilddaten werden dauerhaft aufbewahrt.",
     "Reverse-Image-Links werden generiert aber nicht automatisch aufgerufen.",
     "Nutze dieses Tool nur für Bilder, für deren Analyse du berechtigt bist.",
   ],
@@ -208,14 +208,14 @@ const ERGEBNIS_HINWEIS: Record<string, string> = {
   "1": "Grün = live und einsatzbereit. Wähle ein Modul und starte deine erste Analyse.",
   "2": "Rote Treffer zuerst: Datenlecks und exponierte Profile. Klicke einen Pivot, um einen Fund weiter zu verfolgen.",
   "3": "Jeder Treffer ist ein Profil auf einer Plattform. Achte auf die Konfidenz (hoch / mittel / niedrig), bevor du folgst.",
-  "4": "Land, Anbieter und Leitungstyp geben Kontext. Die Such-Links öffnest nur du selbst — nichts wird automatisch aufgerufen.",
+  "4": "Land, Anbieter und Leitungstyp geben Kontext. Die Such-Links öffnest nur du selbst, nichts wird automatisch aufgerufen.",
   "6": "Prüfe die EXIF-Daten auf GPS (Aufnahmeort) und nutze die Reverse-Image-Suchen, um die Bildquelle zu finden.",
   "5": "Ordne zuerst die beiden Risk-Scores ein. Rote/gelbe Ports und fehlende Security-Header sind die relevanten Schwachstellen.",
   "9": "Jede Subdomain ist potenzielle Angriffsfläche. Live aufgelöste (mit A-Record) zuerst ansehen.",
-  "10": "Zeigt Eigentümer und Routing der IP — die Basis, um Zuständigkeit und Abuse-Kontakt zu bestimmen.",
-  "11": "Offene Dienste und Standort des Hosts — die autoritative Sicht, die Shodan ergänzt.",
-  "8": "Unten erscheint der Beziehungs-Graph: Knoten anklicken und Verbindungen folgen — so werden die Zusammenhänge sichtbar.",
-  "12": "Offene Plattformen liefern echte Profildaten (Name/Bio/Follower). Große Netzwerke sind login-geschützt — nutze dort Profil-Link + Dork. Klicke einen Treffer, um ihn weiterzuverfolgen.",
+  "10": "Zeigt Eigentümer und Routing der IP (die Basis, um Zuständigkeit und Abuse-Kontakt zu bestimmen).",
+  "11": "Offene Dienste und Standort des Hosts (die autoritative Sicht, die Shodan ergänzt).",
+  "8": "Unten erscheint der Beziehungs-Graph: Knoten anklicken und Verbindungen folgen, so werden die Zusammenhänge sichtbar.",
+  "12": "Offene Plattformen liefern echte Profildaten (Name/Bio/Follower). Große Netzwerke sind login-geschützt, nutze dort Profil-Link + Dork. Klicke einen Treffer, um ihn weiterzuverfolgen.",
 };
 
 // ─── Terminal-Hilfsfunktionen ─────────────────────────────────────
@@ -488,7 +488,7 @@ function domainZuTerminal(d: DomainErgebnis): string[] {
 
   const sv = d.sicherheits_bewertung;
   zeilen.push("", S("SICHERHEITSBEWERTUNG"));
-  zeilen.push(`  Score: ${sv.punkte}/${sv.max} (${sv.prozent}%) — ${sv.note.toUpperCase()}`);
+  zeilen.push(`  Score: ${sv.punkte}/${sv.max} (${sv.prozent}%) - ${sv.note.toUpperCase()}`);
   for (const det of sv.details) {
     zeilen.push(`  ${det.ok ? "[ok]" : "[--]"}  ${trunc(det.check, 24)}`);
   }
@@ -1092,14 +1092,14 @@ function subdomainZuTerminal(s: SubdomainErgebnis): string[] {
 
 function censysZuTerminal(c: CensysErgebnis): string[] {
   const z: string[] = [];
-  z.push(R); z.push(K(`CENSYS — ${trunc(c.ziel, 22)}`)); z.push(R); z.push("");
+  z.push(R); z.push(K(`CENSYS -- ${trunc(c.ziel, 22)}`)); z.push(R); z.push("");
   if (c.fehler) { z.push(`  [Fehler] ${c.fehler}`); return z; }
   if (c.verfuegbar === false) { z.push(`  ${c.hinweis ?? "Censys nicht aktiviert"}`); return z; }
   const h = (c.hosts ?? []).find((x) => x.in_censys);
   if (!h) { z.push("  Kein Censys-Datensatz gefunden."); return z; }
   z.push(S("STANDORT"));
-  z.push(WW("Ort", [h.standort?.stadt, h.standort?.land].filter(Boolean).join(", ") || "—"));
-  z.push(WW("AS", h.autonomes_system?.asn != null ? `AS${h.autonomes_system.asn} ${h.autonomes_system.name ?? ""}`.trim() : "—"));
+  z.push(WW("Ort", [h.standort?.stadt, h.standort?.land].filter(Boolean).join(", ") || "-"));
+  z.push(WW("AS", h.autonomes_system?.asn != null ? `AS${h.autonomes_system.asn} ${h.autonomes_system.name ?? ""}`.trim() : "-"));
   if (h.whois_organisation?.name) z.push(WW("Org", trunc(h.whois_organisation.name, 24)));
   z.push(""); z.push(S(`DIENSTE (${h.ports_anzahl ?? 0})`));
   (h.dienste ?? []).slice(0, 20).forEach((d) =>
@@ -1562,7 +1562,7 @@ export default function OsintDemoView() {
           klassen="font-display font-semibold tracking-[-0.01em] leading-snug text-lg md:text-xl max-w-2xl mb-3 opacity-90"
         />
         <p className="text-white/70 text-[15px] leading-relaxed max-w-2xl">
-          Selbst entwickelte Analyse-Werkzeuge, gehostet auf meinem eigenen Server — live gegen öffentliche
+          Selbst entwickelte Analyse-Werkzeuge, gehostet auf meinem eigenen Server, live gegen öffentliche
           Datenquellen geprüft. Funde und ihre Beziehungen erscheinen als übersichtliche Karten und Graph.
           Transparent, kontrolliert, ohne dauerhafte Speicherung.
         </p>
@@ -1589,7 +1589,7 @@ export default function OsintDemoView() {
             {phase === "menue" && (
               <motion.div key="menue" variants={PHASEN_WECHSEL} initial="versteckt" animate="sichtbar" exit="verlassen">
                 <p className="text-[13px] text-white/55 mb-5">
-                  Wähle ein Werkzeug. Du gibst ein Ziel ein — wir prüfen es live und bündeln die Funde verständlich.
+                  Wähle ein Werkzeug. Du gibst ein Ziel ein, wir prüfen es live und bündeln die Funde verständlich.
                 </p>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -1647,11 +1647,13 @@ export default function OsintDemoView() {
                 {/* Projekt unterstützen — dezent */}
                 <div className="mt-7 pt-5 border-t border-white/[0.06] flex items-center justify-between gap-3 flex-wrap">
                   <span className="text-[12px] text-white/45">Frei nutzbar · keine Anmeldung · keine Speicherung</span>
-                  <KnopfAktion
-                    beimKlick={btcAdresseKopieren}
+                  <Knopf
+                    variante="aktion"
+                    onClick={btcAdresseKopieren}
                     klassen="select-none !px-3.5 !py-1.5 !text-[11.5px] !rounded-md"
-                    kinder={btcKopiert === "success" ? "BTC-Adresse kopiert ✓" : btcKopiert === "error" ? "Kopieren fehlgeschlagen" : "Projekt unterstützen · BTC"}
-                  />
+                  >
+                    {btcKopiert === "success" ? "BTC-Adresse kopiert ✓" : btcKopiert === "error" ? "Kopieren fehlgeschlagen" : "Projekt unterstützen · BTC"}
+                  </Knopf>
                 </div>
               </motion.div>
             )}
@@ -1709,14 +1711,14 @@ export default function OsintDemoView() {
                           spellCheck={false} autoComplete="off"
                         />
                       </div>
-                      <KnopfAktion beimKlick={eingabeAbsenden} klassen="flex-shrink-0" kinder="Analysieren →" />
+                      <Knopf variante="aktion" onClick={eingabeAbsenden} klassen="flex-shrink-0">Analysieren →</Knopf>
                     </div>
                   </div>
                 )}
 
                 {/* Module ohne Texteingabe (z. B. Status) — direkter Start */}
                 {aktivesModul.eingabeTyp !== "text" && (
-                  <KnopfAktion beimKlick={eingabeAbsenden} kinder="Jetzt prüfen →" />
+                  <Knopf variante="aktion" onClick={eingabeAbsenden}>Jetzt prüfen →</Knopf>
                 )}
 
                 {/* Soziale Präsenz: Schnell-/Vollscan-Umschalter */}
@@ -1742,7 +1744,7 @@ export default function OsintDemoView() {
                         </button>
                       ))}
                     </div>
-                    <span className="text-white/45 ml-1">{schnellModus ? "Sekunden" : "~30–60 s"}</span>
+                    <span className="text-white/45 ml-1">{schnellModus ? "Sekunden" : "~30-60 s"}</span>
                   </div>
                 )}
 
@@ -1758,7 +1760,7 @@ export default function OsintDemoView() {
                 {/* Imgur-Anleitung — nur bei Modul 6 */}
                 {aktivesModul?.nummer === "6" && (
                   <div className="mt-5 border-t border-white/[0.06] pt-4 text-[11px] font-mono leading-relaxed">
-                    <div className="text-akzent-400/65 mb-2.5">[?] Bild-URL erforderlich — Anleitung</div>
+                    <div className="text-akzent-400/65 mb-2.5">[?] Bild-URL erforderlich - Anleitung</div>
                     <div className="space-y-1 text-white/65">
                       <div>
                         <span className="text-white/65">[1]</span>{" "}
@@ -1770,7 +1772,7 @@ export default function OsintDemoView() {
                         >
                           imgur.com/upload
                         </a>{" "}
-                        <span className="text-white/48">öffnen — kostenlos, kein Account nötig</span>
+                        <span className="text-white/48">öffnen (kostenlos, kein Account nötig)</span>
                       </div>
                       <div>
                         <span className="text-white/65">[2]</span>{" "}
@@ -1956,7 +1958,7 @@ export default function OsintDemoView() {
           Live-Checks aktiv
         </span>
         <span>Keine dauerhafte Speicherung</span>
-        <span>Rate-Limit: 3–20/min</span>
+        <span>Rate-Limit: 3-20/min</span>
       </div>
     </section>
   );

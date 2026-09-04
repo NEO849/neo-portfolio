@@ -11,8 +11,8 @@ export default function SecurityProgrammSeite() {
   return (
     <>
       <SeitenMeta
-        titel="Security-Programm — Sicherheit auf Erfolgsbasis"
-        beschreibung="Autorisiertes Sicherheits-Testprogramm mit schriftlicher Freigabe — Prämie nur bei nachgewiesenem Fund. Web-/API- und KI-Sicherheit. Region Nürnberg + Remote."
+        titel="Security-Programm · Sicherheit auf Erfolgsbasis"
+        beschreibung="Autorisiertes Sicherheits-Testprogramm mit schriftlicher Freigabe, Prämie nur bei nachgewiesenem Fund. Web-/API- und KI-Sicherheit. Region Nürnberg + Remote."
         pfad="/security-programm"
       />
       <motion.div

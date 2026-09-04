@@ -12,8 +12,7 @@ import {
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { Augenbraue } from "../bausteine/Augenbraue";
 import { InfoKarte } from "../bausteine/InfoKarte";
-import { KnopfPrimaer } from "../bausteine/KnopfPrimaer";
-import { KnopfSekundaer } from "../bausteine/KnopfSekundaer";
+import { Knopf } from "../bausteine/Knopf";
 import { AbzeichenStatus, TechTag } from "../bausteine/AbzeichenStatus";
 import { AufklappIndikator } from "../bausteine/AufklappIndikator";
 import { ScrollReveal } from "../bewegung/ScrollReveal";
@@ -62,7 +61,7 @@ export default function SecurityProgrammView() {
             transition={{ duration: 0.8, delay: 0.14, ease: KURVEN.expressiv }}
             className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-[-0.03em] leading-[1.02] text-white max-w-3xl mb-6"
           >
-            Sie zahlen für Ergebnisse — nicht für bloßen Aufwand.
+            Sie zahlen für Ergebnisse, nicht für bloßen Aufwand.
           </motion.h1>
 
           <motion.p
@@ -72,7 +71,7 @@ export default function SecurityProgrammView() {
             className="text-base md:text-lg text-white/70 leading-relaxed max-w-2xl mb-9"
           >
             Ihr eigenes, privates Sicherheits-Testprogramm: Ich prüfe Ihre Systeme mit ausdrücklicher,
-            schriftlicher Freigabe — und Sie vergüten nur echte, nachgewiesene Sicherheitslücken. Ein
+            schriftlicher Freigabe, und Sie vergüten nur echte, nachgewiesene Sicherheitslücken. Ein
             namentlich bekannter Prüfer, klassische Web-/API-Sicherheit und KI-/LLM-Sicherheit in einer
             Person.
           </motion.p>
@@ -83,8 +82,8 @@ export default function SecurityProgrammView() {
             transition={{ duration: 0.6, delay: 0.3, ease: KURVEN.expressiv }}
             className="flex flex-col sm:flex-row items-center gap-3"
           >
-            <KnopfPrimaer zuRoute="/kontakt">15-Minuten-Gespräch vereinbaren →</KnopfPrimaer>
-            <KnopfSekundaer onClick={zuVerguetungScrollen}>So funktioniert das Modell</KnopfSekundaer>
+            <Knopf variante="primaer" zuRoute="/kontakt">15-Minuten-Gespräch vereinbaren →</Knopf>
+            <Knopf variante="sekundaer" onClick={zuVerguetungScrollen}>So funktioniert das Modell</Knopf>
           </motion.div>
         </div>
       </section>
@@ -100,12 +99,12 @@ export default function SecurityProgrammView() {
           <InfoKarte lichtfarbe="79, 124, 251" klassen="p-6 md:p-8">
             <p className="text-sm md:text-base text-white/70 leading-relaxed">
               Zertifikate, Compliance-Nachweise und automatisierte Scanner prüfen gegen Checklisten.
-              Ein Angreifer hält sich an keine Checkliste — er kombiniert kleine Schwächen zu echtem
+              Ein Angreifer hält sich an keine Checkliste. Er kombiniert kleine Schwächen zu echtem
               Schaden: fremde Datensätze abrufen, Rechte ausweiten, eine KI-Funktion zu etwas bringen,
-              das sie nicht tun sollte. Genau diese Schicht — die konkrete Logik Ihrer Anwendung —
+              das sie nicht tun sollte. Genau diese Schicht (die konkrete Logik Ihrer Anwendung)
               bleibt bei reinen Audits meist ungetestet. Dieses Programm schließt die Lücke: ein
               manueller Test aus der Angreifer-Perspektive, mit dem klaren Ziel, reale, ausnutzbare
-              Schwachstellen zu zeigen — bevor es jemand anderes tut.
+              Schwachstellen zu zeigen, bevor es jemand anderes tut.
             </p>
           </InfoKarte>
         </ScrollReveal>
@@ -115,7 +114,7 @@ export default function SecurityProgrammView() {
       <section className="py-16 px-6 max-w-5xl mx-auto">
         <AbschnittsTitel
           prefix="> das angebot"
-          untertitel="Zwei Kompetenzen, ein Ansprechpartner — das spart Ihnen einen zweiten Dienstleister und schließt die Lücke, die reine Netzwerk-Tester bei KI übersehen."
+          untertitel="Zwei Kompetenzen, ein Ansprechpartner. Das spart Ihnen einen zweiten Dienstleister und schließt die Lücke, die reine Netzwerk-Tester bei KI übersehen."
           klassen="mb-8"
         />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -169,7 +168,7 @@ export default function SecurityProgrammView() {
       <section id="verguetung" className="py-16 px-6 max-w-5xl mx-auto">
         <AbschnittsTitel
           prefix="> vergütung"
-          untertitel="Sie vergüten je nachgewiesener Schwachstelle, gestaffelt nach Schweregrad — wie ein privates Bug-Bounty mit einem einzigen, bekannten Tester. Konkrete Beträge legen wir gemeinsam im Gespräch fest, samt planbarer Obergrenze pro Programm."
+          untertitel="Sie vergüten je nachgewiesener Schwachstelle, gestaffelt nach Schweregrad (wie ein privates Bug-Bounty mit einem einzigen, bekannten Tester). Konkrete Beträge legen wir gemeinsam im Gespräch fest, samt planbarer Obergrenze pro Programm."
           klassen="mb-8"
         />
 
@@ -332,8 +331,8 @@ export default function SecurityProgrammView() {
         <ScrollReveal>
           <InfoKarte lichtfarbe="79, 124, 251" klassen="p-6 md:p-8">
             <p className="text-sm md:text-base text-white/70 leading-relaxed mb-5">
-              Michael Fleps — Hintergrund in Sicherheitsforschung und im Bau von KI-Systemen. Ich
-              entwickle orchestrierte Multi-Agent-Systeme und robuste Anwendungen — und prüfe sie mit
+              Michael Fleps, Hintergrund in Sicherheitsforschung und im Bau von KI-Systemen. Ich
+              entwickle orchestrierte Multi-Agent-Systeme und robuste Anwendungen, und prüfe sie mit
               demselben Blick, den ein Angreifer hätte. Dokumentierte Prüf-Praxis auf anerkannten
               Bug-Bounty-Plattformen; Nachweise auf Anfrage.
             </p>
@@ -403,8 +402,8 @@ export default function SecurityProgrammView() {
         />
         <div className="flex flex-col items-center gap-5">
           <div className="flex flex-col sm:flex-row items-center gap-3">
-            <KnopfPrimaer zuRoute="/kontakt">Gespräch vereinbaren →</KnopfPrimaer>
-            <KnopfSekundaer zuUrl={`mailto:${PERSOENLICH.email}`}>Direkt schreiben</KnopfSekundaer>
+            <Knopf variante="primaer" zuRoute="/kontakt">Gespräch vereinbaren →</Knopf>
+            <Knopf variante="sekundaer" zuUrl={`mailto:${PERSOENLICH.email}`}>Direkt schreiben</Knopf>
           </div>
           <p className="font-mono text-xs text-white/40 tracking-wide">Region Nürnberg + Remote (DACH)</p>
         </div>

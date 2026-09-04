@@ -18,36 +18,36 @@ export const NAVIGATION: NavigationModel[] = [
 
 export const PROJEKTE: ProjektModel[] = [
   {
-    titel: "Neo Dev Stack – AI-Augmented Security Workstation",
+    titel: "Neo Dev Stack - AI-Augmented Security Workstation",
     kurzbeschreibung: "Eine selbst gebaute, KI-gesteuerte Arbeitsumgebung, die wiederkehrende Sicherheits- und Recherche-Aufgaben automatisiert: spezialisierte KI-Agenten, kostenlose lokale KI-Modelle und über 80 Werkzeuge greifen nahtlos ineinander.",
-    langbeschreibung: "Der Gewinn liegt im Zusammenspiel: Ein Auftrag läuft durchgehend an einem Ort – von der ersten Recherche über die Analyse bis zum fertigen Report –, statt zwischen Dutzenden Programmen zu springen. Jeder Schritt bleibt dabei nachvollziehbar dokumentiert und lässt sich jederzeit identisch wiederholen.",
+    langbeschreibung: "Der Gewinn liegt im Zusammenspiel: Ein Auftrag läuft durchgehend an einem Ort (von der ersten Recherche über die Analyse bis zum fertigen Report), statt zwischen Dutzenden Programmen zu springen. Jeder Schritt bleibt dabei nachvollziehbar dokumentiert und lässt sich jederzeit identisch wiederholen.",
     kategorie: "tooling",
     technologien: ["Claude Code", "MCP Protocol", "Ollama", "Milvus", "Docker", "tmux", "Python", "Bash", "Chrome DevTools", "Firecrawl", "Censys", "Shodan"],
     highlights: [
       "32 spezialisierte Pentest-Agenten für Recon, Web, Cloud, Mobile, Forensik und Exploit-Chaining",
       "25 angebundene MCP-Server, darunter zwei selbst gebaute (Censys-API und Caido-Bridge)",
       "11 eigene Skills und 11 Slash-Commands automatisieren die komplette Research-Pipeline",
-      "Lokale KI-Inferenz über Ollama und Milvus – semantische Code-Suche über neun Codebases",
+      "Lokale KI-Inferenz über Ollama und Milvus, semantische Code-Suche über neun Codebases",
       "Eigene Status-Zeile mit Reputations-Stand und ein Hook, der vor riskanten Aktionen warnt",
       "Zentrale Funddatenbank (SQLite), die Muster über Engagements hinweg per SQL abrufbar macht",
     ],
-    zeitraum: "2025 – heute",
+    zeitraum: "2025 - heute",
     status: "aktiv",
   },
   {
-    titel: "markmem — Selbst-lernendes KI-Gedächtnis (Open Source)",
-    kurzbeschreibung: "Ein KI-Gedächtnis auf Markdown + git: es ruft semantisch ab, lernt aus Korrekturen, verdichtet sich selbst und tunt seine eigene Suche — sichtbar gemacht durch ein responsives Terminal-Dashboard (memDash). Öffentlich auf GitHub.",
-    langbeschreibung: "markmem macht aus einem gewachsenen Markdown-Notizsystem ein Gedächtnis, das nichts vergisst und seine eigene Qualität misst. Der Abruf ist HybridRAG: Volltext (BM25), Wissens-Graph und semantische Vektor-Embeddings (Ollama / bge-m3) werden per gewichtetem Reciprocal Rank Fusion zusammengeführt. Markdown + git bleiben die einzige Quelle der Wahrheit — keine schwere Vektor-Datenbank, nur SQLite + NumPy, jeder Index ist daraus neu baubar. Eine echte Lern-Schleife (Korrektur, Überraschung, Confidence-Kalibrierung, aktive Sackgassen-Hemmung) und ein Self-Tuning-Eval-Harness (misst Recall@1, optimiert die Such-Gewichte per Grid-Search) halten das System ehrlich. Fail-open im Kern (pure Python-stdlib), getestet via GitHub Actions über Python 3.11–3.13, MIT-lizenziert.",
+    titel: "markmem - Selbst-lernendes KI-Gedächtnis (Open Source)",
+    kurzbeschreibung: "Ein KI-Gedächtnis auf Markdown + git: es ruft semantisch ab, lernt aus Korrekturen, verdichtet sich selbst und tunt seine eigene Suche, sichtbar gemacht durch ein responsives Terminal-Dashboard (memDash). Öffentlich auf GitHub.",
+    langbeschreibung: "markmem macht aus einem gewachsenen Markdown-Notizsystem ein Gedächtnis, das nichts vergisst und seine eigene Qualität misst. Der Abruf ist HybridRAG: Volltext (BM25), Wissens-Graph und semantische Vektor-Embeddings (Ollama / bge-m3) werden per gewichtetem Reciprocal Rank Fusion zusammengeführt. Markdown + git bleiben die einzige Quelle der Wahrheit. Keine schwere Vektor-Datenbank, nur SQLite + NumPy, jeder Index ist daraus neu baubar. Eine echte Lern-Schleife (Korrektur, Überraschung, Confidence-Kalibrierung, aktive Sackgassen-Hemmung) und ein Self-Tuning-Eval-Harness (misst Recall@1, optimiert die Such-Gewichte per Grid-Search) halten das System ehrlich. Fail-open im Kern (pure Python-stdlib), getestet via GitHub Actions über Python 3.11-3.13, MIT-lizenziert.",
     kategorie: "tooling",
     technologien: ["Python", "HybridRAG", "Ollama / bge-m3", "SQLite", "NumPy", "Reciprocal Rank Fusion", "Markdown", "git", "GitHub Actions", "MIT"],
     highlights: [
       "HybridRAG-Abruf: BM25 + Wissens-Graph + Vektor-Embeddings, fusioniert per gewichtetem Reciprocal Rank Fusion (plus optionalem Cross-Encoder-Rerank).",
-      "Markdown + git als alleinige Quelle der Wahrheit — keine schwere Vektor-DB, nur SQLite + NumPy; jeder Index ist jederzeit neu baubar.",
+      "Markdown + git als alleinige Quelle der Wahrheit. Keine schwere Vektor-DB, nur SQLite + NumPy; jeder Index ist jederzeit neu baubar.",
       "Echte Lern-Schleife: lernt aus stillen Korrekturen, kalibriert die eigene Zuversicht, hemmt aktiv bekannte Sackgassen.",
       "Selbst-tunend: ein Eval-Harness misst die Trefferquote (Recall@1), eine Grid-Search optimiert die Such-Gewichte automatisch.",
-      "memDash: responsives Terminal-Dashboard (Mac-Querformat bis iPhone-Hochformat), Unicode-korrekt, mit Klartext-Erklärungen — auch für Laien lesbar.",
+      "memDash: responsives Terminal-Dashboard (Mac-Querformat bis iPhone-Hochformat), Unicode-korrekt, mit Klartext-Erklärungen, auch für Laien lesbar.",
       "Zwei-Kanal-Kontext-Laden: kritische Regeln umgehen das harte Lade-Limit und werden nie abgeschnitten.",
-      "Fail-open-Design, stdlib-Kern, MIT — öffentlich auf GitHub, CI grün über Python 3.11–3.13.",
+      "Fail-open-Design, stdlib-Kern, MIT, öffentlich auf GitHub, CI grün über Python 3.11-3.13.",
     ],
     linkGithub: "https://github.com/NEO849/markmem",
     galerieSlug: "markmem",
@@ -57,17 +57,17 @@ export const PROJEKTE: ProjektModel[] = [
       { quelle: "/projekte/markmem/markmem_real_1.png", titel: "Live-Zustand", text: "Korpus nach Typ, Transformation, Tiers gegen das Lade-Limit und die Recall-Qualität auf einen Blick." },
       { quelle: "/projekte/markmem/markmem_real_2.png", titel: "Engine, Lern-Schicht & Verdichtung", text: "Such-Gewichte (BM25/Vektor/Entity), die Lern-Schicht und die Verdichtungs-Inbox. Die Karten-Namen sind aus Vertraulichkeitsgründen unkenntlich gemacht." },
       // Synthetischer Demo-Korpus — dieselbe Oberfläche, responsiv über drei Fensterbreiten
-      { quelle: "/projekte/markmem/markmem_memdash_0.webp", titel: "Demo — Breit-Modus", text: "Synthetischer Demo-Korpus, Breit-Modus (Desktop): voller Live-Zustand mit allen Panels." },
-      { quelle: "/projekte/markmem/markmem_memdash_1.webp", titel: "Demo — Mittel-Modus", text: "Dieselben Demo-Daten in kompakterem Layout für schmalere Fenster." },
-      { quelle: "/projekte/markmem/markmem_memdash_2.webp", titel: "Demo — Schmal-Modus", text: "Schmal-Modus (Mobil): gestapelt, ohne Rahmen — jede Zeile bleibt im Fenster." },
+      { quelle: "/projekte/markmem/markmem_memdash_0.webp", titel: "Demo - Breit-Modus", text: "Synthetischer Demo-Korpus, Breit-Modus (Desktop): voller Live-Zustand mit allen Panels." },
+      { quelle: "/projekte/markmem/markmem_memdash_1.webp", titel: "Demo - Mittel-Modus", text: "Dieselben Demo-Daten in kompakterem Layout für schmalere Fenster." },
+      { quelle: "/projekte/markmem/markmem_memdash_2.webp", titel: "Demo - Schmal-Modus", text: "Schmal-Modus (Mobil): gestapelt, ohne Rahmen. Jede Zeile bleibt im Fenster." },
     ],
-    zeitraum: "2026 – heute",
+    zeitraum: "2026 - heute",
     status: "aktiv",
   },
   {
-    titel: "claude-bus – Mac↔Server↔iPhone Mailbox-Bridge",
-    kurzbeschreibung: "Eine sichere Brücke zwischen meinen Geräten – Mac, Server und iPhone: Aufgaben und Ergebnisse wandern verschlüsselt hin und her, mit strengen Zugriffsgrenzen und durchgehender Überwachung.",
-    langbeschreibung: "In der Praxis heißt das: Ich starte eine Aufgabe unterwegs am iPhone und führe sie nahtlos am Rechner weiter. Das mobile Gerät darf dabei bewusst nur das Nötigste – Komfort geht so nicht auf Kosten der Sicherheit.",
+    titel: "claude-bus - Mac↔Server↔iPhone Mailbox-Bridge",
+    kurzbeschreibung: "Eine sichere Brücke zwischen meinen Geräten (Mac, Server und iPhone): Aufgaben und Ergebnisse wandern verschlüsselt hin und her, mit strengen Zugriffsgrenzen und durchgehender Überwachung.",
+    langbeschreibung: "In der Praxis heißt das: Ich starte eine Aufgabe unterwegs am iPhone und führe sie nahtlos am Rechner weiter. Das mobile Gerät darf dabei bewusst nur das Nötigste. Komfort geht so nicht auf Kosten der Sicherheit.",
     kategorie: "tooling",
     technologien: ["FastMCP", "Streamable HTTP", "Tailscale WireGuard", "Cloudflare Tunnel", "Cloudflare Workers", "OAuth 2.1", "PKCE", "SQLite", "systemd", "Python"],
     highlights: [
@@ -75,21 +75,21 @@ export const PROJEKTE: ProjektModel[] = [
       "Selbst gebauter OAuth-2.1-Worker mit PKCE und kurzlebigen, gehashten Tokens",
       "Das iPhone darf nur an einen Empfänger senden und nur in einen festgelegten Ordner schreiben",
       "Sensible Pfade wie /etc/shadow oder SSH-Schlüssel sind fest im Code gesperrt",
-      "Ein Watcher meldet ungewöhnliche Zugriffe – Off-Hours, Bursts, Fehlversuche – in Echtzeit",
+      "Ein Watcher meldet ungewöhnliche Zugriffe (Off-Hours, Bursts, Fehlversuche) in Echtzeit",
       "Zugangs-Tokens rotieren automatisch jede Woche",
       "End-to-End live verifiziert: Mac → Server → iPhone",
     ],
-    zeitraum: "2025 – heute",
+    zeitraum: "2025 - heute",
     status: "aktiv",
   },
   {
-    titel: "voice-bridge – Lokaler Whisper-Voice-Daemon mit Apple-UI",
-    kurzbeschreibung: "Sprachsteuerung fürs Smartphone: Eingesprochene Aufgaben werden direkt auf dem eigenen Server – ohne Cloud-Kosten – in Text umgewandelt und landen sofort in der Arbeitssitzung. Mit einer Oberfläche auf Apple-Niveau.",
-    langbeschreibung: "Der eigentliche Gewinn: Gedanken werden zum Befehl, ohne die Hände an der Tastatur – gerade bei langen oder umständlichen Anweisungen oft schneller als Tippen. Und weil alles auf eigener Hardware verarbeitet wird, bleiben die Inhalte vollständig privat.",
+    titel: "voice-bridge - Lokaler Whisper-Voice-Daemon mit Apple-UI",
+    kurzbeschreibung: "Sprachsteuerung fürs Smartphone: Eingesprochene Aufgaben werden direkt auf dem eigenen Server (ohne Cloud-Kosten) in Text umgewandelt und landen sofort in der Arbeitssitzung. Mit einer Oberfläche auf Apple-Niveau.",
+    langbeschreibung: "Der eigentliche Gewinn: Gedanken werden zum Befehl, ohne die Hände an der Tastatur, gerade bei langen oder umständlichen Anweisungen oft schneller als Tippen. Und weil alles auf eigener Hardware verarbeitet wird, bleiben die Inhalte vollständig privat.",
     kategorie: "tooling",
     technologien: ["whisper.cpp", "FastAPI", "ffmpeg", "Cloudflare Tunnel", "tmux", "Web Audio API", "AnalyserNode", "MediaRecorder", "systemd-hardening", "PWA"],
     highlights: [
-      "Spracherkennung läuft lokal über whisper.cpp – mehrsprachig und ohne API-Kosten",
+      "Spracherkennung läuft lokal über whisper.cpp, mehrsprachig und ohne API-Kosten",
       "Oberfläche auf Apple-Niveau mit Live-Visualizer im Mikrofon-Orb",
       "Findet automatisch die richtige Arbeitssitzung, in die das Transkript geschrieben wird",
       "Fällt die Sitzung aus, wird gepuffert und bei Rückkehr automatisch nachgereicht",
@@ -100,40 +100,40 @@ export const PROJEKTE: ProjektModel[] = [
     linkDemo: "/voice-demo",
     galerieSlug: "voice-bridge",
     bilder: [
-      { quelle: "/projekte/voice-bridge/voice_sprechen.webp", titel: "Sprechen & Transkribieren", text: "Tippen, sprechen, nochmal tippen zum Senden — der Live-Ring zeigt die Aufnahme, danach läuft die lokale Transkription." },
-      { quelle: "/projekte/voice-bridge/voice_eingefuegt.webp", titel: "Direkt in Claude eingefügt", text: "Das Transkript landet sofort in der gewählten Arbeitssitzung — mit Bestätigung und Latenz-Anzeige." },
-      { quelle: "/projekte/voice-bridge/voice_session.webp", titel: "Session-Routing", text: "Per Auswahl landet der Befehl in der richtigen Sitzung — mehrere Sessions parallel, eine Stimme." },
+      { quelle: "/projekte/voice-bridge/voice_sprechen.webp", titel: "Sprechen & Transkribieren", text: "Tippen, sprechen, nochmal tippen zum Senden. Der Live-Ring zeigt die Aufnahme, danach läuft die lokale Transkription." },
+      { quelle: "/projekte/voice-bridge/voice_eingefuegt.webp", titel: "Direkt in Claude eingefügt", text: "Das Transkript landet sofort in der gewählten Arbeitssitzung, mit Bestätigung und Latenz-Anzeige." },
+      { quelle: "/projekte/voice-bridge/voice_session.webp", titel: "Session-Routing", text: "Per Auswahl landet der Befehl in der richtigen Sitzung, mehrere Sessions parallel, eine Stimme." },
       { quelle: "/projekte/voice-bridge/voice_server.webp", titel: "Auf dem Server", text: "Die Gegenseite: Claude Code auf dem eigenen Server empfängt den eingesprochenen Befehl (Inhalt unkenntlich gemacht)." },
     ],
-    zeitraum: "2025 – heute",
+    zeitraum: "2025 - heute",
     status: "aktiv",
   },
   {
-    titel: "bb_recon – Research OSINT-Toolkit",
-    kurzbeschreibung: "Ein Recherche-Werkzeug, das öffentlich verfügbare Informationen zu einem Ziel aus über 30 Quellen in Sekunden zusammenträgt und übersichtlich aufbereitet – komplett ohne kostenpflichtige Schnittstellen.",
-    langbeschreibung: "Alle Quellen laufen parallel; fällt eine aus, stört das die anderen nicht. Am Ende steht ein sauber sortiertes Gesamtbild mit einer Verlässlichkeits-Einstufung pro Fund – statt einer Handvoll verstreuter Einzeltreffer.",
+    titel: "bb_recon - Research OSINT-Toolkit",
+    kurzbeschreibung: "Ein Recherche-Werkzeug, das öffentlich verfügbare Informationen zu einem Ziel aus über 30 Quellen in Sekunden zusammenträgt und übersichtlich aufbereitet, komplett ohne kostenpflichtige Schnittstellen.",
+    langbeschreibung: "Alle Quellen laufen parallel; fällt eine aus, stört das die anderen nicht. Am Ende steht ein sauber sortiertes Gesamtbild mit einer Verlässlichkeits-Einstufung pro Fund, statt einer Handvoll verstreuter Einzeltreffer.",
     kategorie: "security",
     technologien: ["Python asyncio", "httpx[socks]", "aiosqlite", "dnspython", "rich", "Tor SOCKS5", "CommonCrawl CDX", "Wayback Machine"],
     highlights: [
       "Über 30 schlüssellose OSINT-Quellen, parallel abgefragt und ohne API-Kosten",
-      "Asynchrone Architektur – rund 510 Treffer in einer Sekunde im IP-Test",
+      "Asynchrone Architektur, rund 510 Treffer in einer Sekunde im IP-Test",
       "Optionaler Tor-Modus für anonyme Recherche bei sensiblen Zielen",
       "Speichert Funde automatisch strukturiert pro Ziel und Zeitpunkt",
       "Ergebnisse als JSON, Markdown und direkt im Terminal nutzbar",
       "Verlässlichkeits-Einstufung pro Treffer, Mehrfach-Funde zusammengeführt",
       "Ein Befehl deckt die ganze Kette ab: Domain, Subdomains und IP-Anreicherung",
     ],
-    zeitraum: "2025 – heute",
+    zeitraum: "2025 - heute",
     status: "aktiv",
   },
   {
-    titel: "NeoRecon – Research Exploit Engine",
-    kurzbeschreibung: "Eine durchgängige Pipeline für autorisierte Sicherheits-Recherche: Sie sammelt Angriffsflächen, bewertet sie automatisch und liefert am Ende eine konkrete, priorisierte Prüf-Liste – aus Hunderttausenden Adressen in Sekunden.",
+    titel: "NeoRecon - Research Exploit Engine",
+    kurzbeschreibung: "Eine durchgängige Pipeline für autorisierte Sicherheits-Recherche: Sie sammelt Angriffsflächen, bewertet sie automatisch und liefert am Ende eine konkrete, priorisierte Prüf-Liste, aus Hunderttausenden Adressen in Sekunden.",
     langbeschreibung: "So fließt die Zeit in die eigentliche Analyse statt ins Sortieren riesiger Datenmengen. Jeder Lauf ist wiederholbar und an jeder Stelle nachvollziehbar, was wie bewertet wurde.",
     kategorie: "security",
     technologien: ["Bash", "awk", "httpx", "Subfinder", "Amass", "ParamSpider", "gf", "Nuclei", "dalfox", "sqlmap", "GraphQL", "Brave Search API"],
     highlights: [
-      "Durchgängige Pipeline in sieben Schritten – wiederaufnehmbar, überspringbar, mit Lauf-Schutz",
+      "Durchgängige Pipeline in sieben Schritten, wiederaufnehmbar, überspringbar, mit Lauf-Schutz",
       "Bewertet 500.000 Adressen in 15 Sekunden anhand von zwölf Sicherheits-Kategorien",
       "Sortiert erreichbare Ziele automatisch in acht Klassen nach Prüf-Potenzial",
       "Erzeugt pro Kandidat eine kompakte Karte mit konkreten Prüfschritten",
@@ -142,11 +142,11 @@ export const PROJEKTE: ProjektModel[] = [
       "Wählt aus mehreren Läufen automatisch den ergiebigsten aus",
       "Durchgehend in vier Phasen dokumentiert, von Setup bis Auswertung"
     ],
-    zeitraum: "2025 – heute",
+    zeitraum: "2025 - heute",
     status: "aktiv",
   },
   {
-    titel: "Exploit Dashboard – Vulnerability Testing Interface",
+    titel: "Exploit Dashboard - Vulnerability Testing Interface",
     kurzbeschreibung: "Ein Browser-Dashboard, das Sicherheitstests übersichtlich und nachvollziehbar macht: priorisierte Ziele, Wiederhol-Tests per Klick und eine visuelle Darstellung verketteter Angriffspfade.",
     langbeschreibung: "Es hängt direkt an meiner Recon-Pipeline, sodass die spannendsten Ziele schon vorsortiert ankommen. Was sonst in verstreuten Terminal-Ausgaben untergeht, wird hier zu einem klaren, vergleichbaren Bild.",
     kategorie: "tooling",
@@ -154,18 +154,18 @@ export const PROJEKTE: ProjektModel[] = [
     highlights: [
       "Schickt Anfragen live durch den Proxy und wertet Status und Antwortlänge aus",
       "Vergleicht gegen eine saubere Baseline und markiert jede relevante Abweichung",
-      "Sortiert und färbt gefundene URLs nach Typ – OAuth, Admin, Auth, API, JS",
+      "Sortiert und färbt gefundene URLs nach Typ: OAuth, Admin, Auth, API, JS",
       "Zeichnet verkettete Angriffspfade als interaktives Diagramm",
       "Schlägt passende Test-Vorlagen je nach URL-Typ vor",
-      "Direkt an die Recon-Pipeline angebunden – Ziele kommen vorsortiert an",
+      "Direkt an die Recon-Pipeline angebunden, Ziele kommen vorsortiert an",
       "Merkt sich interessante Ziele pro Sitzung",
     ],
-    zeitraum: "2025 – heute",
+    zeitraum: "2025 - heute",
     status: "aktiv",
   },
   {
-    titel: "ONE – Multi-Agent AI Chat",
-    kurzbeschreibung: "Eine iOS-App, die mehrere KI-Modelle – Claude, GPT und Gemini – in einer einzigen, aufgeräumten Oberfläche vereint.",
+    titel: "ONE - Multi-Agent AI Chat",
+    kurzbeschreibung: "Eine iOS-App, die mehrere KI-Modelle (Claude, GPT und Gemini) in einer einzigen, aufgeräumten Oberfläche vereint.",
     langbeschreibung: "So lässt sich für jede Frage das passende Modell wählen, ohne die App zu wechseln. Unter der Oberfläche sorgt eine saubere Architektur dafür, dass Zugangsschlüssel sicher auf dem Gerät bleiben und der Stand über alle Geräte synchron ist.",
     kategorie: "development",
     technologien: ["SwiftUI", "MVVM", "Combine", "Firestore", "Keychain", "REST API"],
@@ -175,13 +175,13 @@ export const PROJEKTE: ProjektModel[] = [
       "Saubere MVVM-Architektur mit klar getrennter Datenschicht",
       "Reaktive Oberfläche mit Combine und async/await"
     ],
-    zeitraum: "2024 – 2025",
+    zeitraum: "2024 - 2025",
     status: "aktiv",
   },
   {
-    titel: "Sports Almanach – Smart Betting App",
-    kurzbeschreibung: "Eine iOS-App rund um Sportwetten mit Spielgeld: Ein selbst entwickelter Algorithmus errechnet Quoten aus historischen Ergebnissen und dem Austragungsort – dazu Team- und Spielervergleiche und ein Sportkalender.",
-    langbeschreibung: "Aus nüchternen Zahlen werden so greifbare Einschätzungen – und weil ausschließlich mit virtuellem Guthaben getippt wird, ganz ohne finanzielles Risiko. Je mehr Ergebnisse einfließen, desto treffsicherer werden die berechneten Quoten.",
+    titel: "Sports Almanach - Smart Betting App",
+    kurzbeschreibung: "Eine iOS-App rund um Sportwetten mit Spielgeld: Ein selbst entwickelter Algorithmus errechnet Quoten aus historischen Ergebnissen und dem Austragungsort, dazu Team- und Spielervergleiche und ein Sportkalender.",
+    langbeschreibung: "Aus nüchternen Zahlen werden so greifbare Einschätzungen, und weil ausschließlich mit virtuellem Guthaben getippt wird, ganz ohne finanzielles Risiko. Je mehr Ergebnisse einfließen, desto treffsicherer werden die berechneten Quoten.",
     kategorie: "development",
     technologien: ["Swift", "SwiftUI", "MVVM", "Firebase Auth", "Firestore", "Charts", "Repository Pattern"],
     highlights: [
@@ -206,11 +206,11 @@ export const PROJEKTE: ProjektModel[] = [
       { quelle: "/projekte/sports-almanach/sport_betSlip_7.webp",       titel: "Wettschein",       text: "Alle laufenden Tipps auf einen Blick." },
       { quelle: "/projekte/sports-almanach/sport_historie_8.webp",      titel: "Historie",         text: "Formkurven und Trends als Swift Charts." },
     ],
-    zeitraum: "2024 – 2025",
+    zeitraum: "2024 - 2025",
   },
   {
-    titel: "Z Almanach – Dragon Ball Z Kompendium",
-    kurzbeschreibung: "Eine Android-App als Nachschlagewerk zum Dragon-Ball-Z-Universum: Charaktere, Verwandlungsstufen und Fraktionen im Retro-Arcade-Look – die Daten werden automatisch ins Deutsche übersetzt.",
+    titel: "Z Almanach - Dragon Ball Z Kompendium",
+    kurzbeschreibung: "Eine Android-App als Nachschlagewerk zum Dragon-Ball-Z-Universum: Charaktere, Verwandlungsstufen und Fraktionen im Retro-Arcade-Look. Die Daten werden automatisch ins Deutsche übersetzt.",
     langbeschreibung: "Das Besondere steckt in der Datenpipeline: Die Inhalte stammen aus einer rein spanischsprachigen Quelle und werden im Hintergrund automatisch übersetzt, bevor sie erscheinen. So ist das ganze Universum auf Deutsch durchsuchbar, ohne dass jemand manuell nachhelfen müsste.",
     kategorie: "development",
     technologien: ["Kotlin", "Android SDK", "REST API", "RecyclerView", "SharedPreferences", "Repository Pattern", "ViewHolder Pattern", "XML Layouts"],
@@ -238,9 +238,9 @@ export const PROJEKTE: ProjektModel[] = [
     status: "abgeschlossen",
   },
   {
-    titel: "OSINT Toolkit – Modulares Analyse-Framework",
-    kurzbeschreibung: "Ein modulares Recherche-Tool mit sieben Bausteinen – E-Mail, Benutzername, Telefon, Domain, Bildersuche und mehr –, das öffentliche Online-Spuren strukturiert auswertet und als Report ausgibt.",
-    langbeschreibung: "Statt sieben Programme nacheinander zu bedienen, laufen alle Bausteine über eine Oberfläche zusammen. Jede Analyse wird am Ende automatisch dokumentiert – als Text- und JSON-Datei, direkt weiterverwendbar.",
+    titel: "OSINT Toolkit - Modulares Analyse-Framework",
+    kurzbeschreibung: "Ein modulares Recherche-Tool mit sieben Bausteinen (E-Mail, Benutzername, Telefon, Domain, Bildersuche und mehr), das öffentliche Online-Spuren strukturiert auswertet und als Report ausgibt.",
+    langbeschreibung: "Statt sieben Programme nacheinander zu bedienen, laufen alle Bausteine über eine Oberfläche zusammen. Jede Analyse wird am Ende automatisch dokumentiert, als Text- und JSON-Datei, direkt weiterverwendbar.",
     kategorie: "security",
     technologien: ["Python", "holehe", "sherlock", "phoneinfoga", "LeakCheck API", "NumVerify API", "EXIF", "Selenium"],
     highlights: [
@@ -251,7 +251,7 @@ export const PROJEKTE: ProjektModel[] = [
       "Strukturierte Reports als TXT und JSON, je mit Bewertung",
       "Plattform-Treffer gruppiert nach Social Media, Gaming, Dev und mehr"
     ],
-    zeitraum: "2025 – heute",
+    zeitraum: "2025 - heute",
     status: "aktiv",
   },
 ];
@@ -341,11 +341,11 @@ export const TOOLS_STACK = [
   { name: "Recon-Search-Assistant", rolle: "Custom OSINT-Suchtool mit API-Integration", kategorie: "eigenbau", beschreibung: "Aggregiert Ergebnisse aus Shodan, Censys, VirusTotal und weiteren APIs in einer einzigen Abfrage. Automatische Deduplizierung, Rate-Limiting und strukturierter JSON-Output für die Pipeline-Integration." },
   { name: "GraphQLer",            rolle: "Automatisierte GraphQL-Schema-Analyse", kategorie: "eigenbau", beschreibung: "Führt vollständige Introspection durch, erkennt deprecated Fields und generiert automatisch testbare Queries für alle Mutations. Output wird direkt in den Scoring-Algorithmus eingespeist." },
   { name: "graphql-cop",          rolle: "GraphQL Security Policy Checker", kategorie: "eigenbau", beschreibung: "Prüft Endpoints auf Batching, Query Depth, Introspection, Field Suggestions und weitere Policy-Schwachstellen. Liefert strukturierte Befunde mit CVSS-Einschätzung." },
-  { name: "graphw00f",            rolle: "GraphQL Engine Fingerprinting", kategorie: "eigenbau", beschreibung: "Identifiziert die eingesetzte GraphQL-Engine (Apollo, Hasura, Shopify, etc.) anhand von Fehlermustern und Response-Charakteristika — ohne Introspection zu benötigen." },
+  { name: "graphw00f",            rolle: "GraphQL Engine Fingerprinting", kategorie: "eigenbau", beschreibung: "Identifiziert die eingesetzte GraphQL-Engine (Apollo, Hasura, Shopify, etc.) anhand von Fehlermustern und Response-Charakteristika, ohne Introspection zu benötigen." },
   { name: "graphql-mcp-server",   rolle: "MCP-Integration für GraphQL-Testing", kategorie: "eigenbau", beschreibung: "Bindet GraphQL-Endpoints als MCP-Tools ein, sodass Claude direkt Schema, Queries und Mutations interaktiv analysieren kann. Beschleunigt die manuelle Review-Phase erheblich." },
   { name: "clairvoyance",         rolle: "GraphQL Schema-Rekonstruktion ohne Introspection", kategorie: "eigenbau", beschreibung: "Rekonstruiert das vollständige Schema durch Wortlisten-basiertes Field-Guessing, auch wenn Introspection deaktiviert ist. Essentiell für härtere Targets mit Production-Restrictions." },
   { name: "SSTImap",              rolle: "Server-Side Template Injection Scanner", kategorie: "eigenbau", beschreibung: "Testet Parameter automatisch auf SSTI in Jinja2, Twig, Freemarker und weiteren Engines. Payloads werden dynamisch angepasst und mit Blind-Detection-Technik kombiniert." },
-  { name: "confused",             rolle: "Dependency Confusion Checker", kategorie: "eigenbau", beschreibung: "Analysiert package.json, requirements.txt und andere Manifest-Dateien auf interne Package-Namen, die im öffentlichen Registry nicht registriert sind — potenzielle Dependency-Confusion-Targets." },
+  { name: "confused",             rolle: "Dependency Confusion Checker", kategorie: "eigenbau", beschreibung: "Analysiert package.json, requirements.txt und andere Manifest-Dateien auf interne Package-Namen, die im öffentlichen Registry nicht registriert sind, potenzielle Dependency-Confusion-Targets." },
   { name: "FavFreak",             rolle: "Favicon-basierte Technologie-Erkennung", kategorie: "eigenbau", beschreibung: "Berechnet MurmurHash-Werte von Favicons und matched gegen eine Datenbank bekannter Technologien und Produkte. Effektiv für die Asset-Discovery versteckter Subdomains und interner Services." },
   { name: "LinkFinder",           rolle: "JavaScript Endpoint Extraktion", kategorie: "eigenbau", beschreibung: "Extrahiert Endpoints, Pfade und Parameter direkt aus minifiziertem JavaScript. Analysiert auch dynamisch geladene Bundles und identifiziert undokumentierte API-Routen." },
   // Integrierte Tools
@@ -357,7 +357,7 @@ export const TOOLS_STACK = [
   { name: "xnLinkFinder",        rolle: "Deep Link & Parameter Extraktion", kategorie: "recon", beschreibung: "Crawlt Responses rekursiv auf verlinkte Endpoints und eingebettete Parameter. Besonders effektiv bei Single-Page-Anwendungen mit dynamisch generiertem Markup." },
   { name: "Nuclei",              rolle: "CVE-Scanning & Custom Templates", kategorie: "scanner", beschreibung: "Template-basierter Scanner mit über 9.000 Community-Templates. Im Pipeline-Einsatz mit eigenen Custom-Templates für target-spezifische Checks und Auth-Bypass-Pattern." },
   { name: "dalfox",              rolle: "Blind/DOM XSS Detection", kategorie: "scanner", beschreibung: "Spezialisierter XSS-Scanner mit Blind-Callback-Support über eigenen OOB-Server. Erkennt DOM-basierte, Reflected und Stored XSS mit Context-Awareness für verschiedene Render-Umgebungen." },
-  { name: "Brave Search API",    rolle: "Automatisiertes Dorking (24 Kategorien)", kategorie: "osint", beschreibung: "Führt strukturiertes Dorking über die Brave Search API durch — 24 vordefinierte Kategorien (ENV Files, Config Files, Admin-Panels, Tokens, AWS Keys, Swagger, S3 Buckets, JS-Source-Maps u.a.) — vollautomatisch pro Target via intel_dork_api_to_pipeline.sh." },
+  { name: "Brave Search API",    rolle: "Automatisiertes Dorking (24 Kategorien)", kategorie: "osint", beschreibung: "Führt strukturiertes Dorking über die Brave Search API durch: 24 vordefinierte Kategorien (ENV Files, Config Files, Admin-Panels, Tokens, AWS Keys, Swagger, S3 Buckets, JS-Source-Maps u.a.), vollautomatisch pro Target via intel_dork_api_to_pipeline.sh." },
   { name: "Docker/Kali",         rolle: "Isolierte Testumgebung auf VPS", kategorie: "infrastructure", beschreibung: "Alle Tests laufen in dedizierten Docker-Containern auf einem gehärteten VPS. Kali Linux als Basis sichert vollständige Tool-Verfügbarkeit bei gleichzeitiger Isolation vom Host-System." },
 ];
 
@@ -399,8 +399,8 @@ export const SKILLS: SkillModel[] = [
 
 export const ZEITSTRAHL: ZeitstrahlModel[] = [
   {
-    jahr: "1999–2014",
-    titel: "Elektroinstallateur – Ausbildung & Berufspraxis",
+    jahr: "1999-2014",
+    titel: "Elektroinstallateur - Ausbildung & Berufspraxis",
     beschreibung: "Gesellenbrief 2003 (HWK Niederbayern-Oberpfalz), vier Jahre Ausbildung bei Fa. Freise in Deggendorf. Danach über ein Jahrzehnt Praxis in Elektronik-, Netzwerk-, Server-, Telefon- und Videoanlagen, oft in leitender Rolle. Hier entstand das Fundament: Fehleranalyse, saubere Dokumentation und Systemdenken.",
     kategorie: "beruf",
     modulTitel: "Projekte & Referenzen",
@@ -412,9 +412,9 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
     ],
   },
   {
-    jahr: "2014–2018",
+    jahr: "2014-2018",
     titel: "Teamführung & interdisziplinäre Praxis",
-    beschreibung: "Als Teil eines interdisziplinären Teams begleitete ich schwer erziehbare Jugendliche in der Arbeitstherapie an der Fachklinik Kompass Hof in Mindelheim. Kommunikation auf Augenhöhe, Konfliktlösung und ruhiges Handeln in anspruchsvollen Situationen – Qualitäten, die meine Arbeitsweise bis heute prägen.",
+    beschreibung: "Als Teil eines interdisziplinären Teams begleitete ich schwer erziehbare Jugendliche in der Arbeitstherapie an der Fachklinik Kompass Hof in Mindelheim. Kommunikation auf Augenhöhe, Konfliktlösung und ruhiges Handeln in anspruchsvollen Situationen, Qualitäten, die meine Arbeitsweise bis heute prägen.",
     kategorie: "teamarbeit",
     modulTitel: "Aufgaben & Verantwortung",
     module: [
@@ -425,9 +425,9 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
     ],
   },
   {
-    jahr: "2020–heute",
+    jahr: "2020-heute",
     titel: "Linux, VPS & Infrastruktur",
-    beschreibung: "Aufbau und Betrieb gehärteter Linux-Systeme – als Fundament für alles Weitere. Auf dieser selbst administrierten Infrastruktur laufen heute sämtliche Security-, Recon- und KI-Aufgaben, reproduzierbar und abgesichert.",
+    beschreibung: "Aufbau und Betrieb gehärteter Linux-Systeme, als Fundament für alles Weitere. Auf dieser selbst administrierten Infrastruktur laufen heute sämtliche Security-, Recon- und KI-Aufgaben, reproduzierbar und abgesichert.",
     kategorie: "infrastruktur",
     modulTitel: "Stack & Schwerpunkte",
     module: [
@@ -437,8 +437,8 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
     ],
   },
   {
-    jahr: "2023–2024",
-    titel: "Umschulung App-Entwicklung – Syntax Institut",
+    jahr: "2023-2024",
+    titel: "Umschulung App-Entwicklung - Syntax Institut",
     beschreibung: "Geförderte Umschulung zur IT-Fachkraft für App-Entwicklung (iOS & Android): 2.300 Unterrichtseinheiten, CERTQUA-zertifiziert nach DIN EN ISO 9001. Der strukturierte Einstieg in moderne Software-Entwicklung.",
     kategorie: "bildung",
     modulTitel: "Module der Ausbildung",
@@ -450,9 +450,9 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
     ],
   },
   {
-    jahr: "2024–2025",
+    jahr: "2024-2025",
     titel: "Native Apps & Software-Architektur",
-    beschreibung: "Drei native Apps von Grund auf gebaut – von der Architektur bis zum lauffähigen Stand. Aus Gelerntem wurde gelebte Praxis: saubere Schichtentrennung, reaktive Datenflüsse und wartbarer Code.",
+    beschreibung: "Drei native Apps von Grund auf gebaut, von der Architektur bis zum lauffähigen Stand. Aus Gelerntem wurde gelebte Praxis: saubere Schichtentrennung, reaktive Datenflüsse und wartbarer Code.",
     kategorie: "entwicklung",
     modulTitel: "Projekte",
     module: [
@@ -462,7 +462,7 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
     ],
   },
   {
-    jahr: "2025–heute",
+    jahr: "2025-heute",
     titel: "Security Research",
     beschreibung: "Autorisierte Security-Forschung auf HackerOne und Intigriti, mit bestätigten Schwachstellen. Im Zentrum steht eine selbst gebaute Recon- und Analyse-Pipeline, die Aufklärung, Bewertung und Nachweis zusammenführt.",
     kategorie: "security",
@@ -473,7 +473,7 @@ export const ZEITSTRAHL: ZeitstrahlModel[] = [
     ],
   },
   {
-    jahr: "2025–heute",
+    jahr: "2025-heute",
     titel: "KI-Stack, Agenten & Automatisierung",
     beschreibung: "Eine selbst gebaute, KI-gestützte Arbeitsumgebung, die Recherche und Analyse weitgehend automatisiert. Spezialisierte Agenten, lokale Modelle und eigene Pipelines greifen zu einem reproduzierbaren Ablauf zusammen.",
     kategorie: "eigenbau",
@@ -496,8 +496,8 @@ export const PERSOENLICH = {
   standort: "Nürnberg, Bayern",
   titel: "AI-Automation & Integration Engineer",
   untertitel: "KI-Automation • App-Entwicklung • Infrastruktur • Security",
-  firmaTagline: "Produktive KI-Systeme, gehärtete Infrastruktur, Security mit Angreifer-Blick — selbst gebaut und betrieben.",
-  kurzvorstellung: "Ich baue Software und Automatisierung, die Arbeit abnimmt – und betreibe sie auf einer Infrastruktur, die ich selbst absichere und am Laufen halte. Vom KI-gestützten Workflow bis zum gehärteten Server: keine Demos, sondern Systeme, auf die im Alltag Verlass ist.",
+  firmaTagline: "Produktive KI-Systeme, gehärtete Infrastruktur, Security mit Angreifer-Blick, selbst gebaut und betrieben.",
+  kurzvorstellung: "Ich baue Software und Automatisierung, die Arbeit abnimmt, und betreibe sie auf einer Infrastruktur, die ich selbst absichere und am Laufen halte. Vom KI-gestützten Workflow bis zum gehärteten Server: keine Demos, sondern Systeme, auf die im Alltag Verlass ist.",
   email: "michael_fleps@aol.com",
   telefon: "+49 172 572 5081",
   telefonLink: "+491725725081",
@@ -524,10 +524,10 @@ export interface LeistungModel {
 export const LEISTUNGEN: LeistungModel[] = [
   {
     titel: "KI-Automation & Integration",
-    nutzen: "Wiederkehrende Aufgaben übernehmen Agenten und saubere Schnittstellen – angebunden an die Werkzeuge, die Sie ohnehin nutzen.",
+    nutzen: "Wiederkehrende Aufgaben übernehmen Agenten und saubere Schnittstellen, angebunden an die Werkzeuge, die Sie ohnehin nutzen.",
     leistungen: [
       "Workflow-Automation mit n8n, APIs und eigenen Skripten",
-      "Sprachmodelle & Agenten – mit klaren Grenzen und Kontrolle",
+      "Sprachmodelle & Agenten, mit klaren Grenzen und Kontrolle",
       "Wissensbasis-Suche (RAG), auf Wunsch komplett auf Ihrem Server",
     ],
     ergebnis: "Weniger Handarbeit, schnellere Abläufe, weniger Fehler.",
@@ -536,19 +536,19 @@ export const LEISTUNGEN: LeistungModel[] = [
   },
   {
     titel: "Linux & Infrastruktur",
-    nutzen: "Server, die nicht nur eingerichtet, sondern verlässlich betrieben werden – abgesichert und wartbar.",
+    nutzen: "Server, die nicht nur eingerichtet, sondern verlässlich betrieben werden, abgesichert und wartbar.",
     leistungen: [
       "Gehärtete Linux- und Docker-Umgebungen (Firewall, Fail2ban, SSH)",
       "Reverse-Proxy, Verschlüsselung, Backups und Monitoring",
       "Automatisierung und saubere, wiederholbare Deployments",
     ],
-    ergebnis: "Eine Basis, die läuft – und die man nachts nicht im Kopf hat.",
+    ergebnis: "Eine Basis, die läuft, und die man nachts nicht im Kopf hat.",
     farbeRgb: "56, 189, 248",
     akzentHex: "#38bdf8",
   },
   {
     titel: "Security-Reviews",
-    nutzen: "Ein Blick aus der Angreifer-Perspektive auf Ihre Anwendung – bevor es jemand anderes versucht.",
+    nutzen: "Ein Blick aus der Angreifer-Perspektive auf Ihre Anwendung, bevor es jemand anderes versucht.",
     leistungen: [
       "Prüfung von Web-Apps und APIs auf reale Schwachstellen",
       "Nachvollziehbare Befunde statt anonymer Scanner-Listen",
@@ -560,13 +560,13 @@ export const LEISTUNGEN: LeistungModel[] = [
   },
   {
     titel: "Sichere App-Entwicklung",
-    nutzen: "Native iOS-Apps – von jemandem entwickelt, der Apps und APIs beruflich auch auf Schwachstellen prüft. So ist Sicherheit von Anfang an eingebaut, nicht nachträglich aufgesetzt.",
+    nutzen: "Native iOS-Apps, von jemandem entwickelt, der Apps und APIs beruflich auch auf Schwachstellen prüft. So ist Sicherheit von Anfang an eingebaut, nicht nachträglich aufgesetzt.",
     leistungen: [
       "iOS-Entwicklung in Swift & SwiftUI, saubere MVVM-Architektur",
-      "Auth- und API-Anbindung – Sicherheit von Anfang an mitgedacht",
+      "Auth- und API-Anbindung, Sicherheit von Anfang an mitgedacht",
       "Anbindung an KI-Funktionen und bestehende Backends",
     ],
-    ergebnis: "Apps, die gut aussehen – und auch unter Druck halten.",
+    ergebnis: "Apps, die gut aussehen, und auch unter Druck halten.",
     farbeRgb: "52, 211, 153",
     akzentHex: "#34d399",
   },
@@ -595,7 +595,7 @@ export const MEMORY_TIERS: MemoryTierModel[] = [
     lifecycle: "hand-kuratiert, ≤ 195 Zeilen",
     anzahl: "1 Datei",
     farbeRgb: "122, 162, 255",
-    bedeutung: "Die Inhaltsverzeichnis-Datei, die bei jeder neuen Anfrage automatisch mitgeladen wird. Verweist auf alles andere. Bewusst klein gehalten — was hier oben steht, sieht das Sprachmodell zuerst.",
+    bedeutung: "Die Inhaltsverzeichnis-Datei, die bei jeder neuen Anfrage automatisch mitgeladen wird. Verweist auf alles andere. Bewusst klein gehalten, was hier oben steht, sieht das Sprachmodell zuerst.",
   },
   {
     tier: "Deep",
@@ -604,7 +604,7 @@ export const MEMORY_TIERS: MemoryTierModel[] = [
     lifecycle: "abgeschlossene Themen",
     anzahl: "1 Datei",
     farbeRgb: "138, 160, 200",
-    bedeutung: "Themen, die ich nicht in jeder Session brauche — z.B. abgeschlossene Research-Targets oder alte iOS-Notizen. Wird nur geladen wenn ich explizit darauf zeige. Spart ca. 875 Tokens pro Session.",
+    bedeutung: "Themen, die ich nicht in jeder Session brauche (z.B. abgeschlossene Research-Targets oder alte iOS-Notizen). Wird nur geladen wenn ich explizit darauf zeige. Spart ca. 875 Tokens pro Session.",
   },
   {
     tier: "Archival",
@@ -613,7 +613,7 @@ export const MEMORY_TIERS: MemoryTierModel[] = [
     lifecycle: "Frontmatter mit Wichtigkeit, Vertrauen, Verifizierungs-Datum",
     anzahl: "~ 161 Dateien",
     farbeRgb: "167, 139, 250",
-    bedeutung: "Das eigentliche Gedächtnis. Eine Datei pro Lektion oder Konzept. Jede Datei hat Metadaten — wie wichtig, wie sicher, wann zuletzt geprüft. Wird nur geladen wenn ein anderes Dokument auf sie verweist (Wiki-Link-Prinzip).",
+    bedeutung: "Das eigentliche Gedächtnis. Eine Datei pro Lektion oder Konzept. Jede Datei hat Metadaten: wie wichtig, wie sicher, wann zuletzt geprüft. Wird nur geladen wenn ein anderes Dokument auf sie verweist (Wiki-Link-Prinzip).",
   },
   {
     tier: "Recall",
@@ -631,7 +631,7 @@ export const MEMORY_TIERS: MemoryTierModel[] = [
     lifecycle: "Sammelplatz, niemals direkt produktiv",
     anzahl: "von Hooks gefüttert",
     farbeRgb: "245, 158, 11",
-    bedeutung: "Hier landen automatisch Beobachtungen aus Sessions — Korrekturen, Überraschungen, Widersprüche. Sie werden niemals direkt zu Memory befördert: ich gehe sie regelmäßig durch und entscheide pro Eintrag selbst, was übernommen wird. Schutz vor halluzinierten Memories.",
+    bedeutung: "Hier landen automatisch Beobachtungen aus Sessions: Korrekturen, Überraschungen, Widersprüche. Sie werden niemals direkt zu Memory befördert: ich gehe sie regelmäßig durch und entscheide pro Eintrag selbst, was übernommen wird. Schutz vor halluzinierten Memories.",
   },
 ];
 
@@ -644,7 +644,7 @@ export const MCP_KATEGORIEN: McpKategorieModel[] = [
     kategorie: "Recon & Intel",
     icon: "",
     farbeRgb: "138, 160, 200",
-    beschreibung: "Asset-Discovery, CVE-Lookup, Pattern-Recall — vor jeder Hunt-Phase",
+    beschreibung: "Asset-Discovery, CVE-Lookup, Pattern-Recall (vor jeder Hunt-Phase)",
     mcps: [
       { name: "censys",       rolle: "Platform-API v3 (Eigenbau, 6 Tools)", eigenbau: true },
       { name: "shodan",       rolle: "Host-Info, CVE-DB, CPE-Lookup (~20 Tools)" },
@@ -753,7 +753,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     cadence: "dauerhaft",
     output: "iPhone ↔ Server Mailbox (Cloudflare)",
     farbeRgb: "138, 160, 200",
-    details: "Zweite Mailbox-Instanz speziell für die Claude.ai-iPhone-App. OAuth-2.1-Worker auf Cloudflare davor, strenge Pfad-Allowlist auf der Server-Seite — Mobile darf lesen, schreiben nur in den Handoff-Ordner, kein Shell-Zugriff.",
+    details: "Zweite Mailbox-Instanz speziell für die Claude.ai-iPhone-App. OAuth-2.1-Worker auf Cloudflare davor, strenge Pfad-Allowlist auf der Server-Seite. Mobile darf lesen, schreiben nur in den Handoff-Ordner, kein Shell-Zugriff.",
   },
   {
     name: "claude-bus-anomaly.service",
@@ -762,7 +762,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     output: "Alarm bei Off-Hours / Burst / abgelehnten Zugriffen",
     farbeRgb: "138, 160, 200",
     kritisch: true,
-    details: "Beobachtet das Audit-Log der beiden Mailbox-Services live. Bei verdächtigen Mustern — Aktivität nachts, viele Anfragen in kurzer Zeit, abgelehnte Pfade — kommt sofort ein Alarm. Frühwarnsystem für kompromittierte Tokens.",
+    details: "Beobachtet das Audit-Log der beiden Mailbox-Services live. Bei verdächtigen Mustern (Aktivität nachts, viele Anfragen in kurzer Zeit, abgelehnte Pfade) kommt sofort ein Alarm. Frühwarnsystem für kompromittierte Tokens.",
   },
   {
     name: "caido-pipeline.service",
@@ -786,7 +786,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     cadence: "dauerhaft",
     output: "lokales Speech-to-Text (whisper.cpp)",
     farbeRgb: "138, 160, 200",
-    details: "whisper.cpp-Server mit dem mehrsprachigen ggml-small-Modell (488 MB). Komplett offline, keine Cloud-Calls, kein Datentransfer nach außen. Latenz ~ 10–15 Sekunden für eine 5–15-Sekunden-Aufnahme.",
+    details: "whisper.cpp-Server mit dem mehrsprachigen ggml-small-Modell (488 MB). Komplett offline, keine Cloud-Calls, kein Datentransfer nach außen. Latenz ~ 10-15 Sekunden für eine 5-15-Sekunden-Aufnahme.",
   },
   {
     name: "cloudflared.service",
@@ -794,7 +794,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     cadence: "dauerhaft",
     output: "Cloudflare-Tunnel zu m.cyp-hr.com",
     farbeRgb: "138, 160, 200",
-    details: "Erzeugt einen sicheren Tunnel von Cloudflare zum Server, ohne dass ich einen Port nach außen öffnen muss. TLS automatisch erneuert, WAF + DDoS-Schutz am Edge — der iPhone-Endpunkt + Voice-UI sind nur über diesen Tunnel erreichbar.",
+    details: "Erzeugt einen sicheren Tunnel von Cloudflare zum Server, ohne dass ich einen Port nach außen öffnen muss. TLS automatisch erneuert, WAF + DDoS-Schutz am Edge. Der iPhone-Endpunkt + Voice-UI sind nur über diesen Tunnel erreichbar.",
   },
   {
     name: "milvus-standalone.service",
@@ -802,7 +802,7 @@ export const AUTO_WORKFLOWS: AutoWorkflowModel[] = [
     cadence: "Docker",
     output: "Vektor-Datenbank für semantische Code-Suche",
     farbeRgb: "138, 160, 200",
-    details: "Milvus-Standalone-Container, in dem die Embeddings meiner indexierten Codebases liegen. Ollama erzeugt die Embeddings lokal, claude-context legt sie hier ab — dadurch funktioniert semantische Code-Suche (etwa: 'zeig mir alle Stellen wo API-Keys verarbeitet werden') komplett ohne externe APIs.",
+    details: "Milvus-Standalone-Container, in dem die Embeddings meiner indexierten Codebases liegen. Ollama erzeugt die Embeddings lokal, claude-context legt sie hier ab, dadurch funktioniert semantische Code-Suche (etwa: 'zeig mir alle Stellen wo API-Keys verarbeitet werden') komplett ohne externe APIs.",
   },
 ];
 
@@ -812,15 +812,15 @@ export const SLASH_COMMANDS: SlashCommandModel[] = [
   { cmd: "/submit-gate",   purpose: "5-Phasen Final-Review: 10 Hard-Gates · Devil's-Advocate · Hacktivity-Check · Reputation-Status · Verdict: freigeben / prüfen / stoppen", gruppe: "submit-pipeline", hardRule: true },
   { cmd: "/new-target",    purpose: "7-Phasen-Onboarding: Memory-Gates · Ordner · Recon · Graph-Entity · Cross-Ref · Caido-Pre-Flight",                  gruppe: "submit-pipeline", hardRule: true },
   // Memory-Pflege (markmem — selbst-lernendes System)
-  { cmd: "/memory-review",          purpose: "Interaktives Triage der Inbox (pending · surprises · contradictions) — Promote/Reject pro Item", gruppe: "memory-pflege" },
-  { cmd: "/memory-quiz",            purpose: "Active-Recall: zufällige Memories testen — catched dead/unclear/stale",                          gruppe: "memory-pflege" },
+  { cmd: "/memory-review",          purpose: "Interaktives Triage der Inbox (pending · surprises · contradictions): Promote/Reject pro Item", gruppe: "memory-pflege" },
+  { cmd: "/memory-quiz",            purpose: "Active-Recall: zufällige Memories testen, catched dead/unclear/stale",                          gruppe: "memory-pflege" },
   { cmd: "/memory-outcome",         purpose: "Submit-Resolution → confidence backprop auf zitierte Memories (STALE-Pattern)",                  gruppe: "memory-pflege" },
   { cmd: "/memory-link",            purpose: "A-MEM Auto-Linker: gewichtete Jaccard-Similarity → bidirektionale [[wiki-links]]",                gruppe: "memory-pflege" },
   { cmd: "/memory-search",          purpose: "Semantic Search via claude-context MCP (Ollama+Milvus). 'JWT' matcht 'JSON Web Token'",           gruppe: "memory-pflege" },
   { cmd: "/memory-stub",            purpose: "Auto-generiert project_<target>_bugbounty.md Master aus existierenden feedback_<target>_*.md",    gruppe: "memory-pflege" },
   { cmd: "/memory-synthesize",      purpose: "ExpeL-Pattern-Crystallization: Cluster ähnlicher Memories → synthesisierte Meta-Rule",            gruppe: "memory-pflege" },
   { cmd: "/memory-status",          purpose: "One-Screen Dashboard: Token-Tax · Tier-Verteilung · Top-5 Files · Confidence-Trends (<200ms)",    gruppe: "memory-pflege" },
-  { cmd: "/memory-citation-check",  purpose: "Analyse: wie oft wurde Advice OHNE [[link]] zur Memory gegeben — Pro-Self-Feedback",              gruppe: "memory-pflege" },
+  { cmd: "/memory-citation-check",  purpose: "Analyse: wie oft wurde Advice OHNE [[link]] zur Memory gegeben, Pro-Self-Feedback",              gruppe: "memory-pflege" },
 ];
 
 // Custom Skills (11 — selbst geschrieben, in ~/.claude/skills/)
@@ -852,19 +852,19 @@ export const HARD_GATES: HardGateModel[] = [
     nummer: 2,
     titel: "Nicht auf der Blacklist",
     check: "Kein reiner Topology-Leak, kein Open-Redirect ohne Folge-Chain, keine bloße Enumeration, keine über-gestretchte CVE-Anekdote.",
-    beispiel: "Ich habe in 14 Closes innerhalb von zwei Wochen 6 vorhersagbare Anti-Patterns gemacht. Daraus entstand diese Liste — RFC1918-DNS-Disclosures bei Shopify (0 $), Open-Redirect ohne Cookie-/Token-Klau bei Grammarly (N/A), Enumeration-Only bei GitLab (Informative).",
+    beispiel: "Ich habe in 14 Closes innerhalb von zwei Wochen 6 vorhersagbare Anti-Patterns gemacht. Daraus entstand diese Liste: RFC1918-DNS-Disclosures bei Shopify (0 $), Open-Redirect ohne Cookie-/Token-Klau bei Grammarly (N/A), Enumeration-Only bei GitLab (Informative).",
   },
   {
     nummer: 3,
     titel: "Konkret demonstrierter Impact",
-    check: "Kein „könnte“, kein „potenziell“, kein „theoretisch“ — entweder Daten lesen, oder Aktion ausführen, oder nicht einreichen.",
+    check: "Kein „könnte“, kein „potenziell“, kein „theoretisch“: entweder Daten lesen, oder Aktion ausführen, oder nicht einreichen.",
     beispiel: "Falsch: „SSRF ist möglich, dadurch könnte ein Angreifer interne Services erreichen.“ Richtig: „SSRF lieferte folgenden Output vom Metadata-Endpoint: <konkretes Token>.“ Triager bewerten Demonstrated-Impact-Reports systematisch höher.",
   },
   {
     nummer: 4,
     titel: "Zwei-Account-Beweis bei BOLA / IDOR",
     check: "Bei Zugriffsbruch zwischen Accounts: Beweis mit zwei eigenen Accounts, Screenshot inklusive.",
-    beispiel: "Account A erzeugt Ressource ID 42. Account B sendet GET /api/resource/42 und bekommt Account-A-Daten zurück — Screenshot mit beiden Browser-Profilen nebeneinander. Ohne diesen Beweis schließt der Triager als „architectural risk“ ohne Bounty.",
+    beispiel: "Account A erzeugt Ressource ID 42. Account B sendet GET /api/resource/42 und bekommt Account-A-Daten zurück. Screenshot mit beiden Browser-Profilen nebeneinander. Ohne diesen Beweis schließt der Triager als „architectural risk“ ohne Bounty.",
   },
   {
     nummer: 5,
@@ -875,14 +875,14 @@ export const HARD_GATES: HardGateModel[] = [
   {
     nummer: 6,
     titel: "Original-Report-Suche",
-    check: "Manuell nach deiner exakten Asset + Klasse-Kombination suchen — nicht von einem Agent erledigen lassen.",
+    check: "Manuell nach deiner exakten Asset + Klasse-Kombination suchen, nicht von einem Agent erledigen lassen.",
     beispiel: "Disclosed Reports geben den exakten Wording-Schlüssel des Triagers, was als Bounty-würdig und was als Out-of-Scope gilt. Wenn dein Befund das gleiche Pattern hat: 99 % Duplicate.",
   },
   {
     nummer: 7,
     titel: "Programm-Status live geprüft",
     check: "Programm ist aktuell aktiv für Submissions, nicht suspendiert.",
-    beispiel: "Suspended-Programme sehen in deinen Lesezeichen aus wie sonst — bis du den Submit-Button drückst und einen Fehler bekommst, oder schlimmer: Report im Limbo. Vor jedem Submit das Programm-Dashboard frisch laden.",
+    beispiel: "Suspended-Programme sehen in deinen Lesezeichen aus wie sonst, bis du den Submit-Button drückst und einen Fehler bekommst, oder schlimmer: Report im Limbo. Vor jedem Submit das Programm-Dashboard frisch laden.",
   },
   {
     nummer: 8,
@@ -912,7 +912,7 @@ export const HARD_GATES: HardGateModel[] = [
     nummer: 12,
     titel: "Triager-Brille aufsetzen",
     check: "Würde der Triager schreiben: „Interessante Analyse, aber kein echter Impact“?",
-    beispiel: "Vor dem Submit-Klick mental durchspielen: wie wird der Triager diesen Report wahrnehmen? Wenn das wahrscheinlichste Verdict „Informative — interesting but no real impact“ ist, dann ist es noch kein Submit-Kandidat.",
+    beispiel: "Vor dem Submit-Klick mental durchspielen: wie wird der Triager diesen Report wahrnehmen? Wenn das wahrscheinlichste Verdict „Informative - interesting but no real impact“ ist, dann ist es noch kein Submit-Kandidat.",
   },
 ];
 
@@ -925,7 +925,7 @@ export const DA_PATTERNS: ReadonlyArray<{ titel: string; problem: string; lesson
   },
   {
     titel: "Absence-of-Evidence-Trap",
-    problem: "'Docs erwähnen scope restriction nicht' ≠ Bug — mature payments API enforces server-side ALWAYS",
+    problem: "'Docs erwähnen scope restriction nicht' ≠ Bug: mature payments API enforces server-side ALWAYS",
     lesson: "Bei Surface-Mapping aus Docs allein NIE >25% Confidence vergeben",
   },
   {
@@ -936,7 +936,7 @@ export const DA_PATTERNS: ReadonlyArray<{ titel: string; problem: string; lesson
   {
     titel: "Plan-Bloat",
     problem: "5-Tool-Upgrade-Plan in 3 Monaten contradicts 2-concurrent-programs-Discipline",
-    lesson: "Methodology-Upgrades auf max 2 simultan kappen — low-effort/high-ROI first",
+    lesson: "Methodology-Upgrades auf max 2 simultan kappen, low-effort/high-ROI first",
   },
   {
     titel: "Public-Blog vs HackerOne-Body",
@@ -947,10 +947,10 @@ export const DA_PATTERNS: ReadonlyArray<{ titel: string; problem: string; lesson
 
 // Senior-Elite Hardening Highlights (für /labor Hero-Banner)
 export const ELITE_PRINZIPIEN: ReadonlyArray<{ titel: string; beschreibung: string; rgb: string }> = [
-  { titel: "Disziplin vor Menge",   beschreibung: "Vor jedem Submit greifen zwölf feste Prüf-Gates – eingereicht wird nur, was sie alle besteht.",                rgb: "239, 68, 68" },
+  { titel: "Disziplin vor Menge",   beschreibung: "Vor jedem Submit greifen zwölf feste Prüf-Gates, eingereicht wird nur, was sie alle besteht.",                rgb: "239, 68, 68" },
   { titel: "Lernendes System",      beschreibung: "Ein fünfstufiges Gedächtnis mit automatischen Hooks sorgt dafür, dass jede Sitzung auf der vorherigen aufbaut.", rgb: "122, 162, 255" },
-  { titel: "Geräteübergreifend",    beschreibung: "Mac, Server und iPhone arbeiten zusammen – sicher verbunden über ein privates Netz und einen eigenen OAuth-Worker.", rgb: "138, 160, 200" },
-  { titel: "Kostenbewusst",         beschreibung: "Spracherkennung, Embeddings und die meisten OSINT-Quellen laufen lokal oder schlüssellos – ohne laufende API-Kosten.", rgb: "34, 197, 94" },
+  { titel: "Geräteübergreifend",    beschreibung: "Mac, Server und iPhone arbeiten zusammen, sicher verbunden über ein privates Netz und einen eigenen OAuth-Worker.", rgb: "138, 160, 200" },
+  { titel: "Kostenbewusst",         beschreibung: "Spracherkennung, Embeddings und die meisten OSINT-Quellen laufen lokal oder schlüssellos, ohne laufende API-Kosten.", rgb: "34, 197, 94" },
   { titel: "Ausfallsicher",         beschreibung: "Lockfiles, Wiederholungslogik und eine dauerhafte Warteschlange fangen Fehler ab, bevor sie den Ablauf stoppen.",   rgb: "245, 158, 11" },
   { titel: "Stetiges Lernen",       beschreibung: "Aktive Wiederholung, Ergebnis-Rückkopplung und regelmäßige Refactorings halten das Wissen aktuell.",              rgb: "167, 139, 250" },
 ];

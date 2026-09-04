@@ -86,7 +86,7 @@ export default function SecurityView() {
     <section id="security" className="py-16 px-6 max-w-6xl mx-auto">
       <AbschnittsTitel
         prefix="> security_research"
-        untertitel="Vom ersten DNS-Query bis zum validierten Report — sechs Phasen, 13 Custom-Tools, eigene VPS-Infrastruktur. Jede Phase liefert konkrete Zwischenergebnisse: von priorisierten Angriffsflächen über reproduzierbare PoC-Skripte bis zur manuellen Bestätigung der Schwachstelle."
+        untertitel="Vom ersten DNS-Query bis zum validierten Report: sechs Phasen, 13 Custom-Tools, eigene VPS-Infrastruktur. Jede Phase liefert konkrete Zwischenergebnisse: von priorisierten Angriffsflächen über reproduzierbare PoC-Skripte bis zur manuellen Bestätigung der Schwachstelle."
         klassen="mb-6"
       />
 
@@ -196,7 +196,7 @@ export default function SecurityView() {
           {aktiverTab === "pipeline" && (
             <div>
               <p className="font-mono text-xs text-white/60 mb-5">
-                run_master_pipeline.sh — Lockfile-geschützt · --resume-from · --skip-Flags · --dry-run
+                run_master_pipeline.sh (Lockfile-geschützt) · --resume-from · --skip-Flags · --dry-run
               </p>
               <div className="space-y-2">
                 {PIPELINE_SCHRITTE.map((schritt, index) => (
@@ -269,7 +269,7 @@ export default function SecurityView() {
                   Scoring-Algorithmus
                 </h3>
                 <p className="text-white/40 text-xs mb-5 font-mono">
-                  Single-Pass awk — 500.000 URLs in 15 Sek. · 12 Kategorien · gewichtete Scores
+                  Single-Pass awk (500.000 URLs in 15 Sek.) · 12 Kategorien · gewichtete Scores
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {SCORING_KATEGORIEN.map((kategorie, index) => {

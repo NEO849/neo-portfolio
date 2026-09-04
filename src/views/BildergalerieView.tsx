@@ -78,7 +78,7 @@ export default function BildergalerieView({ startSlug, onLightboxSchliessen }: B
     <section id="bilder" className="py-16 px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
         prefix="> bilder"
-        untertitel="Screenshots und Einblicke aus meinen Projekten – iOS, Android, Tooling und meinem VPS-Ubuntu-Server, jeweils im Detail."
+        untertitel="Screenshots und Einblicke aus meinen Projekten: iOS, Android, Tooling und meinem VPS-Ubuntu-Server, jeweils im Detail."
         klassen="mb-8"
       />
 

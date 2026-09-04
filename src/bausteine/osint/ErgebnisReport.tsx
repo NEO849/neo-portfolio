@@ -335,7 +335,7 @@ function PivotSektion({ pivots, onPivot }: { pivots?: Pivot[]; onPivot?: PivotHa
         })}
       </div>
       <p className="font-mono text-[10px] text-white/55 mt-2 leading-snug">
-        Verknüpfte Datenpunkte aus diesem Ergebnis — ein Klick startet die nächste Analyse.
+        Verknüpfte Datenpunkte aus diesem Ergebnis. Ein Klick startet die nächste Analyse.
       </p>
     </Sektion>
   );
@@ -358,16 +358,16 @@ function ReportTelefon({ t }: { t: TelefonErgebnis }) {
         <Feld label="E.164" copy={t.format?.e164} copyId="e164" kopiertId={kid} onCopy={copy}>{t.format?.e164}</Feld>
       </Sektion>
       <Sektion titel="Metadaten">
-        <Feld label="Land">{t.metadaten?.land_code} — {t.metadaten?.region}</Feld>
+        <Feld label="Land">{t.metadaten?.land_code}, {t.metadaten?.region}</Feld>
         <Feld label="Typ">{t.metadaten?.leitungstyp}</Feld>
-        <Feld label="Carrier">{t.metadaten?.carrier || "—"}</Feld>
+        <Feld label="Carrier">{t.metadaten?.carrier || "-"}</Feld>
         <Feld label="Zeitzone">{(t.metadaten?.zeitzonen ?? []).join(", ")}</Feld>
       </Sektion>
       {t.live_status?.aktiv && (
         <Sektion titel="Live-Status (HLR)" farbe={C.gruen}
           rechts={<span className="font-mono text-[10px] text-white/60">Echtzeit · {t.live_status.quelle}</span>}>
           <div className="flex flex-wrap gap-1.5 mb-2">
-            <Marke text={t.live_status.status_text ?? t.live_status.status ?? "—"}
+            <Marke text={t.live_status.status_text ?? t.live_status.status ?? "-"}
               farbe={t.live_status.erreichbar ? C.gruen : C.gelb} gefuellt />
             {t.live_status.roaming && <Marke text="Roaming" farbe={C.gelb} />}
             {t.live_status.portiert && <Marke text="portiert" farbe={C.cyber} />}
@@ -479,7 +479,7 @@ function ReportBild({ b, onPivot }: { b: BildErgebnis; onPivot?: PivotHandler })
         ? <Verdikt titel="Privatsphäre-Risiko" stufe={bw.stufe} wert={bw.punkte} max={10}
             hinweis={`${bw.befunde.length} Befund(e)`} deutung={bw.zusammenfassung} />
         : gps && <Verdikt titel="Standort-Risiko" stufe="Hoch" wert={6} max={6} hinweis="GPS im Bild gefunden"
-            deutung="Das Bild enthält GPS-Koordinaten — der Aufnahmeort lässt sich auf der Karte unten rekonstruieren." />}
+            deutung="Das Bild enthält GPS-Koordinaten. Der Aufnahmeort lässt sich auf der Karte unten rekonstruieren." />}
       <Sektion titel="Bild-Info">
         <BildVorschau url={b.url} format={b.bild?.format} breite={b.bild?.breite} hoehe={b.bild?.hoehe} />
         <div className="mt-2">
@@ -511,7 +511,7 @@ function ReportBild({ b, onPivot }: { b: BildErgebnis; onPivot?: PivotHandler })
           </Feld>}
           {gps && <GpsKarte lat={gps.lat} lon={gps.lon} />}
         </Sektion>
-      ) : <div className="font-mono text-[12px] text-white/65 mt-4">Keine EXIF-Metadaten vorhanden — gut für die Privatsphäre.</div>}
+      ) : <div className="font-mono text-[12px] text-white/65 mt-4">Keine EXIF-Metadaten vorhanden (gut für die Privatsphäre).</div>}
       {bw && bw.befunde.length > 0 && (
         <Sektion titel="Befunde" farbe={C.gelb}>
           {bw.befunde.map((h, i) => (
@@ -542,7 +542,7 @@ function ReportBild({ b, onPivot }: { b: BildErgebnis; onPivot?: PivotHandler })
         <Sektion titel="Authentizität & Forensik (2026)" farbe={C.lila}>
           {b.content_credentials?.hat_manifest && (
             <>
-              <Feld label="Herkunft (C2PA)">Verifizierbares Manifest vorhanden{b.content_credentials.erzeugt_von ? ` — ${b.content_credentials.erzeugt_von}` : ""}</Feld>
+              <Feld label="Herkunft (C2PA)">Verifizierbares Manifest vorhanden{b.content_credentials.erzeugt_von ? ` (${b.content_credentials.erzeugt_von})` : ""}</Feld>
               {b.content_credentials.signiert_von && <Feld label="Signiert von">{b.content_credentials.signiert_von}</Feld>}
               {b.content_credentials.aktionen && b.content_credentials.aktionen.length > 0 && (
                 <Feld label="Aktionen">{b.content_credentials.aktionen.join(" · ")}</Feld>
@@ -553,7 +553,7 @@ function ReportBild({ b, onPivot }: { b: BildErgebnis; onPivot?: PivotHandler })
             <div className="mt-1"><Marke text="Als KI-erzeugt markiert" farbe={C.gelb} gefuellt /></div>
           )}
           {b.versteckte_daten?.hat_trailing_data && (
-            <div className="mt-2"><Item stufe="mittel">{b.versteckte_daten.trailing_bytes} Byte nach dem Datei-Ende — möglicher versteckter/angehängter Inhalt.</Item></div>
+            <div className="mt-2"><Item stufe="mittel">{b.versteckte_daten.trailing_bytes} Byte nach dem Datei-Ende (möglicher versteckter/angehängter Inhalt).</Item></div>
           )}
           {b.tiefenforensik?.ela?.anwendbar && (
             <div className="mt-2">
@@ -583,7 +583,7 @@ function ReportEmail({ basis, recon, onPivot }: { basis: EmailErgebnis; recon: E
   return (
     <div>
       {risiko && <Verdikt titel="Exposure-Risiko" stufe={risiko.stufe} wert={risiko.punkte} max={12} hinweis={`${basis.adresse}`}
-        deutung="Wie stark diese Adresse öffentlich exponiert ist — Datenlecks und verknüpfte Profile zusammengefasst. Höher = größere Angriffsfläche." />}
+        deutung="Wie stark diese Adresse öffentlich exponiert ist (Datenlecks und verknüpfte Profile zusammengefasst). Höher = größere Angriffsfläche." />}
 
       {gravatar?.gefunden && gravatar.avatar_url && (
         <div className="flex items-center gap-3 mt-4 mb-1">
@@ -662,7 +662,7 @@ function ReportEmail({ basis, recon, onPivot }: { basis: EmailErgebnis; recon: E
               ))}
             </div>
           )}
-          {recon?.pgp?.hat_pgp_key && <Item stufe="info">PGP: {recon.pgp.anzahl} öffentliche(r) Key(s) — sicherheitsaffin</Item>}
+          {recon?.pgp?.hat_pgp_key && <Item stufe="info">PGP: {recon.pgp.anzahl} öffentliche(r) Key(s) (sicherheitsaffin)</Item>}
         </Sektion>
       )}
 
@@ -692,7 +692,7 @@ function ReportEmail({ basis, recon, onPivot }: { basis: EmailErgebnis; recon: E
         </Sektion>
       )}
       {recon?.emailrep?.geprueft && (
-        <Sektion titel="EmailRep — Reputation" farbe={C.cyber}>
+        <Sektion titel="EmailRep (Reputation)" farbe={C.cyber}>
           {recon.emailrep.reputation && <Feld label="Reputation">{recon.emailrep.reputation}</Feld>}
           <div className="flex flex-wrap gap-1.5 mt-1">
             {(recon.emailrep.data_breach || recon.emailrep.credentials_leaked) && <Marke text="in Leak gesehen" farbe={C.rot} gefuellt />}
@@ -803,7 +803,7 @@ function ReportSoziale({ s, onPivot }: { s: SozialePraesenzErgebnis; onPivot?: P
           stufe={gesamt > 8 ? "Mittel" : gesamt > 0 ? "Gering" : "Keines"}
           wert={gesamt} max={Math.max((z.geprueft_offen ?? 0) + (z.walled_gesamt ?? 0) + (z.weitere_geprueft ?? 0), 1)}
           hinweis={`@${s.benutzername} · Modus: ${s.modus === "vollscan" ? "Vollscan 600+" : "Schnell"}`}
-          deutung="Wie sichtbar dieser Name im Netz ist. Je einheitlicher der Username, desto leichter lässt sich daraus EINE Person zusammensetzen — siehe Schutz-Maßnahmen." />
+          deutung="Wie sichtbar dieser Name im Netz ist. Je einheitlicher der Username, desto leichter lässt sich daraus EINE Person zusammensetzen (siehe Schutz-Maßnahmen)." />
       )}
       {z && (
         <div className="flex flex-wrap gap-1.5 mt-3 mb-1">
@@ -813,7 +813,7 @@ function ReportSoziale({ s, onPivot }: { s: SozialePraesenzErgebnis; onPivot?: P
         </div>
       )}
 
-      <Sektion titel="Offene Plattformen — echte Daten" farbe={C.gruen}
+      <Sektion titel="Offene Plattformen (echte Daten)" farbe={C.gruen}
         rechts={<span className="font-mono text-[10px] text-white/60">{offen.length} gefunden</span>}>
         {offen.length === 0 ? (
           <div className="font-mono text-[12px] text-white/65 py-2">Keine offenen Profile gefunden.</div>
@@ -839,7 +839,7 @@ function ReportSoziale({ s, onPivot }: { s: SozialePraesenzErgebnis; onPivot?: P
         </Sektion>
       )}
 
-      <Sektion titel="Große Netzwerke — login-geschützt" farbe={C.gelb}
+      <Sektion titel="Große Netzwerke (login-geschützt)" farbe={C.gelb}
         rechts={<span className="font-mono text-[10px] text-white/60">{walledBestaetigt} bestätigt</span>}>
         {(s.walled_gardens ?? []).map((w, i) => {
           const farbe = w.existenz === true ? C.gruen : w.existenz === false ? C.cyber : C.gelb;
@@ -863,7 +863,7 @@ function ReportSoziale({ s, onPivot }: { s: SozialePraesenzErgebnis; onPivot?: P
       </Sektion>
 
       {weitere.length > 0 && (
-        <Sektion titel="Weitere Plattformen — WhatsMyName" farbe={C.cyber}
+        <Sektion titel="Weitere Plattformen (WhatsMyName)" farbe={C.cyber}
           rechts={<span className="font-mono text-[10px] text-white/60">{weitere.length} Treffer</span>}>
           <div className="flex flex-wrap gap-1.5">
             {weitere.slice(0, 60).map((w, i) => {
@@ -954,7 +954,7 @@ function ReportDomain({ domain, shodan, onPivot }: { domain: DomainErgebnis; sho
       </Sektion>
 
       <Sektion titel="HTTP-Header-Audit">
-        <Feld label="Status">{domain.http.status ?? "—"} {domain.http.server ? `· ${domain.http.server}` : ""}</Feld>
+        <Feld label="Status">{domain.http.status ?? "-"} {domain.http.server ? `· ${domain.http.server}` : ""}</Feld>
         {sv.details.map((d, i) => <Item key={i} stufe={d.ok ? "ok" : "neg"}>{d.check}</Item>)}
       </Sektion>
 
@@ -1151,7 +1151,7 @@ function ReportCensys({ c }: { c: CensysErgebnis }) {
     <div>
       <Sektion titel="Ziel">
         <Feld label="Eingabe">{c.ziel}{c.eingabe_typ ? ` (${c.eingabe_typ})` : ""}</Feld>
-        <Feld label="IP-Adressen">{(c.ips ?? []).join(", ") || "—"}</Feld>
+        <Feld label="IP-Adressen">{(c.ips ?? []).join(", ") || "-"}</Feld>
       </Sektion>
 
       {treffer.map((h, idx) => (
@@ -1163,7 +1163,7 @@ function ReportCensys({ c }: { c: CensysErgebnis }) {
               </Feld>
             )}
             {h.autonomes_system?.asn != null && (
-              <Feld label="Betreiber">AS{h.autonomes_system.asn} · {h.autonomes_system.name ?? h.autonomes_system.beschreibung ?? "—"}</Feld>
+              <Feld label="Betreiber">AS{h.autonomes_system.asn} · {h.autonomes_system.name ?? h.autonomes_system.beschreibung ?? "-"}</Feld>
             )}
             {h.autonomes_system?.bgp_prefix && (
               <Feld label="BGP-Prefix" copy={h.autonomes_system.bgp_prefix} copyId={`px${idx}`} kopiertId={kid} onCopy={copy}>{h.autonomes_system.bgp_prefix}</Feld>
@@ -1301,7 +1301,7 @@ function ReportStatus() {
   const infra = [
     "FastAPI · uvicorn · slowapi",
     "dnspython · python-whois",
-    "httpx — TLS-verify + SSRF-Guard",
+    "httpx · TLS-verify + SSRF-Guard",
     "WhatsMyName-DB (cached)",
     "Shodan InternetDB · Censys Platform",
     "RIPEstat (RIPE NCC)",
@@ -1387,15 +1387,15 @@ function klartextFuer(modulNummer: string, daten: unknown): KlartextDaten | null
           return {
             stufe: r?.stufe ?? "Mittel",
             schlagzeile: "Diese Adresse ist öffentlich exponiert",
-            text: `Gefunden: ${teile.join(", ")}. Je mehr öffentlich verknüpft ist, desto größer die Angriffsfläche — bei Datenlecks die Passwörter ändern und 2-Faktor-Schutz aktivieren.`,
+            text: `Gefunden: ${teile.join(", ")}. Je mehr öffentlich verknüpft ist, desto größer die Angriffsfläche. Bei Datenlecks die Passwörter ändern und 2-Faktor-Schutz aktivieren.`,
           };
         }
         return {
           stufe: "Keines",
           schlagzeile: "Keine bekannten Datenlecks für diese Adresse",
           text: teile.length
-            ? `Öffentlich sichtbar ist lediglich: ${teile.join(", ")}. Keine Treffer in den Leak-Datenbanken — guter Stand.`
-            : "Diese Adresse taucht in keiner bekannten Leak-Datenbank auf und hat keine öffentlich verknüpften Profile — sauber.",
+            ? `Öffentlich sichtbar ist lediglich: ${teile.join(", ")}. Keine Treffer in den Leak-Datenbanken (guter Stand).`
+            : "Diese Adresse taucht in keiner bekannten Leak-Datenbank auf und hat keine öffentlich verknüpften Profile (sauber).",
         };
       }
       case "3": {
@@ -1405,7 +1405,7 @@ function klartextFuer(modulNummer: string, daten: unknown): KlartextDaten | null
         return {
           stufe: s.treffer_rate >= 50 ? "Hoch" : s.treffer_rate >= 20 ? "Mittel" : "Gering",
           schlagzeile: `„${b.benutzername}" existiert auf ${zahlwort(s.gefunden, "Plattform", "Plattformen")}`,
-          text: `Von ${s.geprueft} geprüften Plattformen gab es ${s.gefunden} Treffer — das ist der digitale Fußabdruck dieses Namens. Ein Klick auf einen Treffer öffnet das jeweilige Profil.`,
+          text: `Von ${s.geprueft} geprüften Plattformen gab es ${s.gefunden} Treffer. Das ist der digitale Fußabdruck dieses Namens. Ein Klick auf einen Treffer öffnet das jeweilige Profil.`,
         };
       }
       case "4": {
@@ -1416,7 +1416,7 @@ function klartextFuer(modulNummer: string, daten: unknown): KlartextDaten | null
         return {
           stufe: "ok",
           schlagzeile: `Nummer aus ${ort}${m?.leitungstyp ? ` · ${m.leitungstyp}` : ""}`,
-          text: `${m?.carrier ? `Anbieter: ${m.carrier}. ` : ""}Die Basis-Analyse läuft komplett lokal — die Such-Links zu Truecaller, Tellows & Co. öffnest du selbst, es werden keine Daten automatisch gesendet.`,
+          text: `${m?.carrier ? `Anbieter: ${m.carrier}. ` : ""}Die Basis-Analyse läuft komplett lokal. Die Such-Links zu Truecaller, Tellows & Co. öffnest du selbst, es werden keine Daten automatisch gesendet.`,
         };
       }
       case "5": {
@@ -1431,7 +1431,7 @@ function klartextFuer(modulNummer: string, daten: unknown): KlartextDaten | null
         return {
           stufe,
           schlagzeile: `Diese Domain ist ${wort} abgesichert`,
-          text: `Die HTTP-Sicherheits-Header erreichen ${sv.prozent}%. Nach außen sichtbar sind ${zahlwort(ports, "offener Port", "offene Ports")}${vulns ? ` und ${zahlwort(vulns, "bekannte Schwachstelle", "bekannte Schwachstellen")}` : ""} — das ist die Angriffsfläche, die jeder im Internet sehen kann.`,
+          text: `Die HTTP-Sicherheits-Header erreichen ${sv.prozent}%. Nach außen sichtbar sind ${zahlwort(ports, "offener Port", "offene Ports")}${vulns ? ` und ${zahlwort(vulns, "bekannte Schwachstelle", "bekannte Schwachstellen")}` : ""}. Das ist die Angriffsfläche, die jeder im Internet sehen kann.`,
         };
       }
       case "6": {
@@ -1443,7 +1443,7 @@ function klartextFuer(modulNummer: string, daten: unknown): KlartextDaten | null
           return {
             stufe: "Hoch",
             schlagzeile: "Das Bild verrät seinen Aufnahmeort",
-            text: `In den Metadaten stecken GPS-Koordinaten${gps.ort_name ? ` (${gps.ort_name})` : ""} — der genaue Ort lässt sich auf der Karte unten rekonstruieren. Vor dem öffentlichen Teilen die Metadaten entfernen.`,
+            text: `In den Metadaten stecken GPS-Koordinaten${gps.ort_name ? ` (${gps.ort_name})` : ""}. Der genaue Ort lässt sich auf der Karte unten rekonstruieren. Vor dem öffentlichen Teilen die Metadaten entfernen.`,
           };
         }
         if (bw && bw.punkte >= 2) {
@@ -1453,8 +1453,8 @@ function klartextFuer(modulNummer: string, daten: unknown): KlartextDaten | null
           stufe: "Keines",
           schlagzeile: "Das Bild ist unkritisch",
           text: b.exif?.verfuegbar
-            ? "Es wurden nur harmlose Metadaten gefunden — kein Standort, keine Geräte-ID."
-            : "Das Bild enthält keine auslesbaren Metadaten — gut für die Privatsphäre (vermutlich bereits bereinigt).",
+            ? "Es wurden nur harmlose Metadaten gefunden (kein Standort, keine Geräte-ID)."
+            : "Das Bild enthält keine auslesbaren Metadaten (gut für die Privatsphäre, vermutlich bereits bereinigt).",
         };
       }
       case "8": {
@@ -1465,7 +1465,7 @@ function klartextFuer(modulNummer: string, daten: unknown): KlartextDaten | null
         return {
           stufe: "info",
           schlagzeile: `${zahlwort(k, "Datenpunkt", "Datenpunkte")} rund um „${o.eingabe}" verknüpft`,
-          text: `Automatisch erkannt als ${o.typ}.${p ? ` ${zahlwort(p, "neue Verbindung", "neue Verbindungen")} entdeckt.` : ""} Der interaktive Graph unten zeigt, wie alle Datenpunkte zusammenhängen — Knoten anklicken für Details.`,
+          text: `Automatisch erkannt als ${o.typ}.${p ? ` ${zahlwort(p, "neue Verbindung", "neue Verbindungen")} entdeckt.` : ""} Der interaktive Graph unten zeigt, wie alle Datenpunkte zusammenhängen (Knoten anklicken für Details).`,
         };
       }
       case "9": {
@@ -1476,7 +1476,7 @@ function klartextFuer(modulNummer: string, daten: unknown): KlartextDaten | null
         return {
           stufe: ges > 20 ? "Mittel" : "Gering",
           schlagzeile: `${zahlwort(ges, "Subdomain", "Subdomains")} entdeckt`,
-          text: `${live ? `${live} davon sind aktuell live erreichbar. ` : ""}Subdomains sind oft die übersehene Angriffsfläche — jede ist ein möglicher Einstiegspunkt und lohnt einen zweiten Blick.`,
+          text: `${live ? `${live} davon sind aktuell live erreichbar. ` : ""}Subdomains sind oft die übersehene Angriffsfläche. Jede ist ein möglicher Einstiegspunkt und lohnt einen zweiten Blick.`,
         };
       }
       case "10": {

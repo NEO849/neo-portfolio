@@ -290,7 +290,7 @@ export default function OsintGraph({ nodes, edges, breite, hoehe }: Props) {
   if (!nodes.length) {
     return (
       <div className="flex items-center justify-center h-64 text-white/50 text-sm font-mono">
-        Kein Graph verfügbar — führe erst eine Orchestrator-Analyse aus.
+        Kein Graph verfügbar. Führe erst eine Orchestrator-Analyse aus.
       </div>
     );
   }

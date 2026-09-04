@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { PERSOENLICH } from "../models/daten";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
-import { KnopfAktion } from "../bausteine/KnopfAktion";
+import { Knopf } from "../bausteine/Knopf";
 import { LegalModal, type LegalTab } from "../bausteine/LegalModal";
 import { STATISCHE_TEXTKARTE } from "../bewegung/varianten";
 
@@ -343,13 +343,15 @@ function KontaktFormular() {
           <p className="text-[10px] font-mono text-white/25 leading-relaxed">
             Deine Angaben werden nur zur Bearbeitung deiner Nachricht verwendet.
           </p>
-          <KnopfAktion
+          <Knopf
+            variante="aktion"
             typ="submit"
             laedt={sendet}
             ladeText="Senden…"
             klassen="w-full sm:w-auto flex-shrink-0"
-            kinder="Nachricht senden →"
-          />
+          >
+            Nachricht senden →
+          </Knopf>
         </div>
 
       </InfoKarte>

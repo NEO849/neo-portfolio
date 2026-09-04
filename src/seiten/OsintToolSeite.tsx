@@ -13,7 +13,7 @@ export default function OsintToolSeite() {
     <>
       <SeitenMeta
         titel="OSINT-Lab"
-        beschreibung="Interaktive OSINT-Demo: 30+ keyless Quellen für E-Mail-, Domain-, IP-, Subdomain- und Username-Analyse. Breach-Daten, Reverse-Image, PGP-Lookup — alles in einem Interface, kostenlos und passiv."
+        beschreibung="Interaktive OSINT-Demo: 30+ keyless Quellen für E-Mail-, Domain-, IP-, Subdomain- und Username-Analyse. Breach-Daten, Reverse-Image, PGP-Lookup, alles in einem Interface, kostenlos und passiv."
         pfad="/osint-tools"
       />
       <motion.div

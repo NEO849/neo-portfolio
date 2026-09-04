@@ -10,6 +10,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Anbieter } from "./app/Anbieter";
 import App from "./app/App";
 import { neuLadenGegenStaleChunk } from "./app/chunkSelbstheilung";
+import "./gestaltung/schriften.ts";
 import "./gestaltung/global.css";
 
 // Selbstheilung bei veralteten Chunks nach einem Deploy: Vite meldet einen

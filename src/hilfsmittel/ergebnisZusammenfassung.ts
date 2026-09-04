@@ -198,7 +198,7 @@ export function fasseErgebnisZusammen(modulNummer: string, daten: object | null)
       const kennzahlen: Kennzahl[] = [
         { etikett: "Daten­leck-Treffer", wert: String(leaks), schwere: leaks > 0 ? "kritisch" : "ok" },
         { etikett: "GitHub-Spuren", wert: String(github), schwere: github > 0 ? "auffaellig" : "ok" },
-        { etikett: "Gravatar", wert: recon?.gravatar?.gefunden ? "vorhanden" : "—", schwere: "neutral" },
+        { etikett: "Gravatar", wert: recon?.gravatar?.gefunden ? "vorhanden" : "-", schwere: "neutral" },
       ];
       return {
         schwere,
@@ -217,7 +217,7 @@ export function fasseErgebnisZusammen(modulNummer: string, daten: object | null)
         schwere: gefunden > 0 ? "neutral" : "ok",
         verdikt: `${gefunden} Profil${gefunden === 1 ? "" : "e"} gefunden`,
         kernaussage: gefunden > 0
-          ? "Der Benutzername existiert auf diesen Plattformen — der öffentliche Fußabdruck. Achte je Treffer auf die Konfidenz, bevor du folgst."
+          ? "Der Benutzername existiert auf diesen Plattformen, der öffentliche Fußabdruck. Achte je Treffer auf die Konfidenz, bevor du folgst."
           : "Auf den geprüften Plattformen kein passendes Profil gefunden.",
         kennzahlen: nach_schwere([
           { etikett: "Profile", wert: String(gefunden), schwere: gefunden > 0 ? "neutral" : "ok" },
@@ -228,16 +228,16 @@ export function fasseErgebnisZusammen(modulNummer: string, daten: object | null)
 
     case "4": {
       const schwere = stufeZuSchwere(d.risiko?.stufe);
-      const land = d.metadaten?.land_code ?? "—";
+      const land = d.metadaten?.land_code ?? "-";
       const carrier = d.metadaten?.carrier || "unbekannt";
       return {
         schwere,
         verdikt: `${land} · ${carrier}`,
-        kernaussage: "Land, Anbieter und Leitungstyp geben den Kontext. Die kuratierten Such-Links öffnest nur du selbst — nichts wird automatisch aufgerufen.",
+        kernaussage: "Land, Anbieter und Leitungstyp geben den Kontext. Die kuratierten Such-Links öffnest nur du selbst, nichts wird automatisch aufgerufen.",
         kennzahlen: nach_schwere([
           { etikett: "Anbieter", wert: carrier, schwere: "neutral" },
-          { etikett: "Leitungstyp", wert: d.metadaten?.leitungstyp || "—", schwere: "neutral" },
-          { etikett: "Region", wert: d.metadaten?.region || "—", schwere: "ok" },
+          { etikett: "Leitungstyp", wert: d.metadaten?.leitungstyp || "-", schwere: "neutral" },
+          { etikett: "Region", wert: d.metadaten?.region || "-", schwere: "ok" },
         ]),
       };
     }
@@ -252,12 +252,12 @@ export function fasseErgebnisZusammen(modulNummer: string, daten: object | null)
         schwere,
         verdikt: cves > 0 ? `${cves} bekannte CVE${cves === 1 ? "" : "s"} · ${ports} offene Ports` : `${ports} offene Port${ports === 1 ? "" : "s"}`,
         kernaussage: cves > 0
-          ? "Es sind bekannte Schwachstellen (CVEs) und offene Ports nach außen sichtbar — das sind die relevanten Angriffspunkte. Zuerst die roten ansehen."
+          ? "Es sind bekannte Schwachstellen (CVEs) und offene Ports nach außen sichtbar, das sind die relevanten Angriffspunkte. Zuerst die roten ansehen."
           : "Ordne die beiden Risk-Scores ein. Offene Ports und fehlende Security-Header sind die Stellen, an denen du genauer hinschaust.",
         kennzahlen: nach_schwere([
           { etikett: "Bekannte CVEs", wert: String(cves), schwere: cves > 0 ? "kritisch" : "ok" },
           { etikett: "Offene Ports", wert: String(ports), schwere: ports > 0 ? "auffaellig" : "ok" },
-          { etikett: "HTTP-Sicherheit", wert: d.domain?.risiko?.stufe ?? "—", schwere: httpSchwere },
+          { etikett: "HTTP-Sicherheit", wert: d.domain?.risiko?.stufe ?? "-", schwere: httpSchwere },
         ]),
       };
     }
@@ -268,7 +268,7 @@ export function fasseErgebnisZusammen(modulNummer: string, daten: object | null)
         schwere: gps ? "auffaellig" : "neutral",
         verdikt: gps ? "GPS-Aufnahmeort im Bild" : "Keine GPS-Daten im Bild",
         kernaussage: gps
-          ? "Das Bild enthält GPS-Koordinaten — der Aufnahmeort lässt sich rekonstruieren. Nutze außerdem die Reverse-Image-Suchen, um die Quelle zu finden."
+          ? "Das Bild enthält GPS-Koordinaten (der Aufnahmeort lässt sich rekonstruieren). Nutze außerdem die Reverse-Image-Suchen, um die Quelle zu finden."
           : "Keine GPS-Koordinaten gefunden. Über die Reverse-Image-Suchen kannst du dennoch nach der Bildquelle suchen.",
         kennzahlen: [],
       };
@@ -280,7 +280,7 @@ export function fasseErgebnisZusammen(modulNummer: string, daten: object | null)
       return {
         schwere: "neutral",
         verdikt: `${knoten} Knoten · ${kanten} Verbindungen`,
-        kernaussage: "Unten erscheint der Beziehungs-Graph. Klicke einen Knoten an und folge den Verbindungen — so werden die Zusammenhänge zwischen den Funden sichtbar.",
+        kernaussage: "Unten erscheint der Beziehungs-Graph. Klicke einen Knoten an und folge den Verbindungen, so werden die Zusammenhänge zwischen den Funden sichtbar.",
         kennzahlen: nach_schwere([
           { etikett: "Knoten", wert: String(knoten), schwere: "neutral" },
           { etikett: "Verbindungen", wert: String(kanten), schwere: "neutral" },
@@ -295,7 +295,7 @@ export function fasseErgebnisZusammen(modulNummer: string, daten: object | null)
       return {
         schwere,
         verdikt: `${gesamt} Subdomain${gesamt === 1 ? "" : "s"}${live != null ? ` · ${live} live` : ""}`,
-        kernaussage: "Jede Subdomain ist potenzielle Angriffsfläche. Sieh dir die live aufgelösten (mit aktivem A-Record) zuerst an — sie sind erreichbar.",
+        kernaussage: "Jede Subdomain ist potenzielle Angriffsfläche. Sieh dir die live aufgelösten (mit aktivem A-Record) zuerst an, sie sind erreichbar.",
         kennzahlen: nach_schwere([
           { etikett: "Subdomains", wert: String(gesamt), schwere: gesamt > 0 ? "neutral" : "ok" },
           ...(live != null ? [{ etikett: "live", wert: String(live), schwere: (live > 0 ? "auffaellig" : "ok") as Schwere }] : []),
@@ -304,12 +304,12 @@ export function fasseErgebnisZusammen(modulNummer: string, daten: object | null)
     }
 
     case "10": {
-      const holder = d.autonomes_system?.name || d.autonomes_system?.beschreibung || d.whois_organisation?.name || "—";
+      const holder = d.autonomes_system?.name || d.autonomes_system?.beschreibung || d.whois_organisation?.name || "-";
       const asn = d.autonomes_system?.asn;
       return {
         schwere: "neutral",
         verdikt: asn ? `AS${asn} · ${holder}` : String(holder),
-        kernaussage: "Zeigt Eigentümer und Routing der IP — die Basis, um Zuständigkeit und den Abuse-Kontakt zu bestimmen.",
+        kernaussage: "Zeigt Eigentümer und Routing der IP, die Basis, um Zuständigkeit und den Abuse-Kontakt zu bestimmen.",
         kennzahlen: nach_schwere([
           { etikett: "Betreiber", wert: String(holder), schwere: "neutral" },
           ...(asn ? [{ etikett: "ASN", wert: `AS${asn}`, schwere: "ok" as Schwere }] : []),
@@ -323,7 +323,7 @@ export function fasseErgebnisZusammen(modulNummer: string, daten: object | null)
       return {
         schwere,
         verdikt: `${ports} offene Dienst${ports === 1 ? "" : "e"}`,
-        kernaussage: "Offene Dienste und Standort des Hosts — die autoritative Sicht, die Shodan ergänzt. Prüfe, ob die offenen Ports so gewollt sind.",
+        kernaussage: "Offene Dienste und Standort des Hosts: die autoritative Sicht, die Shodan ergänzt. Prüfe, ob die offenen Ports so gewollt sind.",
         kennzahlen: nach_schwere([
           { etikett: "Offene Dienste", wert: String(ports), schwere: ports > 0 ? "neutral" : "ok" },
         ]),
@@ -341,7 +341,7 @@ export function fasseErgebnisZusammen(modulNummer: string, daten: object | null)
         schwere,
         verdikt: `${gesamt} Treffer · ${offen} mit echten Daten`,
         kernaussage: gesamt > 0
-          ? "Der digitale Fußabdruck dieses Namens: echte Profile (mit Daten) auf offenen Plattformen + Existenz auf großen Netzwerken und weiteren Seiten. Je einheitlicher der Username, desto leichter lässt sich daraus EINE Person zusammensetzen — siehe Schutz-Maßnahmen unten."
+          ? "Der digitale Fußabdruck dieses Namens: echte Profile (mit Daten) auf offenen Plattformen + Existenz auf großen Netzwerken und weiteren Seiten. Je einheitlicher der Username, desto leichter lässt sich daraus EINE Person zusammensetzen (siehe Schutz-Maßnahmen unten)."
           : "Auf den geprüften Plattformen kein Profil gefunden. Für die großen Netzwerke stehen unten Profil-Links + Dork-Suchen bereit.",
         kennzahlen: nach_schwere([
           { etikett: "Offene Profile", wert: String(offen), schwere: offen > 0 ? "neutral" : "ok" },

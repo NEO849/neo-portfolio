@@ -26,7 +26,7 @@ import { AbzeichenStatus, TechTag } from "../bausteine/AbzeichenStatus";
 import { AusklappKarte } from "../bausteine/AusklappKarte";
 import { AufklappIndikator } from "../bausteine/AufklappIndikator";
 import { GlassTabs } from "../bausteine/GlassTabs";
-import { KnopfSekundaer } from "../bausteine/KnopfSekundaer";
+import { Knopf } from "../bausteine/Knopf";
 
 type LaborTab = "memory" | "mcps" | "workflows" | "commands";
 
@@ -46,7 +46,7 @@ export default function LaborView() {
     <section id="labor" className="py-16 px-6 max-w-6xl mx-auto">
       <AbschnittsTitel
         prefix="> labor"
-        untertitel="Die Werkzeuge, Workflows und Regeln hinter meiner täglichen Security-Arbeit – vieles selbst gebaut, der Rest bewusst integriert. Entscheidend ist nicht die Zahl der Tools, sondern wie diszipliniert sie zusammenspielen."
+        untertitel="Die Werkzeuge, Workflows und Regeln hinter meiner täglichen Security-Arbeit, vieles selbst gebaut, der Rest bewusst integriert. Entscheidend ist nicht die Zahl der Tools, sondern wie diszipliniert sie zusammenspielen."
         klassen="mb-8"
       />
 
@@ -157,21 +157,21 @@ function MemoryAct() {
     <div className="space-y-6">
       <header>
         <h3 className="font-display text-lg font-bold text-white mb-1.5">
-          markmem — selbst-lernendes KI-Gedächtnis
+          markmem, selbst-lernendes KI-Gedächtnis
         </h3>
         <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
           Damit der KI-Assistent zwischen Sitzungen dazulernt statt jedes Mal von vorn zu beginnen, habe
-          ich ihm ein gestaffeltes Gedächtnis gegeben – angelehnt an Forschung wie MemGPT und A-MEM.
-          Das hier öffentlich als <span className="text-akzent-400 font-semibold">markmem</span> auf GitHub —
+          ich ihm ein gestaffeltes Gedächtnis gegeben, angelehnt an Forschung wie MemGPT und A-MEM.
+          Das hier öffentlich als <span className="text-akzent-400 font-semibold">markmem</span> auf GitHub,
           ein KI-Gedächtnis auf Markdown + git, dessen Live-Zustand das Dashboard
           {" "}<span className="text-cyber-400 font-semibold">memDash</span> zeigt. Markdown + git bleiben
           die einzige Quelle der Wahrheit; der Abruf ist HybridRAG, eine echte Lern-Schleife und ein
           Self-Tuning-Eval-Harness halten das System ehrlich.
         </p>
         <div className="flex items-center gap-3 mt-4 flex-wrap">
-          <KnopfSekundaer zuUrl="https://github.com/NEO849/markmem" klassen="px-4 py-2 text-[13px]">
+          <Knopf variante="sekundaer" zuUrl="https://github.com/NEO849/markmem" klassen="px-4 py-2 text-[13px]">
             GitHub →
-          </KnopfSekundaer>
+          </Knopf>
           <span className="font-mono text-[10px] px-2 py-1 rounded-md border border-emerald-400/25 bg-emerald-400/10 text-emerald-400 uppercase tracking-wider leading-none">
             Open Source · MIT
           </span>
@@ -236,10 +236,10 @@ function MemoryAct() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
         {[
-          { titel: "HybridRAG-Abruf",  bsp: "BM25-Volltext, Wissens-Graph und Vektor-Embeddings (bge-m3), fusioniert per gewichtetem Reciprocal Rank Fusion — plus optionalem Cross-Encoder-Rerank.", rgb: "79, 124, 251" },
+          { titel: "HybridRAG-Abruf",  bsp: "BM25-Volltext, Wissens-Graph und Vektor-Embeddings (bge-m3), fusioniert per gewichtetem Reciprocal Rank Fusion, plus optionalem Cross-Encoder-Rerank.", rgb: "79, 124, 251" },
           { titel: "Lern-Schleife",    bsp: "Lernt aus stillen Korrekturen, kalibriert die eigene Zuversicht und hemmt aktiv bekannte Sackgassen.",                                                  rgb: "167, 139, 250" },
           { titel: "Self-Tuning",      bsp: "Ein Eval-Harness misst die Trefferquote (Recall@1); eine Grid-Search optimiert die Such-Gewichte automatisch.",                                          rgb: "34, 197, 94" },
-          { titel: "memDash",          bsp: "Responsives Terminal-Dashboard (Mac-Querformat bis iPhone-Hochformat) — macht den Live-Zustand des Gedächtnisses Unicode-korrekt sichtbar.",            rgb: "138, 160, 200" },
+          { titel: "memDash",          bsp: "Responsives Terminal-Dashboard (Mac-Querformat bis iPhone-Hochformat), macht den Live-Zustand des Gedächtnisses Unicode-korrekt sichtbar.",            rgb: "138, 160, 200" },
         ].map((meta, i) => (
           <motion.div
             key={meta.titel}
@@ -285,10 +285,10 @@ function McpAct() {
     <div className="space-y-5">
       <header>
         <h3 className="font-display text-lg font-bold text-white mb-1.5">
-          MCP-Server — was wann womit
+          MCP-Server, was wann womit
         </h3>
         <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
-          MCP-Server verbinden den KI-Assistenten mit allem anderen – APIs, Browser, Datenbanken,
+          MCP-Server verbinden den KI-Assistenten mit allem anderen: APIs, Browser, Datenbanken,
           Dateisystemen. 22 sind eingebunden, zwei davon selbst gebaut (die Censys-API und die
           Caido-Bridge). Wichtiger als die Anzahl ist die Auswahl: Statt blind Befehle abzusetzen,
           übernimmt für jede Aufgabe das Werkzeug, das sie am saubersten löst.
@@ -409,7 +409,7 @@ function WorkflowsAct() {
           Automatisierte Abläufe
         </h3>
         <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
-          Wiederkehrende Aufgaben laufen automatisch – zeitgesteuert als Timer oder dauerhaft als Dienst:
+          Wiederkehrende Aufgaben laufen automatisch, zeitgesteuert als Timer oder dauerhaft als Dienst:
           nächtliche Backups, wöchentliche Token-Rotation, stündliches Hacktivity-Polling und die ständigen
           Bridges zwischen Mac, iPhone und Server. Jede Aktion wird protokolliert, ein Watcher meldet
           ungewöhnliche Muster sofort.
@@ -578,11 +578,11 @@ function CommandsAct() {
           Eigene Erweiterungen für Claude Code
         </h3>
         <p className="text-sm text-white/60 leading-relaxed max-w-3xl">
-          Was Claude Code von Haus aus nicht abdeckt, habe ich selbst ergänzt: 22 eigene Erweiterungen –
+          Was Claude Code von Haus aus nicht abdeckt, habe ich selbst ergänzt: 22 eigene Erweiterungen,
           11 kurze Slash-Commands wie
           <span className="font-mono text-akzent-400"> /submit-gate</span> und 11 mehrstufige Skills wie
           <span className="font-mono text-cyber-400"> /research</span>.
-          Zwei davon sind Pflicht vor jedem neuen Ziel bzw. jedem Submit – als feste Regel, die nicht
+          Zwei davon sind Pflicht vor jedem neuen Ziel bzw. jedem Submit, als feste Regel, die nicht
           von der Tagesform abhängt.
         </p>
       </header>

@@ -52,7 +52,7 @@ const ICON_PROPS = {
 const BANNER: Banner[] = [
   {
     pfad: "/osint-tools", titel: "OSINT Analyseplattform",
-    nutzen: "E-Mail, Domain, Username & mehr live — Beziehungen als Graph.",
+    nutzen: "E-Mail, Domain, Username & mehr live: Beziehungen als Graph.",
     featured: true,
     icon: (
       <svg {...ICON_PROPS}><circle cx="10.5" cy="10.5" r="6" /><path d="m20 20-4.2-4.2" /><circle cx="10.5" cy="10.5" r="2" /></svg>
@@ -67,14 +67,14 @@ const BANNER: Banner[] = [
   },
   {
     pfad: "/security", titel: "Security & Analyse",
-    nutzen: "Schwachstellen finden, bevor andere es tun — der Blick des Angreifers.",
+    nutzen: "Schwachstellen finden, bevor andere es tun: der Blick des Angreifers.",
     icon: (
       <svg {...ICON_PROPS}><path d="M12 2.5l7.5 3.2v5.1c0 4.7-3.2 8-7.5 9.7-4.3-1.7-7.5-5-7.5-9.7V5.7z" /><path d="m9 11.7 2 2 3.6-4" /></svg>
     ),
   },
   {
     pfad: "/projekte", titel: "Projekte & Entwicklung",
-    nutzen: "Eigene Software & Systeme — seit Jahren produktiv im Einsatz.",
+    nutzen: "Eigene Software & Systeme, seit Jahren produktiv im Einsatz.",
     icon: (
       <svg {...ICON_PROPS}><path d="m8 8.5-3.5 3.5 3.5 3.5" /><path d="m16 8.5 3.5 3.5-3.5 3.5" /><path d="m13.5 6-3 12" /></svg>
     ),

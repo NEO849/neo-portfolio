@@ -14,7 +14,7 @@ export default function StartSeite() {
     <>
       <SeitenMeta
         titel="KI-Automation, Infrastruktur & Security"
-        beschreibung="FREE DATA Solutions — Michael Fleps aus Nürnberg baut und betreibt produktive KI-Automation, gehärtete Linux-Infrastruktur und Security-Reviews. Remote, sofort verfügbar."
+        beschreibung="FREE DATA Solutions: Michael Fleps aus Nürnberg baut und betreibt produktive KI-Automation, gehärtete Linux-Infrastruktur und Security-Reviews. Remote, sofort verfügbar."
         pfad="/"
       />
       <motion.div

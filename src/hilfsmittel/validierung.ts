@@ -52,7 +52,7 @@ export function validiereEingabe(
   switch (typ) {
     case "email":    return istGueltigeEmail(wert)    ? undefined : "Ungültige E-Mail-Adresse";
     case "domain":   return istGueltigeDomain(wert)   ? undefined : "Ungültige Domain (z.B. example.com)";
-    case "username": return istGueltigerUsername(wert) ? undefined : "Ungültiger Username (2–50 Zeichen, a-z, 0-9, _ -)";
+    case "username": return istGueltigerUsername(wert) ? undefined : "Ungültiger Username (2-50 Zeichen, a-z, 0-9, _ -)";
     default:         return undefined;
   }
 }

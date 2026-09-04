@@ -62,7 +62,7 @@ export default function VoiceDemoView() {
     <section className="pt-6 pb-10 sm:py-16 px-4 sm:px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
         prefix="> voice-bridge · demo"
-        untertitel="Originalgetreuer, interaktiver Klon der echten Oberfläche — alle Funktionen simuliert. Drück aufs Mikro (oder die Leertaste). Es wird nichts aufgenommen, gesendet oder gespeichert."
+        untertitel="Originalgetreuer, interaktiver Klon der echten Oberfläche, alle Funktionen simuliert. Drück aufs Mikro (oder die Leertaste). Es wird nichts aufgenommen, gesendet oder gespeichert."
         klassen="mb-5 sm:mb-8"
       />
 
@@ -414,7 +414,7 @@ function EinstellungenDialog({ steuerung }: { steuerung: VoiceDemoSteuerung }) {
         <ModalRahmen onSchliessen={steuerung.einstellungenSchliessen}>
           <h3 className="text-[18px] font-semibold mb-4" style={{ color: T.text }}>Einstellungen</h3>
           <div className="mb-3.5">
-            <label className="block text-[12px] mb-1.5" style={{ color: T.muted }}>Bearer Token (nur Demo — ohne Funktion)</label>
+            <label className="block text-[12px] mb-1.5" style={{ color: T.muted }}>Bearer Token (nur Demo, ohne Funktion)</label>
             <input
               type="password" placeholder="vb_…" autoComplete="off" disabled
               className="w-full px-3 py-2.5 rounded-xl text-sm opacity-60"

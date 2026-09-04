@@ -71,7 +71,7 @@ export default function UeberMichView() {
           element="h3"
           dauerSekunden={6.5}
           klassen="font-display font-semibold text-lg md:text-xl leading-snug tracking-[-0.01em] opacity-90"
-          kinder="Eine seltene Kombination: über 15 Jahre IT-Systeme aufgebaut — heute entwickle ich die Software für die Hardware. Das gibt mir einen besonderen Blick fürs große Ganze."
+          kinder="Eine seltene Kombination: über 15 Jahre IT-Systeme aufgebaut, heute entwickle ich die Software für die Hardware. Das gibt mir einen besonderen Blick fürs große Ganze."
         />
       </motion.div>
 
@@ -90,7 +90,7 @@ export default function UeberMichView() {
           </div>
           <div className="space-y-4">
             <p className="text-white/80 leading-relaxed">
-              Ich arbeite strukturiert, analytisch und mit dem Anspruch, Systeme wirklich zu verstehen. Neue Themen erschließe ich mir nicht oberflächlich, sondern Schritt für Schritt – durch Recherche, Dokumentation, Tests und praktische Umsetzung. Genau so habe ich mir in den letzten Jahren ein breites technisches Fundament aufgebaut: IT-Infrastruktur, Linux- und Server-Administration, iOS-Entwicklung mit SwiftUI und MVVM, moderne Web-Anwendungen, Security Research und eigene Research-Pipelines.
+              Ich arbeite strukturiert, analytisch und mit dem Anspruch, Systeme wirklich zu verstehen. Neue Themen erschließe ich mir nicht oberflächlich, sondern Schritt für Schritt: durch Recherche, Dokumentation, Tests und praktische Umsetzung. Genau so habe ich mir in den letzten Jahren ein breites technisches Fundament aufgebaut: IT-Infrastruktur, Linux- und Server-Administration, iOS-Entwicklung mit SwiftUI und MVVM, moderne Web-Anwendungen, Security Research und eigene Research-Pipelines.
             </p>
             <p className="text-white/70 leading-relaxed">
               Meine Stärke liegt darin, komplexe Zusammenhänge greifbar zu machen. Ich denke in Architekturen, Protokollen, Repositories, ViewModels, Services, APIs, Datenflüssen und klar getrennten Verantwortlichkeiten. Dabei ist mir wichtig, dass Anwendungen nicht nur funktionieren, sondern verständlich, wartbar, testbar und langfristig erweiterbar bleiben.
@@ -117,7 +117,7 @@ export default function UeberMichView() {
             <div className="h-px flex-1 bg-white/[0.04]" />
           </div>
           <p className="text-white/70 leading-relaxed text-sm">
-            Auch abseits der Technik ist mir Ausdauer wichtig. In den Bergen bin ich zuhause – beim Wandern, Klettern und auf Klettersteigen. Diese Erfahrungen schärfen meinen Fokus, meine Geduld und meine Fähigkeit, in anspruchsvollen Situationen ruhig und entschlossen zu handeln.
+            Auch abseits der Technik ist mir Ausdauer wichtig. In den Bergen bin ich zuhause: beim Wandern, Klettern und auf Klettersteigen. Diese Erfahrungen schärfen meinen Fokus, meine Geduld und meine Fähigkeit, in anspruchsvollen Situationen ruhig und entschlossen zu handeln.
           </p>
         </InfoKarte>
       </motion.div>

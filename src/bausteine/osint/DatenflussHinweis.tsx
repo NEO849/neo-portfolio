@@ -102,7 +102,7 @@ export default function DatenflussHinweis({ nummer }: { nummer: string }) {
                 <div className="flex items-start gap-2 text-[11px] leading-relaxed"
                   style={{ color: `${GRUEN}cc` }}>
                   <SchildIkon farbe={GRUEN} />
-                  <span>Es wird serverseitig kein Drittdienst kontaktiert — die Analyse läuft lokal auf unserem Server.</span>
+                  <span>Es wird serverseitig kein Drittdienst kontaktiert. Die Analyse läuft lokal auf unserem Server.</span>
                 </div>
               ) : (
                 <div className="space-y-2">

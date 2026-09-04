@@ -5,7 +5,7 @@ import type { ProjektModel } from "../models/typen";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { AbzeichenStatus, TechTag } from "../bausteine/AbzeichenStatus";
 import { AusklappKarte } from "../bausteine/AusklappKarte";
-import { KnopfSekundaer } from "../bausteine/KnopfSekundaer";
+import { Knopf } from "../bausteine/Knopf";
 import { GlassTabs, type GlassTab } from "../bausteine/GlassTabs";
 import { KATEGORIE_KONFIGURATION, kategorieKonfig } from "../models/kategorieKonfiguration";
 import { galeriePfad } from "../hilfsmittel/galeriePfad";
@@ -85,24 +85,24 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
           {(projekt.linkGithub || projekt.linkLive || projekt.linkDemo || (projekt.bilder?.length && projekt.galerieSlug)) && (
             <div className="flex flex-wrap gap-2 pt-1">
               {projekt.linkGithub && (
-                <KnopfSekundaer zuUrl={projekt.linkGithub} klassen="text-xs">
+                <Knopf variante="sekundaer" zuUrl={projekt.linkGithub} klassen="text-xs">
                   GitHub →
-                </KnopfSekundaer>
+                </Knopf>
               )}
               {projekt.galerieSlug && (projekt.bilder?.length ?? 0) > 0 && (
-                <KnopfSekundaer zuRoute={galeriePfad(projekt.galerieSlug)} klassen="text-xs">
+                <Knopf variante="sekundaer" zuRoute={galeriePfad(projekt.galerieSlug)} klassen="text-xs">
                   Bilder →
-                </KnopfSekundaer>
+                </Knopf>
               )}
               {projekt.linkLive && (
-                <KnopfSekundaer zuUrl={projekt.linkLive} klassen="text-xs">
+                <Knopf variante="sekundaer" zuUrl={projekt.linkLive} klassen="text-xs">
                   Live →
-                </KnopfSekundaer>
+                </Knopf>
               )}
               {projekt.linkDemo && (
-                <KnopfSekundaer zuRoute={projekt.linkDemo} klassen="text-xs">
+                <Knopf variante="sekundaer" zuRoute={projekt.linkDemo} klassen="text-xs">
                   Demo ansehen →
-                </KnopfSekundaer>
+                </Knopf>
               )}
             </div>
           )}
@@ -131,7 +131,7 @@ export default function ProjekteView() {
     <section id="projekte" className="py-16 px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
         prefix="> projekte"
-        untertitel="Von nativer App-Entwicklung bis zur KI-augmentierten Security-Pipeline – gebaut mit echtem Anspruch an Architektur und Wartbarkeit."
+        untertitel="Von nativer App-Entwicklung bis zur KI-augmentierten Security-Pipeline, gebaut mit echtem Anspruch an Architektur und Wartbarkeit."
         klassen="mb-8"
       />
 

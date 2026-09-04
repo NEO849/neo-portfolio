@@ -57,7 +57,7 @@ export class FehlerGrenze extends Component<FehlerGrenzeProps, FehlerGrenzeState
           Etwas ist schiefgelaufen
         </h1>
         <p className="text-white/40 text-sm mb-8 max-w-sm leading-relaxed">
-          Diese Ansicht konnte nicht geladen werden. Häufig hilft schon ein Neuladen —
+          Diese Ansicht konnte nicht geladen werden. Häufig hilft schon ein Neuladen,
           dabei wird die aktuelle Version frisch geholt.
         </p>
         <div className="flex items-center gap-4">

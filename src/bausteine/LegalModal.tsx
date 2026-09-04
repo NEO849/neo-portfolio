@@ -143,7 +143,7 @@ function ImpressumInhalt() {
 function DatenschutzInhalt() {
   return (
     <div className="space-y-6">
-      <Abschnitt titel="Hosting — Vercel Inc.">
+      <Abschnitt titel="Hosting: Vercel Inc.">
         <Absatz>
           Diese Website wird bei Vercel Inc. (340 Pine Street, Suite 900, San Francisco, CA 94104, USA)
           gehostet und weltweit über deren CDN ausgeliefert. Beim Seitenaufruf übermittelt Ihr Browser
@@ -156,7 +156,7 @@ function DatenschutzInhalt() {
         </p>
       </Abschnitt>
 
-      <Abschnitt titel="OSINT-Tool — Live API (VPS)">
+      <Abschnitt titel="OSINT-Tool: Live API (VPS)">
         <Absatz>
           Das OSINT-Toolkit übermittelt vom Nutzer eingegebene Daten (E-Mail-Adressen, Benutzernamen,
           Domains, Telefonnummern, Bild-URLs) zur Analyse an eine FastAPI-Instanz auf einem VPS der
@@ -196,7 +196,7 @@ function DatenschutzInhalt() {
         </Absatz>
       </Abschnitt>
 
-      <Abschnitt titel="Ihre Rechte (Art. 15 – 21 DSGVO)">
+      <Abschnitt titel="Ihre Rechte (Art. 15-21 DSGVO)">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
           {[
             ["Art. 15", "Auskunft"],

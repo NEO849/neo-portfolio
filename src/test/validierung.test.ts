@@ -135,7 +135,7 @@ describe("validierung.ts — Eingabe-Grenzkontrolle", () => {
 
     it("meldet ungültigen Username", () => {
       expect(validiereEingabe("username", "!!")).toBe(
-        "Ungültiger Username (2–50 Zeichen, a-z, 0-9, _ -)",
+        "Ungültiger Username (2-50 Zeichen, a-z, 0-9, _ -)",
       );
     });
 
