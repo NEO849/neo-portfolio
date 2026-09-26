@@ -28,13 +28,6 @@ const KONTAKT_EINTRAEGE: KontaktEintrag[] = [
     wert: PERSOENLICH.email,
   },
   {
-    href: `tel:${PERSOENLICH.telefon?.replace(/\s/g, "")}`,
-    extern: false,
-    icon: "📱",
-    label: "Telefon",
-    wert: PERSOENLICH.telefon,
-  },
-  {
     href: PERSOENLICH.github,
     extern: true,
     icon: "⌥",
