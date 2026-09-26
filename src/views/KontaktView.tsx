@@ -458,10 +458,7 @@ export default function KontaktView() {
           <div className="w-7 h-7 rounded-lg bg-cyber-400/[0.08] border border-cyber-400/20 flex items-center justify-center flex-shrink-0 font-mono text-xs text-white/45">
             §
           </div>
-          <span className="text-[11px] font-mono text-white/45 flex-1 select-none">
-            Rechtliches
-          </span>
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-0.5 ml-auto">
             <button
               onClick={() => legalOeffnen("impressum")}
               className="text-[11px] font-mono text-cyber-400/70 hover:text-cyber-400 px-2.5 py-1.5 rounded-lg hover:bg-cyber-400/[0.07] transition-all duration-200"
