@@ -454,11 +454,8 @@ export default function KontaktView() {
         transition={{ duration: 0.4, delay: 0.28 }}
         className="mt-4"
       >
-        <div className="rounded-xl border border-cyber-400/[0.1] bg-cyber-400/[0.02] px-4 py-3 flex items-center gap-3">
-          <div className="w-7 h-7 rounded-lg bg-cyber-400/[0.08] border border-cyber-400/20 flex items-center justify-center flex-shrink-0 font-mono text-xs text-white/45">
-            §
-          </div>
-          <div className="flex items-center gap-0.5 ml-auto">
+        <div className="rounded-xl border border-cyber-400/[0.1] bg-cyber-400/[0.02] px-4 py-3 flex items-center justify-center">
+          <div className="flex items-center gap-0.5">
             <button
               onClick={() => legalOeffnen("impressum")}
               className="text-[11px] font-mono text-cyber-400/70 hover:text-cyber-400 px-2.5 py-1.5 rounded-lg hover:bg-cyber-400/[0.07] transition-all duration-200"
