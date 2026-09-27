@@ -3,6 +3,14 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "description": "Portfolio & live OSINT-Analyseplattform von FREE DATA Solutions — React 19 SPA + FastAPI-Backend.",
+  "homepage": "https://www.f3-data-solutions.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NEO849/neo-portfolio.git"
+  },
+  "author": "Michael Fleps (FREE DATA Solutions)",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
