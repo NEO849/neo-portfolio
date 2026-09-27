@@ -6,7 +6,7 @@
 
 **KI-Automation · gehärtete Linux-Infrastruktur · Security mit Angreifer-Blick**
 
-Eine in Eigenregie gebaute Single-Page-App mit einer echten, live betriebenen
+Eine in Eigenregie gebaute Web-Anwendung mit einer echten, live betriebenen
 OSINT-Intelligence-Suite — vom React-Frontend bis zur gehärteten FastAPI auf eigenem Server.
 
 [![Live](https://img.shields.io/badge/live-www.f3--data--solutions.com-4f7cfb?style=flat-square)](https://www.f3-data-solutions.com)
@@ -41,7 +41,6 @@ zwei Herzstücken:
 
 ### Inhalt
 
-[Screenshots](#screenshots) ·
 [Highlights](#highlights) ·
 [OSINT-Lab](#osint-lab--die-analyseplattform) ·
 [Architektur](#architektur) ·
@@ -52,43 +51,6 @@ zwei Herzstücken:
 [Struktur](#projektstruktur) ·
 [Autor](#autor) ·
 [Lizenz](#lizenz)
-
----
-
-## Screenshots
-
-<div align="center">
-<table>
-  <tr>
-    <td align="center" valign="top">
-      <img src="docs/assets/readme/hero.png" width="270" alt="Startseite"><br>
-      <strong>Start</strong><br><sub>Hero &amp; Bereiche</sub>
-    </td>
-    <td align="center" valign="top">
-      <img src="docs/assets/readme/osint-terminal.png" width="270" alt="OSINT-Terminal"><br>
-      <strong>OSINT-Terminal</strong><br><sub>8 Live-Werkzeuge</sub>
-    </td>
-    <td align="center" valign="top">
-      <img src="docs/assets/readme/osint-graph.png" width="270" alt="Beziehungs-Graph"><br>
-      <strong>Intelligence-Graph</strong><br><sub>Maltego-Style, pures SVG</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" valign="top">
-      <img src="docs/assets/readme/labor.png" width="270" alt="Labor"><br>
-      <strong>Labor</strong><br><sub>KI-Agenten &amp; Automation</sub>
-    </td>
-    <td align="center" valign="top">
-      <img src="docs/assets/readme/security.png" width="270" alt="Security"><br>
-      <strong>Security</strong><br><sub>Research &amp; Härtung</sub>
-    </td>
-    <td align="center" valign="top">
-      <img src="docs/assets/readme/kontakt.png" width="270" alt="Kontakt"><br>
-      <strong>Kontakt</strong><br><sub>gehärtetes Formular</sub>
-    </td>
-  </tr>
-</table>
-</div>
 
 ---
 
@@ -145,16 +107,17 @@ typisiertes Fehlermodell (`Apifehler`), In-Memory-Cache für die Transparenz-Dek
 
 ```mermaid
 flowchart LR
-    U([Besucher · Browser]) -->|HTTPS| CF[Cloudflare Pages<br/>React-SPA · statisch]
+    U([Besucher · Browser]) -->|HTTPS| CF[Cloudflare Pages<br/>React-App · react-router]
     CF -->|POST /api/kontakt| FN[Pages Function<br/>functions/api/kontakt.ts]
     FN -->|E-Mail| RS[(Resend)]
     CF -->|POST /api/v1/osint/*| API[FastAPI · uvicorn<br/>eigener VPS · api.cyp-hr.com]
     API --> SRC{{Öffentliche OSINT-Quellen<br/>HIBP · Shodan · Censys · RIPEstat · crt.sh · …}}
 ```
 
-Das Frontend ist eine rein statische, clientseitig gerenderte SPA. Es gibt **keine Sessions, kein Login,
-keine Nutzerdaten** — nur zwei zustandslose Backend-Wege: das Kontaktformular (Cloudflare Pages Function
-→ Resend) und die OSINT-API (FastAPI auf eigenem Server, außerhalb dieses Repos betrieben).
+Das Frontend ist eine clientseitig gerenderte Web-Anwendung (React + react-router, rund zehn Bereiche/Routen),
+statisch über Cloudflare Pages ausgeliefert. Es gibt **keine Sessions, kein Login, keine Nutzerdaten** — nur
+zwei zustandslose Backend-Wege: das Kontaktformular (Cloudflare Pages Function → Resend) und die OSINT-API
+(FastAPI auf eigenem Server, außerhalb dieses Repos betrieben).
 
 ### Frontend-Schichten (MCVM)
 
@@ -218,7 +181,7 @@ neo-portfolio/
 
 | Bereich | Technologie |
 |---------|-------------|
-| Framework | React `19.1` · react-router-dom `7.9` (BrowserRouter, Client-SPA) |
+| Framework | React `19.1` · react-router-dom `7.9` (BrowserRouter, clientseitig gerendert) |
 | Build | Vite `7.1` · TypeScript `5.9` (`strict`) |
 | Styling | Tailwind CSS `3.4` · PostCSS · Autoprefixer |
 | Motion | Framer Motion `12.23` (reduced-motion-treu) |
