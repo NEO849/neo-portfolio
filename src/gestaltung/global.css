@@ -308,3 +308,26 @@ body::before {
   border-bottom-color: rgba(241, 100, 108, 0.7);
   box-shadow: 0 1px 0 0 rgba(241, 100, 108, 0.18);
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Prozess-Graph (ProzessFluss) — Fluss-Punkt entlang der Verbindung
+   und sanfter Puls am Security-Gate. Bewegung wird zusätzlich im
+   Code über useBewegungErlaubt abgeschaltet; hier der CSS-Fallback.
+   ───────────────────────────────────────────────────────────── */
+@keyframes fluss-dot {
+  0%   { left: -2%;  opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { left: 102%; opacity: 0; }
+}
+.fluss-dot { animation: fluss-dot 2.8s linear infinite; }
+
+@keyframes gate-puls {
+  0%   { box-shadow: 0 0 0 0 rgba(79, 124, 251, 0.45); }
+  70%  { box-shadow: 0 0 0 10px rgba(79, 124, 251, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 124, 251, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fluss-dot { animation: none; display: none; }
+}

@@ -13,8 +13,8 @@ export default function StartSeite() {
   return (
     <>
       <SeitenMeta
-        titel="KI-Automation, Infrastruktur & Security"
-        beschreibung="FREE DATA Solutions: Michael Fleps aus Nürnberg baut und betreibt produktive KI-Automation, gehärtete Linux-Infrastruktur und Security-Reviews. Remote, sofort verfügbar."
+        titel="Sichere KI-Automation für den Mittelstand"
+        beschreibung="FREE DATA Solutions: Michael Fleps aus Nürnberg baut KI-Automation für den Mittelstand und sichert sie von Anfang an ab — Prozesse automatisieren und auf Datenlecks prüfen, aus einer Hand. Festpreis, remote im DACH-Raum."
         pfad="/"
       />
       <motion.div
