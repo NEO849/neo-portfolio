@@ -6,7 +6,7 @@
 import { Link, NavLink } from "react-router-dom";
 import { aktuellesJahr } from "../../hilfsmittel/formatierung";
 import { PERSOENLICH } from "../../models/daten";
-import { NAV_EINTRAEGE, NAV_SEKUNDAER } from "../navigation/navKonfiguration";
+import { NAV_EINTRAEGE } from "../navigation/navKonfiguration";
 
 const SOZIALE_LINKS = [
   { url: PERSOENLICH.github, label: "GitHub", kurz: "NEO849" },
@@ -34,8 +34,8 @@ export function Fusszeile() {
               />
             </Link>
             <p className="text-xs text-white/70 leading-relaxed max-w-xs">
-              Sichere KI-Automation von Anfang bis Ende.<br />
-              KI-Prozesse automatisieren und absichern — aus einer Hand, aus Nürnberg.
+              Sichere KI-Automation & KI-automatisierte Pentests.<br />
+              KI-Systeme bauen, absichern und prüfen — aus einer Hand, aus Nürnberg.
             </p>
           </div>
 
@@ -55,28 +55,6 @@ export function Fusszeile() {
                         isActive
                           ? "text-akzent-400 font-medium"
                           : "text-white/80 hover:text-akzent-400 focus-visible:text-akzent-400"
-                      }`
-                    }
-                  >
-                    {link.label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-
-            <p className="font-mono text-xs text-white/60 mt-6 mb-3 uppercase tracking-widest">
-              Mehr
-            </p>
-            <ul className="space-y-2">
-              {NAV_SEKUNDAER.map((link) => (
-                <li key={link.pfad}>
-                  <NavLink
-                    to={link.pfad}
-                    className={({ isActive }) =>
-                      `text-sm transition-colors duration-200 focus-visible:outline-none ${
-                        isActive
-                          ? "text-akzent-400 font-medium"
-                          : "text-white/60 hover:text-akzent-400 focus-visible:text-akzent-400"
                       }`
                     }
                   >

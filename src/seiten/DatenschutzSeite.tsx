@@ -36,26 +36,37 @@ export default function DatenschutzSeite() {
 
             <Abschnitt titel="Hosting">
               <p>
-                Diese Website wird über Cloudflare Pages bereitgestellt. Dabei werden technisch notwendige
-                Server-Logdaten (z. B. IP-Adresse, Zeitpunkt, abgerufene Seite) verarbeitet. Rechtsgrundlage:
-                Art. 6 Abs. 1 lit. f DSGVO (sicherer, stabiler Betrieb). {PLATZHALTER}: Auftragsverarbeitung mit
-                Cloudflare und Serverstandorte bestätigen.
+                Diese Website wird über Cloudflare Pages (Cloudflare, Inc., USA) bereitgestellt. Dabei werden
+                technisch notwendige Server-Logdaten (z. B. IP-Adresse, Zeitpunkt, abgerufene Seite) verarbeitet.
+                Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (sicherer, stabiler Betrieb). Cloudflare ist
+                Auftragsverarbeiter (Art. 28 DSGVO); da es sich um einen US-Anbieter handelt, erfolgt die
+                Übermittlung auf Grundlage der EU-Standardvertragsklauseln (Art. 46 DSGVO). {PLATZHALTER}:
+                Abschluss des Auftragsverarbeitungsvertrags mit Cloudflare bestätigen.
               </p>
             </Abschnitt>
 
             <Abschnitt titel="Kontaktformular">
               <p>
                 Wenn Sie das Kontaktformular nutzen, verarbeite ich die von Ihnen eingegebenen Daten (Name,
-                E-Mail, Nachricht), um Ihre Anfrage zu beantworten. Der Versand erfolgt über einen E-Mail-Dienst
-                ({PLATZHALTER}: Dienstleister nennen, z. B. Resend, mit Auftragsverarbeitungsvertrag).
-                Rechtsgrundlage: Art. 6 Abs. 1 lit. b und f DSGVO.
+                E-Mail, Nachricht), um Ihre Anfrage zu beantworten. Der Versand der Benachrichtigung erfolgt über
+                den E-Mail-Dienst Resend (Resend, Inc., USA) als Auftragsverarbeiter (Art. 28 DSGVO; Übermittlung
+                auf Grundlage der EU-Standardvertragsklauseln, Art. 46 DSGVO). Rechtsgrundlage: Art. 6 Abs. 1
+                lit. b und f DSGVO. {PLATZHALTER}: Auftragsverarbeitungsvertrag mit Resend bestätigen.
               </p>
             </Abschnitt>
 
-            <Abschnitt titel="Keine Tracker ohne Einwilligung">
+            <Abschnitt titel="Speicherdauer">
               <p>
-                {PLATZHALTER}: Falls Analyse- oder Marketing-Tools eingesetzt werden, hier benennen und ein
-                Einwilligungs-Banner vorsehen. Stand des Entwurfs: keine Tracking-Cookies.
+                Kontaktanfragen und die dabei übermittelten Daten werden gelöscht, sobald Ihre Anfrage
+                abschließend bearbeitet ist, soweit keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
+              </p>
+            </Abschnitt>
+
+            <Abschnitt titel="Keine Tracker, kein Cookie-Banner">
+              <p>
+                Diese Website setzt keine Analyse-, Marketing- oder Tracking-Cookies ein und lädt keine externen
+                Ressourcen von Drittanbietern; Schriften sind lokal eingebunden. Eine Einwilligung nach § 25
+                TDDDG und ein Cookie-Banner sind daher nicht erforderlich.
               </p>
             </Abschnitt>
 

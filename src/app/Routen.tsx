@@ -17,10 +17,6 @@ import { galeriePfad } from "../hilfsmittel/galeriePfad";
 // lazyMitNeuversuch verhält sich wie React.lazy(), heilt aber Stale-Chunks
 // nach einem Deploy automatisch (Retry → einmaliger Hard-Reload).
 const StartSeite      = lazyMitNeuversuch(() => import("../seiten/StartSeite"));
-const VorgehensweiseSeite = lazyMitNeuversuch(() => import("../seiten/VorgehensweiseSeite"));
-const LeistungenSeite = lazyMitNeuversuch(() => import("../seiten/LeistungenSeite"));
-const ReferenzenSeite = lazyMitNeuversuch(() => import("../seiten/ReferenzenSeite"));
-const DemoSeite       = lazyMitNeuversuch(() => import("../seiten/DemoSeite"));
 const UeberMichSeite  = lazyMitNeuversuch(() => import("../seiten/UeberMichSeite"));
 const ProjekteSeite   = lazyMitNeuversuch(() => import("../seiten/ProjekteSeite"));
 const SecuritySeite   = lazyMitNeuversuch(() => import("../seiten/SecuritySeite"));
@@ -30,6 +26,7 @@ const OsintToolSeite  = lazyMitNeuversuch(() => import("../seiten/OsintToolSeite
 const KontaktSeite    = lazyMitNeuversuch(() => import("../seiten/KontaktSeite"));
 const VoiceDemoSeite  = lazyMitNeuversuch(() => import("../seiten/VoiceDemoSeite"));
 const BildergalerieSeite = lazyMitNeuversuch(() => import("../seiten/BildergalerieSeite"));
+const ReferenzenSeite = lazyMitNeuversuch(() => import("../seiten/ReferenzenSeite"));
 const ImpressumSeite  = lazyMitNeuversuch(() => import("../seiten/ImpressumSeite"));
 const DatenschutzSeite = lazyMitNeuversuch(() => import("../seiten/DatenschutzSeite"));
 
@@ -82,13 +79,10 @@ function ScrollZuTop() {
 function useRoutenVorladen() {
   useEffect(() => {
     const vorladen = () => {
-      void import("../seiten/VorgehensweiseSeite");
-      void import("../seiten/LeistungenSeite");
-      void import("../seiten/ReferenzenSeite");
-      void import("../seiten/DemoSeite");
       void import("../seiten/UeberMichSeite");
       void import("../seiten/ProjekteSeite");
       void import("../seiten/SecuritySeite");
+      void import("../seiten/ReferenzenSeite");
       void import("../seiten/SecurityProgrammSeite");
       void import("../seiten/LaborSeite");
       void import("../seiten/OsintToolSeite");
@@ -127,13 +121,10 @@ export function Routen() {
       <Suspense key={ort.pathname} fallback={<SeitenLadeindikator />}>
         <Routes location={ort}>
           <Route path="/"              element={<StartSeite />} />
-          <Route path="/vorgehensweise" element={<VorgehensweiseSeite />} />
-          <Route path="/leistungen"    element={<LeistungenSeite />} />
-          <Route path="/referenzen"    element={<ReferenzenSeite />} />
-          <Route path="/demo"          element={<DemoSeite />} />
           <Route path="/ueber-mich"    element={<UeberMichSeite />} />
           <Route path="/projekte"      element={<ProjekteSeite />} />
           <Route path="/security"      element={<SecuritySeite />} />
+          <Route path="/referenzen"    element={<ReferenzenSeite />} />
           <Route path="/labor"         element={<LaborSeite />} />
           <Route path="/osint-tools"   element={<OsintToolSeite />} />
           <Route path="/kontakt"       element={<KontaktSeite />} />

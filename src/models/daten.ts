@@ -494,10 +494,10 @@ export const PERSOENLICH = {
   name: "Michael Fleps",
   firma: "FREE DATA Solutions",
   standort: "Nürnberg, Bayern",
-  titel: "KI-Automation für den Mittelstand — sicher gebaut und geprüft",
-  untertitel: "KI-Automation • AI-Security • ein Ansprechpartner aus Nürnberg",
-  firmaTagline: "Sichere KI-Automation von Anfang bis Ende. Ich automatisiere wiederkehrende Prozesse mit KI — und prüfe sie auf Datenlecks, bevor sie live gehen. Beides aus einer Hand.",
-  kurzvorstellung: "Die meisten KI-Projekte scheitern nicht an der Idee, sondern an der Umsetzung, am Datenschutz und an unklaren Kosten. Ich baue KI-Automation, die im echten Betrieb hält, sichere sie von Anfang an ab und arbeite zum Festpreis. Ein Ansprechpartner aus Nürnberg, remote im DACH-Raum.",
+  titel: "KI-Automation, sichere KI & KI-automatisierte Pentests",
+  untertitel: "KI-Automation • Sichere KI • KI-automatisierte Pentests • Nürnberg",
+  firmaTagline: "Ich baue KI-Automation, sichere die eingesetzte KI ab und prüfe Anwendungen mit KI-automatisierten Pentests — bevor es ein Angreifer tut. Alles aus einer Hand.",
+  kurzvorstellung: "Die meisten KI-Projekte scheitern nicht an der Idee, sondern an der Umsetzung, am Datenschutz und an unklaren Kosten. Ich baue KI-Automation, die im echten Betrieb hält, sichere die eingesetzte KI von Anfang an ab und prüfe Anwendungen mit einer KI-gestützten Pentest-Pipeline — breiter und schneller als von Hand. Ein Ansprechpartner aus Nürnberg, remote im DACH-Raum.",
   email: "michael_fleps@aol.com",
   telefon: "+49 172 572 5081",
   telefonLink: "+491725725081",
@@ -523,7 +523,7 @@ export interface LeistungModel {
 
 export const LEISTUNGEN: LeistungModel[] = [
   {
-    titel: "KI-Automation-Sprint",
+    titel: "KI-Automation",
     nutzen: "Ein wiederkehrender Büro-Prozess (Angebote und Reports erstellen, Recherche zusammenfassen, Dokumente auslesen, Support vorqualifizieren) wird zum laufenden System, gebaut für den Betrieb, nicht fürs Demo.",
     leistungen: [
       "Von der Idee zum produktiven Workflow in rund zwei Wochen",
@@ -535,14 +535,14 @@ export const LEISTUNGEN: LeistungModel[] = [
     akzentHex: "#7aa2ff",
   },
   {
-    titel: "Copilot- & ChatGPT-Freigabe-Check",
-    nutzen: "Bevor Microsoft Copilot oder ChatGPT im Unternehmen ausgerollt wird: die Prüfung, welche Daten die KI sehen darf und wo Berechtigungen zu weit offen stehen.",
+    titel: "KI-automatisierte Pentests",
+    nutzen: "Ihre Web-App oder API auf dem Prüfstand, mit einer selbst gebauten, KI-gestützten Pentest-Pipeline, die die Angriffsfläche automatisiert erfasst, priorisiert und gezielt testet.",
     leistungen: [
-      "Berechtigungen und Datenzugriff der KI systematisch geprüft",
-      "Datenschutz-Fallstricke vor dem Rollout sichtbar gemacht",
-      "Konkrete Empfehlung mit klarer Ampel statt Fachchinesisch",
+      "KI-gestützte Recon und Priorisierung: breiter und schneller als reine Handarbeit",
+      "Gezielte manuelle Verifikation statt blinder Scanner-Flut",
+      "Nachvollziehbare Befunde mit klarer Schwere-Einstufung und konkretem Fix",
     ],
-    ergebnis: "Ein kontrollierter KI-Rollout statt eines unbemerkten Datenabflusses.",
+    ergebnis: "Mehr geprüfte Fläche in weniger Zeit und Befunde, die Sie belegen können.",
     farbeRgb: "129, 140, 248",
     akzentHex: "#818cf8",
   },

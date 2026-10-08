@@ -57,7 +57,7 @@ export default function ImpressumSeite() {
               <h2 className="font-display text-base font-bold text-white mb-2">Streitbeilegung</h2>
               <p>
                 Ich bin nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren vor einer
-                Verbraucherschlichtungsstelle teilzunehmen. {PLATZHALTER}: vor Go-Live rechtlich prüfen lassen.
+                Verbraucherschlichtungsstelle teilzunehmen.
               </p>
             </section>
 

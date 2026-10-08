@@ -51,31 +51,32 @@ const ICON_PROPS = {
 
 const BANNER: Banner[] = [
   {
-    pfad: "/vorgehensweise", titel: "Vorgehensweise",
-    nutzen: "Von der Idee bis zum Betrieb — Sicherheit ist in jedem Schritt eingebaut.",
+    pfad: "/osint-tools", titel: "OSINT Analyseplattform",
+    nutzen: "E-Mail, Domain, Username & mehr live: Beziehungen als Graph.",
+    featured: true,
+    icon: (
+      <svg {...ICON_PROPS}><circle cx="10.5" cy="10.5" r="6" /><path d="m20 20-4.2-4.2" /><circle cx="10.5" cy="10.5" r="2" /></svg>
+    ),
+  },
+  {
+    pfad: "/labor", titel: "Infrastruktur & Automation",
+    nutzen: "Gehärtete Linux-Systeme & KI-Agenten, die Abläufe übernehmen.",
     icon: (
       <svg {...ICON_PROPS}><rect x="3" y="4" width="18" height="6.5" rx="2" /><rect x="3" y="13.5" width="18" height="6.5" rx="2" /><path d="M6.5 7.25h.01M6.5 16.75h.01" /></svg>
     ),
   },
   {
-    pfad: "/leistungen", titel: "Leistungen",
-    nutzen: "Automation-Sprint, Sicherheits-Check, Copilot-Freigabe & Schatten-KI.",
-    icon: (
-      <svg {...ICON_PROPS}><path d="m8 8.5-3.5 3.5 3.5 3.5" /><path d="m16 8.5 3.5 3.5-3.5 3.5" /><path d="m13.5 6-3 12" /></svg>
-    ),
-  },
-  {
-    pfad: "/security", titel: "KI-Sicherheit",
-    nutzen: "Chatbots & Agenten geprüft, bevor sie zum Datenleck werden.",
+    pfad: "/security", titel: "KI-automatisierte Pentests",
+    nutzen: "Schwachstellen finden, bevor andere es tun — KI-gestützt, mit dem Blick des Angreifers.",
     icon: (
       <svg {...ICON_PROPS}><path d="M12 2.5l7.5 3.2v5.1c0 4.7-3.2 8-7.5 9.7-4.3-1.7-7.5-5-7.5-9.7V5.7z" /><path d="m9 11.7 2 2 3.6-4" /></svg>
     ),
   },
   {
-    pfad: "/referenzen", titel: "Referenzen",
-    nutzen: "Ein anonymisierter echter Fund, ein Beispiel-Bericht und eine Demo zum Anfassen.",
+    pfad: "/projekte", titel: "Projekte & Entwicklung",
+    nutzen: "Eigene Software & Systeme, seit Jahren produktiv im Einsatz.",
     icon: (
-      <svg {...ICON_PROPS}><circle cx="10.5" cy="10.5" r="6" /><path d="m20 20-4.2-4.2" /><circle cx="10.5" cy="10.5" r="2" /></svg>
+      <svg {...ICON_PROPS}><path d="m8 8.5-3.5 3.5 3.5 3.5" /><path d="m16 8.5 3.5 3.5-3.5 3.5" /><path d="m13.5 6-3 12" /></svg>
     ),
   },
 ];

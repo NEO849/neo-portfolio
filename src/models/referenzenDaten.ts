@@ -1,53 +1,114 @@
 // ═══════════════════════════════════════════════════════════════════
-// MODEL: Referenzen / Proof — der stärkste Vertrauens-Hebel.
-// WICHTIG (Ehrlichkeit vor Marketing): nichts hier ist erfunden.
-// Die Case-Study ist anonymisiert und bewusst zurückhaltend formuliert;
-// Details nur auf Anfrage. Der Beispiel-Bericht trägt ausdrücklich
-// ERFUNDENE Daten und ist als solcher gekennzeichnet.
+// MODEL: Referenzen / Belege — anonymisierte echte Befunde (Enterprise).
+// EHRLICHKEIT VOR MARKETING: nichts hier ist erfunden. Alle Befunde sind
+// real und stammen aus autorisierten Tests / Bug-Bounty-Programmen; sie
+// sind DE-IDENTIFIZIERT (keine Anbieter-Namen, keine Hosts, keine Keys/
+// Modulus-Werte). Offenlegung ist nicht freigegeben → Name und technische
+// Einzelheiten nur auf Anfrage unter Vertraulichkeit. Der Beispiel-Bericht
+// weiter unten trägt AUSDRÜCKLICH erfundene Daten.
 // ═══════════════════════════════════════════════════════════════════
 
-export interface CaseStudy {
-  readonly kennzeichen: string;        // Badge, z.B. "Autorisierter Wettbewerb"
+export type Schwere = "Kritisch" | "Hoch" | "Mittel" | "Niedrig";
+
+export const SCHWERE_META: Record<Schwere, { hex: string; farbeRgb: string }> = {
+  Kritisch: { hex: "#f1646c", farbeRgb: "241, 100, 108" },
+  Hoch:     { hex: "#f5884b", farbeRgb: "245, 136, 75" },
+  Mittel:   { hex: "#f5b544", farbeRgb: "245, 181, 68" },
+  Niedrig:  { hex: "#7aa2ff", farbeRgb: "122, 162, 255" },
+};
+
+// ─── Flaggschiff-Reporte (de-identifiziert, als Report-Karten) ──────────
+export interface AnonymerReport {
+  readonly id: string;
+  readonly kennzeichen: string;     // Herkunfts-Badge
   readonly titel: string;
-  readonly situation: string;
-  readonly vorgehen: string;
-  readonly ergebnis: string;
-  readonly lehre: string;
-  readonly hinweis?: string;           // z.B. "Details auf Anfrage"
-  readonly akzentHex: string;
-  readonly farbeRgb: string;
+  readonly klasse: string;          // Schwachstellen-Klasse
+  readonly schwere: Schwere;
+  readonly cvss?: string;           // z.B. "7.5"
+  readonly cwe: string;
+  readonly kontext: string;         // Ausgangslage (anonym)
+  readonly fund: string;            // was gefunden wurde
+  readonly impact: string;          // warum es zählt
+  readonly nachweis: string;        // wie belegt (ohne Eingriff)
+  readonly diagramm?: "trust-boundary";
 }
 
-export const CASE_STUDIES: CaseStudy[] = [
+export const REPORTE: AnonymerReport[] = [
   {
-    kennzeichen: "Autorisierter Sicherheits-Wettbewerb",
-    titel: "Ein KI-Agent gab Daten eines anderen Nutzers preis",
-    situation:
-      "In einem autorisierten KI-Sicherheits-Wettbewerb stand ein KI-Agent zur Verfügung, der im Auftrag von Nutzern Aufgaben erledigte und dabei auf deren Daten zugriff.",
-    vorgehen:
-      "Ich habe untersucht, ob sich der Agent über präparierte Eingaben dazu bewegen lässt, seine Grenzen zu überschreiten, also Daten zu verwenden oder auszugeben, die zu einem anderen Nutzer gehören.",
-    ergebnis:
-      "Der Agent liess sich zu einem Cross-User-Datenzugriff bringen: Informationen eines fremden Nutzers wurden preisgegeben. Der Zugriff liess sich nachweisen.",
-    lehre:
-      "Genau diese Klasse von Fehlern — ein KI-System gibt Daten heraus, die es nicht hergeben darf — prüfe ich in meinem KI-Sicherheits-Check, bevor eine Lösung in den Betrieb geht.",
-    hinweis: "Anonymisiert. Konkreter Write-up und Nachweis auf Anfrage.",
-    akzentHex: "#4f7cfb",
-    farbeRgb: "79, 124, 251",
+    id: "cross-env-key",
+    kennzeichen: "Autorisiertes Bug-Bounty · anonymisiert",
+    titel: "Produktion und Testumgebung teilten denselben Signatur-Schlüssel",
+    klasse: "Cross-Environment Trust-Boundary / fehlende Schlüssel-Trennung",
+    schwere: "Hoch",
+    cvss: "7.5",
+    cwe: "CWE-693 · CWE-668 · NIST SP 800-57",
+    kontext:
+      "Ein grosser deutscher SaaS-Anbieter (Name vertraulich) betrieb seine Login- und API-Infrastruktur in zwei getrennten Umgebungen — Produktion und eine Sandbox zum Testen. Beide veröffentlichten, wie vom Standard vorgesehen, ihre Signatur-Schlüssel.",
+    fund:
+      "Zwei dieser Signatur-Schlüssel waren in beiden Umgebungen bit-identisch — nicht nur gleich benannt, sondern mathematisch dasselbe Schlüsselmaterial.",
+    impact:
+      "Eine Produktiv-Anwendung, die ein Zugangs-Token nur anhand der Signatur prüft, würde damit auch ein in der Sandbox ausgestelltes Token akzeptieren. Genau die Grenze zwischen Test und Produktion, die schützen soll, war kryptografisch aufgehoben.",
+    nachweis:
+      "Rein passiv belegbar: zwei öffentliche Abrufe und ein Vergleich des Schlüssel-Materials. Kein Eingriff in fremde Systeme, kein Zugriff auf Daten.",
+    diagramm: "trust-boundary",
+  },
+  {
+    id: "ki-agent-cross-user",
+    kennzeichen: "Autorisierter KI-Sicherheits-Wettbewerb",
+    titel: "KI-Agent gab Daten eines anderen Nutzers preis",
+    klasse: "Fehlerhafte Autorisierung in einem KI-Agenten (Cross-User)",
+    schwere: "Hoch",
+    cwe: "CWE-863 · CWE-200",
+    kontext:
+      "Ein KI-Agent erledigte im Auftrag von Nutzern Aufgaben und griff dabei auf deren Daten zu. Ich prüfte, ob er sich über präparierte Eingaben aus seinen Grenzen bewegen lässt.",
+    fund:
+      "Der Agent liess sich zu einem Cross-User-Datenzugriff bringen: Informationen eines fremden Nutzers wurden preisgegeben.",
+    impact:
+      "Die Klasse, die bei KI-Features am meisten zählt: Ein System gibt Daten heraus, die es nicht hergeben darf. Genau das prüfe ich bei Kundenlösungen, bevor sie in den Betrieb gehen.",
+    nachweis:
+      "Der Zugriff liess sich im Rahmen des Wettbewerbs nachweisen. Write-up auf Anfrage.",
+  },
+];
+
+// ─── Weitere bestätigte Befunde (kompakt, anonymisiert) ─────────────────
+export interface KurzBefund {
+  readonly klasse: string;
+  readonly schwere: Schwere;
+  readonly kurz: string;
+  readonly cwe: string;
+}
+
+export const WEITERE_BEFUNDE: KurzBefund[] = [
+  {
+    klasse: "OAuth-CSRF (fehlender State-Schutz)",
+    schwere: "Mittel",
+    cwe: "CWE-352",
+    kurz: "Ein Login-Flow liess sich ohne wirksamen State-Parameter anstossen — Grundlage für Account-Verknüpfungs-Angriffe.",
+  },
+  {
+    klasse: "GraphQL Request-Batching",
+    schwere: "Mittel",
+    cwe: "CWE-799",
+    kurz: "Mehrere Operationen pro Anfrage umgingen eine mengenbasierte Begrenzung (z. B. für Brute-Force-ähnliche Muster).",
+  },
+  {
+    klasse: "Open Redirect",
+    schwere: "Niedrig",
+    cwe: "CWE-601",
+    kurz: "Eine Weiterleitung liess sich auf eine fremde Zieladresse lenken — relevant v. a. als Baustein in einer Angriffskette.",
   },
 ];
 
 // ─── Beispiel-Bericht (ERFUNDENE Daten, nur zur Veranschaulichung) ──────
-// Zeigt, was ein Kunde als Ergebnis eines KI-Sicherheits-Checks bekommt:
-// eine klare Ampel und nachvollziehbare Befunde, keine Scanner-Liste.
-
+// Zeigt die FORM eines Ergebnisses: klare Ampel + nachvollziehbare Befunde.
 export type BefundAmpel = "rot" | "gelb" | "gruen";
 
 export interface BeispielBefund {
   readonly ampel: BefundAmpel;
   readonly titel: string;
-  readonly was: string;       // was wurde beobachtet
-  readonly risiko: string;    // warum es zählt
-  readonly fix: string;       // empfohlene Behebung
+  readonly was: string;
+  readonly risiko: string;
+  readonly fix: string;
 }
 
 export const BEISPIEL_BERICHT: {
@@ -81,24 +142,3 @@ export const BEISPIEL_BERICHT: {
     },
   ],
 };
-
-// ─── Flaggschiff-Fallstudie (DE-IDENTIFIZIERT) ──────────────────────────
-// Echter Bounty-Fund, bewusst ohne Name und ohne rekonstruierbare Details
-// (keine Hosts, keine Key-IDs, keine Modulus-Werte). Offenlegung ist nicht
-// freigegeben → Name/Details nur auf Anfrage unter Vertraulichkeit.
-export const KEY_FALLSTUDIE = {
-  kennzeichen: "Autorisiertes Bug-Bounty · anonymisiert",
-  titel: "Produktion und Testumgebung teilten denselben Schlüssel",
-  anbieter: "Grosser deutscher SaaS-Anbieter (Name vertraulich)",
-  situation:
-    "Der Anbieter betrieb seine Login- und API-Infrastruktur in zwei getrennten Umgebungen — Produktion und eine Sandbox zum Testen. Beide veröffentlichten, wie vom Standard vorgesehen, ihre Signatur-Schlüssel.",
-  fund:
-    "Zwei dieser Signatur-Schlüssel waren in beiden Umgebungen bit-identisch — nicht nur gleich benannt, sondern mathematisch dasselbe Schlüsselmaterial.",
-  warum:
-    "Eine Produktiv-Anwendung, die ein Zugangs-Token nur anhand der Signatur prüft, würde damit auch ein in der Sandbox ausgestelltes Token akzeptieren. Genau die Grenze zwischen Test und Produktion, die schützen soll, war kryptografisch aufgehoben.",
-  nachweis:
-    "Rein passiv belegbar: zwei öffentliche Abrufe und ein Vergleich des Schlüssel-Materials. Kein Eingriff in fremde Systeme, kein Zugriff auf Daten.",
-  verantwortung:
-    "Name und technische Details werden vertraulich behandelt und nur auf Anfrage unter Vertraulichkeit geteilt. Ohne freigegebene Offenlegung nenne ich weder Anbieter noch rekonstruierbare Einzelheiten.",
-  norm: "Einordnung: CWE-693 (fehlende Trennung der Schutzmechanismen), NIST SP 800-57 (Schlüssel je Umgebung trennen).",
-} as const;
