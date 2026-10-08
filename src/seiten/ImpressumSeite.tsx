@@ -1,16 +1,12 @@
 // ═══════════════════════════════════════════════════════
 // SEITE: ImpressumSeite — Route: /impressum
-// Pflichtangaben nach § 5 DDG. ENTHÄLT PLATZHALTER — vor Go-Live mit
-// echten Daten füllen und vom Legal-Gate (legal-compliance-advisor)
-// prüfen lassen. Dies ist kein Rechtsrat.
+// Pflichtangaben nach § 5 DDG.
 // ═══════════════════════════════════════════════════════
 
 import { motion } from "framer-motion";
 import { SEITEN_EINGANG } from "../bewegung/varianten";
 import { SeitenMeta } from "../bausteine/SeitenMeta";
 import { PERSOENLICH } from "../models/daten";
-
-const PLATZHALTER = "〈PLATZHALTER: bitte ergänzen〉";
 
 export default function ImpressumSeite() {
   return (
@@ -26,44 +22,34 @@ export default function ImpressumSeite() {
               <p>
                 {PERSOENLICH.name}<br />
                 {PERSOENLICH.firma}<br />
-                {PLATZHALTER} (Straße und Hausnummer)<br />
-                {PLATZHALTER} (PLZ und Ort)<br />
+                Ludwigstraße 61<br />
+                90429 Nürnberg<br />
                 Deutschland
               </p>
             </section>
 
             <section>
               <h2 className="font-display text-base font-bold text-white mb-2">Kontakt</h2>
-              <p>
-                Telefon: {PERSOENLICH.telefon}<br />
-                E-Mail: {PERSOENLICH.email}
-              </p>
+              <p>E-Mail: {PERSOENLICH.email}</p>
             </section>
 
             <section>
               <h2 className="font-display text-base font-bold text-white mb-2">Umsatzsteuer</h2>
-              <p>
-                {PLATZHALTER}: Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG, falls vorhanden.
-                Andernfalls Hinweis auf Kleinunternehmerregelung nach § 19 UStG.
-              </p>
+              <p>Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG: DE459129384</p>
             </section>
 
             <section>
-              <h2 className="font-display text-base font-bold text-white mb-2">Verantwortlich für den Inhalt</h2>
-              <p>{PERSOENLICH.name}, Anschrift wie oben.</p>
+              <h2 className="font-display text-base font-bold text-white mb-2">Verantwortlich i. S. d. § 18 Abs. 2 MStV</h2>
+              <p>{PERSOENLICH.name} (Anschrift wie oben).</p>
             </section>
 
             <section>
-              <h2 className="font-display text-base font-bold text-white mb-2">Streitbeilegung</h2>
+              <h2 className="font-display text-base font-bold text-white mb-2">Verbraucherstreitbeilegung</h2>
               <p>
-                Ich bin nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren vor einer
+                Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer
                 Verbraucherschlichtungsstelle teilzunehmen.
               </p>
             </section>
-
-            <p className="text-xs text-white/40 italic pt-4 border-t border-white/[0.06]">
-              Entwurf mit Platzhaltern. Vor Veröffentlichung mit echten Daten füllen und rechtlich prüfen lassen.
-            </p>
           </div>
         </div>
       </motion.div>

@@ -1,16 +1,12 @@
 // ═══════════════════════════════════════════════════════
 // SEITE: DatenschutzSeite — Route: /datenschutz
-// Orientierungs-Entwurf nach DSGVO. ENTHÄLT PLATZHALTER und ist KEIN
-// Rechtsrat. Vor Go-Live vom Legal-Gate prüfen und anwaltlich abnehmen
-// lassen (verbindlich bei Haftung).
+// Datenschutzerklärung nach DSGVO.
 // ═══════════════════════════════════════════════════════
 
 import { motion } from "framer-motion";
 import { SEITEN_EINGANG } from "../bewegung/varianten";
 import { SeitenMeta } from "../bausteine/SeitenMeta";
 import { PERSOENLICH } from "../models/daten";
-
-const PLATZHALTER = "〈PLATZHALTER: bitte prüfen/ergänzen〉";
 
 function Abschnitt({ titel, children }: { titel: string; children: React.ReactNode }) {
   return (
@@ -40,8 +36,8 @@ export default function DatenschutzSeite() {
                 technisch notwendige Server-Logdaten (z. B. IP-Adresse, Zeitpunkt, abgerufene Seite) verarbeitet.
                 Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (sicherer, stabiler Betrieb). Cloudflare ist
                 Auftragsverarbeiter (Art. 28 DSGVO); da es sich um einen US-Anbieter handelt, erfolgt die
-                Übermittlung auf Grundlage der EU-Standardvertragsklauseln (Art. 46 DSGVO). {PLATZHALTER}:
-                Abschluss des Auftragsverarbeitungsvertrags mit Cloudflare bestätigen.
+                Übermittlung auf Grundlage der EU-Standardvertragsklauseln (Art. 46 DSGVO), abgesichert durch
+                einen Auftragsverarbeitungsvertrag (Art. 28 DSGVO).
               </p>
             </Abschnitt>
 
@@ -50,8 +46,8 @@ export default function DatenschutzSeite() {
                 Wenn Sie das Kontaktformular nutzen, verarbeite ich die von Ihnen eingegebenen Daten (Name,
                 E-Mail, Nachricht), um Ihre Anfrage zu beantworten. Der Versand der Benachrichtigung erfolgt über
                 den E-Mail-Dienst Resend (Resend, Inc., USA) als Auftragsverarbeiter (Art. 28 DSGVO; Übermittlung
-                auf Grundlage der EU-Standardvertragsklauseln, Art. 46 DSGVO). Rechtsgrundlage: Art. 6 Abs. 1
-                lit. b und f DSGVO. {PLATZHALTER}: Auftragsverarbeitungsvertrag mit Resend bestätigen.
+                auf Grundlage der EU-Standardvertragsklauseln, Art. 46 DSGVO, abgesichert durch einen
+                Auftragsverarbeitungsvertrag nach Art. 28 DSGVO). Rechtsgrundlage: Art. 6 Abs. 1 lit. b und f DSGVO.
               </p>
             </Abschnitt>
 
@@ -78,9 +74,8 @@ export default function DatenschutzSeite() {
               </p>
             </Abschnitt>
 
-            <p className="text-xs text-white/40 italic pt-4 border-t border-white/[0.06]">
-              Orientierungs-Entwurf mit Platzhaltern, kein Rechtsrat. Vor Veröffentlichung vollständigen und
-              anwaltlich prüfen lassen.
+            <p className="text-xs text-white/40 pt-4 border-t border-white/[0.06]">
+              Stand: Oktober 2026.
             </p>
           </div>
         </div>
