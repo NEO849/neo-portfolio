@@ -7,7 +7,6 @@ export const NAV_EINTRAEGE: NavEintrag[] = [
   { pfad: "/",              label: "Start" },
   { pfad: "/ueber-mich",    label: "Über mich" },
   { pfad: "/projekte",      label: "Projekte" },
-  { pfad: "/bilder",        label: "Bilder" },
   { pfad: "/security",      label: "Security" },
   { pfad: "/referenzen",    label: "Referenzen" },
   { pfad: "/labor",         label: "Labor" },

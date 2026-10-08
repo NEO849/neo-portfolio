@@ -1,20 +1,21 @@
 // ═══════════════════════════════════════════════════════════════════
-// VIEW: Referenzen / Belege (Enterprise) — anonymisierte echte Befunde
-// als Report-Karten (Schweregrad/CVSS/CWE), Flaggschiff mit Diagramm,
-// weitere bestätigte Befunde, ein Beispiel-Bericht (erfundene Daten) und
-// ein Vertraulichkeits-Hinweis. Keine Anbieter-Namen, keine Re-ID.
+// VIEW: Referenzen / Belege (Enterprise) — anonymisierte echte Befunde als
+// aufklappbare volle Report-Dokumente (Zusammenfassung → Methodik → Finding
+// → Impact → Remediation, Schwere/CVSS/CWE), Flaggschiff mit Diagramm, je
+// Befund eine ausführbare Terminal-Demo (Mock-Daten). Keine Namen, keine Re-ID.
 // ═══════════════════════════════════════════════════════════════════
 
-import { motion } from "framer-motion";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
+import { AusklappKarte } from "../bausteine/AusklappKarte";
 import { TrustBoundaryDiagramm } from "../bausteine/TrustBoundaryDiagramm";
-import { KURVEN } from "../bewegung/varianten";
+import { TerminalDemo } from "../bausteine/TerminalDemo";
 import {
   REPORTE, WEITERE_BEFUNDE, BEISPIEL_BERICHT, SCHWERE_META,
 } from "../models/referenzenDaten";
-import type { AnonymerReport, BefundAmpel, Schwere } from "../models/referenzenDaten";
+import type { AnonymerReport, BefundAmpel, KurzBefund, Schwere } from "../models/referenzenDaten";
 
 const AMPEL: Record<BefundAmpel, { hex: string; label: string }> = {
   rot: { hex: "#f1646c", label: "Kritisch" },
@@ -45,50 +46,103 @@ function Ampelpunkt({ ampel }: { ampel: BefundAmpel }) {
   );
 }
 
-function ReportKarte({ r, index }: { r: AnonymerReport; index: number }) {
+function DokListe({ titel, hex, punkte }: { titel: string; hex: string; punkte: readonly string[] }) {
+  return (
+    <div>
+      <p className="font-mono text-[10px] uppercase tracking-[0.16em] mb-2" style={{ color: `${hex}cc` }}>{titel}</p>
+      <ul className="space-y-1.5">
+        {punkte.map((p) => (
+          <li key={p} className="flex items-start gap-2 text-sm text-white/70">
+            <span className="mt-[3px] flex-shrink-0 text-[10px]" style={{ color: hex }}>›</span>
+            <span>{p}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ReportDoc({ r }: { r: AnonymerReport }) {
+  const [offen, setOffen] = useState(false);
   const m = SCHWERE_META[r.schwere];
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ delay: index * 0.06, duration: 0.6, ease: KURVEN.expressiv }}
-    >
-      <InfoKarte lichtfarbe={m.farbeRgb}>
-        <div className="p-6 md:p-7">
-          {/* Kopf: Herkunft + Schwere */}
-          <div className="mb-4 flex flex-wrap items-center gap-2">
+    <AusklappKarte
+      lichtfarbe={m.farbeRgb}
+      akzentFarbe={m.hex}
+      offen={offen}
+      onUmschalten={() => setOffen(!offen)}
+      kopf={
+        <>
+          <div className="mb-3 flex flex-wrap items-center gap-2">
             <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/45">{r.kennzeichen}</span>
             <span className="text-white/15">·</span>
             <SchwereBadge schwere={r.schwere} cvss={r.cvss} />
           </div>
-
           <h3 className="font-display text-lg md:text-xl font-bold text-white leading-snug">{r.titel}</h3>
           <p className="mt-1 font-mono text-[11px] text-white/45">{r.klasse}</p>
-          <p className="mt-1 font-mono text-[11px] tracking-wide text-white/35">{r.cwe}</p>
+          <p className="mt-0.5 font-mono text-[11px] tracking-wide text-white/35">{r.cwe}</p>
+          <p className="mt-3 text-sm text-white/65 leading-relaxed">{r.zusammenfassung}</p>
+        </>
+      }
+      detail={
+        <div className="space-y-5">
+          {r.diagramm === "trust-boundary" && <TrustBoundaryDiagramm />}
 
-          {r.diagramm === "trust-boundary" && (
-            <div className="mt-5">
-              <TrustBoundaryDiagramm />
-            </div>
-          )}
+          <DokListe titel="Scope & Methodik" hex={m.hex} punkte={r.methodik} />
 
-          <dl className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2">
             {[
               ["Ausgangslage", r.kontext],
               ["Der Fund", r.fund],
               ["Warum das zählt", r.impact],
               ["Nachweis", r.nachweis],
             ].map(([k, v]) => (
-              <div key={k}>
-                <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40 mb-1">{k}</dt>
-                <dd className="text-sm text-white/70 leading-relaxed">{v}</dd>
+              <div key={k} className="rounded-2xl2 border border-white/[0.06] bg-white/[0.02] p-4">
+                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40 mb-1">{k}</p>
+                <p className="text-sm text-white/70 leading-relaxed">{v}</p>
               </div>
             ))}
-          </dl>
+          </div>
+
+          <DokListe titel="Empfohlene Behebung" hex={m.hex} punkte={r.remediation} />
+
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40 mb-2">Live-Demo (Mock-Daten)</p>
+            <TerminalDemo skript={r.demo} />
+          </div>
         </div>
-      </InfoKarte>
-    </motion.div>
+      }
+    />
+  );
+}
+
+function KurzBefundKarte({ b }: { b: KurzBefund }) {
+  const [offen, setOffen] = useState(false);
+  const m = SCHWERE_META[b.schwere];
+  return (
+    <AusklappKarte
+      lichtfarbe={m.farbeRgb}
+      akzentFarbe={m.hex}
+      offen={offen}
+      onUmschalten={() => setOffen(!offen)}
+      kopf={
+        <>
+          <div className="mb-1.5 flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full" style={{ background: m.hex }} />
+            <span className="font-mono text-[11px] uppercase tracking-wider" style={{ color: m.hex }}>{b.schwere}</span>
+            <span className="font-mono text-[10px] text-white/35">{b.cwe}</span>
+          </div>
+          <h3 className="font-display text-base font-semibold text-white leading-snug">{b.klasse}</h3>
+          <p className="mt-1 text-[13px] text-white/60 leading-relaxed">{b.kurz}</p>
+        </>
+      }
+      detail={
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40 mb-2">Live-Demo (Mock-Daten)</p>
+          <TerminalDemo skript={b.demo} />
+        </div>
+      }
+    />
   );
 }
 
@@ -97,40 +151,26 @@ export default function ReferenzenView() {
     <section id="referenzen" className="py-16 px-6 max-w-5xl mx-auto">
       <AbschnittsTitel
         prefix="> referenzen"
-        untertitel="Belege statt Behauptungen. Echte Befunde aus autorisierten Tests und Bug-Bounty-Programmen — anonymisiert, mit Schweregrad und Einordnung. Namen und technische Einzelheiten nur auf Anfrage unter Vertraulichkeit."
+        untertitel="Belege statt Behauptungen. Echte Befunde aus autorisierten Tests und Bug-Bounty-Programmen — anonymisiert, als aufklappbares Report-Dokument mit ausführbarer Demo. Namen und Einzelheiten nur auf Anfrage unter Vertraulichkeit."
         klassen="mb-8"
       />
 
       {/* Flaggschiff-Reporte */}
-      <div className="space-y-5">
-        {REPORTE.map((r, i) => (
-          <ReportKarte key={r.id} r={r} index={i} />
+      <div className="space-y-4">
+        {REPORTE.map((r) => (
+          <ReportDoc key={r.id} r={r} />
         ))}
       </div>
 
       {/* Weitere bestätigte Befunde */}
       <div className="mt-12">
         <h3 className="font-display text-lg font-bold text-white mb-1">Weitere bestätigte Befunde</h3>
-        <p className="text-sm text-white/50 mb-5">Auszug, anonymisiert.</p>
-        <InfoKarte lichtfarbe="79, 124, 251">
-          <ul className="divide-y divide-white/[0.06]">
-            {WEITERE_BEFUNDE.map((b) => {
-              const m = SCHWERE_META[b.schwere];
-              return (
-                <li key={b.klasse} className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:gap-4">
-                  <div className="flex items-center gap-2 sm:w-44 sm:flex-shrink-0">
-                    <span className="h-2 w-2 rounded-full" style={{ background: m.hex }} />
-                    <span className="font-mono text-[11px] uppercase tracking-wider" style={{ color: m.hex }}>{b.schwere}</span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-display text-sm font-semibold text-white">{b.klasse} <span className="font-mono text-[10px] font-normal text-white/35">{b.cwe}</span></p>
-                    <p className="text-[13px] text-white/60 leading-relaxed">{b.kurz}</p>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </InfoKarte>
+        <p className="text-sm text-white/50 mb-5">Auszug, anonymisiert — jeweils mit Demo zum Ausführen.</p>
+        <div className="space-y-4">
+          {WEITERE_BEFUNDE.map((b) => (
+            <KurzBefundKarte key={b.id} b={b} />
+          ))}
+        </div>
       </div>
 
       {/* Beispiel-Bericht (erfundene Daten) */}

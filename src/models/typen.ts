@@ -16,6 +16,8 @@ export interface ProjektModel {
   readonly titel: string;
   readonly kurzbeschreibung: string;
   readonly langbeschreibung: string;
+  /** Kurzer, leicht verständlicher Nutzen/Mehrwert (1–2 Sätze) — „Was bringt es?". */
+  readonly mehrwert: string;
   readonly kategorie: "security" | "development" | "tooling";
   readonly technologien: string[];
   readonly highlights: string[];

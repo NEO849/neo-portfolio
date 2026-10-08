@@ -6,12 +6,11 @@
 // ═══════════════════════════════════════════════════════════════════
 
 import { Suspense, useEffect } from "react";
-import { Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { KartenSkeleton } from "../bausteine/LadeanzeigePuls";
 import { FehlerGrenze } from "../bausteine/FehlerGrenze";
 import { lazyMitNeuversuch } from "./chunkSelbstheilung";
-import { galeriePfad } from "../hilfsmittel/galeriePfad";
 
 // Lazy-Imports: Jede Seite wird nur geladen wenn sie aufgerufen wird.
 // lazyMitNeuversuch verhält sich wie React.lazy(), heilt aber Stale-Chunks
@@ -25,17 +24,9 @@ const LaborSeite      = lazyMitNeuversuch(() => import("../seiten/LaborSeite"));
 const OsintToolSeite  = lazyMitNeuversuch(() => import("../seiten/OsintToolSeite"));
 const KontaktSeite    = lazyMitNeuversuch(() => import("../seiten/KontaktSeite"));
 const VoiceDemoSeite  = lazyMitNeuversuch(() => import("../seiten/VoiceDemoSeite"));
-const BildergalerieSeite = lazyMitNeuversuch(() => import("../seiten/BildergalerieSeite"));
 const ReferenzenSeite = lazyMitNeuversuch(() => import("../seiten/ReferenzenSeite"));
 const ImpressumSeite  = lazyMitNeuversuch(() => import("../seiten/ImpressumSeite"));
 const DatenschutzSeite = lazyMitNeuversuch(() => import("../seiten/DatenschutzSeite"));
-
-// Leitet die alte Galerie-Route "/projekte/:slug/bilder" dauerhaft auf den
-// neuen Deep-Link "/bilder/:slug" um (Lazy-Chunk-frei, kein extra Bundle).
-function AlteGalerieUmleitung() {
-  const { slug } = useParams<{ slug: string }>();
-  return <Navigate to={slug ? galeriePfad(slug) : "/bilder"} replace />;
-}
 
 // Fallback während eine Seite geladen wird
 function SeitenLadeindikator() {
@@ -88,7 +79,6 @@ function useRoutenVorladen() {
       void import("../seiten/OsintToolSeite");
       void import("../seiten/KontaktSeite");
       void import("../seiten/VoiceDemoSeite");
-      void import("../seiten/BildergalerieSeite");
     };
     const hatIdle = "requestIdleCallback" in window;
     const id = hatIdle
@@ -129,10 +119,6 @@ export function Routen() {
           <Route path="/osint-tools"   element={<OsintToolSeite />} />
           <Route path="/kontakt"       element={<KontaktSeite />} />
           <Route path="/voice-demo"    element={<VoiceDemoSeite />} />
-          <Route path="/bilder"        element={<BildergalerieSeite />} />
-          <Route path="/bilder/:slug"  element={<BildergalerieSeite />} />
-          {/* Alt-Route dauerhaft auf den neuen Deep-Link umgeleitet */}
-          <Route path="/projekte/:slug/bilder" element={<AlteGalerieUmleitung />} />
           <Route path="/security-programm" element={<SecurityProgrammSeite />} />
           <Route path="/impressum"     element={<ImpressumSeite />} />
           <Route path="/datenschutz"   element={<DatenschutzSeite />} />

@@ -1,5 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════
-// TEST: ProjekteView — "Bilder →"-Button bleibt erhalten + Ziel aus galeriePfad
+// TEST: ProjekteView — Mehrwert-Block + Vorschau-Bild-Buttons im Detail
+// (die separate Bildergalerie-Seite wurde entfernt; Bilder leben jetzt
+// in der Projekt-Karte und öffnen die Lightbox).
 // ═══════════════════════════════════════════════════════════════════
 
 import { describe, it, expect } from "vitest";
@@ -7,10 +9,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import ProjekteView from "../views/ProjekteView";
 import { PROJEKTE } from "../models/daten";
-import { galeriePfad } from "../hilfsmittel/galeriePfad";
 
-// Die "Bilder →"-Buttons liegen im aufklappbaren Detail jeder ProjektKarte.
-// Für die Tests klappen wir alle Karten auf (aria-expanded="false" → Klick).
+// Alle aufklappbaren Karten öffnen (Kopf-Button hat aria-expanded="false").
 function renderProjekteAufgeklappt() {
   const ergebnis = render(
     <MemoryRouter>
@@ -24,23 +24,16 @@ function renderProjekteAufgeklappt() {
   return ergebnis;
 }
 
-describe("ProjekteView — Bilder-Button", () => {
-  it("zeigt für jedes Projekt mit Galerie einen 'Bilder →'-Link", () => {
+describe("ProjekteView — Detail", () => {
+  it("zeigt für jedes Projekt den Mehrwert-Block 'WAS ES BRINGT'", () => {
     renderProjekteAufgeklappt();
-    const mitGalerie = PROJEKTE.filter((p) => p.galerieSlug && (p.bilder?.length ?? 0) > 0);
-    const buttons = screen.getAllByRole("link", { name: /Bilder →/ });
-    expect(buttons).toHaveLength(mitGalerie.length);
+    expect(screen.getAllByText("WAS ES BRINGT")).toHaveLength(PROJEKTE.length);
   });
 
-  it("verlinkt das Galerie-Ziel über galeriePfad(slug) = /bilder/<slug>", () => {
+  it("zeigt je Projektbild einen Vorschau-Button, der die grosse Ansicht öffnet", () => {
     renderProjekteAufgeklappt();
-    const projekt = PROJEKTE.find((p) => p.galerieSlug && (p.bilder?.length ?? 0) > 0)!;
-    const buttons = screen.getAllByRole("link", { name: /Bilder →/ });
-    const ziele = buttons.map((b) => b.getAttribute("href"));
-    expect(ziele).toContain(galeriePfad(projekt.galerieSlug!));
-    // Keiner zeigt mehr auf die alte Route.
-    for (const ziel of ziele) {
-      expect(ziel).toMatch(/^\/bilder\//);
-    }
+    const erwartet = PROJEKTE.reduce((n, p) => n + (p.bilder?.length ?? 0), 0);
+    const buttons = screen.queryAllByRole("button", { name: /Bild gross anzeigen:/ });
+    expect(buttons).toHaveLength(erwartet);
   });
 });

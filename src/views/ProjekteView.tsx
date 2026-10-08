@@ -7,8 +7,8 @@ import { AbzeichenStatus, TechTag } from "../bausteine/AbzeichenStatus";
 import { AusklappKarte } from "../bausteine/AusklappKarte";
 import { Knopf } from "../bausteine/Knopf";
 import { GlassTabs, type GlassTab } from "../bausteine/GlassTabs";
+import { BilderLightbox } from "../bausteine/BilderLightbox";
 import { KATEGORIE_KONFIGURATION, kategorieKonfig } from "../models/kategorieKonfiguration";
-import { galeriePfad } from "../hilfsmittel/galeriePfad";
 
 // ─── Kategorie-Konfiguration ──────────────────────────────────────
 // Akzentfarben + Labels kommen aus der gemeinsamen Quelle
@@ -23,9 +23,10 @@ const FILTER_TABS: GlassTab[] = [
 
 // ─── Projekt-Karte ────────────────────────────────────────────────
 
-function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
+function ProjektKarte({ projekt, onBildKlick }: { projekt: ProjektModel; onBildKlick: (index: number) => void }) {
   const [offen, setOffen] = useState(false);
   const cfg = kategorieKonfig(projekt.kategorie);
+  const bilder = projekt.bilder ?? [];
 
   return (
     <AusklappKarte
@@ -64,6 +65,17 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
         <div className="space-y-4">
           <p className="text-sm text-white/70 leading-relaxed">{projekt.langbeschreibung}</p>
 
+          {/* Was es bringt — kurzer, leicht verständlicher Nutzen */}
+          <div
+            className="rounded-2xl2 border p-4"
+            style={{ borderColor: `${cfg.akzentFarbe}33`, background: `${cfg.akzentFarbe}0d` }}
+          >
+            <p className="font-mono text-[11px] tracking-widest mb-1.5" style={{ color: `${cfg.akzentFarbe}cc` }}>
+              WAS ES BRINGT
+            </p>
+            <p className="text-sm text-white/75 leading-relaxed">{projekt.mehrwert}</p>
+          </div>
+
           <div>
             <p className="font-mono text-[11px] tracking-widest mb-2.5"
               style={{ color: `${cfg.akzentFarbe}99` }}>
@@ -82,16 +94,43 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
             </ul>
           </div>
 
-          {(projekt.linkGithub || projekt.linkLive || projekt.linkDemo || (projekt.bilder?.length && projekt.galerieSlug)) && (
+          {/* Vorschau-Leiste — horizontal scrollbar, Klick öffnet den grossen Viewer */}
+          {bilder.length > 0 && (
+            <div>
+              <p className="font-mono text-[11px] tracking-widest mb-2.5" style={{ color: `${cfg.akzentFarbe}99` }}>
+                BILDER
+              </p>
+              <ul className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-1 px-1">
+                {bilder.map((bild, i) => (
+                  <li key={bild.quelle} className="snap-start flex-shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => onBildKlick(i)}
+                      aria-label={`Bild gross anzeigen: ${bild.titel}`}
+                      className="group relative block w-28 sm:w-32 aspect-[3/4] overflow-hidden rounded-xl2 border border-white/10 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-akzent-400/70 hover:border-white/25"
+                    >
+                      <img
+                        src={bild.quelle}
+                        alt={bild.titel}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-2 py-1 text-[10px] text-white/85 truncate">
+                        {bild.titel}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {(projekt.linkGithub || projekt.linkLive || projekt.linkDemo) && (
             <div className="flex flex-wrap gap-2 pt-1">
               {projekt.linkGithub && (
                 <Knopf variante="sekundaer" zuUrl={projekt.linkGithub} klassen="text-xs">
                   GitHub →
-                </Knopf>
-              )}
-              {projekt.galerieSlug && (projekt.bilder?.length ?? 0) > 0 && (
-                <Knopf variante="sekundaer" zuRoute={galeriePfad(projekt.galerieSlug)} klassen="text-xs">
-                  Bilder →
                 </Knopf>
               )}
               {projekt.linkLive && (
@@ -116,6 +155,7 @@ function ProjektKarte({ projekt }: { projekt: ProjektModel }) {
 
 export default function ProjekteView() {
   const [aktiverFilter, setAktiverFilter] = useState<string>("alle");
+  const [lightbox, setLightbox] = useState<{ projekt: ProjektModel; index: number } | null>(null);
 
   const gefilterteProjekte = aktiverFilter === "alle"
     ? PROJEKTE
@@ -198,10 +238,19 @@ export default function ProjekteView() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.06, duration: 0.35, ease: "easeOut" }}
           >
-            <ProjektKarte projekt={projekt} />
+            <ProjektKarte
+              projekt={projekt}
+              onBildKlick={(i) => setLightbox({ projekt, index: i })}
+            />
           </motion.div>
         ))}
       </motion.div>
+
+      <BilderLightbox
+        projekt={lightbox?.projekt ?? null}
+        startIndex={lightbox?.index ?? 0}
+        onSchliessen={() => setLightbox(null)}
+      />
     </section>
   );
 }
