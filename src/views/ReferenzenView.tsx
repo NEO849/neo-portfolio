@@ -11,7 +11,8 @@ import { AbschnittsTitel } from "../bausteine/AbschnittsTitel";
 import { InfoKarte } from "../bausteine/InfoKarte";
 import { AusklappKarte } from "../bausteine/AusklappKarte";
 import { TrustBoundaryDiagramm } from "../bausteine/TrustBoundaryDiagramm";
-import { TerminalDemo } from "../bausteine/TerminalDemo";
+import { AngriffsSimulation } from "../bausteine/AngriffsSimulation";
+import { PipelineKette } from "../bausteine/PipelineKette";
 import {
   REPORTE, WEITERE_BEFUNDE, BEISPIEL_BERICHT, SCHWERE_META,
 } from "../models/referenzenDaten";
@@ -107,8 +108,10 @@ function ReportDoc({ r }: { r: AnonymerReport }) {
           <DokListe titel="Empfohlene Behebung" hex={m.hex} punkte={r.remediation} />
 
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40 mb-2">Live-Demo (Mock-Daten)</p>
-            <TerminalDemo skript={r.demo} />
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40 mb-2">
+              Angriffs-Simulation — vom automatisierten Fund bis zum maximalen Schaden
+            </p>
+            <AngriffsSimulation kette={r.angriff} />
           </div>
         </div>
       }
@@ -138,8 +141,8 @@ function KurzBefundKarte({ b }: { b: KurzBefund }) {
       }
       detail={
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40 mb-2">Live-Demo (Mock-Daten)</p>
-          <TerminalDemo skript={b.demo} />
+          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40 mb-2">Angriffs-Simulation (Mock)</p>
+          <AngriffsSimulation kette={b.angriff} />
         </div>
       }
     />
@@ -155,7 +158,18 @@ export default function ReferenzenView() {
         klassen="mb-8"
       />
 
+      {/* Wie wir finden — die automatisierte Pipeline */}
+      <div className="mb-12">
+        <h3 className="font-display text-lg font-bold text-white mb-1">Wie wir finden: die automatisierte Pipeline</h3>
+        <p className="text-sm text-white/50 mb-5">
+          Dieselbe Recon-Pipeline, die diese Befunde aufgespürt hat — vom Scope bis zum priorisierten Kandidaten,
+          jeder Schritt reproduzierbar.
+        </p>
+        <PipelineKette />
+      </div>
+
       {/* Flaggschiff-Reporte */}
+      <h3 className="font-display text-lg font-bold text-white mb-4">Ausgewählte Befunde</h3>
       <div className="space-y-4">
         {REPORTE.map((r) => (
           <ReportDoc key={r.id} r={r} />
