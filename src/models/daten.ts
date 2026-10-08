@@ -42,9 +42,6 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "NetScope - Netzwerk- & Paketanalyse",
-    bilder: [
-      { quelle: "/projekte/netscope/cover.svg", titel: "NetScope", text: "Netzwerk- & Paketanalyse mit eigener Web-UI." },
-    ],
     kurzbeschreibung: "Ein self-hosted Analyse-Tool, das Netzwerkverkehr aufzeichnet und verständlich darstellt — Aufnahmen, Pakete und Datenflüsse in einer eigenen Web-Oberfläche.",
     langbeschreibung: "NetScope bündelt tshark und ntopng hinter einer eigenen Web-UI: Aufnahmen starten, Pakete filtern, Streams folgen und Verbindungen visuell nachvollziehen. Läuft ausschließlich im eigenen Tailscale-Netz, nichts wird nach außen gegeben.",
     mehrwert: "Macht sichtbar, was im Netzwerk wirklich passiert — ohne Daten aus der Hand zu geben.",
@@ -61,9 +58,6 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "ntfy-Alerting-Stack - Ausfälle sofort bemerken",
-    bilder: [
-      { quelle: "/projekte/ntfy-stack/cover.svg", titel: "ntfy-Alerting-Stack", text: "Self-hosted Alerting, ausfallresistent." },
-    ],
     kurzbeschreibung: "Ein self-hosted Benachrichtigungs-System, das kritische Ereignisse (Ausfälle, Funde, Health-Warnungen) sofort aufs Handy bringt — abgesichert und ausfallresistent.",
     langbeschreibung: "Ein selbst betriebener ntfy-Server (nur im Tailscale-Netz, Token-Auth, deny-all) mit geteilter Sende-Bibliothek, Themen-Kanälen und einem OnFailure-Netz: Schlägt ein Dienst fehl, gibt es automatisch eine Nachricht — mit Schutz gegen Benachrichtigungs-Schleifen und einem externen Dead-Man's-Switch.",
     mehrwert: "Probleme fallen sofort auf, statt erst wenn jemand sie zufällig bemerkt.",
@@ -100,9 +94,6 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "Neo Dev Stack - AI-Augmented Security Workstation",
-    bilder: [
-      { quelle: "/projekte/neo-dev-stack/cover.svg", titel: "Neo Dev Stack", text: "KI-gesteuerte Security-Workstation." },
-    ],
     mehrwert: "Ein Auftrag läuft von der Recherche bis zum Report an einem Ort — weniger Werkzeug-Wechsel, jeder Schritt nachvollziehbar und wiederholbar.",
     kurzbeschreibung: "Eine selbst gebaute, KI-gesteuerte Arbeitsumgebung, die wiederkehrende Sicherheits- und Recherche-Aufgaben automatisiert: spezialisierte KI-Agenten, kostenlose lokale KI-Modelle und über 80 Werkzeuge greifen nahtlos ineinander.",
     langbeschreibung: "Der Gewinn liegt im Zusammenspiel: Ein Auftrag läuft durchgehend an einem Ort (von der ersten Recherche über die Analyse bis zum fertigen Report), statt zwischen Dutzenden Programmen zu springen. Jeder Schritt bleibt dabei nachvollziehbar dokumentiert und lässt sich jederzeit identisch wiederholen.",
@@ -152,9 +143,6 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "claude-bus - Mac↔Server↔iPhone Mailbox-Bridge",
-    bilder: [
-      { quelle: "/projekte/claude-bus/cover.svg", titel: "claude-bus", text: "Sichere Brücke zwischen Mac, Server und iPhone." },
-    ],
     mehrwert: "Aufgaben unterwegs am iPhone starten und am Rechner weiterführen — Komfort über Geräte hinweg, ohne Abstriche bei der Sicherheit.",
     kurzbeschreibung: "Eine sichere Brücke zwischen meinen Geräten (Mac, Server und iPhone): Aufgaben und Ergebnisse wandern verschlüsselt hin und her, mit strengen Zugriffsgrenzen und durchgehender Überwachung.",
     langbeschreibung: "In der Praxis heißt das: Ich starte eine Aufgabe unterwegs am iPhone und führe sie nahtlos am Rechner weiter. Das mobile Gerät darf dabei bewusst nur das Nötigste. Komfort geht so nicht auf Kosten der Sicherheit.",
@@ -201,9 +189,6 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "bb_recon - Research OSINT-Toolkit",
-    bilder: [
-      { quelle: "/projekte/bb-recon/cover.svg", titel: "bb_recon", text: "OSINT-Toolkit, 30+ Quellen parallel." },
-    ],
     mehrwert: "Alle öffentlichen Spuren zu einem Ziel in Sekunden statt Stunden — ein sauber sortiertes Gesamtbild statt verstreuter Einzeltreffer.",
     kurzbeschreibung: "Ein Recherche-Werkzeug, das öffentlich verfügbare Informationen zu einem Ziel aus über 30 Quellen in Sekunden zusammenträgt und übersichtlich aufbereitet, komplett ohne kostenpflichtige Schnittstellen.",
     langbeschreibung: "Alle Quellen laufen parallel; fällt eine aus, stört das die anderen nicht. Am Ende steht ein sauber sortiertes Gesamtbild mit einer Verlässlichkeits-Einstufung pro Fund, statt einer Handvoll verstreuter Einzeltreffer.",
@@ -223,9 +208,6 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "NeoRecon - Research Exploit Engine",
-    bilder: [
-      { quelle: "/projekte/neorecon/cover.svg", titel: "NeoRecon", text: "7-Phasen Recon- & Exploit-Engine." },
-    ],
     mehrwert: "Aus Hunderttausenden Adressen in Sekunden eine priorisierte Prüf-Liste — die Zeit fließt in die Analyse statt ins Sortieren.",
     kurzbeschreibung: "Eine durchgängige Pipeline für autorisierte Sicherheits-Recherche: Sie sammelt Angriffsflächen, bewertet sie automatisch und liefert am Ende eine konkrete, priorisierte Prüf-Liste, aus Hunderttausenden Adressen in Sekunden.",
     langbeschreibung: "So fließt die Zeit in die eigentliche Analyse statt ins Sortieren riesiger Datenmengen. Jeder Lauf ist wiederholbar und an jeder Stelle nachvollziehbar, was wie bewertet wurde.",
@@ -246,9 +228,6 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "Exploit Dashboard - Vulnerability Testing Interface",
-    bilder: [
-      { quelle: "/projekte/exploit-dashboard/cover.svg", titel: "Exploit Dashboard", text: "Vulnerability-Testing-Interface." },
-    ],
     mehrwert: "Sicherheitstests werden übersichtlich und vergleichbar — die spannendsten Ziele kommen vorsortiert, nichts geht in Terminal-Ausgaben unter.",
     kurzbeschreibung: "Ein Browser-Dashboard, das Sicherheitstests übersichtlich und nachvollziehbar macht: priorisierte Ziele, Wiederhol-Tests per Klick und eine visuelle Darstellung verketteter Angriffspfade.",
     langbeschreibung: "Es hängt direkt an meiner Recon-Pipeline, sodass die spannendsten Ziele schon vorsortiert ankommen. Was sonst in verstreuten Terminal-Ausgaben untergeht, wird hier zu einem klaren, vergleichbaren Bild.",
@@ -268,9 +247,6 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "ONE - Multi-Agent AI Chat",
-    bilder: [
-      { quelle: "/projekte/one/cover.svg", titel: "ONE", text: "Multi-Agent AI Chat für iOS." },
-    ],
     mehrwert: "Claude, GPT und Gemini in einer App — für jede Frage das passende Modell, ohne zu wechseln, Schlüssel sicher auf dem Gerät.",
     kurzbeschreibung: "Eine iOS-App, die mehrere KI-Modelle (Claude, GPT und Gemini) in einer einzigen, aufgeräumten Oberfläche vereint.",
     langbeschreibung: "So lässt sich für jede Frage das passende Modell wählen, ohne die App zu wechseln. Unter der Oberfläche sorgt eine saubere Architektur dafür, dass Zugangsschlüssel sicher auf dem Gerät bleiben und der Stand über alle Geräte synchron ist.",
@@ -348,9 +324,6 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "OSINT Toolkit - Modulares Analyse-Framework",
-    bilder: [
-      { quelle: "/projekte/osint-toolkit/cover.svg", titel: "OSINT Toolkit", text: "Modulares Analyse-Framework." },
-    ],
     mehrwert: "Sieben Recherche-Bausteine unter einer Oberfläche — jede Analyse am Ende sauber als Report dokumentiert.",
     kurzbeschreibung: "Ein modulares Recherche-Tool mit sieben Bausteinen (E-Mail, Benutzername, Telefon, Domain, Bildersuche und mehr), das öffentliche Online-Spuren strukturiert auswertet und als Report ausgibt.",
     langbeschreibung: "Statt sieben Programme nacheinander zu bedienen, laufen alle Bausteine über eine Oberfläche zusammen. Jede Analyse wird am Ende automatisch dokumentiert, als Text- und JSON-Datei, direkt weiterverwendbar.",
