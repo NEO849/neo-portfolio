@@ -66,8 +66,8 @@ const BANNER: Banner[] = [
     ),
   },
   {
-    pfad: "/security", titel: "Security & Analyse",
-    nutzen: "Schwachstellen finden, bevor andere es tun: der Blick des Angreifers.",
+    pfad: "/security", titel: "KI-automatisierte Pentests",
+    nutzen: "Schwachstellen finden, bevor andere es tun — KI-gestützt, mit dem Blick des Angreifers.",
     icon: (
       <svg {...ICON_PROPS}><path d="M12 2.5l7.5 3.2v5.1c0 4.7-3.2 8-7.5 9.7-4.3-1.7-7.5-5-7.5-9.7V5.7z" /><path d="m9 11.7 2 2 3.6-4" /></svg>
     ),

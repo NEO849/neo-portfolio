@@ -48,6 +48,7 @@ describe('daten.ts — Senior-Elite Invarianten', () => {
         expect(p.titel).toBeTruthy();
         expect(p.kurzbeschreibung).toBeTruthy();
         expect(p.langbeschreibung).toBeTruthy();
+        expect(p.mehrwert).toBeTruthy();
         expect(p.kategorie).toMatch(/^(security|development|tooling)$/);
         expect(p.technologien.length).toBeGreaterThan(0);
         expect(p.highlights.length).toBeGreaterThan(0);

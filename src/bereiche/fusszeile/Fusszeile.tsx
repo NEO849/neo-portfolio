@@ -34,8 +34,8 @@ export function Fusszeile() {
               />
             </Link>
             <p className="text-xs text-white/70 leading-relaxed max-w-xs">
-              KI-Automation & Integration · Linux/Infrastruktur · Security.<br />
-              Produktive Systeme, selbst gebaut und betrieben.
+              Sichere KI-Automation & KI-automatisierte Pentests.<br />
+              KI-Systeme bauen, absichern und prüfen — aus einer Hand, aus Nürnberg.
             </p>
           </div>
 
@@ -95,8 +95,10 @@ export function Fusszeile() {
             <span className="text-akzent-400">© {aktuellesJahr()} {PERSOENLICH.name}</span>
             {". Alle Rechte vorbehalten"}
           </p>
-          <p className="text-xs text-white/60 font-mono">
-            Gebaut mit React · TypeScript · Framer Motion
+          <p className="text-xs text-white/60 font-mono flex items-center gap-3">
+            <Link to="/impressum" className="hover:text-akzent-400 transition-colors">Impressum</Link>
+            <span className="text-white/20">·</span>
+            <Link to="/datenschutz" className="hover:text-akzent-400 transition-colors">Datenschutz</Link>
           </p>
         </div>
       </div>

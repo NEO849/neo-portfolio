@@ -18,7 +18,92 @@ export const NAVIGATION: NavigationModel[] = [
 
 export const PROJEKTE: ProjektModel[] = [
   {
+    titel: "PRIFRAME - On-Device Video- & Bild-Anonymisierung",
+    bilder: [
+      { quelle: "/projekte/priframe/live-intro.png", titel: "Start", text: "Einstieg in PRIFRAME — Anonymisierung direkt im Browser." },
+      { quelle: "/projekte/priframe/face-person.png", titel: "Gesichts-/Personen-Erkennung", text: "Erkannte Regionen werden on-device markiert." },
+      { quelle: "/projekte/priframe/face-export.png", titel: "Export", text: "Anonymisiertes Ergebnis, nichts verlässt das Gerät." },
+      { quelle: "/projekte/priframe/pricing.png", titel: "Produkt", text: "Das Live-Produkt unter priframe.com." },
+    ],
+    kurzbeschreibung: "Gesichter und Personen in Videos und Bildern unkenntlich machen — vollständig im Browser, auf dem eigenen Gerät. Kein Upload, nichts verlässt den Rechner.",
+    langbeschreibung: "PRIFRAME erkennt Gesichter und Personen über ein im Browser laufendes KI-Modell (on-device, WebGPU/WASM) und anonymisiert sie frame-genau. Weil die Verarbeitung lokal passiert, verlassen die Aufnahmen nie das Gerät — das macht es datenschutzfreundlich und für sensibles Material geeignet.",
+    mehrwert: "Sensible Aufnahmen DSGVO-freundlich anonymisieren, ohne sie je hochzuladen — Datenschutz by design.",
+    kategorie: "tooling",
+    technologien: ["TypeScript", "WebGPU", "ONNX Runtime Web", "WASM", "Vite", "On-Device-Inferenz"],
+    highlights: [
+      "Gesichts- und Personen-Erkennung vollständig on-device im Browser",
+      "Kein Upload — Aufnahmen verlassen das Gerät nicht",
+      "Frame-genaue Anonymisierung von Video und Bild",
+      "Lizenzreines Modell für den kommerziellen Einsatz",
+    ],
+    linkLive: "https://priframe.com",
+    zeitraum: "2026 - heute",
+    status: "aktiv",
+  },
+  {
+    titel: "NetScope - Netzwerk- & Paketanalyse",
+    bilder: [
+      { quelle: "/projekte/netscope/cover.svg", titel: "NetScope", text: "Netzwerk- & Paketanalyse mit eigener Web-UI." },
+    ],
+    kurzbeschreibung: "Ein self-hosted Analyse-Tool, das Netzwerkverkehr aufzeichnet und verständlich darstellt — Aufnahmen, Pakete und Datenflüsse in einer eigenen Web-Oberfläche.",
+    langbeschreibung: "NetScope bündelt tshark und ntopng hinter einer eigenen Web-UI: Aufnahmen starten, Pakete filtern, Streams folgen und Verbindungen visuell nachvollziehen. Läuft ausschließlich im eigenen Tailscale-Netz, nichts wird nach außen gegeben.",
+    mehrwert: "Macht sichtbar, was im Netzwerk wirklich passiert — ohne Daten aus der Hand zu geben.",
+    kategorie: "tooling",
+    technologien: ["tshark", "ntopng", "Python", "systemd", "Tailscale", "Canvas"],
+    highlights: [
+      "Aufnahme und Analyse von Netzwerkverkehr",
+      "Follow-Stream im Detail-Viewer",
+      "Eigene Web-UI im Machined-Graphite-Look",
+      "Nur im eigenen Netz erreichbar (Tailscale)",
+    ],
+    zeitraum: "2026 - heute",
+    status: "aktiv",
+  },
+  {
+    titel: "ntfy-Alerting-Stack - Ausfälle sofort bemerken",
+    bilder: [
+      { quelle: "/projekte/ntfy-stack/cover.svg", titel: "ntfy-Alerting-Stack", text: "Self-hosted Alerting, ausfallresistent." },
+    ],
+    kurzbeschreibung: "Ein self-hosted Benachrichtigungs-System, das kritische Ereignisse (Ausfälle, Funde, Health-Warnungen) sofort aufs Handy bringt — abgesichert und ausfallresistent.",
+    langbeschreibung: "Ein selbst betriebener ntfy-Server (nur im Tailscale-Netz, Token-Auth, deny-all) mit geteilter Sende-Bibliothek, Themen-Kanälen und einem OnFailure-Netz: Schlägt ein Dienst fehl, gibt es automatisch eine Nachricht — mit Schutz gegen Benachrichtigungs-Schleifen und einem externen Dead-Man's-Switch.",
+    mehrwert: "Probleme fallen sofort auf, statt erst wenn jemand sie zufällig bemerkt.",
+    kategorie: "tooling",
+    technologien: ["ntfy", "Python", "systemd", "Tailscale", "Docker"],
+    highlights: [
+      "Self-hosted, nur im eigenen Netz, Token-Auth (deny-all)",
+      "Geteilte Sende-Lib und getrennte Themen-Kanäle",
+      "OnFailure-Netz mit Schleifen-Schutz",
+      "Externer Dead-Man's-Switch für den Ernstfall",
+    ],
+    zeitraum: "2026 - heute",
+    status: "aktiv",
+  },
+  {
+    titel: "agentdeck - Live-Agenten-Panel für Claude Code (Open Source)",
+    bilder: [
+      { quelle: "/projekte/agentdeck/hero.png", titel: "Live-Agenten-Panel", text: "Alle laufenden Agenten über Sessions hinweg im Blick." },
+    ],
+    kurzbeschreibung: "Eine Integrationsschicht, die ein Live-Panel aller laufenden KI-Agenten (Status, Prompts, Tool-Calls, Git-Stand) in einem Befehl in die Terminal-Arbeitsumgebung bringt. Öffentlich auf GitHub.",
+    langbeschreibung: "agentdeck ist kein Fork, sondern die Integrationsschicht, die hiroppys tmux-agent-sidebar additiv und rückbaubar in Claude Code einbindet — ein Befehl, null Lock-in. Headless-VPS-tauglich, MIT-lizenziert.",
+    mehrwert: "Alle laufenden KI-Agenten auf einen Blick — in einem Befehl eingerichtet, jederzeit rückstandslos entfernbar.",
+    kategorie: "tooling",
+    technologien: ["Bash", "tmux", "Claude Code Hooks", "MIT"],
+    highlights: [
+      "Ein-Befehl-Setup, additiv und vollständig rückbaubar",
+      "Live-Panel über alle Sessions und Fenster",
+      "Headless-VPS-tauglich",
+      "Öffentlich auf GitHub, MIT-Lizenz",
+    ],
+    linkGithub: "https://github.com/NEO849/agentdeck",
+    zeitraum: "2026 - heute",
+    status: "aktiv",
+  },
+  {
     titel: "Neo Dev Stack - AI-Augmented Security Workstation",
+    bilder: [
+      { quelle: "/projekte/neo-dev-stack/cover.svg", titel: "Neo Dev Stack", text: "KI-gesteuerte Security-Workstation." },
+    ],
+    mehrwert: "Ein Auftrag läuft von der Recherche bis zum Report an einem Ort — weniger Werkzeug-Wechsel, jeder Schritt nachvollziehbar und wiederholbar.",
     kurzbeschreibung: "Eine selbst gebaute, KI-gesteuerte Arbeitsumgebung, die wiederkehrende Sicherheits- und Recherche-Aufgaben automatisiert: spezialisierte KI-Agenten, kostenlose lokale KI-Modelle und über 80 Werkzeuge greifen nahtlos ineinander.",
     langbeschreibung: "Der Gewinn liegt im Zusammenspiel: Ein Auftrag läuft durchgehend an einem Ort (von der ersten Recherche über die Analyse bis zum fertigen Report), statt zwischen Dutzenden Programmen zu springen. Jeder Schritt bleibt dabei nachvollziehbar dokumentiert und lässt sich jederzeit identisch wiederholen.",
     kategorie: "tooling",
@@ -36,6 +121,7 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "markmem - Selbst-lernendes KI-Gedächtnis (Open Source)",
+    mehrwert: "Ein Notizsystem, das nichts vergisst und seine eigene Trefferqualität misst — Wissen bleibt auffindbar, statt in alten Dateien zu versanden.",
     kurzbeschreibung: "Ein KI-Gedächtnis auf Markdown + git: es ruft semantisch ab, lernt aus Korrekturen, verdichtet sich selbst und tunt seine eigene Suche, sichtbar gemacht durch ein responsives Terminal-Dashboard (memDash). Öffentlich auf GitHub.",
     langbeschreibung: "markmem macht aus einem gewachsenen Markdown-Notizsystem ein Gedächtnis, das nichts vergisst und seine eigene Qualität misst. Der Abruf ist HybridRAG: Volltext (BM25), Wissens-Graph und semantische Vektor-Embeddings (Ollama / bge-m3) werden per gewichtetem Reciprocal Rank Fusion zusammengeführt. Markdown + git bleiben die einzige Quelle der Wahrheit. Keine schwere Vektor-Datenbank, nur SQLite + NumPy, jeder Index ist daraus neu baubar. Eine echte Lern-Schleife (Korrektur, Überraschung, Confidence-Kalibrierung, aktive Sackgassen-Hemmung) und ein Self-Tuning-Eval-Harness (misst Recall@1, optimiert die Such-Gewichte per Grid-Search) halten das System ehrlich. Fail-open im Kern (pure Python-stdlib), getestet via GitHub Actions über Python 3.11-3.13, MIT-lizenziert.",
     kategorie: "tooling",
@@ -66,6 +152,10 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "claude-bus - Mac↔Server↔iPhone Mailbox-Bridge",
+    bilder: [
+      { quelle: "/projekte/claude-bus/cover.svg", titel: "claude-bus", text: "Sichere Brücke zwischen Mac, Server und iPhone." },
+    ],
+    mehrwert: "Aufgaben unterwegs am iPhone starten und am Rechner weiterführen — Komfort über Geräte hinweg, ohne Abstriche bei der Sicherheit.",
     kurzbeschreibung: "Eine sichere Brücke zwischen meinen Geräten (Mac, Server und iPhone): Aufgaben und Ergebnisse wandern verschlüsselt hin und her, mit strengen Zugriffsgrenzen und durchgehender Überwachung.",
     langbeschreibung: "In der Praxis heißt das: Ich starte eine Aufgabe unterwegs am iPhone und führe sie nahtlos am Rechner weiter. Das mobile Gerät darf dabei bewusst nur das Nötigste. Komfort geht so nicht auf Kosten der Sicherheit.",
     kategorie: "tooling",
@@ -84,6 +174,7 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "voice-bridge - Lokaler Whisper-Voice-Daemon mit Apple-UI",
+    mehrwert: "Gedanken werden zum Befehl, ohne Tippen — oft schneller als die Tastatur, und alles bleibt auf eigener Hardware privat.",
     kurzbeschreibung: "Sprachsteuerung fürs Smartphone: Eingesprochene Aufgaben werden direkt auf dem eigenen Server (ohne Cloud-Kosten) in Text umgewandelt und landen sofort in der Arbeitssitzung. Mit einer Oberfläche auf Apple-Niveau.",
     langbeschreibung: "Der eigentliche Gewinn: Gedanken werden zum Befehl, ohne die Hände an der Tastatur, gerade bei langen oder umständlichen Anweisungen oft schneller als Tippen. Und weil alles auf eigener Hardware verarbeitet wird, bleiben die Inhalte vollständig privat.",
     kategorie: "tooling",
@@ -110,6 +201,10 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "bb_recon - Research OSINT-Toolkit",
+    bilder: [
+      { quelle: "/projekte/bb-recon/cover.svg", titel: "bb_recon", text: "OSINT-Toolkit, 30+ Quellen parallel." },
+    ],
+    mehrwert: "Alle öffentlichen Spuren zu einem Ziel in Sekunden statt Stunden — ein sauber sortiertes Gesamtbild statt verstreuter Einzeltreffer.",
     kurzbeschreibung: "Ein Recherche-Werkzeug, das öffentlich verfügbare Informationen zu einem Ziel aus über 30 Quellen in Sekunden zusammenträgt und übersichtlich aufbereitet, komplett ohne kostenpflichtige Schnittstellen.",
     langbeschreibung: "Alle Quellen laufen parallel; fällt eine aus, stört das die anderen nicht. Am Ende steht ein sauber sortiertes Gesamtbild mit einer Verlässlichkeits-Einstufung pro Fund, statt einer Handvoll verstreuter Einzeltreffer.",
     kategorie: "security",
@@ -128,6 +223,10 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "NeoRecon - Research Exploit Engine",
+    bilder: [
+      { quelle: "/projekte/neorecon/cover.svg", titel: "NeoRecon", text: "7-Phasen Recon- & Exploit-Engine." },
+    ],
+    mehrwert: "Aus Hunderttausenden Adressen in Sekunden eine priorisierte Prüf-Liste — die Zeit fließt in die Analyse statt ins Sortieren.",
     kurzbeschreibung: "Eine durchgängige Pipeline für autorisierte Sicherheits-Recherche: Sie sammelt Angriffsflächen, bewertet sie automatisch und liefert am Ende eine konkrete, priorisierte Prüf-Liste, aus Hunderttausenden Adressen in Sekunden.",
     langbeschreibung: "So fließt die Zeit in die eigentliche Analyse statt ins Sortieren riesiger Datenmengen. Jeder Lauf ist wiederholbar und an jeder Stelle nachvollziehbar, was wie bewertet wurde.",
     kategorie: "security",
@@ -147,6 +246,10 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "Exploit Dashboard - Vulnerability Testing Interface",
+    bilder: [
+      { quelle: "/projekte/exploit-dashboard/cover.svg", titel: "Exploit Dashboard", text: "Vulnerability-Testing-Interface." },
+    ],
+    mehrwert: "Sicherheitstests werden übersichtlich und vergleichbar — die spannendsten Ziele kommen vorsortiert, nichts geht in Terminal-Ausgaben unter.",
     kurzbeschreibung: "Ein Browser-Dashboard, das Sicherheitstests übersichtlich und nachvollziehbar macht: priorisierte Ziele, Wiederhol-Tests per Klick und eine visuelle Darstellung verketteter Angriffspfade.",
     langbeschreibung: "Es hängt direkt an meiner Recon-Pipeline, sodass die spannendsten Ziele schon vorsortiert ankommen. Was sonst in verstreuten Terminal-Ausgaben untergeht, wird hier zu einem klaren, vergleichbaren Bild.",
     kategorie: "tooling",
@@ -165,6 +268,10 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "ONE - Multi-Agent AI Chat",
+    bilder: [
+      { quelle: "/projekte/one/cover.svg", titel: "ONE", text: "Multi-Agent AI Chat für iOS." },
+    ],
+    mehrwert: "Claude, GPT und Gemini in einer App — für jede Frage das passende Modell, ohne zu wechseln, Schlüssel sicher auf dem Gerät.",
     kurzbeschreibung: "Eine iOS-App, die mehrere KI-Modelle (Claude, GPT und Gemini) in einer einzigen, aufgeräumten Oberfläche vereint.",
     langbeschreibung: "So lässt sich für jede Frage das passende Modell wählen, ohne die App zu wechseln. Unter der Oberfläche sorgt eine saubere Architektur dafür, dass Zugangsschlüssel sicher auf dem Gerät bleiben und der Stand über alle Geräte synchron ist.",
     kategorie: "development",
@@ -180,6 +287,7 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "Sports Almanach - Smart Betting App",
+    mehrwert: "Aus nüchternen Zahlen greifbare Einschätzungen — mit Spielgeld, ganz ohne finanzielles Risiko.",
     kurzbeschreibung: "Eine iOS-App rund um Sportwetten mit Spielgeld: Ein selbst entwickelter Algorithmus errechnet Quoten aus historischen Ergebnissen und dem Austragungsort, dazu Team- und Spielervergleiche und ein Sportkalender.",
     langbeschreibung: "Aus nüchternen Zahlen werden so greifbare Einschätzungen, und weil ausschließlich mit virtuellem Guthaben getippt wird, ganz ohne finanzielles Risiko. Je mehr Ergebnisse einfließen, desto treffsicherer werden die berechneten Quoten.",
     kategorie: "development",
@@ -210,6 +318,7 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "Z Almanach - Dragon Ball Z Kompendium",
+    mehrwert: "Ein ganzes Universum auf Deutsch durchsuchbar — Inhalte werden automatisch übersetzt, ohne manuelles Nachpflegen.",
     kurzbeschreibung: "Eine Android-App als Nachschlagewerk zum Dragon-Ball-Z-Universum: Charaktere, Verwandlungsstufen und Fraktionen im Retro-Arcade-Look. Die Daten werden automatisch ins Deutsche übersetzt.",
     langbeschreibung: "Das Besondere steckt in der Datenpipeline: Die Inhalte stammen aus einer rein spanischsprachigen Quelle und werden im Hintergrund automatisch übersetzt, bevor sie erscheinen. So ist das ganze Universum auf Deutsch durchsuchbar, ohne dass jemand manuell nachhelfen müsste.",
     kategorie: "development",
@@ -239,6 +348,10 @@ export const PROJEKTE: ProjektModel[] = [
   },
   {
     titel: "OSINT Toolkit - Modulares Analyse-Framework",
+    bilder: [
+      { quelle: "/projekte/osint-toolkit/cover.svg", titel: "OSINT Toolkit", text: "Modulares Analyse-Framework." },
+    ],
+    mehrwert: "Sieben Recherche-Bausteine unter einer Oberfläche — jede Analyse am Ende sauber als Report dokumentiert.",
     kurzbeschreibung: "Ein modulares Recherche-Tool mit sieben Bausteinen (E-Mail, Benutzername, Telefon, Domain, Bildersuche und mehr), das öffentliche Online-Spuren strukturiert auswertet und als Report ausgibt.",
     langbeschreibung: "Statt sieben Programme nacheinander zu bedienen, laufen alle Bausteine über eine Oberfläche zusammen. Jede Analyse wird am Ende automatisch dokumentiert, als Text- und JSON-Datei, direkt weiterverwendbar.",
     kategorie: "security",
@@ -494,10 +607,10 @@ export const PERSOENLICH = {
   name: "Michael Fleps",
   firma: "FREE DATA Solutions",
   standort: "Nürnberg, Bayern",
-  titel: "AI-Automation & Integration Engineer",
-  untertitel: "KI-Automation • App-Entwicklung • Infrastruktur • Security",
-  firmaTagline: "Produktive KI-Systeme, gehärtete Infrastruktur, Security mit Angreifer-Blick, selbst gebaut und betrieben.",
-  kurzvorstellung: "Ich baue Software und Automatisierung, die Arbeit abnimmt, und betreibe sie auf einer Infrastruktur, die ich selbst absichere und am Laufen halte. Vom KI-gestützten Workflow bis zum gehärteten Server: keine Demos, sondern Systeme, auf die im Alltag Verlass ist.",
+  titel: "KI-Automation, sichere KI & KI-automatisierte Pentests",
+  untertitel: "KI-Automation • Sichere KI • KI-automatisierte Pentests • Nürnberg",
+  firmaTagline: "Ich baue KI-Automation, sichere die eingesetzte KI ab und prüfe Anwendungen mit KI-automatisierten Pentests — bevor es ein Angreifer tut. Alles aus einer Hand.",
+  kurzvorstellung: "Die meisten KI-Projekte scheitern nicht an der Idee, sondern an der Umsetzung, am Datenschutz und an unklaren Kosten. Ich baue KI-Automation, die im echten Betrieb hält, sichere die eingesetzte KI von Anfang an ab und prüfe Anwendungen mit einer KI-gestützten Pentest-Pipeline — breiter und schneller als von Hand. Ein Ansprechpartner aus Nürnberg, remote im DACH-Raum.",
   email: "michael_fleps@aol.com",
   telefon: "+49 172 572 5081",
   telefonLink: "+491725725081",
@@ -523,52 +636,52 @@ export interface LeistungModel {
 
 export const LEISTUNGEN: LeistungModel[] = [
   {
-    titel: "KI-Automation & Integration",
-    nutzen: "Wiederkehrende Aufgaben übernehmen Agenten und saubere Schnittstellen, angebunden an die Werkzeuge, die Sie ohnehin nutzen.",
+    titel: "KI-Automation",
+    nutzen: "Ein wiederkehrender Büro-Prozess (Angebote und Reports erstellen, Recherche zusammenfassen, Dokumente auslesen, Support vorqualifizieren) wird zum laufenden System, gebaut für den Betrieb, nicht fürs Demo.",
     leistungen: [
-      "Workflow-Automation mit n8n, APIs und eigenen Skripten",
-      "Sprachmodelle & Agenten, mit klaren Grenzen und Kontrolle",
-      "Wissensbasis-Suche (RAG), auf Wunsch komplett auf Ihrem Server",
+      "Von der Idee zum produktiven Workflow in rund zwei Wochen",
+      "n8n, APIs, Sprachmodelle und Agenten, mit klaren Grenzen und Kontrolle",
+      "Sicherheit und Fehlerfälle von Anfang an mitgebaut, nicht nachträglich aufgesetzt",
     ],
-    ergebnis: "Weniger Handarbeit, schnellere Abläufe, weniger Fehler.",
-    farbeRgb: "79, 124, 251",
+    ergebnis: "Weniger Handarbeit, planbar zum Festpreis. Laufender Ausbau als Retainer möglich.",
+    farbeRgb: "122, 162, 255",
     akzentHex: "#7aa2ff",
   },
   {
-    titel: "Linux & Infrastruktur",
-    nutzen: "Server, die nicht nur eingerichtet, sondern verlässlich betrieben werden, abgesichert und wartbar.",
+    titel: "KI-automatisierte Pentests",
+    nutzen: "Ihre Web-App oder API auf dem Prüfstand, mit einer selbst gebauten, KI-gestützten Pentest-Pipeline, die die Angriffsfläche automatisiert erfasst, priorisiert und gezielt testet.",
     leistungen: [
-      "Gehärtete Linux- und Docker-Umgebungen (Firewall, Fail2ban, SSH)",
-      "Reverse-Proxy, Verschlüsselung, Backups und Monitoring",
-      "Automatisierung und saubere, wiederholbare Deployments",
+      "KI-gestützte Recon und Priorisierung: breiter und schneller als reine Handarbeit",
+      "Gezielte manuelle Verifikation statt blinder Scanner-Flut",
+      "Nachvollziehbare Befunde mit klarer Schwere-Einstufung und konkretem Fix",
     ],
-    ergebnis: "Eine Basis, die läuft, und die man nachts nicht im Kopf hat.",
+    ergebnis: "Mehr geprüfte Fläche in weniger Zeit und Befunde, die Sie belegen können.",
+    farbeRgb: "129, 140, 248",
+    akzentHex: "#818cf8",
+  },
+  {
+    titel: "KI-Sicherheits-Check",
+    nutzen: "Ihr Chatbot, Assistent oder KI-Agent arbeitet auf Kunden- oder Mitarbeiterdaten? Ich prüfe mit Angreifer-Blick, ob man ihn zur Preisgabe von Daten bringen kann, die er nicht hergeben darf.",
+    leistungen: [
+      "Prompt-Injection, Datenabfluss und unautorisierte Aktionen getestet",
+      "Nachvollziehbare Befunde statt anonymer Scanner-Liste",
+      "Konkrete Fixes und Nachkontrolle nach der Behebung",
+    ],
+    ergebnis: "Sicherheit, die Sie verstehen und belegen können, geprüft bevor es ein Angreifer tut.",
     farbeRgb: "56, 189, 248",
     akzentHex: "#38bdf8",
   },
   {
-    titel: "Security-Reviews",
-    nutzen: "Ein Blick aus der Angreifer-Perspektive auf Ihre Anwendung, bevor es jemand anderes versucht.",
+    titel: "Schatten-KI-Check",
+    nutzen: "Welche KI-Tools nutzen Ihre Mitarbeiter wirklich, und welche Daten fließen dabei ab? Sichtbar gemacht aus Ihren vorhandenen Logs, ohne neue Software im Netz.",
     leistungen: [
-      "Prüfung von Web-Apps und APIs auf reale Schwachstellen",
-      "Nachvollziehbare Befunde statt anonymer Scanner-Listen",
-      "Konkrete Handlungsempfehlung und Nachkontrolle nach dem Fix",
+      "Inventar der tatsächlichen KI-Nutzung aus Proxy-, DNS- und OAuth-Logs",
+      "Priorisierte Risiken statt Bauchgefühl",
+      "Maßnahmenplan als niedrigschwelliger Einstieg in KI-Governance",
     ],
-    ergebnis: "Sicherheit, die man versteht und belegen kann.",
-    farbeRgb: "148, 163, 184",
-    akzentHex: "#94a3b8",
-  },
-  {
-    titel: "Sichere App-Entwicklung",
-    nutzen: "Native iOS-Apps, von jemandem entwickelt, der Apps und APIs beruflich auch auf Schwachstellen prüft. So ist Sicherheit von Anfang an eingebaut, nicht nachträglich aufgesetzt.",
-    leistungen: [
-      "iOS-Entwicklung in Swift & SwiftUI, saubere MVVM-Architektur",
-      "Auth- und API-Anbindung, Sicherheit von Anfang an mitgedacht",
-      "Anbindung an KI-Funktionen und bestehende Backends",
-    ],
-    ergebnis: "Apps, die gut aussehen, und auch unter Druck halten.",
-    farbeRgb: "52, 211, 153",
-    akzentHex: "#34d399",
+    ergebnis: "Sie wissen, was läuft, und haben einen Plan, bevor daraus ein Datenleck wird.",
+    farbeRgb: "165, 180, 252",
+    akzentHex: "#a5b4fc",
   },
 ];
 

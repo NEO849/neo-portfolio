@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960" viewBox="0 0 720 960" fill="none" role="img" aria-label="ntfy-Alerting-Stack">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c1018"/><stop offset="1" stop-color="#070a12"/></linearGradient>
+<radialGradient id="glow" cx="30%" cy="22%" r="60%"><stop offset="0" stop-color="rgba(138,160,200,0.32)"/><stop offset="1" stop-color="rgba(138,160,200,0)"/></radialGradient>
+<pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" fill="none" stroke="rgba(255,255,255,0.045)" stroke-width="1"/></pattern>
+</defs>
+<rect width="720" height="960" fill="url(#bg)"/>
+<rect width="720" height="960" fill="url(#grid)"/>
+<rect width="720" height="960" fill="url(#glow)"/>
+<circle cx="610" cy="150" r="5" fill="#8aa0c8"/>
+<rect x="60" y="150" width="54" height="4" rx="2" fill="#8aa0c8"/>
+<text x="60" y="130" font-family="Manrope,Inter,system-ui,sans-serif" font-size="22" letter-spacing="4" fill="#8aa0c8" opacity="0.9">F3 · PROJEKT</text>
+<text x="60" y="396" font-family="Manrope,Inter,system-ui,sans-serif" font-size="58" font-weight="800" fill="#f2f5f9"><tspan x="60" dy="0"></tspan><tspan x="60" dy="64">ntfy-Alerting-Stack</tspan></text>
+<text x="60" y="466" font-family="Inter,system-ui,sans-serif" font-size="26" fill="rgba(255,255,255,0.6)">Self-hosted Alerting, ausfallresistent</text>
+<text x="60" y="880" font-family="ui-monospace,monospace" font-size="18" letter-spacing="2" fill="rgba(255,255,255,0.3)">f3-data-solutions.com</text>
+</svg>

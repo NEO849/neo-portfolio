@@ -25,6 +25,8 @@ import { SchliessenKnopf } from "./SchliessenKnopf";
 interface BilderLightboxProps {
   /** Das anzuzeigende Projekt — null/ohne Bilder = Overlay zu. */
   projekt: ProjektModel | null;
+  /** Start-Index, auf dem das Karussell öffnet (angeklicktes Vorschaubild). */
+  startIndex?: number;
   onSchliessen: () => void;
 }
 
@@ -32,7 +34,7 @@ interface BilderLightboxProps {
 const FOKUSSIERBAR =
   'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-export function BilderLightbox({ projekt, onSchliessen }: BilderLightboxProps) {
+export function BilderLightbox({ projekt, startIndex = 0, onSchliessen }: BilderLightboxProps) {
   const offen = !!projekt && (projekt.bilder?.length ?? 0) > 0;
   const panelRef = useRef<HTMLDivElement>(null);
   // Element, das vor dem Öffnen fokussiert war — bekommt den Fokus zurück.
@@ -172,6 +174,7 @@ export function BilderLightbox({ projekt, onSchliessen }: BilderLightboxProps) {
               <div className="overflow-y-auto px-5 sm:px-7 py-5 flex-1">
                 <PeekKarussell
                   eintraege={fotoEintraege}
+                  startIndex={startIndex}
                   ariaLabel={`Fotos von ${projekt.titel} durchblättern`}
                 />
               </div>
