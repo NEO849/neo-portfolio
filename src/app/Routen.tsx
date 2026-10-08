@@ -30,6 +30,8 @@ const OsintToolSeite  = lazyMitNeuversuch(() => import("../seiten/OsintToolSeite
 const KontaktSeite    = lazyMitNeuversuch(() => import("../seiten/KontaktSeite"));
 const VoiceDemoSeite  = lazyMitNeuversuch(() => import("../seiten/VoiceDemoSeite"));
 const BildergalerieSeite = lazyMitNeuversuch(() => import("../seiten/BildergalerieSeite"));
+const ImpressumSeite  = lazyMitNeuversuch(() => import("../seiten/ImpressumSeite"));
+const DatenschutzSeite = lazyMitNeuversuch(() => import("../seiten/DatenschutzSeite"));
 
 // Leitet die alte Galerie-Route "/projekte/:slug/bilder" dauerhaft auf den
 // neuen Deep-Link "/bilder/:slug" um (Lazy-Chunk-frei, kein extra Bundle).
@@ -141,6 +143,8 @@ export function Routen() {
           {/* Alt-Route dauerhaft auf den neuen Deep-Link umgeleitet */}
           <Route path="/projekte/:slug/bilder" element={<AlteGalerieUmleitung />} />
           <Route path="/security-programm" element={<SecurityProgrammSeite />} />
+          <Route path="/impressum"     element={<ImpressumSeite />} />
+          <Route path="/datenschutz"   element={<DatenschutzSeite />} />
           <Route path="*"              element={<NichtGefundenSeite />} />
         </Routes>
       </Suspense>

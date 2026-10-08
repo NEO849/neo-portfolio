@@ -27,9 +27,9 @@ export const CASE_STUDIES: CaseStudy[] = [
     vorgehen:
       "Ich habe untersucht, ob sich der Agent über präparierte Eingaben dazu bewegen lässt, seine Grenzen zu überschreiten, also Daten zu verwenden oder auszugeben, die zu einem anderen Nutzer gehören.",
     ergebnis:
-      "Der Agent liess sich zu einem Cross-User-Datenzugriff bringen: Informationen eines fremden Nutzers wurden preisgegeben. Der Fund wurde im Rahmen des Wettbewerbs anerkannt.",
+      "Der Agent liess sich zu einem Cross-User-Datenzugriff bringen: Informationen eines fremden Nutzers wurden preisgegeben. Der Zugriff liess sich nachweisen.",
     lehre:
-      "Genau diese Klasse von Fehlern (ein KI-System gibt Daten heraus, die es nicht herausgeben darf) prüfe ich heute bei Kundenlösungen, bevor sie in den Betrieb gehen.",
+      "Genau diese Klasse von Fehlern — ein KI-System gibt Daten heraus, die es nicht hergeben darf — prüfe ich in meinem KI-Sicherheits-Check, bevor eine Lösung in den Betrieb geht.",
     hinweis: "Anonymisiert. Konkreter Write-up und Nachweis auf Anfrage.",
     akzentHex: "#4f7cfb",
     farbeRgb: "79, 124, 251",
@@ -99,6 +99,6 @@ export const KEY_FALLSTUDIE = {
   nachweis:
     "Rein passiv belegbar: zwei öffentliche Abrufe und ein Vergleich des Schlüssel-Materials. Kein Eingriff in fremde Systeme, kein Zugriff auf Daten.",
   verantwortung:
-    "Verantwortungsvoll über das Bug-Bounty-Programm des Anbieters gemeldet und live bestätigt. Name und Details bleiben vertraulich, solange keine Offenlegung freigegeben ist.",
+    "Name und technische Details werden vertraulich behandelt und nur auf Anfrage unter Vertraulichkeit geteilt. Ohne freigegebene Offenlegung nenne ich weder Anbieter noch rekonstruierbare Einzelheiten.",
   norm: "Einordnung: CWE-693 (fehlende Trennung der Schutzmechanismen), NIST SP 800-57 (Schlüssel je Umgebung trennen).",
 } as const;

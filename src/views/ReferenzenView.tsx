@@ -58,7 +58,7 @@ export default function ReferenzenView() {
             ["Der Fund", KEY_FALLSTUDIE.fund],
             ["Warum das zählt", KEY_FALLSTUDIE.warum],
             ["Nachweis", KEY_FALLSTUDIE.nachweis],
-            ["Verantwortungsvoll gemeldet", KEY_FALLSTUDIE.verantwortung],
+            ["Vertraulichkeit", KEY_FALLSTUDIE.verantwortung],
             ["Einordnung", KEY_FALLSTUDIE.norm],
           ].map(([k, v]) => (
             <div key={k} className="rounded-2xl2 border border-white/[0.06] bg-white/[0.02] p-4">

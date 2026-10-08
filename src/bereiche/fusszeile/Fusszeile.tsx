@@ -117,8 +117,10 @@ export function Fusszeile() {
             <span className="text-akzent-400">© {aktuellesJahr()} {PERSOENLICH.name}</span>
             {". Alle Rechte vorbehalten"}
           </p>
-          <p className="text-xs text-white/60 font-mono">
-            Gebaut mit React · TypeScript · Framer Motion
+          <p className="text-xs text-white/60 font-mono flex items-center gap-3">
+            <Link to="/impressum" className="hover:text-akzent-400 transition-colors">Impressum</Link>
+            <span className="text-white/20">·</span>
+            <Link to="/datenschutz" className="hover:text-akzent-400 transition-colors">Datenschutz</Link>
           </p>
         </div>
       </div>

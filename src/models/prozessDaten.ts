@@ -70,7 +70,7 @@ export const PROZESS_PHASEN: ProzessPhase[] = [
       "Nachvollziehbare Befunde mit klarer Ampel statt Scanner-Liste",
       "Gefundene Lücken behoben und erneut gegengeprüft",
     ],
-    sicherheit: "Dies ist das Herzstück: derselbe Blick, mit dem ich fremde KI-Systeme in autorisierten Tests prüfe, angewandt auf Ihre Lösung, bevor ein Angreifer es tut.",
+    sicherheit: "Dies ist das Herzstück: derselbe Angreifer-Blick, mit dem ich in einem autorisierten KI-Sicherheits-Wettbewerb einen Cross-User-Datenzugriff gefunden habe, angewandt auf Ihre Lösung, bevor ein echter Angreifer es tut.",
     ergebnis: "Eine Lösung, deren Sicherheit Sie verstehen und belegen können.",
     istGate: true,
     akzentHex: "#4f7cfb",
